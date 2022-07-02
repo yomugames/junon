@@ -1,11 +1,9 @@
-const base64id = require('base64id')
-const SocketUtil = require("junon-common/socket_util")
-
 class PendingSector {
   constructor(server, sectorId, requestId, options = {}) {
     this.requestId = requestId
     this.sectorId = sectorId
     this.server = server
+    this.matchmaker = this.server.matchmaker
 
     this.options = {}
 
@@ -53,7 +51,7 @@ class PendingSector {
 
   onCreateSuccess(data) {
     this.queuedSockets.forEach((socket) => {
-      SocketUtil.emit(socket, "JoinMiniGameStatus", data)
+      this.matchmaker.socketUtil.emit(socket, "JoinMiniGameStatus", data)
     })
 
     this.remove()
@@ -61,7 +59,7 @@ class PendingSector {
 
   onCreateError(data) {
     this.queuedSockets.forEach((socket) => {
-      SocketUtil.emit(socket, "JoinMiniGameStatus", data)
+      this.matchmaker.socketUtil.emit(socket, "JoinMiniGameStatus", data)
     })
 
     this.remove()

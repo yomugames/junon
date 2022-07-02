@@ -1,5 +1,4 @@
 const Mobs = require("./mobs/index")
-const SocketUtil = require("junon-common/socket_util")
 const Protocol = require('../../common/util/protocol')
 const Constants = require('../../common/constants.json')
 const Raid = require("./raid")
@@ -12,6 +11,10 @@ class EventManager {
     this.eventsByTeam = {}
     this.pendingRaids = {}
     this.pendingMeteors = {}
+  }
+
+  getSocketUtil() {
+    return this.game.server.socketUtil
   }
 
   onHourChanged(hour) {
@@ -375,7 +378,7 @@ class EventManager {
         let team = meteor.team
 
         this.createMeteorShowerNear(team, meteor.chunk.row, meteor.chunk.col)
-        
+
         delete this.pendingMeteors[id]
       }
     }
@@ -483,8 +486,8 @@ class EventManager {
     if (this.getTeamEvent(team, Constants.Events.MeteorShower)) {
       return
     }
-    
-    let chunk 
+
+    let chunk
 
     if (options.row) {
       let chunkRow = Math.floor(options.row / Constants.chunkRowCount)
@@ -498,11 +501,11 @@ class EventManager {
 
     let id = this.game.generateEntityId()
     let occurTimestamp = this.game.timestamp + (Constants.physicsTimeStep * Constants.secondsPerHour)
-    let data = { 
-      id: id, 
+    let data = {
+      id: id,
       team: team,
-      occurTimestamp: occurTimestamp , 
-      chunk: chunk 
+      occurTimestamp: occurTimestamp ,
+      chunk: chunk
     }
 
     this.pendingMeteors[id] = data
@@ -525,11 +528,11 @@ class EventManager {
 
     let id = this.game.generateEntityId()
 
-    let data = { 
-      id: id, 
+    let data = {
+      id: id,
       team: team,
-      occurTimestamp: this.game.timestamp, 
-      chunk: chunk 
+      occurTimestamp: this.game.timestamp,
+      chunk: chunk
     }
 
     this.registerMeteor(data, team)
@@ -583,7 +586,7 @@ class EventManager {
       // remove existing spiders
       let spiders = this.getExistingSpiders()
 
-      spiders.forEach((spider) => { 
+      spiders.forEach((spider) => {
         spider.remove()
       })
 
@@ -647,7 +650,7 @@ class EventManager {
     if (eventData) {
       data.eventData = JSON.stringify(eventData)
     }
-    SocketUtil.emit(player.getSocket(), "Event", data)
+    this.getSocketUtil().emit(player.getSocket(), "Event", data)
   }
 
 

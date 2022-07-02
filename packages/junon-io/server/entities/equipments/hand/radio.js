@@ -3,7 +3,6 @@ const HandEquipment = require("./hand_equipment")
 const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
 const Projectiles = require("./../../projectiles/index")
-const SocketUtil = require("junon-common/socket_util")
 
 class Radio extends HandEquipment {
   use(player, targetEntity) {
@@ -28,9 +27,9 @@ class Radio extends HandEquipment {
       })
 
       player.game.forEachPlayer((targetPlayer) => {
-        SocketUtil.emit(targetPlayer.socket, "PlaySound", { id: Protocol.definition().SoundType.Alert })
+        this.getSocketUtil().emit(targetPlayer.socket, "PlaySound", { id: Protocol.definition().SoundType.Alert })
       })
-      
+
     } else {
       player.showError("No corpses nearby")
     }

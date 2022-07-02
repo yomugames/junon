@@ -35,7 +35,6 @@ const Projectiles = require("./projectiles/index")
 const PathFinder = require("./../ai/path_finder")
 const MapGenerator = require("./../util/map_generator")
 const FirebaseAdminHelper = require("../util/firebase_admin_helper")
-const SocketUtil = require("junon-common/socket_util")
 const Chunk = require("./chunk")
 const Helper = require('../../common/helper')
 const FovManager = require('../../common/entities/fov')
@@ -77,7 +76,7 @@ class Sector {
     this.id    = metadata.id || game.generateEntityId()
 
     this.uid = this.game.sectorUid || this.id.toString()
-    
+
     this.sector = this
     game.sector = this
     this.name = metadata.name
@@ -170,6 +169,10 @@ class Sector {
     }
   }
 
+  getSocketUtil() {
+    return this.game.server.socketUtil
+  }
+
   initObjectives() {
     if (debugMode) {
       if (this.game.origSectorUid === "eWC1CfZymRExY") {
@@ -192,11 +195,11 @@ class Sector {
 
   getBuildLimit(klassName) {
     if (!this.buildLimits.hasOwnProperty(klassName)) return 99999
-    return this.buildLimits[klassName] 
+    return this.buildLimits[klassName]
   }
 
   removeBuildLimit(klassName, limit) {
-    delete this.buildLimits[klassName] 
+    delete this.buildLimits[klassName]
   }
 
   addCommandBlockTimer(timer) {
@@ -227,7 +230,7 @@ class Sector {
 
   initCommandBlock(entities) {
     this.commandBlock = new CommandBlock(this)
-    
+
     let json
     try {
       if (this.canUseCommandBlocks()) {
@@ -241,7 +244,7 @@ class Sector {
     } else if (false) {
       this.commandBlock.applyData(this.getSampleCommandBlockJson())
     }
-    
+
     this.importCommandBlockToEventHandler()
   }
 
@@ -279,7 +282,7 @@ class Sector {
     if (!this.canUseCommandBlocks()) return
 
     if (this.isMiniGame()) {
-      if (!this.miniGame.shouldImportCommandBlock()) return 
+      if (!this.miniGame.shouldImportCommandBlock()) return
     }
 
     if (this.game.origSectorUid === "BPF0uFha5QLUr" ||
@@ -290,7 +293,7 @@ class Sector {
     } else {
       this.eventHandler.importFromCommandBlock(this.commandBlock)
     }
-    
+
   }
 
   findNewTeamSpawn(entities) {
@@ -329,7 +332,7 @@ class Sector {
     return {
       isEnabled: true,
       triggers: [
-        { 
+        {
           id: 1,
           event: "PlayerJoined",
           actions: [
@@ -398,17 +401,17 @@ class Sector {
       if (!this.miniGame.canCraftItem(type)) {
         return false
       }
-    } 
+    }
 
     return true
   }
 
   hasInfiniteAmmo() {
-    return this.settings['isInfiniteAmmo'] 
+    return this.settings['isInfiniteAmmo']
   }
 
   hasInfinitePower() {
-    return this.settings['isInfinitePower'] 
+    return this.settings['isInfinitePower']
   }
 
   shouldShowPlayerList() {
@@ -468,7 +471,7 @@ class Sector {
   }
 
   onButtonClicked(data) {
-    this.game.triggerEvent("ButtonClicked", data)  
+    this.game.triggerEvent("ButtonClicked", data)
   }
 
   renamePath(name, newName) {
@@ -590,7 +593,7 @@ class Sector {
   }
 
   showChatSuccess() {
-    
+
   }
 
   initGlobalVariables(entities) {
@@ -625,7 +628,7 @@ class Sector {
 
   setCustomMobStat(type, stats) {
     this.mobCustomStats[type] = stats
-    SocketUtil.broadcast(this.game.getSocketIds(), "CustomStats", {
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CustomStats", {
       group: "mobs",
       type: type,
       stats: stats
@@ -634,7 +637,7 @@ class Sector {
 
   setCustomBuildingStat(type, stats) {
     this.buildingCustomStats[type] = stats
-    SocketUtil.broadcast(this.game.getSocketIds(), "CustomStats", {
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CustomStats", {
       group: "buildings",
       type: type,
       stats: stats
@@ -643,7 +646,7 @@ class Sector {
 
   setCustomItemStat(type, stats) {
     this.itemCustomStats[type] = stats
-    SocketUtil.broadcast(this.game.getSocketIds(), "CustomStats", {
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CustomStats", {
       group: "items",
       type: type,
       stats: stats
@@ -652,7 +655,7 @@ class Sector {
 
   setCustomEntityStat(id, stats) {
     this.entityCustomStats[id] = stats
-    SocketUtil.broadcast(this.game.getSocketIds(), "CustomStats", {
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CustomStats", {
       group: "entities",
       type: id,
       stats: stats
@@ -705,7 +708,7 @@ class Sector {
     let group = klass.prototype.isMob() ? "mob" : "item"
     this.purchasables[klass.prototype.getTypeName()] = { group: group, type: klass.prototype.getType(), cost: cost }
 
-    SocketUtil.broadcast(this.game.getSocketIds(), "SellableUpdated", this.getSellableData())
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "SellableUpdated", this.getSellableData())
   }
 
   hasPurchasable(klass) {
@@ -714,7 +717,7 @@ class Sector {
 
   deletePurchasable(klass) {
     delete this.purchasables[klass.prototype.getTypeName()]
-    SocketUtil.broadcast(this.game.getSocketIds(), "SellableUpdated", this.getSellableData())
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "SellableUpdated", this.getSellableData())
   }
 
   setCustomSell(isCustomSell) {
@@ -723,14 +726,14 @@ class Sector {
   }
 
   onCustomSellChanged() {
-    SocketUtil.broadcast(this.game.getSocketIds(), "SellableUpdated", this.getSellableData())
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "SellableUpdated", this.getSellableData())
   }
 
   setSellable(klass, cost, itemName) {
     let group = klass.prototype.isMob() ? "mob" : "item"
     this.sellables[klass.prototype.getTypeName()] = { group: group, type: klass.prototype.getType(), cost: cost, itemName: itemName }
 
-    SocketUtil.broadcast(this.game.getSocketIds(), "SellableUpdated", this.getSellableData())
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "SellableUpdated", this.getSellableData())
   }
 
   getSellableData() {
@@ -747,7 +750,7 @@ class Sector {
 
   deleteSellable(klass) {
     delete this.sellables[klass.prototype.getTypeName()]
-    SocketUtil.broadcast(this.game.getSocketIds(), "SellableUpdated", this.getSellableData())
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "SellableUpdated", this.getSellableData())
   }
 
   getActivityLogs(teamId) {
@@ -778,7 +781,7 @@ class Sector {
       this.settings[key] = value
       this.onSettingChanged(key, value)
 
-      SocketUtil.broadcast(this.game.getSocketIds(), "SectorUpdated", {
+      this.getSocketUtil().broadcast(this.game.getSocketIds(), "SectorUpdated", {
         settings: this.settings
       })
     }
@@ -854,7 +857,7 @@ class Sector {
   initPrivacy() {
     let sectorModel = this.game.sectorModel
     if (sectorModel) {
-      if (!this.isMiniGame()) { 
+      if (!this.isMiniGame()) {
         // minigame has its own privacy status. public by default
         this.isPrivate = sectorModel.isPrivate
       }
@@ -894,7 +897,7 @@ class Sector {
 
   onVoteChanged() {
     if (this.isMiniGame()) return
-      
+
     // after 2 second.. sum total upvote/downvote from votes and cache values in sector..
     // prevent autoclicker spam sql
     clearTimeout(this.cacheVoteTimeout)
@@ -931,7 +934,7 @@ class Sector {
         upvoteCount: upvoteCount,
         downvoteCount: downvoteCount,
         rating: rating
-      }, { 
+      }, {
         where: { uid: this.getUid() }
       })
     } catch(e) {
@@ -985,12 +988,12 @@ class Sector {
     this.sectorBans = await SectorBan.findAll({ where: { sectorUid: this.getUid() } })
     this.sectorBans = this.sectorBans.map((sectorBan) => { return sectorBan.dataValues })
 
-    SocketUtil.broadcast(this.game.getSocketIds(), "SectorUpdated", {
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "SectorUpdated", {
       sectorBans: this.sectorBans
     })
   }
 
-  async fetchFavoriteCount() { 
+  async fetchFavoriteCount() {
     let newFavoriteCount = await Favorite.count({
       where: {
         sectorUid: this.getUid()
@@ -1045,7 +1048,7 @@ class Sector {
   }
 
   getBuildOwner() {
-    return this.getCreatorTeam()    
+    return this.getCreatorTeam()
   }
 
   setName(name) {
@@ -1648,8 +1651,8 @@ class Sector {
   }
 
   addVote(player, data) {
-    this.voteManager.addVote({ 
-      sourcePlayerId: player.getId(), 
+    this.voteManager.addVote({
+      sourcePlayerId: player.getId(),
       targetPlayerId: data.targetPlayerId
     })
   }
@@ -1684,7 +1687,7 @@ class Sector {
 
     let buildingKlass = Buildings.forType(data.type)
     if (!buildingKlass) return null
-      
+
     let building = buildingKlass.build(data, this)
     if (building.dontBuild) return null
 
@@ -1748,18 +1751,18 @@ class Sector {
   }
 
   setBuildSpeed(buildSpeed) {
-    if (isNaN(buildSpeed)) return 
+    if (isNaN(buildSpeed)) return
     if (buildSpeed < 1 || buildSpeed > 5) return
 
     this.buildSpeed = buildSpeed
 
-    SocketUtil.broadcast(this.game.getSocketIds(), "SectorUpdated", {
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "SectorUpdated", {
       buildSpeed: this.buildSpeed
     })
   }
 
   setMiningSpeed(miningSpeed) {
-    if (isNaN(miningSpeed)) return 
+    if (isNaN(miningSpeed)) return
     if (miningSpeed < 1 || miningSpeed > 5) return
 
     this.miningSpeed = miningSpeed
@@ -1782,7 +1785,7 @@ class Sector {
     this.undergroundVents = {}
     this.objectives = {}
     this.changedPlayers = {}
-    this.permissions = {} 
+    this.permissions = {}
     this.loadSectorStep = 0
     this.eating = {}
     this.sleeping = {}
@@ -1832,12 +1835,12 @@ class Sector {
   }
 
   removeCameraFeed(camera) {
-    delete this.cameraFeeds[camera.id] 
+    delete this.cameraFeeds[camera.id]
     this.onCameraFeedsChanged()
   }
 
   onCameraFeedsChanged() {
-    SocketUtil.broadcast(this.game.getSocketIds(), "CameraFeedUpdated", { cameraFeeds: this.cameraFeeds })
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CameraFeedUpdated", { cameraFeeds: this.cameraFeeds })
   }
 
   getOccupancyPercentage() {
@@ -1854,7 +1857,7 @@ class Sector {
     let text = user.name + ": " + msg
     this.terminalMessages.push(text)
 
-    SocketUtil.broadcast(this.game.getSocketIds(), "TerminalUpdated", { message: text })
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "TerminalUpdated", { message: text })
   }
 
   incrementDirtCount() {
@@ -1952,7 +1955,7 @@ class Sector {
 
   removeSpawnPoint(key, beacon) {
     this.spawnPoints[key] = this.spawnPoints[key] || {}
-    delete this.spawnPoints[key][beacon.getCoord()] 
+    delete this.spawnPoints[key][beacon.getCoord()]
   }
 
   addUndergroundVent(vent) {
@@ -2387,12 +2390,12 @@ class Sector {
   }
 
   createRock(row, col) {
-    new Terrains.Rock(this, row, col) 
+    new Terrains.Rock(this, row, col)
   }
 
   createTerrain(klassName, row, col) {
     let klass = Terrains[klassName]
-    new klass(this, row, col) 
+    new klass(this, row, col)
   }
 
   createChaserEvent() {
@@ -2705,7 +2708,7 @@ class Sector {
   }
 
   spawnProjectile(options) {
-    const klassName = this.klassifySnakeCase(options.type) 
+    const klassName = this.klassifySnakeCase(options.type)
     const caller = options.caller
     let x = options.x
     let y = options.y
@@ -2762,7 +2765,7 @@ class Sector {
         return []
       }
     }
-    
+
     if (mobKlass.prototype.hasCategory('bot') && caller && caller.isPlayer()) {
       if (caller.getTeam().isBotLimitReached(count)) {
         caller.showError("Bot Limit Reached")
@@ -2802,7 +2805,7 @@ class Sector {
   }
 
   getMobCount() {
-    return Object.keys(this.mobs).length   
+    return Object.keys(this.mobs).length
   }
 
   getMaxMobCount() {
@@ -3153,7 +3156,7 @@ class Sector {
 
   cleanupCorpses() {
     if (this.game.isPeaceful() || this.game.isMiniGame()) return
-      
+
     const isOneMinuteInterval = this.game.timestamp % (Constants.physicsTimeStep * 60) === 0
     if (!isOneMinuteInterval) return
 
@@ -3454,7 +3457,7 @@ class Sector {
 
   getHostileMobCount() {
     let count = 0
-    
+
     for (let id in this.mobs) {
       let mob = this.mobs[id]
       if (mob.status === Protocol.definition().MobStatus.Hostile) {

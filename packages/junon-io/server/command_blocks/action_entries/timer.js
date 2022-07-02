@@ -1,6 +1,5 @@
 const Command = require("../command")
 const ActionEntry = require("./action_entry")
-const SocketUtil = require("junon-common/socket_util")
 
 class Timer extends ActionEntry {
   static create(parent, data) {
@@ -31,7 +30,7 @@ class Timer extends ActionEntry {
     this.timer = { name: "Timer", duration: 10, every: 1 }
 
     if (data.timer) {
-      this.timer.name = data.timer.name 
+      this.timer.name = data.timer.name
       this.setDuration(data.timer.duration)
       this.setEvery(data.timer.every)
     }
@@ -76,7 +75,7 @@ class Timer extends ActionEntry {
   }
 
   onValueChanged(key, value) {
-    SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", { 
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
       operation: "edit",
       id: this.id,
       value: [key, value].join(":")
@@ -86,7 +85,7 @@ class Timer extends ActionEntry {
   }
 
   remove() {
-    super.remove() 
+    super.remove()
     this.game.sector.removeCommandBlockTimer(this)
   }
 

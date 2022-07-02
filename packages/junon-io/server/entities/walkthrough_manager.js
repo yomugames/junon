@@ -1,6 +1,5 @@
 const Constants = require('../../common/constants.json')
 const Protocol = require('../../common/util/protocol')
-const SocketUtil = require("junon-common/socket_util")
 
 class WalkthroughManager {
   constructor(player) {
@@ -8,6 +7,10 @@ class WalkthroughManager {
     this.index = 1
 
     this.initSteps()
+  }
+
+  getSocketUtil() {
+    return this.player.getSocketUtil()
   }
 
   initSteps() {
@@ -69,7 +72,7 @@ class WalkthroughManager {
         // mobile
         this.firstMoveTimestamp = this.player.game.timestamp
       }
-    } 
+    }
 
     if ((this.player.game.timestamp - this.firstMoveTimestamp) > (Constants.physicsTimeStep * 2)) {
       this.nextStep()
@@ -226,7 +229,7 @@ class WalkthroughManager {
     let isEndOfTutorial = !stepName
     if (isEndOfTutorial) stepName = "end"
 
-    SocketUtil.emit(this.player.getSocket(), "WalkthroughUpdated", { index: this.index, step: stepName })
+    this.getSocketUtil().emit(this.player.getSocket(), "WalkthroughUpdated", { index: this.index, step: stepName })
   }
 
 }

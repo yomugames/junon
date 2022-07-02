@@ -1,6 +1,5 @@
 const HandEquipment = require("./hand_equipment")
 const Projectiles = require("./../../projectiles/index")
-const SocketUtil = require("junon-common/socket_util")
 
 const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")

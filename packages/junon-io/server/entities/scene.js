@@ -1,31 +1,34 @@
 const Helper = require('../../common/helper')
-const SocketUtil = require("junon-common/socket_util")
 const SceneAction = require("./scene_action")
 const Constants = require('../../common/constants.json')
 
 class Scene {
   constructor(game, name) {
     this.game = game
-    this.name = name  
+    this.name = name
     this.sector = game.sector
 
-    this.timeline = {} 
+    this.timeline = {}
     this.seconds = 0
 
     this.register()
   }
 
+  getSocketUtil() {
+    return this.game.server.socketUtil
+  }
+
   setCamera(object) {
     if (object.hasOwnProperty("row")) {
-      object.x = object.col * Constants.tileSize 
-      object.y = object.row * Constants.tileSize 
+      object.x = object.col * Constants.tileSize
+      object.y = object.row * Constants.tileSize
 
-      object.getX = function() { 
-        return object.col * Constants.tileSize 
+      object.getX = function() {
+        return object.col * Constants.tileSize
       }
 
-      object.getY = function() { 
-        return object.row * Constants.tileSize 
+      object.getY = function() {
+        return object.row * Constants.tileSize
       }
     }
     this.camera = object
@@ -61,7 +64,7 @@ class Scene {
   }
 
   play(options = {}) {
-    this.origFovMode = this.sector.settings["isFovMode"] 
+    this.origFovMode = this.sector.settings["isFovMode"]
     this.sector.editSetting("isFovMode", false)
 
     if (options.camera) {
@@ -86,7 +89,7 @@ class Scene {
     this.game.forEachPlayer((player) => {
       this.sendCameraTargetToClient(player)
       player.setCameraFocusTarget(this.camera)
-      SocketUtil.emit(player.getSocket(), "StartScene", { name: this.name })
+      this.getSocketUtil().emit(player.getSocket(), "StartScene", { name: this.name })
     })
   }
 
@@ -126,7 +129,7 @@ class Scene {
     entityData[this.camera.getEntityGroup] = {}
     entityData[this.camera.getEntityGroup][this.camera.getId()] = this.camera
 
-    SocketUtil.emit(player.getSocket(), "EntityUpdated", entityData)
+    this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", entityData)
   }
 
   onFinished() {
@@ -137,7 +140,7 @@ class Scene {
 
     this.game.forEachPlayer((player) => {
       player.resetCameraFocusTarget()
-      SocketUtil.emit(player.getSocket(), "EndScene", { name: this.name })
+      this.getSocketUtil().emit(player.getSocket(), "EndScene", { name: this.name })
       if (this.sector.settings["isFovMode"]) {
         if (!player.isDestroyed()) {
           player.assignFov()
@@ -148,7 +151,7 @@ class Scene {
     this.game.triggerEvent("scene:" + this.name + ":end")
   }
 
-  setDuration(duration) { 
+  setDuration(duration) {
     this.duration = duration
   }
 

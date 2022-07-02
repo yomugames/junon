@@ -1,14 +1,20 @@
-const SocketUtil = require("junon-common/socket_util")
-
 class Sidebar {
   constructor(player, options = {}) {
     this.game = options.game
     this.player = player
     this.title = null
     this.rows = {}
-    this.scoreBoardRow = null 
+    this.scoreBoardRow = null
 
     this.MAX_ROW_COUNT = 16
+  }
+
+  getSocketUtil() {
+    if (this.player) {
+      return this.player.game.server.socketUtil
+    } else {
+      return this.game.server.socketUtil
+    }
   }
 
   isGlobal() {
@@ -75,7 +81,7 @@ class Sidebar {
 
   hideScoreboard() {
     let maxRow = this.scoreBoardRow + this.MAX_ROW_COUNT
-    
+
     for (var row = this.scoreBoardRow; row < maxRow; row++) {
       if (typeof this.rows[row] !== 'undefined') {
         this.rows[row] = ''
@@ -94,19 +100,19 @@ class Sidebar {
     data[options.row] = options.text
     this.onSidebarUpdated({ rows: data })
   }
-  
+
   onSidebarUpdated(options = {}) {
     if (this.isGlobal()) {
       this.game.forEachPlayer((player) => {
-        SocketUtil.emit(player.getSocket(), "SidebarUpdated", options)
+        this.getSocketUtil().emit(player.getSocket(), "SidebarUpdated", options)
       })
     } else {
-      SocketUtil.emit(this.player.getSocket(), "SidebarUpdated", options)
+      this.getSocketUtil().emit(this.player.getSocket(), "SidebarUpdated", options)
     }
   }
 
   emitContentsToPlayer(player) {
-    SocketUtil.emit(player.getSocket(), "SidebarUpdated", { rows: this.rows })
+    this.getSocketUtil().emit(player.getSocket(), "SidebarUpdated", { rows: this.rows })
   }
 
   broadcastContents() {
@@ -114,7 +120,7 @@ class Sidebar {
 
     this.game.forEachPlayer((player) => {
       this.emitContentsToPlayer(player)
-    }) 
+    })
   }
 
   getMaxRow() {

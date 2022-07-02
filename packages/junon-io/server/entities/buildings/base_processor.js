@@ -1,5 +1,4 @@
 const BaseBuilding = require("./base_building")
-const SocketUtil = require("junon-common/socket_util")
 const Constants = require('../../../common/constants.json')
 
 class BaseProcessor extends BaseBuilding {
@@ -52,7 +51,7 @@ class BaseProcessor extends BaseBuilding {
 
   notifyViewSubscribers() {
     Object.values(this.getViewSubscribers()).forEach((viewSubscriber) => {
-      SocketUtil.emit(viewSubscriber.getSocket(), "RenderStorage", {
+      this.getSocketUtil().emit(viewSubscriber.getSocket(), "RenderStorage", {
         id: this.id,
         inventory: this,
         progress: this.getProgressPercentage()
@@ -77,7 +76,7 @@ class BaseProcessor extends BaseBuilding {
       if (outputItem) {
         this.storeAt(this.getOutputStorageIndex(), outputItem)
       }
-      
+
 
       if (inputItem) {
         inputItem.consume()

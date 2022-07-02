@@ -2,7 +2,6 @@ const SurvivalTool = require("./survival_tool")
 
 const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
-const SocketUtil = require("junon-common/socket_util")
 const ExceptionReporter = require('junon-common/exception_reporter')
 
 class Drill extends SurvivalTool {

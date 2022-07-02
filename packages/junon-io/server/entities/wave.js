@@ -1,6 +1,5 @@
 const Constants = require('../../common/constants.json')
 const Mobs = require("./mobs/index")
-const SocketUtil = require("junon-common/socket_util")
 const Blueprint = require("./blueprint")
 const Ship = require("./ship")
 
@@ -18,6 +17,10 @@ class Wave {
 
     this.ships = {}
     this.mobs = {}
+  }
+
+  getSocketUtil() {
+    return this.game.server.socketUtil
   }
 
   getSector() {
@@ -60,7 +63,7 @@ class Wave {
       timeout += 7500
     }
 
-    SocketUtil.emit(this.player.socket, "WaveLevel", { level: this.level })
+    this.getSocketUtil().emit(this.player.socket, "WaveLevel", { level: this.level })
     this.increaseLevel()
   }
 

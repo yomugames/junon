@@ -8,7 +8,6 @@ const Protocol = require('../../common/util/protocol')
 const p2 = require('p2')
 const Constants = require('../../common/constants.json')
 const Movable = require('../../common/interfaces/movable')
-const SocketUtil = require("junon-common/socket_util")
 const Destroyable = require('../../common/interfaces/destroyable')
 const Container = require('../../common/interfaces/container')
 const RoomManager = require("./networks/room_manager")
@@ -344,7 +343,7 @@ class Ship extends BaseEntity {
     this.pilot.isOnStarMap = true
     this.pilot.controlKeys = 0
     this.pilot.setSector(null)
-    SocketUtil.emit(this.pilot.getSocket(), "ShowStarMap", { })
+    this.getSocketUtil().emit(this.pilot.getSocket(), "ShowStarMap", { })
   }
 
 
@@ -995,7 +994,7 @@ class Ship extends BaseEntity {
     let floodFillManager = this.getFloodFillManager()
 
     let vertices = []
-    
+
     floodFillManager.floodFill(platform.getRow(), platform.getCol(), {}, (tile, neighbors, sourceHit) => {
       if (neighbors.length === 2) {
         vertices.push(tile)

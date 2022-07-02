@@ -13,7 +13,6 @@ const Owner = require('../../common/interfaces/owner')
 const Needs = require('../../common/interfaces/needs')
 const Protocol = require('../../common/util/protocol')
 const Helper = require('../../common/helper')
-const SocketUtil = require("junon-common/socket_util")
 const BaseEntity = require('./base_entity')
 const Buildings = require("./buildings/index")
 const Terrains = require("./terrains/index")
@@ -96,7 +95,7 @@ class Player extends BaseEntity {
   canEditCommandBlock() {
     if (this.sector.isLobby()) return true
     if (!this.sector.canUseCommandBlocks()) return false
-      
+
     return this.isSectorOwner()
   }
 
@@ -113,7 +112,7 @@ class Player extends BaseEntity {
     if (!user) return
 
     let accountBalance = user.gold || 0
-    SocketUtil.emit(this.socket, "AccountBalance", { balance: accountBalance })
+    this.getSocketUtil().emit(this.socket, "AccountBalance", { balance: accountBalance })
   }
 
   onStorageChanged(storage) {
@@ -152,7 +151,7 @@ class Player extends BaseEntity {
         this.sector.decreaseUpvote()
         isRemoved = true
 
-        this.game.triggerEvent("ColonyUnlike", { 
+        this.game.triggerEvent("ColonyUnlike", {
           player: this.name
         })
       } else if (voteRecord.downvote === 1) {
@@ -160,13 +159,13 @@ class Player extends BaseEntity {
         this.sector.decreaseDownvote()
         this.sector.increaseUpvote()
 
-        this.game.triggerEvent("ColonyLike", { 
+        this.game.triggerEvent("ColonyLike", {
           player: this.name
         })
       } else {
         await voteRecord.update({ upvote: 1 })
         this.sector.increaseUpvote()
-        this.game.triggerEvent("ColonyLike", { 
+        this.game.triggerEvent("ColonyLike", {
           player: this.name
         })
       }
@@ -175,14 +174,14 @@ class Player extends BaseEntity {
       if (sectorModel) {
         await Vote.createOne({ userUid: this.getUid(), sectorUid: sectorId, upvote: 1 })
         this.sector.increaseUpvote()
-        this.game.triggerEvent("ColonyLike", { 
+        this.game.triggerEvent("ColonyLike", {
           player: this.name
         })
       }
     }
 
     if (this.sector.getUid() === sectorId) {
-      SocketUtil.broadcast(this.game.getSocketIds(), "FavoriteUpdated", {
+      this.getSocketUtil().broadcast(this.game.getSocketIds(), "FavoriteUpdated", {
         upvoteCount: this.sector.upvoteCount,
         userUid: this.getUid(),
         isRemoved: isRemoved
@@ -202,7 +201,7 @@ class Player extends BaseEntity {
 
   async performToggleDownvote(sectorId) {
     if (this.game.isMiniGame()) return
-      
+
     if (this.sector.getUid() === sectorId) {
       if (this.sector.isLobby()) return
       if (this.sector.game.isCreatedByAnonynmous()) return
@@ -230,7 +229,7 @@ class Player extends BaseEntity {
     }
 
     if (this.sector.getUid() === sectorId) {
-      // SocketUtil.broadcast(this.game.getSocketIds(), "SectorUpdated", {
+      // this.getSocketUtil().broadcast(this.game.getSocketIds(), "SectorUpdated", {
       //   upvoteCount: this.sector.upvoteCount,
       //   downvoteCount: this.sector.downvoteCount
       // })
@@ -270,7 +269,7 @@ class Player extends BaseEntity {
 
     if (this.sector.getUid() === sectorId) {
       await this.sector.fetchFavoriteCount()
-      SocketUtil.broadcast(this.game.getSocketIds(), "FavoriteUpdated", {
+      this.getSocketUtil().broadcast(this.game.getSocketIds(), "FavoriteUpdated", {
         favoriteCount: this.sector.favoriteCount,
         userUid: this.getUid(),
         isRemoved: isRemoved
@@ -291,7 +290,7 @@ class Player extends BaseEntity {
   }
 
   emitSocket(eventName, data) {
-    SocketUtil.emit(this.getSocket(), eventName, data)
+    this.getSocketUtil().emit(this.getSocket(), eventName, data)
   }
 
   setRegionVisible(isRegionVisible) {
@@ -325,7 +324,7 @@ class Player extends BaseEntity {
   assignObjective(objective) {
     this.objectives[objective.name] = objective
 
-    SocketUtil.emit(this.socket, "Objective", { name: objective.name, description: objective.description, translations: objective.translations })
+    this.getSocketUtil().emit(this.socket, "Objective", { name: objective.name, description: objective.description, translations: objective.translations })
   }
 
   unassignObjectives() {
@@ -491,7 +490,7 @@ class Player extends BaseEntity {
   }
 
   isImmuneTo(category) {
-    if (this.isDestroyed() && category === 'miasma') return true 
+    if (this.isDestroyed() && category === 'miasma') return true
 
     return super.isImmuneTo(category)
   }
@@ -514,7 +513,7 @@ class Player extends BaseEntity {
     if (!this.game.isMiniGame()) {
       let sectorModel = await SectorModel.findOne({ where: { uid: this.sector.getUid() }})
       if (sectorModel) {
-        data["currentSectorUid"] = sectorModel.uid 
+        data["currentSectorUid"] = sectorModel.uid
       }
     }
 
@@ -527,7 +526,7 @@ class Player extends BaseEntity {
 
   isGameDev() {
     return this.uid === 'jEleFj7LAVhfv8FwLEKejEj6ESx2' ||
-           this.uid === '8LuO6XRih2dRNfvtjaS2TwnLWzm1' 
+           this.uid === '8LuO6XRih2dRNfvtjaS2TwnLWzm1'
   }
 
   createSurvivalTool() {
@@ -542,7 +541,7 @@ class Player extends BaseEntity {
     if (this.game.isPvP() && roleType === Team.GuestRoleType) {
       return
     }
-    
+
     if (this.roleType !== roleType) {
       let prevRoleType = this.roleType
       this.roleType = roleType
@@ -581,7 +580,7 @@ class Player extends BaseEntity {
   }
 
   onRoleAssigned() {
-    let role = this.getRole()    
+    let role = this.getRole()
     if (role && role.hasKit()) {
       this.game.giveKit(role.kitName, this)
     }
@@ -611,14 +610,14 @@ class Player extends BaseEntity {
       this.tutorialIndex["main"] = 1
     }
 
-    this.game.sendToMatchmaker({ event: "PlayerJoin", 
-      data: { 
-        playerRemoteAddress: this.getRemoteAddress(), 
+    this.game.sendToMatchmaker({ event: "PlayerJoin",
+      data: {
+        playerRemoteAddress: this.getRemoteAddress(),
         fingerprint: this.fingerprint,
-        host: this.game.server.getHost(), 
-        region: this.game.getRegion(), 
-        sectorUid: this.game.sectorUid 
-      } 
+        host: this.game.server.getHost(),
+        region: this.game.getRegion(),
+        sectorUid: this.game.sectorUid
+      }
     })
   }
 
@@ -662,7 +661,7 @@ class Player extends BaseEntity {
   }
 
   onAccountBalanceChanged(balance) {
-    SocketUtil.emit(this.socket, "AccountBalance", { balance: balance })
+    this.getSocketUtil().emit(this.socket, "AccountBalance", { balance: balance })
   }
 
   async depositAccount(gold) {
@@ -689,7 +688,7 @@ class Player extends BaseEntity {
 
     this.onAccountBalanceChanged(newBalance)
   }
-  
+
   initCommands() {
     this.commands = {}
     this.commands["spawnpet"] = this.spawnPet.bind(this)
@@ -769,7 +768,7 @@ class Player extends BaseEntity {
     }
 
     if (flowField) {
-      SocketUtil.emit(this.socket, "FlowField", flowField.toJson())
+      this.getSocketUtil().emit(this.socket, "FlowField", flowField.toJson())
     }
   }
 
@@ -792,7 +791,7 @@ class Player extends BaseEntity {
 
   flow(args) {
     if (!this.isAdminMode) return
-      
+
     if (!args[0]) {
       this.showChatError("/flow [entity_id]")
       return
@@ -810,7 +809,7 @@ class Player extends BaseEntity {
 
     if (flowField) {
       this.sector.pathFinder.addFlowSubscription(flowField, this)
-      SocketUtil.emit(this.socket, "FlowField", flowField.toJson())
+      this.getSocketUtil().emit(this.socket, "FlowField", flowField.toJson())
     }
   }
 
@@ -843,7 +842,7 @@ class Player extends BaseEntity {
       }
 
 
-      SocketUtil.emit(this.socket, "UpdateChunkRegionPath", { chunkRegionPaths: json })
+      this.getSocketUtil().emit(this.socket, "UpdateChunkRegionPath", { chunkRegionPaths: json })
     }
   }
 
@@ -853,7 +852,7 @@ class Player extends BaseEntity {
         type: "room",
         data: JSON.stringify(room.pressureNetwork.toDebugJson()),
       }
-      SocketUtil.emit(this.socket, "RenderDebug", data)
+      this.getSocketUtil().emit(this.socket, "RenderDebug", data)
     }
   }
 
@@ -861,7 +860,7 @@ class Player extends BaseEntity {
     if (!this.isAdminMode) return
 
     if (!args[0]) {
-      SocketUtil.emit(this.socket, "ServerChat", { message: "%error%/gold [amount]" })
+      this.getSocketUtil().emit(this.socket, "ServerChat", { message: "%error%/gold [amount]" })
       return
     }
 
@@ -905,14 +904,14 @@ class Player extends BaseEntity {
     this.isAdminMode = !this.isAdminMode
     this.showChatSuccess("admin mode: " + (this.isAdminMode ? "ON" : "OFF" ))
 
-    SocketUtil.emit(this.socket, "SetAdmin", { isAdminMode: this.isAdminMode })
+    this.getSocketUtil().emit(this.socket, "SetAdmin", { isAdminMode: this.isAdminMode })
   }
 
   enableAdmin() {
     this.isAdminMode = !this.isAdminMode
     this.showChatSuccess("admin mode: " + (this.isAdminMode ? "ON" : "OFF" ))
 
-    SocketUtil.emit(this.socket, "SetAdmin", { isAdminMode: this.isAdminMode })
+    this.getSocketUtil().emit(this.socket, "SetAdmin", { isAdminMode: this.isAdminMode })
   }
 
   isConnected() {
@@ -928,7 +927,7 @@ class Player extends BaseEntity {
       }
       this.possessId = null
     }
-    
+
     if (!this.ghost) {
       this.ghost = new Mobs.Ghost(this.sector, { x: this.getCameraFocusTarget().getX(), y: this.getCameraFocusTarget().getY() })
       this.ghost.master = this
@@ -968,7 +967,7 @@ class Player extends BaseEntity {
 
     const hour = parseInt(args[0])
     if (isNaN(hour) || hour < 0 || hour > 23 ) {
-      SocketUtil.emit(this.socket, "ServerChat", { message: "%error%hour must be a number from 0-23" })
+      this.getSocketUtil().emit(this.socket, "ServerChat", { message: "%error%hour must be a number from 0-23" })
     }
 
     this.sector.setTime({ player: this, hour: hour })
@@ -982,7 +981,7 @@ class Player extends BaseEntity {
     if (!this.isAdminMode) return
 
     if (!args[0]) {
-      SocketUtil.emit(this.socket, "ServerChat", { message: "%error%/spawnpet [type] [count] [x] [y]" })
+      this.getSocketUtil().emit(this.socket, "ServerChat", { message: "%error%/spawnpet [type] [count] [x] [y]" })
       return
     }
 
@@ -1102,14 +1101,14 @@ class Player extends BaseEntity {
 
     for (let id in this.sector.screenshots) {
       this.getTeam().forEachMember((player) => {
-        SocketUtil.emit(player.getSocket(), "ScreenshotUpdated", { id: id, clientMustDelete: true })
+        this.getSocketUtil().emit(player.getSocket(), "ScreenshotUpdated", { id: id, clientMustDelete: true })
       })
     }
 
     let screenshotId = await this.sector.replaceScreenshot(data, this)
     if (screenshotId) {
       this.getTeam().forEachMember((player) => {
-        SocketUtil.emit(player.getSocket(), "ScreenshotUpdated", { id: screenshotId, position: data.position })
+        this.getSocketUtil().emit(player.getSocket(), "ScreenshotUpdated", { id: screenshotId, position: data.position })
       })
 
       this.lastScreenshotTaken = Date.now()
@@ -1125,7 +1124,7 @@ class Player extends BaseEntity {
 
     await this.sector.removeScreenshot(data.id, this)
     this.getTeam().forEachMember((player) => {
-      SocketUtil.emit(player.getSocket(), "ScreenshotUpdated", { id: data.id, clientMustDelete: true })
+      this.getSocketUtil().emit(player.getSocket(), "ScreenshotUpdated", { id: data.id, clientMustDelete: true })
     })
   }
 
@@ -1212,7 +1211,7 @@ class Player extends BaseEntity {
       if (approvers.length > 0) {
         this.teamRequests[team.id] = true
         approvers.forEach((approver) => {
-          SocketUtil.emit(approver.getSocket(), "TeamRequest", { playerId: this.getId(), playerName: this.getName() })
+          this.getSocketUtil().emit(approver.getSocket(), "TeamRequest", { playerId: this.getId(), playerName: this.getName() })
         })
       }
     }
@@ -1284,7 +1283,7 @@ class Player extends BaseEntity {
      if (!klass) return 0
      return this.inventory.getItemCount(klass.prototype.getType())
   }
-  
+
 
   initEquipment() {
     this.equipments = new EquipmentInventory(this, 4)
@@ -1381,7 +1380,7 @@ class Player extends BaseEntity {
       let stackableIndex = destinationStorage.getStackableSpaceIndex(sourceItem.type, 0)
       if (stackableIndex >= 0) {
         let destinationItem = destinationStorage.get(stackableIndex)
-        // increment/decrement stack  
+        // increment/decrement stack
         let maxStackableIncrement = destinationItem.getMaxStack() - destinationItem.count
         let sourceReductionAmount = sourceItem.count > maxStackableIncrement ? maxStackableIncrement : sourceItem.count
         sourceItem.setCount(sourceItem.count - sourceReductionAmount)
@@ -1402,11 +1401,11 @@ class Player extends BaseEntity {
   }
 
   triggerStorageGet(sourceStorage, sourceItem, sourceReductionAmount) {
-    this.game.triggerEvent("StorageGet", { 
+    this.game.triggerEvent("StorageGet", {
       playerId: this.getId(),
       player: this.getName(),
-      storageId: sourceStorage.getId(), 
-      storageType: sourceStorage.getTypeName(), 
+      storageId: sourceStorage.getId(),
+      storageType: sourceStorage.getTypeName(),
       itemType: sourceItem.getTypeName(),
       count: sourceReductionAmount
     })
@@ -1417,32 +1416,32 @@ class Player extends BaseEntity {
     if (sourceStorage && sourceStorage.isInventory() && destinationStorage.isInventory()) return
 
     if (destinationStorage.isInventory()) {
-      this.game.triggerEvent("StorageGet", { 
+      this.game.triggerEvent("StorageGet", {
         playerId: this.getId(),
         player: this.getName(),
-        storageId: sourceStorage.getId(), 
-        storageType: sourceStorage.getTypeName(), 
+        storageId: sourceStorage.getId(),
+        storageType: sourceStorage.getTypeName(),
         itemType: sourceItem.getTypeName(),
         count: sourceReductionAmount
       })
     } else if (destinationStorage.isBuildingStorage()) {
-      this.game.triggerEvent("StoragePut", { 
+      this.game.triggerEvent("StoragePut", {
         playerId: this.getId(),
         player: this.getName(),
-        storageId: destinationStorage.getId(), 
-        storageType: destinationStorage.getTypeName(), 
+        storageId: destinationStorage.getId(),
+        storageType: destinationStorage.getTypeName(),
         itemType: sourceItem.getTypeName(),
         count: sourceReductionAmount
       })
     }
 
     if (sourceStorage) {
-      this.game.triggerEvent("StoreItem", { 
+      this.game.triggerEvent("StoreItem", {
         actorId: this.getId(),
-        sourceStorageId: sourceStorage.getId(), 
-        sourceStorageType: sourceStorage.getType(), 
-        destinationStorageId: destinationStorage.getId(), 
-        destinationStorageType: destinationStorage.getType(), 
+        sourceStorageId: sourceStorage.getId(),
+        sourceStorageType: sourceStorage.getType(),
+        destinationStorageId: destinationStorage.getId(),
+        destinationStorageType: destinationStorage.getType(),
         itemType: sourceItem.type,
         itemCount: sourceReductionAmount
       })
@@ -1453,34 +1452,34 @@ class Player extends BaseEntity {
   triggerStorageStoreEvents(sourceStorage, destinationStorage, sourceItem) {
     if (sourceStorage === destinationStorage) return
     if (sourceStorage && sourceStorage.isInventory() && destinationStorage.isInventory()) return
-      
+
     if (destinationStorage.isInventory()) {
-      this.game.triggerEvent("StorageGet", { 
+      this.game.triggerEvent("StorageGet", {
         playerId: this.getId(),
         player: this.getName(),
-        storageId: sourceStorage.getId(), 
-        storageType: sourceStorage.getTypeName(), 
+        storageId: sourceStorage.getId(),
+        storageType: sourceStorage.getTypeName(),
         itemType: sourceItem.getTypeName(),
         count: sourceItem.count
       })
     } else if (destinationStorage.isBuildingStorage()) {
-      this.game.triggerEvent("StoragePut", { 
+      this.game.triggerEvent("StoragePut", {
         playerId: this.getId(),
         player: this.getName(),
-        storageId: destinationStorage.getId(), 
-        storageType: destinationStorage.getTypeName(), 
+        storageId: destinationStorage.getId(),
+        storageType: destinationStorage.getTypeName(),
         itemType: sourceItem.getTypeName(),
         count: sourceItem.count
       })
     }
 
     if (sourceStorage) {
-      this.game.triggerEvent("StoreItem", { 
+      this.game.triggerEvent("StoreItem", {
         actorId: this.getId(),
-        sourceStorageId: sourceStorage.getId(), 
-        sourceStorageType: sourceStorage.getType(), 
-        destinationStorageId: destinationStorage.getId(), 
-        destinationStorageType: destinationStorage.getType(), 
+        sourceStorageId: sourceStorage.getId(),
+        sourceStorageType: sourceStorage.getType(),
+        destinationStorageId: destinationStorage.getId(),
+        destinationStorageType: destinationStorage.getType(),
         itemType: sourceItem.type,
         itemCount: sourceItem.count
       })
@@ -1488,7 +1487,7 @@ class Player extends BaseEntity {
   }
 
   performItemThrow(sourceStorage, sourceIndex) {
-    if (sourceStorage.isEquipmentStorage() && 
+    if (sourceStorage.isEquipmentStorage() &&
         sourceIndex === Protocol.definition().EquipmentRole.Armor &&
         !this.sector.shouldAllowSuitChanged()) {
       return
@@ -1499,7 +1498,7 @@ class Player extends BaseEntity {
         return
       }
     }
-    
+
     let sourceItem      = sourceStorage.retrieve(sourceIndex)
     if (sourceItem) {
       this.throwInventory(sourceItem)
@@ -1610,7 +1609,7 @@ class Player extends BaseEntity {
     this.holdItem = null
 
     let json = { index: Constants.holdItemIndex, clientMustDelete: true }
-    SocketUtil.emit(this.socket, "InventoryChanged", { inventory: json })
+    this.getSocketUtil().emit(this.socket, "InventoryChanged", { inventory: json })
   }
 
   hasInfiniteAmmo() {
@@ -1643,10 +1642,10 @@ class Player extends BaseEntity {
       }
     }
 
-    SocketUtil.emit(this.socket, "InventoryChanged", { inventory: this.holdItem })
+    this.getSocketUtil().emit(this.socket, "InventoryChanged", { inventory: this.holdItem })
 
     if (storage.isBuildingStorage()) {
-      SocketUtil.emit(this.socket, "RenderStorage", { id: storage.id, inventory: storage })
+      this.getSocketUtil().emit(this.socket, "RenderStorage", { id: storage.id, inventory: storage })
     }
   }
 
@@ -1678,7 +1677,7 @@ class Player extends BaseEntity {
       this.holdItem = null
 
       let json = { index: Constants.holdItemIndex, clientMustDelete: true }
-      SocketUtil.emit(this.socket, "InventoryChanged", { inventory: json })
+      this.getSocketUtil().emit(this.socket, "InventoryChanged", { inventory: json })
     } else {
       let reducableCount
       if (item && (item.count + this.holdItem.count > 99)) {
@@ -1712,12 +1711,12 @@ class Player extends BaseEntity {
       if (this.holdItem.getCount() === 0) {
         this.holdItem = null
         let json = { index: Constants.holdItemIndex, clientMustDelete: true }
-        SocketUtil.emit(this.socket, "InventoryChanged", { inventory: json })
+        this.getSocketUtil().emit(this.socket, "InventoryChanged", { inventory: json })
       }
     }
 
     if (storage.isBuildingStorage()) {
-      SocketUtil.emit(this.socket, "RenderStorage", { id: storage.id, inventory: storage })
+      this.getSocketUtil().emit(this.socket, "RenderStorage", { id: storage.id, inventory: storage })
     }
 
   }
@@ -1754,7 +1753,7 @@ class Player extends BaseEntity {
     }
 
     if (nonInventoryStorage) {
-      SocketUtil.emit(this.socket, "RenderStorage", { id: nonInventoryStorage.id, inventory: nonInventoryStorage })
+      this.getSocketUtil().emit(this.socket, "RenderStorage", { id: nonInventoryStorage.id, inventory: nonInventoryStorage })
     }
   }
 
@@ -1804,7 +1803,7 @@ class Player extends BaseEntity {
       }
 
       storage.addViewSubscriber(this)
-      SocketUtil.emit(this.socket, "RenderStorage", { id: storage.id, inventory: storage })
+      this.getSocketUtil().emit(this.socket, "RenderStorage", { id: storage.id, inventory: storage })
     }
   }
 
@@ -1820,7 +1819,7 @@ class Player extends BaseEntity {
       } else {
         storage.removeViewSubscriber(this)
       }
-      
+
     }
   }
 
@@ -1858,10 +1857,10 @@ class Player extends BaseEntity {
     if (!isSuccess) return
 
     if (storage.isBuildingStorage()) {
-      SocketUtil.emit(this.socket, "RenderStorage", { id: storage.id, inventory: storage })
+      this.getSocketUtil().emit(this.socket, "RenderStorage", { id: storage.id, inventory: storage })
     } else {
       this.game.triggerEvent("ItemCrafted", { type: item.getTypeName(), player: this.getName() })
-      SocketUtil.emit(this.socket, "CraftSuccess", { name: item.getTypeName(), count: count })
+      this.getSocketUtil().emit(this.socket, "CraftSuccess", { name: item.getTypeName(), count: count })
     }
   }
 
@@ -1873,7 +1872,7 @@ class Player extends BaseEntity {
     // TODO: validate that its within view of user
     const storage = this.game.getEntity(data.id)
     if (storage) {
-      SocketUtil.emit(this.socket, "RenderStorage", { id: storage.id, inventory: storage })
+      this.getSocketUtil().emit(this.socket, "RenderStorage", { id: storage.id, inventory: storage })
     }
   }
 
@@ -1972,9 +1971,9 @@ class Player extends BaseEntity {
       this.setSector(sector)
       this.onPositionChanged({ isGridPositionChanged: true })
 
-      SocketUtil.broadcast(prevSector.getSocketIds(), 'LeaveSector', { player: this }, { excludeSocketId: this.getSocket().id })
-      SocketUtil.broadcast(this.sector.getSocketIds(), 'EnterSector', { player: this }, { excludeSocketId: this.getSocket().id })
-      SocketUtil.emit(this.getSocket(),'Teleport', {
+      this.getSocketUtil().broadcast(prevSector.getSocketIds(), 'LeaveSector', { player: this }, { excludeSocketId: this.getSocket().id })
+      this.getSocketUtil().broadcast(this.sector.getSocketIds(), 'EnterSector', { player: this }, { excludeSocketId: this.getSocket().id })
+      this.getSocketUtil().emit(this.getSocket(),'Teleport', {
         playerId: this.id,
         inventory: this.inventory,
         sector: sector,
@@ -2155,7 +2154,7 @@ class Player extends BaseEntity {
     if (prevChunk) {
       prevChunk.addChangedPlayers(this)
     }
-    
+
     this.lastWarpTimestamp = this.game.timestamp
   }
 
@@ -2277,7 +2276,7 @@ class Player extends BaseEntity {
   }
 
   hasSameViewDistance(player, otherPlayer) {
-    return player.getMaxViewDistance() === otherPlayer.getMaxViewDistance()    
+    return player.getMaxViewDistance() === otherPlayer.getMaxViewDistance()
   }
 
   determineVisiblePlayers() {
@@ -2393,11 +2392,11 @@ class Player extends BaseEntity {
 
   sendChangedPlayersToClient() {
     if (Object.keys(this.changedPlayers).length > 0) {
-      SocketUtil.emit(this.getSocket(), "EntityUpdated", { players: this.changedPlayers })
+      this.getSocketUtil().emit(this.getSocket(), "EntityUpdated", { players: this.changedPlayers })
     }
 
     if (Object.keys(this.removedPlayers).length > 0) {
-      SocketUtil.emit(this.getSocket(), "EntityUpdated", { players: this.removedPlayers })
+      this.getSocketUtil().emit(this.getSocket(), "EntityUpdated", { players: this.removedPlayers })
     }
 
     this.clearChangedPlayers()
@@ -2405,11 +2404,11 @@ class Player extends BaseEntity {
 
   sendChangedCorpsesToClient() {
     if (Object.keys(this.changedCorpses).length > 0) {
-      SocketUtil.emit(this.getSocket(), "EntityUpdated", { corpses: this.changedCorpses })
+      this.getSocketUtil().emit(this.getSocket(), "EntityUpdated", { corpses: this.changedCorpses })
     }
 
     if (Object.keys(this.removedCorpses).length > 0) {
-      SocketUtil.emit(this.getSocket(), "EntityUpdated", { corpses: this.removedCorpses })
+      this.getSocketUtil().emit(this.getSocket(), "EntityUpdated", { corpses: this.removedCorpses })
     }
 
     this.clearChangedCorpses()
@@ -2496,7 +2495,7 @@ class Player extends BaseEntity {
   }
 
   removePlayerViewership(player) {
-    delete this.playerViewerships[player.getId()] 
+    delete this.playerViewerships[player.getId()]
   }
 
   calculateEntityVisible(entity) {
@@ -2525,7 +2524,7 @@ class Player extends BaseEntity {
 
   recalculateFovIfHitPresent(hits) {
     if (this.isControllingGhost()) return
-      
+
     for (var i = 0; i < hits.length; i++) {
       let hit = hits[i]
       if (this.isTileVisible(hit.row, hit.col)) {
@@ -2575,7 +2574,7 @@ class Player extends BaseEntity {
     for (let tutorialName in this.tutorialIndex) {
       this.sendClientTutorialIndex(tutorialName)
     }
-    
+
     this.requestNewChunks()
     this.sendAllRegions()
     this.sendCommandBlocks()
@@ -2587,13 +2586,13 @@ class Player extends BaseEntity {
   sendAllRegions() {
     for (let name in this.sector.regions) {
       let region = this.sector.regions[name]
-      SocketUtil.emit(this.getSocket(), "RegionUpdated", { region: region })
+      this.getSocketUtil().emit(this.getSocket(), "RegionUpdated", { region: region })
     }
   }
 
   sendCommandBlocks() {
     let fullJson = JSON.stringify(this.sector.commandBlock.toJson())
-    SocketUtil.emit(this.getSocket(), "CommandBlockUpdated", { fullJson: fullJson })
+    this.getSocketUtil().emit(this.getSocket(), "CommandBlockUpdated", { fullJson: fullJson })
   }
 
   requestNewChunks() {
@@ -2700,12 +2699,12 @@ class Player extends BaseEntity {
 
   retrievePickups() {
     if (this.health === 0) return
-      
+
     let pickups = this.sector.pickupTree.search(this.getBoundingBox())
     pickups.forEach((pickup) => {
       let isSuccessful = pickup.giveTo(this)
       if (isSuccessful) {
-        SocketUtil.emit(this.socket, "PlaySound", { id: Protocol.definition().SoundType.Pickup })
+        this.getSocketUtil().emit(this.socket, "PlaySound", { id: Protocol.definition().SoundType.Pickup })
 
         this.game.triggerEvent("ItemPickup", {
           playerId: this.getId(),
@@ -2750,7 +2749,7 @@ class Player extends BaseEntity {
     if (this.isPlayerReady && !this.isRemoved) {
       if (item.storage === this.inventory ||
           item === this.holdItem) {
-        SocketUtil.emit(this.socket, "InventoryChanged", { inventory: item })
+        this.getSocketUtil().emit(this.socket, "InventoryChanged", { inventory: item })
       }
     }
   }
@@ -2758,14 +2757,14 @@ class Player extends BaseEntity {
   onLastUsedTimestampChanged(item) {
     if (this.isPlayerReady && !this.isRemoved) {
       if (item.storage === this.inventory) {
-        SocketUtil.emit(this.socket, "InventoryChanged", { inventory: item })
+        this.getSocketUtil().emit(this.socket, "InventoryChanged", { inventory: item })
       }
     }
   }
 
   syncGoldAmountToClient() {
     let data = { gold: this.gold }
-    SocketUtil.emit(this.getSocket(), "UpdateStats", data)
+    this.getSocketUtil().emit(this.getSocket(), "UpdateStats", data)
   }
 
   onInventoryStorageChanged(item, index) {
@@ -2779,7 +2778,7 @@ class Player extends BaseEntity {
         json = item
       }
 
-      SocketUtil.emit(this.socket, "InventoryChanged", { inventory: json })
+      this.getSocketUtil().emit(this.socket, "InventoryChanged", { inventory: json })
     }
 
     let inventoryItem = this.inventory.get(index)
@@ -2992,7 +2991,7 @@ class Player extends BaseEntity {
 
   onPressKeyChanged(pressedKey) {
     let char = String.fromCharCode(pressedKey).toLowerCase()
-    
+
     this.game.triggerEvent("PlayerKeyboard", {
       playerId: this.id,
       player: this.getName(),
@@ -3020,7 +3019,7 @@ class Player extends BaseEntity {
 
       if (isActionStopped) {
         if (this.actTargetEntity && this.actTargetEntity.onActionReleased) {
-          this.actTargetEntity.onActionReleased()  
+          this.actTargetEntity.onActionReleased()
           this.actTargetEntity = null
         }
 
@@ -3028,7 +3027,7 @@ class Player extends BaseEntity {
 
         if (this.hasPendingItem()) {
           this.stopEquipmentAnimation()
-          this.removePendingItem()  
+          this.removePendingItem()
         }
       } else if (isActionStarted) {
         this.releasedAction = false
@@ -3103,7 +3102,7 @@ class Player extends BaseEntity {
     if (targetVent) {
       targetVent.hideInVent(this)
     }
-    
+
   }
 
   goToNextVent() {
@@ -3128,7 +3127,7 @@ class Player extends BaseEntity {
     if (targetVent) {
       targetVent.hideInVent(this)
     }
-    
+
   }
 
   setCurrentVent(vent) {
@@ -3218,7 +3217,7 @@ class Player extends BaseEntity {
       if (this.game.isPvP()) {
         this.sector.findNewTeamSpawn([this])
       }
-      
+
       this.respawn()
     }
   }
@@ -3237,7 +3236,7 @@ class Player extends BaseEntity {
   }
 
   sendClientTutorialIndex(name) {
-    SocketUtil.emit(this.getSocket(), "SetTutorialIndex", {
+    this.getSocketUtil().emit(this.getSocket(), "SetTutorialIndex", {
       name: name,
       tutorialIndex: this.tutorialIndex[name]
     })
@@ -3312,7 +3311,7 @@ class Player extends BaseEntity {
 
   move(deltaTime) {
     if (this.isAFKTimeLimitExceeded()) {
-      SocketUtil.emit(this.getSocket(), "AFK", {})
+      this.getSocketUtil().emit(this.getSocket(), "AFK", {})
       this.closeSocket()
       this.remove()
       return
@@ -3361,7 +3360,7 @@ class Player extends BaseEntity {
     let cameraTarget = this.getCameraFocusTarget()
     if (!cameraTarget.body) return
 
-    this.performRepair() 
+    this.performRepair()
 
     if (this.isPilot) return // let ship handle movement based on players moveEntity logic
     if (this.isWorking) return
@@ -3621,15 +3620,15 @@ class Player extends BaseEntity {
         let foodValuePerIncrement = Math.floor(foodValue / foodUsageIterationCount)
 
         this.setHealth(this.getHealth() + foodValuePerIncrement)
-      }  
-      
+      }
+
       this.isFoodDigested = true
       this.onFoodEaten(this.activeFood)
     }
   }
 
   onFoodEaten(activeFood) {
-    if (activeFood.getTypeName() === "HumanMeat" || 
+    if (activeFood.getTypeName() === "HumanMeat" ||
         activeFood.getTypeName() === "LectersDinner") {
       this.getTeam().addDeed("cannibalism")
 
@@ -3747,7 +3746,7 @@ class Player extends BaseEntity {
 
   applyVelocity(body, targetVelocity, deltaTime) {
     if (this.isControllingGhost()) {
-      vec2.scale(body.velocity, targetVelocity, 1) 
+      vec2.scale(body.velocity, targetVelocity, 1)
       return
     }
 
@@ -3906,7 +3905,7 @@ class Player extends BaseEntity {
       minX: x - w/2,
       minY: y - h/2,
       maxX: x + w/2,
-      maxY: y + w/2 
+      maxY: y + w/2
     }
 
     let regions = this.sector.regionTree.search(boundingBox)
@@ -3961,7 +3960,7 @@ class Player extends BaseEntity {
     }
 
     // username restricted
-    return this.name === buildFlag 
+    return this.name === buildFlag
   }
 
   // data.x,y are absolute coordinates
@@ -4064,8 +4063,8 @@ class Player extends BaseEntity {
         }
       }
 
-      this.game.triggerEvent("BuildingPlaced", { 
-        entityId: building.getId(), 
+      this.game.triggerEvent("BuildingPlaced", {
+        entityId: building.getId(),
         entityType: building.getTypeName(),
         player: this.getName(),
         playerId: this.getId()
@@ -4099,7 +4098,7 @@ class Player extends BaseEntity {
   }
 
   onTeamAssignmentChanged() {
-    SocketUtil.emit(this.getSocket(), "TeamAssignmentChanged", { 
+    this.getSocketUtil().emit(this.getSocket(), "TeamAssignmentChanged", {
       roles: this.getTeam().roles
     })
   }
@@ -4123,7 +4122,7 @@ class Player extends BaseEntity {
     if (!this.isAngleLocked) {
       this.setAngle(data.angle)
     }
-    
+
     this.setMouseCoord(data)
 
     this.updateDragTargetPosition()
@@ -4168,7 +4167,7 @@ class Player extends BaseEntity {
 
   onRoomHoveredChanged() {
     let roomId = this.lastRoomHovered ? this.lastRoomHovered.id : 0
-    SocketUtil.emit(this.getSocket(), "RoomHovered", { id: roomId })
+    this.getSocketUtil().emit(this.getSocket(), "RoomHovered", { id: roomId })
   }
 
   onAngleChanged() {
@@ -4226,14 +4225,14 @@ class Player extends BaseEntity {
           this.showError("Too far", { isWarning: true })
           return false
         }
-      
+
         entity.interact(this, action, content)
 
         let data = {
-          entityId: entity.id, 
-          entityType: entity.getTypeName(), 
+          entityId: entity.id,
+          entityType: entity.getTypeName(),
           playerId: this.id,
-          player: this.name 
+          player: this.name
         }
 
         if (this.sector.miniGame && this.sector.miniGame.name === 'find_the_imposter') {
@@ -4252,15 +4251,15 @@ class Player extends BaseEntity {
   showError(message, options = {}) {
     message = i18n.t(this.locale, message)
     options.message = message
-    SocketUtil.emit(this.getSocket(), "ErrorMessage", options)
+    this.getSocketUtil().emit(this.getSocket(), "ErrorMessage", options)
   }
 
   showChatError(message) {
-    SocketUtil.emit(this.getSocket(), "ServerChat", { message: "%error%" + message })
+    this.getSocketUtil().emit(this.getSocket(), "ServerChat", { message: "%error%" + message })
   }
 
   showChatSuccess(message) {
-    SocketUtil.emit(this.getSocket(), "ServerChat", { message: "%success%" + message })
+    this.getSocketUtil().emit(this.getSocket(), "ServerChat", { message: "%success%" + message })
   }
 
   possess(entity) {
@@ -4412,7 +4411,7 @@ class Player extends BaseEntity {
   }
 
   emit(eventName, data) {
-    SocketUtil.emit(this.socket, eventName, data)
+    this.getSocketUtil().emit(this.socket, eventName, data)
   }
 
   canDamage(target) {
@@ -4427,7 +4426,7 @@ class Player extends BaseEntity {
     }
 
     if (!target) return false
-    if (target.isBuilding() && target.isOnFire()) return true 
+    if (target.isBuilding() && target.isOnFire()) return true
     if (target.isDestroyed()) return false
 
     if (target.isOwnedBy(this)) {
@@ -4441,7 +4440,7 @@ class Player extends BaseEntity {
     let isTargetInsideCryotube = target.storage && target.storage.getType && target.storage.getType() === Protocol.definition().BuildingType.CryoTube
     if (isTargetInsideCryotube) return false
 
-    if (target.hasCategory("platform") || 
+    if (target.hasCategory("platform") ||
         target.hasCategory("pipe") ||
         target.hasCategory("wire")) return false
 
@@ -4457,7 +4456,7 @@ class Player extends BaseEntity {
 
   restartCharacter() {
     this.game.addCharacterRestart(this)
-    
+
     if (this.initialEscapePod) {
       this.initialEscapePod.clearStorage()
       this.initialEscapePod.remove()
@@ -4497,9 +4496,9 @@ class Player extends BaseEntity {
       this.holdItem.remove()
       this.holdItem = null
       let json = { index: Constants.holdItemIndex, clientMustDelete: true }
-      SocketUtil.emit(this.socket, "InventoryChanged", { inventory: json })
+      this.getSocketUtil().emit(this.socket, "InventoryChanged", { inventory: json })
     }
-    this.removeInventoryAndEquipments(options)  
+    this.removeInventoryAndEquipments(options)
   }
 
   removeInventoryAndEquipments(options = {}) {
@@ -4560,7 +4559,7 @@ class Player extends BaseEntity {
     }
 
     if (this.core) {
-      this.core.remove()  
+      this.core.remove()
       this.core = null
     }
   }
@@ -4686,14 +4685,14 @@ class Player extends BaseEntity {
 
     this.game.removePlayer(this) // game also keeps track of players
 
-    this.game.sendToMatchmaker({ event: "PlayerLeave", 
-      data: { 
-        playerRemoteAddress: this.getRemoteAddress(), 
+    this.game.sendToMatchmaker({ event: "PlayerLeave",
+      data: {
+        playerRemoteAddress: this.getRemoteAddress(),
         fingerprint: this.fingerprint,
         host: this.game.server.getHost(),
-        region: this.game.getRegion(), 
-        sectorUid: this.game.sectorUid 
-      } 
+        region: this.game.getRegion(),
+        sectorUid: this.game.sectorUid
+      }
     })
 
     this.clientMustDelete = true
@@ -4702,7 +4701,7 @@ class Player extends BaseEntity {
 
   broadcastPlayerRemoved() {
     this.game.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), 'RemovedFromGame', { playerId: this.getId(), playerName: this.name })
+      this.getSocketUtil().emit(player.getSocket(), 'RemovedFromGame', { playerId: this.getId(), playerName: this.name })
     })
   }
 
@@ -4714,7 +4713,7 @@ class Player extends BaseEntity {
     this.game.triggerEvent("EquipmentUsageChanged", { itemType: equipment.item.type, usage: equipment.usage, actorId: this.getId() })
 
     if (this.isPlayerReady && equipment.item.storage && !this.isRemoved) {
-      SocketUtil.emit(this.socket, "InventoryChanged", { inventory: equipment.item })
+      this.getSocketUtil().emit(this.socket, "InventoryChanged", { inventory: equipment.item })
     }
   }
 
@@ -4855,9 +4854,9 @@ class Player extends BaseEntity {
     this.requestNewChunks()
 
     if (this.cameraFocusTarget.isPositionBased) {
-      SocketUtil.emit(this.socket, "CameraFocusTarget", { row: this.cameraFocusTarget.row, col: this.cameraFocusTarget.col })
+      this.getSocketUtil().emit(this.socket, "CameraFocusTarget", { row: this.cameraFocusTarget.row, col: this.cameraFocusTarget.col })
     } else {
-      SocketUtil.emit(this.socket, "CameraFocusTarget", { id: this.cameraFocusTarget.id })
+      this.getSocketUtil().emit(this.socket, "CameraFocusTarget", { id: this.cameraFocusTarget.id })
     }
   }
 
@@ -5044,7 +5043,7 @@ class Player extends BaseEntity {
 
       if (item.isDrug() && this.hasActiveDrug()) {
         this.showError("You just used. Wait for a few more seconds.")
-        return 
+        return
       }
 
       if (item.isDelayedConsumption()) {
@@ -5060,7 +5059,7 @@ class Player extends BaseEntity {
 
   removePendingItem() {
     this.pendingItem = null
-    SocketUtil.emit(this.getSocket(), "ProgressCircle", { clientMustDelete: true })
+    this.getSocketUtil().emit(this.getSocket(), "ProgressCircle", { clientMustDelete: true })
   }
 
   setPendingItem(item) {
@@ -5069,7 +5068,7 @@ class Player extends BaseEntity {
     this.pendingItemReadyTimestamp = this.game.timestamp + duration
     this.sendEquipmentAnimation()
 
-    SocketUtil.emit(this.getSocket(), "ProgressCircle", { completeTimestamp: this.pendingItemReadyTimestamp })
+    this.getSocketUtil().emit(this.getSocket(), "ProgressCircle", { completeTimestamp: this.pendingItemReadyTimestamp })
   }
 
   isInjectable() {
@@ -5240,7 +5239,7 @@ class Player extends BaseEntity {
 
   onEquipIndexChanged(prevIndex, newIndex) {
     if (this.isPlayerReady) {
-      SocketUtil.emit(this.getSocket(), "EquipIndexChanged", { equipIndex: newIndex })
+      this.getSocketUtil().emit(this.getSocket(), "EquipIndexChanged", { equipIndex: newIndex })
     }
 
     const oldItem = this.inventory.get(prevIndex)
@@ -5329,7 +5328,7 @@ class Player extends BaseEntity {
       }
 
       message = this.sanitize(message)
-        
+
       let maxChatLength = 100
       message = message.substring(0, maxChatLength)
 
@@ -5337,7 +5336,7 @@ class Player extends BaseEntity {
 
       if (!this.sector.settings["isChatEnabled"]) {
         if (!this.sector.voteManager.isStarted) {
-          return 
+          return
         }
       }
 
@@ -5353,7 +5352,7 @@ class Player extends BaseEntity {
       let isSameMessage = this.lastMessage === message
       let isSlowMode = !this.isLoggedIn() || isSameMessage
       if (isSlowMode && (Date.now() - this.lastChatTimestamp < 3000)) {
-        SocketUtil.emit(this.socket, "ServerChat", { message: "%error%Please wait 3 seconds", isTeam: isTeamChat })
+        this.getSocketUtil().emit(this.socket, "ServerChat", { message: "%error%Please wait 3 seconds", isTeam: isTeamChat })
         return
       }
 
@@ -5387,9 +5386,9 @@ class Player extends BaseEntity {
         }
 
         if (isTeamChat) {
-          SocketUtil.broadcast(this.getTeam().getSocketIds(), "ServerChat", data)
+          this.getSocketUtil().broadcast(this.getTeam().getSocketIds(), "ServerChat", data)
         } else {
-          SocketUtil.broadcast(this.sector.getSocketIds(), "ServerChat", data)
+          this.getSocketUtil().broadcast(this.sector.getSocketIds(), "ServerChat", data)
         }
       }
     }
@@ -5418,7 +5417,7 @@ class Player extends BaseEntity {
       }
     })
 
-    SocketUtil.emit(this.getSocket(), "EntityUpdated", result)
+    this.getSocketUtil().emit(this.getSocket(), "EntityUpdated", result)
   }
 
   viewCamera(data) {
@@ -5436,10 +5435,10 @@ class Player extends BaseEntity {
     let col = camera.getCenterCol()
 
     this.skipFov = true
-    this.setCameraFocusTarget({ 
-      row: row, 
-      col: col, 
-      isPositionBased: true 
+    this.setCameraFocusTarget({
+      row: row,
+      col: col,
+      isPositionBased: true
     })
   }
 
@@ -5597,19 +5596,19 @@ class Player extends BaseEntity {
 
   setColorIndex(colorIndex) {
     this.colorIndex = colorIndex
-    SocketUtil.emit(this.getSocket(), "UpdateStats", { colorIndex: this.colorIndex })
+    this.getSocketUtil().emit(this.getSocket(), "UpdateStats", { colorIndex: this.colorIndex })
   }
 
   setTextureIndex(textureIndex) {
     this.textureIndex = textureIndex
-    SocketUtil.emit(this.getSocket(), "UpdateStats", { textureIndex: this.textureIndex })
+    this.getSocketUtil().emit(this.getSocket(), "UpdateStats", { textureIndex: this.textureIndex })
   }
 
   viewTeamLogs() {
-    let activityLogs = this.sector.getActivityLogs(this.getTeam().id)  
-    let commandLogs = this.sector.getCommandLogs(this.getTeam().id)  
+    let activityLogs = this.sector.getActivityLogs(this.getTeam().id)
+    let commandLogs = this.sector.getCommandLogs(this.getTeam().id)
 
-    SocketUtil.emit(this.getSocket(), "TeamLogs", { activityLogs: activityLogs, commandLogs: commandLogs })
+    this.getSocketUtil().emit(this.getSocket(), "TeamLogs", { activityLogs: activityLogs, commandLogs: commandLogs })
   }
 
   onStateChanged(attribute) {
@@ -5625,7 +5624,7 @@ class Player extends BaseEntity {
         data[attribute] = this[attribute]
       }
 
-      SocketUtil.emit(this.getSocket(), "UpdateStats", data)
+      this.getSocketUtil().emit(this.getSocket(), "UpdateStats", data)
     } else {
       let chunk = this.getChunk()
       if (chunk) {
@@ -5664,13 +5663,13 @@ class Player extends BaseEntity {
   }
 
   setViewDistance(distance) {
-    this.viewDistance = distance  
+    this.viewDistance = distance
 
     if (this.sector.isFovMode()) {
       if (this.isControllingGhost()) return
       this.assignFov()
     }
-    
+
     this.onStateChanged("viewDistance")
   }
 
@@ -5682,7 +5681,7 @@ class Player extends BaseEntity {
   sendChangedRooms() {
     if (Object.keys(this.changedRooms).length === 0) return
 
-    SocketUtil.emit(this.getSocket(), "EntityUpdated", { rooms: this.changedRooms })
+    this.getSocketUtil().emit(this.getSocket(), "EntityUpdated", { rooms: this.changedRooms })
 
     this.clearChangedRooms()
   }
@@ -5834,15 +5833,15 @@ Object.assign(Player.prototype, Destroyable.prototype, {
       this.releaseDragTarget()
     }
 
-    SocketUtil.broadcast(this.game.getSocketIds(), "PlayerDestroyed", { id: this.id, canRespawn: this.canRespawn(), restartCooldown: this.getRespawnCooldown()  })
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "PlayerDestroyed", { id: this.id, canRespawn: this.canRespawn(), restartCooldown: this.getRespawnCooldown()  })
     EventBus.dispatch(`${this.game.getId()}:entity:died:${this.getId()}`, this)
 
-    let data = { 
-      playerName: this.getName(), 
+    let data = {
+      playerName: this.getName(),
       playerRole: this.getRoleName(),
       player: this.getName(),
-      killingPlayer: "", 
-      killingPlayerRole: "", 
+      killingPlayer: "",
+      killingPlayerRole: "",
       killingMob: ""
     }
 
@@ -5869,7 +5868,7 @@ Object.assign(Player.prototype, Destroyable.prototype, {
 
     if (this.game.isMiniGame() && !this.canRespawn()) {
       this.setHidden(true)
-      this.transformIntoGhost()    
+      this.transformIntoGhost()
       this.followGhost()
       this.game.onAlivePlayerCountChanged()
     }
@@ -5883,8 +5882,8 @@ Object.assign(Player.prototype, Destroyable.prototype, {
     }
 
     let data = {
-      "entityId": this.id, 
-      "entityType": "", 
+      "entityId": this.id,
+      "entityType": "",
       "playerId": this.id,
       "player": this.getName(),
       "previous": (this.health - delta),

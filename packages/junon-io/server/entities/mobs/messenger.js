@@ -4,7 +4,6 @@ const Constants = require("./../../../common/constants.json")
 const Projectiles = require('./../projectiles/index')
 const EquipmentInventory = require("./../equipment_inventory")
 const Item = require("./../item")
-const SocketUtil = require("junon-common/socket_util")
 
 class Messenger extends LandMob {
   onPostInit() {
@@ -25,7 +24,7 @@ class Messenger extends LandMob {
     this.choice = data.choice
 
     if (data.choice === 1) {
-      this.onPlayerPayment(data)  
+      this.onPlayerPayment(data)
     } else if (data.choice === 2) {
       if (!data.player.isAdmin()) {
         data.player.showError("Only Admin can choose that action")
@@ -73,8 +72,8 @@ class Messenger extends LandMob {
     if (this.owner) {
       if (!this.owner.hasAdminOnline()) return
       this.owner.addDeed("taxes_not_paid")
-      this.owner.broadcast("NPCServerMessage", { 
-        entityId: this.getId(), 
+      this.owner.broadcast("NPCServerMessage", {
+        entityId: this.getId(),
         choice: this.choice,
         message: "Messenger.Blasphemy"
       })
@@ -96,7 +95,7 @@ class Messenger extends LandMob {
       return
     }
 
-    player.reduceGold(taxAmount)    
+    player.reduceGold(taxAmount)
 
     this.onPlayerPaymentReceived(data)
   }
@@ -107,8 +106,8 @@ class Messenger extends LandMob {
 
     if (this.owner) {
       this.owner.removeDeed("taxes_not_paid")
-      this.owner.broadcast("NPCServerMessage", { 
-        entityId: this.getId(), 
+      this.owner.broadcast("NPCServerMessage", {
+        entityId: this.getId(),
         choice: this.choice,
         message: "Messenger.RightChoice"
       })
@@ -116,10 +115,10 @@ class Messenger extends LandMob {
   }
 
   onGoalReached(targetEntityToMove, goal) {
-    super.onGoalReached(targetEntityToMove, goal) 
+    super.onGoalReached(targetEntityToMove, goal)
 
     this.setDormant(true)
-    this.setAngle(90) 
+    this.setAngle(90)
   }
 
 

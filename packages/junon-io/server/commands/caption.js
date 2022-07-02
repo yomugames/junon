@@ -1,6 +1,5 @@
 const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
-const SocketUtil = require("junon-common/socket_util")
 
 class Caption extends BaseCommand {
 
@@ -22,8 +21,8 @@ class Caption extends BaseCommand {
   }
 
   perform(player, args) {
-    let row 
-    let col 
+    let row
+    let col
     let entityToTeleport
 
     let selector = args[0]
@@ -61,13 +60,13 @@ class Caption extends BaseCommand {
       })
     } catch(e) {
       // not json. assume plain text
-      
+
       playerList.forEach((player) => {
         let message = i18n.t(player.locale, text)
         player.showError(message, { isTransparent: true, isTitle: isTitle })
       })
     }
-    
+
   }
 
 }

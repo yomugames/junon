@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "junon-common": "*",
     "@sentry/node": "^4.3.4",
     "aws-sdk": "^2.229.1",
     "cors": "^2.8.5",
@@ -19,7 +20,6 @@
     "firebase-admin": "^8.2.0",
     "js-yaml": "^3.12.2",
     "json-stream": "^1.0.0",
-    "junon-common": "github:yomugames/junon-common.git#master",
     "lodash": "^4.17.4",
     "morgan": "^1.9.0",
     "request": "^2.88.0",

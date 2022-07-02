@@ -1,4 +1,3 @@
-const SocketUtil = require("junon-common/socket_util")
 const Constants = require("../../common/constants")
 
 class VoteManager {
@@ -10,6 +9,10 @@ class VoteManager {
     this.lastEmergencyMeeting = null
 
     this.votes = {}
+  }
+
+  getSocketUtil() {
+    return this.game.server.socketUtil
   }
 
   canUseEmergencyMeeting(user) {
@@ -58,7 +61,7 @@ class VoteManager {
     this.startCountdown()
 
     this.game.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), "StartVote", { votingEndTimestamp: this.votingEndTimestamp })
+      this.getSocketUtil().emit(player.getSocket(), "StartVote", { votingEndTimestamp: this.votingEndTimestamp })
     })
   }
 
@@ -95,7 +98,7 @@ class VoteManager {
     result[sourcePlayerId] = 0 // indicating voted, but dont reveal player
 
     this.sector.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), "VoteUpdated", { voteResults: result })
+      this.getSocketUtil().emit(player.getSocket(), "VoteUpdated", { voteResults: result })
     })
 
     if (this.isVoteFinished()) {
@@ -107,7 +110,7 @@ class VoteManager {
     if (this.game.timestamp >= this.votingEndTimestamp) return true
 
     let voteCount = Object.keys(this.votes).length
-    let playerCount = Object.keys(this.game.getAlivePlayers()).length 
+    let playerCount = Object.keys(this.game.getAlivePlayers()).length
 
     if (voteCount >= playerCount) {
       return true
@@ -141,12 +144,12 @@ class VoteManager {
     }
 
     let voteCount = countMap[mostVotedPlayer.getId()]
-    let isTiePresent = Object.keys(countMap).find((playerId) => { 
+    let isTiePresent = Object.keys(countMap).find((playerId) => {
       playerId = parseInt(playerId)
       let count = countMap[playerId]
-      return playerId !== mostVotedPlayer.getId() && count === voteCount 
+      return playerId !== mostVotedPlayer.getId() && count === voteCount
     })
-    
+
     if (isTiePresent) {
       return { mostVotedPlayer: null, countMap: countMap }
     } else {
@@ -161,7 +164,7 @@ class VoteManager {
   onVotingFinished() {
     if (this.stopVotes) return
     this.stopVotes = true
-    this.isStarted = false 
+    this.isStarted = false
 
     this.game.unpause()
     this.game.resumeCooldown()
@@ -180,16 +183,16 @@ class VoteManager {
       }
 
       this.game.forEachPlayer((player) => {
-        SocketUtil.emit(player.getSocket(), "EndVote", {})
+        this.getSocketUtil().emit(player.getSocket(), "EndVote", {})
       })
-      
+
       this.lastEmergencyMeeting = this.game.timestamp
     }, 3000)
   }
 
   sendFinalVoteResults(countMap) {
     this.sector.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), "VoteUpdated", { voteResults: countMap, isFinal: true })
+      this.getSocketUtil().emit(player.getSocket(), "VoteUpdated", { voteResults: countMap, isFinal: true })
     })
   }
 

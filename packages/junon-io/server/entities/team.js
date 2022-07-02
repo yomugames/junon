@@ -1,5 +1,4 @@
 const BaseTransientEntity = require('./base_transient_entity')
-const SocketUtil = require("junon-common/socket_util")
 const Protocol = require('../../common/util/protocol')
 const Owner = require('../../common/interfaces/owner')
 const Constants = require('../../common/constants')
@@ -40,7 +39,7 @@ class Team extends BaseTransientEntity {
     } else {
       this.createDefaultRoles()
     }
-    
+
     this.initOwner()
 
     this.onTeamCreated()
@@ -79,7 +78,7 @@ class Team extends BaseTransientEntity {
 
   getRoleByName(name) {
     if (!name) return null
-      
+
     let target
 
     for (let id in this.roles) {
@@ -102,7 +101,7 @@ class Team extends BaseTransientEntity {
   }
 
   removeRole(role) {
-    delete this.roles[role.id] 
+    delete this.roles[role.id]
     this.onRoleRemoved(role.id)
   }
 
@@ -137,11 +136,11 @@ class Team extends BaseTransientEntity {
   }
 
   createGuestRole() {
-    let role = new Role({ id: 0, name: "Guest", team: this }) 
+    let role = new Role({ id: 0, name: "Guest", team: this })
   }
 
   createMemberRole() {
-    let role = new Role({ id: 1, name: "Member", team: this }) 
+    let role = new Role({ id: 1, name: "Member", team: this })
     role.allowAll()
     role.setPermissions({
       SellToTrader: false,
@@ -155,7 +154,7 @@ class Team extends BaseTransientEntity {
   createNewRole() {
     let highestId = Math.max(...Object.keys(this.roles))
     // if highest id is 2, next should be 4. 3 reserved for slave
-    
+
     let newRoleId = highestId === 2 ? 4 : (highestId + 1)
 
     let options = {
@@ -164,12 +163,12 @@ class Team extends BaseTransientEntity {
       name: "Role" + newRoleId
     }
 
-    let role = new Role(options) 
+    let role = new Role(options)
     role.onRoleChanged()
   }
 
   createAdminRole() {
-    let role = new Role({ id: 2, name: "Admin", team: this }) 
+    let role = new Role({ id: 2, name: "Admin", team: this })
     role.allowAll()
     role.setPermissions({
       Kick: false,
@@ -296,7 +295,7 @@ class Team extends BaseTransientEntity {
 
   removeDeed(deed) {
     if (this.game.isMiniGame()) return
-      
+
     delete this.deeds[deed]
   }
 
@@ -383,7 +382,7 @@ class Team extends BaseTransientEntity {
       if (!member.sector.isLobby()) {
         if (options.exclude && options.exclude === member) {
           continue
-        } 
+        }
 
         landed = member
         break
@@ -394,7 +393,7 @@ class Team extends BaseTransientEntity {
   }
 
   incrementDayCount() {
-    this.dayCount += 1  
+    this.dayCount += 1
     this.onDayCountChanged()
     this.onTeamChanged()
   }
@@ -435,7 +434,7 @@ class Team extends BaseTransientEntity {
   }
 
   getLeader() {
-    return this.leader    
+    return this.leader
   }
 
   getInviteApprovers() {
@@ -448,7 +447,7 @@ class Team extends BaseTransientEntity {
     if (this.getMembers()[0]) {
       return [this.getMembers()[0]]
     }
-    
+
     return []
   }
 
@@ -482,7 +481,7 @@ class Team extends BaseTransientEntity {
 
     if (positionsJson.length > 0) {
       this.forEachMember((player) => {
-        SocketUtil.emit(player.getSocket(), "MapPositions", { positions: positionsJson })
+        this.getSocketUtil().emit(player.getSocket(), "MapPositions", { positions: positionsJson })
       })
     }
 
@@ -596,9 +595,9 @@ class Team extends BaseTransientEntity {
     if (this.sector.shouldShowPlayerList()) {
       if (data) {
         data.id = this.getId()
-        SocketUtil.broadcast(this.game.getSocketIds(), "TeamUpdated", { team: data })
+        this.getSocketUtil().broadcast(this.game.getSocketIds(), "TeamUpdated", { team: data })
       } else {
-        SocketUtil.broadcast(this.game.getSocketIds(), "TeamUpdated", { team: this })
+        this.getSocketUtil().broadcast(this.game.getSocketIds(), "TeamUpdated", { team: this })
       }
     }
 
@@ -629,8 +628,8 @@ class Team extends BaseTransientEntity {
     if (this.game.sectorModel &&
         this.game.sectorModel.name === this.name) {
       return
-    } 
-    
+    }
+
     if (this.shouldTeamNameChangeSectorName()) {
       await this.updateDatabaseSectorName()
       this.sector.setName(this.name)
@@ -648,7 +647,7 @@ class Team extends BaseTransientEntity {
 
   async updateDatabaseSectorName() {
     if (this.game.isMiniGame()) return
-      
+
     let sectorModel = await SectorModel.findOne({
       where: { uid: this.game.getSectorUid() }
     })
@@ -664,7 +663,7 @@ class Team extends BaseTransientEntity {
     this.forEachMember((member) => {
       let socketId = member.getSocket().id
       socketIds.push(socketId)
-    })    
+    })
 
     return socketIds
   }
@@ -723,24 +722,24 @@ class Team extends BaseTransientEntity {
     if (this.game.isMiniGame()) return
 
     let ip = member.getRemoteAddress()
-    this.ipBlacklist[ip] = { timestamp: this.game.timestamp, type: 'kick' } 
+    this.ipBlacklist[ip] = { timestamp: this.game.timestamp, type: 'kick' }
     let uid = member.getUid()
     if (uid) {
-      this.uidBlacklist[uid] = { timestamp: this.game.timestamp, type: 'kick' } 
+      this.uidBlacklist[uid] = { timestamp: this.game.timestamp, type: 'kick' }
     }
-    
+
     this.removeMember(member)
-    SocketUtil.emit(member.getSocket(), "PlayerKick", {})
+    this.getSocketUtil().emit(member.getSocket(), "PlayerKick", {})
     member.kick()
 
     let actor = [user.name, user.getRemoteAddress()].join("-")
     LOG.info("[" + this.game.getSectorUid() + "] " + actor + " [kicked] " + member.name)
-    
+
     return true
   }
 
   banOfflineMember(user, member) {
-    if (!user.isSectorOwner()) return 
+    if (!user.isSectorOwner()) return
 
     this.banInDatabase(member)
   }
@@ -759,7 +758,7 @@ class Team extends BaseTransientEntity {
     }
 
     this.removeMember(member)
-    SocketUtil.emit(member.getSocket(), "PlayerKick", { isBan: true })
+    this.getSocketUtil().emit(member.getSocket(), "PlayerKick", { isBan: true })
 
     member.kick()
     this.banInDatabase(member)
@@ -790,7 +789,7 @@ class Team extends BaseTransientEntity {
     let attrs
 
     if (isOfflineMember) {
-      attrs = { 
+      attrs = {
         sectorUid: this.sector.getUid(),
         username: member.name,
         userUid: member.uid
@@ -813,11 +812,11 @@ class Team extends BaseTransientEntity {
   }
 
   async unbanInDatabase(sector, banId) {
-    let sectorBan = await SectorBanModel.findOne({ 
-      where: { 
+    let sectorBan = await SectorBanModel.findOne({
+      where: {
         sectorUid: sector.getUid(),
         id: banId
-      } 
+      }
     })
 
     if (sectorBan) {
@@ -859,8 +858,8 @@ class Team extends BaseTransientEntity {
     } else if (onlineMember) {
       if (onlineMember.uid === this.creatorUid && !user.isSectorOwner()) return
       if (onlineMember.isAdmin() && !user.isSectorOwner()) return
-      if (this.isSectorOwner() && 
-          roleType === Team.AdminRoleType && 
+      if (this.isSectorOwner() &&
+          roleType === Team.AdminRoleType &&
           !user.isSectorOwner()) {
         user.showError("Permission Denied", { isWarning: true })
         return
@@ -878,7 +877,7 @@ class Team extends BaseTransientEntity {
   isBanned(ip, uid) {
     if (!uid && this.isOnIpBlacklist(ip)) return true
     if (uid && this.isOnUidBlacklist(uid)) return true
-    
+
     let isBannedInDb = this.sector.sectorBans.find((sectorBan) => {
       if (uid) {
         return sectorBan.userUid === uid
@@ -1046,11 +1045,11 @@ class Team extends BaseTransientEntity {
 
   hasAdminOnline() {
     let result = false
-    
+
     for (let memberId in this.members) {
       let member = this.members[memberId]
       if (member.getUid() === this.creatorUid) {
-        result = true        
+        result = true
         break
       }
 
@@ -1065,11 +1064,11 @@ class Team extends BaseTransientEntity {
 
   isCreatorOnline() {
     let result = false
-    
+
     for (let memberId in this.members) {
       let member = this.members[memberId]
       if (member.getUid() === this.creatorUid) {
-        result = true        
+        result = true
         break
       }
     }
@@ -1115,7 +1114,7 @@ class Team extends BaseTransientEntity {
     if (admin) {
       this.setLeader(admin)
       return
-    } 
+    }
 
     let member = this.getMembers()[0]
     if (member) {
@@ -1166,9 +1165,9 @@ class Team extends BaseTransientEntity {
   }
 
   onMemberAdded(player) {
-    this.game.triggerEvent("TeamMemberAdded", { 
-      teamId: this.id, 
-      team: this.name, 
+    this.game.triggerEvent("TeamMemberAdded", {
+      teamId: this.id,
+      team: this.name,
       playerId: player.id,
       player: player.getName(),
       count: this.getMemberCount()
@@ -1176,17 +1175,17 @@ class Team extends BaseTransientEntity {
   }
 
   onMemberRemoved(player) {
-    this.game.triggerEvent("TeamMemberRemoved", { 
-      teamId: this.id, 
-      team: this.name, 
+    this.game.triggerEvent("TeamMemberRemoved", {
+      teamId: this.id,
+      team: this.name,
       playerId: player.id,
       player: player.getName(),
       count: this.getMemberCount()
     })
 
-    let tames = this.getOwnerships('tames')    
+    let tames = this.getOwnerships('tames')
     for (let entityId in tames) {
-      let tame = tames[entityId]  
+      let tame = tames[entityId]
       if (tame.isMob() && tame.isMaster(player)) {
         tame.setMaster(null)
       }
@@ -1201,7 +1200,7 @@ class Team extends BaseTransientEntity {
     if (this.getTotalMemberCount() === 0) {
       let data = { clientMustDelete: true }
       this.onTeamChanged(data)
-      
+
       if (this.game.isPvP()) {
         this.remove()
       }
@@ -1215,12 +1214,12 @@ class Team extends BaseTransientEntity {
 
   broadcastPlayerHealth(player) {
     let socketIds = this.getMemberSocketIds()
-    SocketUtil.broadcast(socketIds, "UpdateTeamHealth", { entityId: player.id, health: player.health })
+    this.getSocketUtil().broadcast(socketIds, "UpdateTeamHealth", { entityId: player.id, health: player.health })
   }
 
   broadcast(eventName, data) {
     let socketIds = this.getMemberSocketIds()
-    SocketUtil.broadcast(socketIds, eventName, data)
+    this.getSocketUtil().broadcast(socketIds, eventName, data)
   }
 
   getAlliance() {
@@ -1236,14 +1235,14 @@ class Team extends BaseTransientEntity {
     if (score < 0) score = 0
 
     return {
-      id: this.id,  
-      name: this.name,  
-      score: score  
+      id: this.id,
+      name: this.name,
+      score: score
     }
   }
 
   canBeRemoved() {
-    return !this.isSectorOwner()    
+    return !this.isSectorOwner()
   }
 
   remove() {
@@ -1259,7 +1258,7 @@ class Team extends BaseTransientEntity {
 
     this.removeTamesAndBots()
     this.removeOwnerships()
-    
+
     this.clearChangedMapPositions()
 
     EventBus.dispatch(this.game.getId() + ":team:removed", this)
@@ -1314,7 +1313,7 @@ class Team extends BaseTransientEntity {
   }
 
   getRequiredTaxAmount() {
-    let paymentAmount = 100 * Math.ceil(this.dayCount / 3) 
+    let paymentAmount = 100 * Math.ceil(this.dayCount / 3)
     paymentAmount = Math.max(0, paymentAmount)
     paymentAmount = Math.min(5000, paymentAmount)
     return paymentAmount
@@ -1334,9 +1333,9 @@ class Team extends BaseTransientEntity {
       return this.leader.getRaidableOwnedStructures()
     } else {
       return this.getOwnedStructures().filter((building) => {
-        return !building.sector.isLobby() && 
+        return !building.sector.isLobby() &&
                !building.hasCategory("door") &&
-               !building.hasCategory("rail") 
+               !building.hasCategory("rail")
       })
     }
   }
@@ -1356,7 +1355,7 @@ class Team extends BaseTransientEntity {
       residents[id] = this.ownerships["bots"][id]
     }
 
-    SocketUtil.emit(player.getSocket(), "TeamResidentsUpdated", { residents: residents })
+    this.getSocketUtil().emit(player.getSocket(), "TeamResidentsUpdated", { residents: residents })
   }
 
   getOwnershipCount(typeName) {

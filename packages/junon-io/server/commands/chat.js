@@ -1,6 +1,5 @@
 const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
-const SocketUtil = require("junon-common/socket_util")
 
 class Chat extends BaseCommand {
 
@@ -18,8 +17,8 @@ class Chat extends BaseCommand {
   }
 
   perform(caller, args) {
-    let row 
-    let col 
+    let row
+    let col
     let entityToTeleport
 
     let selector = args[0]
@@ -38,7 +37,7 @@ class Chat extends BaseCommand {
 
     targetPlayers.forEach((player) => {
       let message = player.replaceBadWords(text)
-      SocketUtil.emit(player.getSocket(), "ServerChat", {
+      this.getSocketUtil().emit(player.getSocket(), "ServerChat", {
         message: message
       })
     })

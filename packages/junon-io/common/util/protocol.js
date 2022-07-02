@@ -4,7 +4,8 @@ const Protocol = {
     this.init(protoFile, cb)
   },
   initServer(cb) {
-    const directory = "node_modules/junon-common/protocol"
+    let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
+    const directory = nodeModulesPath + "/junon-common/protocol"
     let protoFile = debugMode ? `${directory}/app_debug.proto` : `${directory}/app.proto`
     this.init(protoFile, cb)
   },

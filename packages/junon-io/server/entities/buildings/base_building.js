@@ -1,7 +1,6 @@
 const p2 = require("p2")
 const Constants = require('../../../common/constants.json')
 const Protocol = require('../../../common/util/protocol')
-const SocketUtil = require("junon-common/socket_util")
 const Destroyable = require('../../../common/interfaces/destroyable')
 const Powerable = require('../../../common/interfaces/powerable')
 const NetworkAssignable = require('../../../common/interfaces/network_assignable')
@@ -36,7 +35,7 @@ class BaseBuilding extends BaseEntity {
     this.container = container
 
     if (!this.isCoordValid(container, data.x, data.y, this.getWidth(), this.getHeight())) {
-      this.stopConstruction()          
+      this.stopConstruction()
     }
 
     this.replaceExistingTiles()
@@ -111,7 +110,7 @@ class BaseBuilding extends BaseEntity {
     let right = !!neighbors[2].entity ? 1 : 0
     let down  = !!neighbors[3].entity ? 1 : 0
 
-    // or operation against bit index 
+    // or operation against bit index
     this.neighbors = 0
     this.neighbors = this.neighbors | (left  << 3)
     this.neighbors = this.neighbors | (top   << 2)
@@ -199,7 +198,7 @@ class BaseBuilding extends BaseEntity {
 //     if (data.decayStartTimestamp) {
 //       this.setDecayStartTimestamp(data.decayStartTimestamp)
 //     }
-// 
+//
     if (data.owner) {
       let owner = this.game.getEntity(data.owner.id)
       this.setOwner(owner)
@@ -228,7 +227,7 @@ class BaseBuilding extends BaseEntity {
     }
 
     if (data.targets) {
-      this.targets = data.targets      
+      this.targets = data.targets
     } else if (this.getDefaultTargets()) {
       this.targets = this.getDefaultTargets()
     }
@@ -299,7 +298,7 @@ class BaseBuilding extends BaseEntity {
       } else {
         return true
       }
-      
+
     } else {
       return true
     }
@@ -424,9 +423,9 @@ class BaseBuilding extends BaseEntity {
     let row = Math.floor(y / Constants.tileSize)
     let col = Math.floor(x / Constants.tileSize)
 
-    let isNotPlacedOnGrid = w === Constants.tileSize && 
-                            h === Constants.tileSize && 
-                            (x % Constants.tileSize === 0 || 
+    let isNotPlacedOnGrid = w === Constants.tileSize &&
+                            h === Constants.tileSize &&
+                            (x % Constants.tileSize === 0 ||
                              y % Constants.tileSize === 0)
 
     if (isNotPlacedOnGrid) {
@@ -554,7 +553,7 @@ class BaseBuilding extends BaseEntity {
 
   addBuildActivity(player) {
     this.sector.addActivityLog({
-      username: player.name, 
+      username: player.name,
       activityType: Protocol.definition().ActivityType.Build,
       entityId: this.id,
       entityType: this.type,
@@ -586,7 +585,7 @@ class BaseBuilding extends BaseEntity {
       }
 
       this.sector.addActivityLog({
-        username: this.lastBreaker.name, 
+        username: this.lastBreaker.name,
         activityType: Protocol.definition().ActivityType.Deconstruct,
         entityId: this.id,
         entityType: this.type,
@@ -1306,7 +1305,7 @@ class BaseBuilding extends BaseEntity {
   }
 
   getOppositeNeighborDirection(index) {
-    if (index === 0) return "right" 
+    if (index === 0) return "right"
     if (index === 1) return "down"
     if (index === 2) return "left"
     if (index === 3) return "up"
@@ -1971,10 +1970,10 @@ Object.assign(BaseBuilding.prototype, Destroyable.prototype, {
     if (!this.getOwner()) return
     if (this.getOwner().isTeam()) {
       this.getOwner().forEachMember((member) => {
-        SocketUtil.emit(member.getSocket(), "MapAction", { action: "drawDamage", row: this.getTopLeftRow(), col: this.getTopLeftCol() })
+        this.getSocketUtil().emit(member.getSocket(), "MapAction", { action: "drawDamage", row: this.getTopLeftRow(), col: this.getTopLeftCol() })
       })
     } else if (this.getOwner().isPlayer()) {
-      SocketUtil.emit(this.getOwner().getSocket(), "MapAction", { action: "drawDamage", row: this.getTopLeftRow(), col: this.getTopLeftCol() })
+      this.getSocketUtil().emit(this.getOwner().getSocket(), "MapAction", { action: "drawDamage", row: this.getTopLeftRow(), col: this.getTopLeftCol() })
     }
   },
   getMaxHealth() {
@@ -1998,8 +1997,8 @@ Object.assign(BaseBuilding.prototype, Destroyable.prototype, {
 
     if (!this.isCrop()) {
       let data = {
-        "entityId": this.id, 
-        "entityType": this.getTypeName(), 
+        "entityId": this.id,
+        "entityType": this.getTypeName(),
         "playerId": "",
         "player": "",
         "previous": (this.health - delta),
@@ -2034,11 +2033,11 @@ Object.assign(BaseBuilding.prototype, Powerable.prototype, {
 
 Object.assign(BaseBuilding.prototype, NetworkAssignable.prototype, {
   onNetworkAssignmentChanged(networkName) {
-    
+
     if (networkName === 'railNetwork') {
       this.game.triggerEvent("NetworkAssignmentChanged:Rail", { entityId: this.getId() })
     }
-    
+
     this.onStateChanged(networkName)
   }
 })

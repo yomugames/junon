@@ -1,7 +1,6 @@
 const Server = require('./server')
 const FirebaseAdminHelper = require("./firebase_admin_helper")
 const SectorModel = require("junon-common/db/sector")
-const SocketUtil = require("junon-common/socket_util")
 const LOG = require('junon-common/logger')
 const ExceptionReporter = require("junon-common/exception_reporter")
 
@@ -9,6 +8,7 @@ class Node {
   constructor(region, name) {
     this.region = region
     this.name = name
+    this.matchmaker = this.region.matchmaker
     this.servers = {}
 
     if (!global.isOffline) {
@@ -266,7 +266,7 @@ class Node {
     }
 
     let gameServerSocket = this.region.matchmaker.gameServerSockets[server.host]
-    SocketUtil.emit(gameServerSocket, "CreateGame", gameParams)
+    this.matchmaker.socketUtil.emit(gameServerSocket, "CreateGame", gameParams)
   }
 
   async createPvPServer() {
@@ -292,7 +292,7 @@ class Node {
     LOG.info("Node creating pvp server " + sectorModel.uid)
 
     let gameServerSocket = this.region.matchmaker.gameServerSockets[server.host]
-    SocketUtil.emit(gameServerSocket, "CreateGame", gameParams)
+    this.matchmaker.socketUtil.emit(gameServerSocket, "CreateGame", gameParams)
   }
 
   async onPvPServerCreated(data) {

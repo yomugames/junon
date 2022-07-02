@@ -2,7 +2,6 @@ const BaseBuilding = require("./../base_building")
 const Constants = require('../../../../common/constants.json')
 const Protocol = require('../../../../common/util/protocol')
 const BaseDistribution = require("./../base_distribution")
-const SocketUtil = require("junon-common/socket_util")
 
 class BaseSeed extends BaseDistribution {
 
@@ -149,12 +148,12 @@ class BaseSeed extends BaseDistribution {
         return
       }
     }
-      
+
     this.createDrop()
     this.remove()
 
     if (user && user.isPlayer()) {
-      SocketUtil.emit(user.getSocket(), "PlaySound", { id: Protocol.definition().SoundType.HarvestPlant })
+      this.getSocketUtil().emit(user.getSocket(), "PlaySound", { id: Protocol.definition().SoundType.HarvestPlant })
     }
 
     let dropTypeName = this.getItemDropTypeName()
@@ -178,7 +177,7 @@ class BaseSeed extends BaseDistribution {
 
     mob.setHandItem(cropItem)
 
-    let seedCount = Math.floor(Math.random() * 3) 
+    let seedCount = Math.floor(Math.random() * 3)
     let seedItem = this.sector.createItem(this.getType(), { count: seedCount })
 
     mob.setExtraItem(seedItem)

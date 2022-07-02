@@ -1,7 +1,6 @@
 const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
 const Protocol = require('../../common/util/protocol')
-const SocketUtil = require("junon-common/socket_util")
 
 class Map extends BaseCommand {
   getUsage() {
@@ -28,7 +27,7 @@ class Map extends BaseCommand {
         this.sector.mapGenerator.regenerate()
 
         break
-      case "blink": 
+      case "blink":
         selector = args[1]
         let entities = this.getEntitiesBySelector(selector)
         if (entities.length === 0) {
@@ -39,12 +38,12 @@ class Map extends BaseCommand {
 
         this.game.forEachPlayer((targetPlayer) => {
           entities.forEach((entity) => {
-            SocketUtil.emit(targetPlayer.getSocket(), "MapAction", { action: "drawDamage", row: entity.getTopLeftRow(), col: entity.getTopLeftCol() })
+            this.getSocketUtil().emit(targetPlayer.getSocket(), "MapAction", { action: "drawDamage", row: entity.getTopLeftRow(), col: entity.getTopLeftCol() })
           })
         })
 
         break
-      default: 
+      default:
         player.showChatError("No such subcommand: " + subcommand)
     }
   }

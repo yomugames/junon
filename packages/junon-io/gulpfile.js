@@ -29,7 +29,8 @@ let env                = process.env.NODE_ENV || 'development';
 let paths
 let gameVersion        = fs.readFileSync("VERSION.txt", 'utf8').replace("\n","")
 
-let protocolDirectory = "node_modules/junon-common/protocol"
+let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
+let protocolDirectory = nodeModulesPath + "/junon-common/protocol"
 let protocolContents        = require('child_process').execSync(`cat ${protocolDirectory}/enum.proto ${protocolDirectory}/base.proto ${protocolDirectory}/app.proto`).toString()
 let protocolHash = require('crypto').createHash('md5').update(protocolContents).digest("hex").substring(0,8)
 
@@ -175,7 +176,8 @@ function compressMangle() {
 }
 
 function copyProtobuf(){
-  let file = gulp.src('./node_modules/junon-common/protocol/*.proto')
+  let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
+  let file = gulp.src(nodeModulesPath + '/junon-common/protocol/*.proto')
                  .pipe(replace(/(\w+)\.proto/g, '$1-' + protocolHash + '.proto'))
                  .pipe(rename((path) => {
                    path.basename += `-${protocolHash}`

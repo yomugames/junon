@@ -1,6 +1,5 @@
 const Command = require("./command")
 const Trigger = require("./trigger")
-const SocketUtil = require("junon-common/socket_util")
 const ActionEntries = require("./action_entries/index")
 
 class CommandBlock {
@@ -12,6 +11,10 @@ class CommandBlock {
     this.triggers = []
     this.nodes = {}
     this.isEnabled = true
+  }
+
+  getSocketUtil() {
+    return this.game.server.socketUtil
   }
 
   applyData(json) {
@@ -51,8 +54,8 @@ class CommandBlock {
     let trigger = Trigger.create(this, { event: data.value })
 
     if (trigger) {
-      SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
-        id: trigger.id, 
+      this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
+        id: trigger.id,
         operation: "add",
         value: trigger.event,
         tempId: data.tempId
@@ -93,7 +96,7 @@ class CommandBlock {
       this.sector.removeEventHandlerTriggers()
     }
 
-    SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
       operation: "enable",
       value: this.isEnabled ? "true" : "false"
     })
@@ -112,7 +115,7 @@ class CommandBlock {
   }
 
   unregisterNode(node) {
-    delete this.nodes[node.id] 
+    delete this.nodes[node.id]
   }
 
   toJson() {

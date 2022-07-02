@@ -2,7 +2,6 @@ const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
 const Protocol = require('../../common/util/protocol')
 const Region = require("../entities/region")
-const SocketUtil = require("junon-common/socket_util")
 
 class RegionCommand extends BaseCommand {
 

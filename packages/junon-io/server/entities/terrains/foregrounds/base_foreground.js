@@ -1,6 +1,5 @@
 const BaseTerrain = require("./../base_terrain")
 const Destroyable = require('../../../../common/interfaces/destroyable')
-const SocketUtil = require("junon-common/socket_util")
 
 class BaseForeground extends BaseTerrain {
 

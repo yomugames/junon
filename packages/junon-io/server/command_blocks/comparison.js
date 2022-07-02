@@ -1,5 +1,4 @@
 const Node = require("./node")
-const SocketUtil = require("junon-common/socket_util")
 
 class Comparison extends Node {
   constructor(parent, data) {
@@ -50,7 +49,7 @@ class Comparison extends Node {
   }
 
   onValueChanged(key, value) {
-    SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", { 
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
       operation: "edit",
       id: this.id,
       value: [key, value].join(":")
@@ -61,7 +60,7 @@ class Comparison extends Node {
 
   remove() {
     this.parent.removeCondition(this)
-    super.remove() 
+    super.remove()
   }
 
   toJson() {

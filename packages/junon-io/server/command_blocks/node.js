@@ -1,4 +1,3 @@
-const SocketUtil = require("junon-common/socket_util")
 const BaseTransientEntity = require("../entities/base_transient_entity")
 
 class Node {
@@ -14,6 +13,10 @@ class Node {
     this.commandBlock = game.sector.commandBlock
 
     this.registerNode()
+  }
+
+  getSocketUtil() {
+    return this.game.server.socketUtil
   }
 
   registerNode() {
@@ -34,7 +37,7 @@ class Node {
     }
 
     this.unregisterNode()
-    SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", { 
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
       operation: "delete",
       id: this.id
     })

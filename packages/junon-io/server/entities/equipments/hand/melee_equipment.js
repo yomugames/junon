@@ -2,7 +2,6 @@ const HandEquipment = require("./hand_equipment")
 const Helper = require('../../../../common/helper')
 const Constants = require('../../../../common/constants')
 const Protocol = require('../../../../common/util/protocol')
-const SocketUtil = require("junon-common/socket_util")
 
 class MeleeEquipment extends HandEquipment {
 
@@ -26,12 +25,12 @@ class MeleeEquipment extends HandEquipment {
       super.use(user, targetEntity, options)
       return
     }
-    
+
     let success
     let meleeTargetOptions = this.getMeleeTargetOptions()
 
     if (this.canHitMultipleTargets()) {
-      let targets = user.getMeleeTargets(this.getMeleeRange(), meleeTargetOptions) //this.getMeleeTarget(user) 
+      let targets = user.getMeleeTargets(this.getMeleeRange(), meleeTargetOptions) //this.getMeleeTarget(user)
 
       targets = targets.slice(0, this.getConcurrentTargetCount())
 
@@ -41,7 +40,7 @@ class MeleeEquipment extends HandEquipment {
 
       success = true
     } else {
-      let target = user.getMeleeTarget(this.getMeleeRange(), meleeTargetOptions) //this.getMeleeTarget(user) 
+      let target = user.getMeleeTarget(this.getMeleeRange(), meleeTargetOptions) //this.getMeleeTarget(user)
       success = this.useOnTarget(user, target)
     }
 
@@ -78,7 +77,7 @@ class MeleeEquipment extends HandEquipment {
   }
 
   canHitMultipleTargets() {
-    return this.getConstants().concurrentTargetCount && 
+    return this.getConstants().concurrentTargetCount &&
            this.getConstants().concurrentTargetCount > 1
   }
 
@@ -91,7 +90,6 @@ class MeleeEquipment extends HandEquipment {
     if (target) {
       target.damage(damage, user, this)
       if (user.isPlayer()) {
-        // SocketUtil.emit(user.getSocket(), "PlaySound", { id: Protocol.definition().SoundType.MeleeHit })
       }
 
       if (this.canStunEnemy()) {

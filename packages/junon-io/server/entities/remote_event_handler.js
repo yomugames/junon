@@ -1,4 +1,3 @@
-const SocketUtil = require("junon-common/socket_util")
 const LOG = require('junon-common/logger')
 const Helper = require('../../common/helper')
 const Protocol = require('../../common/util/protocol')
@@ -10,6 +9,10 @@ class RemoteEventHandler {
 
   constructor(server) {
     this.server = server
+  }
+
+  getSocketUtil() {
+    return this.server.socketUtil
   }
 
   onSocketMessage(eventName, data, socket) {
@@ -27,7 +30,7 @@ class RemoteEventHandler {
   }
 
   onPing(player, data, socket) {
-    SocketUtil.emit(socket, "Pong", {})
+    this.getSocketUtil().emit(socket, "Pong", {})
   }
 
   onInviteToTeam(player, data, socket) {
@@ -41,7 +44,7 @@ class RemoteEventHandler {
   onSendMoney(player, data, socket) {
     let targetPlayer = this.server.getPlayerById(data.playerId)
     if (!targetPlayer) return
-      
+
     player.sendMoney(targetPlayer, data.gold)
 
   }
@@ -101,7 +104,7 @@ class RemoteEventHandler {
   async onRequestGame(player, data, socket) {
     // check if available game exist, if not create one
     if (this.server.isServerFull(socket)) {
-      SocketUtil.emit(socket, "CantJoin", { message: "Server is full" })
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "Server is full" })
       return
     }
 
@@ -118,20 +121,20 @@ class RemoteEventHandler {
         } else {
           game = this.server.getGame(data.sectorId)
         }
-        
+
         if (game) {
           game.join(socket, data)
         }
       }
     } catch(e) {
-      SocketUtil.emit(socket, "CantJoin", { message: "Unable to join server" })
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "Unable to join server" })
       throw e
     }
   }
 
   onStartRound(player, data, socket) {
     if (!player.game.sector.miniGame) return
-      
+
     if (player.game.getPlayerCount() < player.game.sector.miniGame.getRequiredPlayerCount()) {
       let count = player.game.sector.miniGame.getRequiredPlayerCount()
       let message = i18n.t(player.locale, "NeededToStart", { count: count })
@@ -168,8 +171,8 @@ class RemoteEventHandler {
     for (let id in chunkRegions) {
       let chunkRegion = chunkRegions[id]
       let chunkRegionPath = chunkRegion.requestChunkRegionPath()
-      SocketUtil.emit(socket, "EntityChunkRegionPath", { 
-        entityId: entity.getId(), 
+      this.getSocketUtil().emit(socket, "EntityChunkRegionPath", {
+        entityId: entity.getId(),
         chunkRegionPath: chunkRegionPath.toJson()
       })
     }
@@ -190,7 +193,7 @@ class RemoteEventHandler {
       return chunkRegion.toJson()
     })
 
-    SocketUtil.emit(socket, "UpdateChunkRegion", { chunkRegions: chunkRegionsData })
+    this.getSocketUtil().emit(socket, "UpdateChunkRegion", { chunkRegions: chunkRegionsData })
   }
 
   onManageStack(player, data, socket) {
@@ -213,7 +216,7 @@ class RemoteEventHandler {
     if (player.health > 0) return
 
     player.respawnIfReady()
-    SocketUtil.emit(socket, "Respawn", {})
+    this.getSocketUtil().emit(socket, "Respawn", {})
   }
 
   onResumeGame(player, data, socket) {
@@ -224,12 +227,12 @@ class RemoteEventHandler {
 
     let game = this.server.getGame(data.sectorId)
     if (!game) {
-      SocketUtil.emit(socket, "CantJoin", { message: "Game not found" })
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "Game not found" })
       return
     }
 
     if (!game.isReady()) {
-      SocketUtil.emit(socket, "CantJoin", { message: "Game is not ready yet. Try again in a few seconds." })
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "Game is not ready yet. Try again in a few seconds." })
       return
     }
 
@@ -458,10 +461,10 @@ class RemoteEventHandler {
   }
 
   onButtonClick(player, data, socket) {
-    player.sector.onButtonClicked({ 
+    player.sector.onButtonClicked({
       playerId: player.id,
       entityId: data.entityId,
-      name: data.name 
+      name: data.name
     })
   }
 
@@ -555,7 +558,7 @@ class RemoteEventHandler {
     }
 
     if (data.hasOwnProperty("permission")) {
-      team.editPermission(data.permission, data.roleId, data.isEnabled) 
+      team.editPermission(data.permission, data.roleId, data.isEnabled)
     }
   }
 
@@ -632,15 +635,15 @@ class RemoteEventHandler {
     let team = player.getTeam()
     if (team.isFull()) return
 
-    delete requestingPlayer.teamRequests[team.id] 
+    delete requestingPlayer.teamRequests[team.id]
 
     if (data.isReject) {
-      SocketUtil.emit(requestingPlayer.getSocket(), "TeamInvitation", { teamId: team.getId(), isReject: true })
+      this.getSocketUtil().emit(requestingPlayer.getSocket(), "TeamInvitation", { teamId: team.getId(), isReject: true })
     } else {
       let oldTeam = requestingPlayer.getTeam()
 
       LOG.info(`${requestingPlayer.name} has been successfully invited to team: ${team.name} - ${team.id}. leaving old team `)
-      requestingPlayer.leaveTeam() 
+      requestingPlayer.leaveTeam()
       team.addMemberWithRole(requestingPlayer)
 
       // remove other pending requests
@@ -650,7 +653,7 @@ class RemoteEventHandler {
           let approvers = team.getInviteApprovers()
           if (approvers.length > 0) {
             approvers.forEach((approver) => {
-              SocketUtil.emit(approver.getSocket(), "TeamRequest", { playerId: requestingPlayer.getId(), clientMustDelete: true })
+              this.getSocketUtil().emit(approver.getSocket(), "TeamRequest", { playerId: requestingPlayer.getId(), clientMustDelete: true })
             })
           }
         }

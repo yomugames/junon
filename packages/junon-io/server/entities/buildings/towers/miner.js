@@ -2,7 +2,6 @@ const BaseTower = require("./base_tower")
 const Attacker = require('../../../../common/interfaces/attacker')
 const Constants = require('../../../../common/constants')
 const Projectiles = require('./../../projectiles/index')
-const SocketUtil = require("junon-common/socket_util")
 
 class Miner extends BaseTower {
   onBuildingPlaced() {
@@ -122,7 +121,7 @@ class Miner extends BaseTower {
         if (this.projectile) {
           this.projectile.markForRemoval()
           this.projectile = null
-          SocketUtil.emit(this.owner.getSocket(), "MineralCapacityReached", { })
+          this.getSocketUtil().emit(this.owner.getSocket(), "MineralCapacityReached", { })
         }
       }
     } else {

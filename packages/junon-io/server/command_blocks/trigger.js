@@ -1,4 +1,3 @@
-const SocketUtil = require("junon-common/socket_util")
 const Node = require("./node")
 const ActionContainer = require('./action_container')
 const Constants = require('../../common/constants.json')
@@ -61,7 +60,7 @@ class Trigger extends Node {
 
     this.commandBlock.addTrigger(this)
     this.onNodeChanged()
-  }  
+  }
 
   remove() {
     this.commandBlock.removeTrigger(this)

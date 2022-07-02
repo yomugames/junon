@@ -112,6 +112,10 @@ class BaseTransientEntity {
     return Object.assign({}, this.getConstants().requirements)
   }
 
+  getSocketUtil() {
+    return this.game.server.socketUtil
+  }
+
   static getCost() {
     let requirements = this.prototype.getConstants().requirements
 

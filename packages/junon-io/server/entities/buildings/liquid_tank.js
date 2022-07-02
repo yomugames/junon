@@ -1,7 +1,6 @@
 const Constants = require('../../../common/constants.json')
 const Protocol = require('../../../common/util/protocol')
 const BaseBuilding = require("./base_building")
-const SocketUtil = require("junon-common/socket_util")
 
 class LiquidTank extends BaseBuilding {
 
@@ -24,7 +23,7 @@ class LiquidTank extends BaseBuilding {
   drainSample() {
     let liquidStorage = this.resourceStorages.liquid
     if (liquidStorage.getUsage() === 0) return null
-      
+
     liquidStorage.setUsage(liquidStorage.getUsage() - this.getBottleFillAmount())
     return "Water"
   }

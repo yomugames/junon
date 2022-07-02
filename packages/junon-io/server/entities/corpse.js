@@ -6,7 +6,6 @@ const Destroyable = require('../../common/interfaces/destroyable')
 const ShipMountable = require('../../common/interfaces/ship_mountable')
 const Protocol = require('../../common/util/protocol')
 const Helper = require("../../common/helper")
-const SocketUtil = require("junon-common/socket_util")
 
 class Corpse extends BaseEntity {
   constructor(container, data) {
@@ -30,7 +29,7 @@ class Corpse extends BaseEntity {
   }
 
   removePlayerViewership(player) {
-    delete this.playerViewerships[player.getId()] 
+    delete this.playerViewerships[player.getId()]
   }
 
   unregisterFromPlayerViewership() {
@@ -57,7 +56,7 @@ class Corpse extends BaseEntity {
     if (prevOwner !== owner) {
       this.onOwnerChanged(prevOwner, owner)
     }
-    
+
   }
 
   onOwnerChanged(prevOwner, owner) {
@@ -71,21 +70,21 @@ class Corpse extends BaseEntity {
   }
 
   getMobKlass() {
-    return this.sector.getMobKlassForType(this.type) 
+    return this.sector.getMobKlassForType(this.type)
   }
 
   isTamable() {
-    let mobKlass = this.sector.getMobKlassForType(this.type) 
+    let mobKlass = this.sector.getMobKlassForType(this.type)
     return mobKlass.prototype.isTamable()
   }
 
   isSlave() {
-    let mobKlass = this.sector.getMobKlassForType(this.type) 
+    let mobKlass = this.sector.getMobKlassForType(this.type)
     return mobKlass.prototype.hasCategory('worker')
   }
 
   getMobMaxHealth() {
-    let mobKlass = this.sector.getMobKlassForType(this.type) 
+    let mobKlass = this.sector.getMobKlassForType(this.type)
     return mobKlass.prototype.getMaxHealth()
   }
 
@@ -145,7 +144,7 @@ class Corpse extends BaseEntity {
     let aliveDuration = this.game.timestamp - this.createTimestamp
     let maxSeconds = 60 * 30
     let maxTicks   = maxSeconds * Constants.physicsTimeStep
-    
+
     return aliveDuration > maxTicks
   }
 
@@ -154,7 +153,7 @@ class Corpse extends BaseEntity {
   }
 
   onStorageChanged(storage) {
-    
+
   }
 
   getX() {
@@ -178,7 +177,7 @@ class Corpse extends BaseEntity {
   }
 
   harvest(dropPosition) {
-    let mobKlass = this.sector.getMobKlassForType(this.type) 
+    let mobKlass = this.sector.getMobKlassForType(this.type)
 
     let pickup = null
 
@@ -195,9 +194,9 @@ class Corpse extends BaseEntity {
   }
 
   harvestToItem() {
-    let mobKlass = this.sector.getMobKlassForType(this.type) 
+    let mobKlass = this.sector.getMobKlassForType(this.type)
     let drop = mobKlass.prototype.getDrop()
-    let item 
+    let item
 
     if (drop) {
       if (Math.random() < 0.8) {
@@ -265,7 +264,7 @@ class Corpse extends BaseEntity {
   }
 
   isSlaveCorpse() {
-    let mobKlass = this.sector.getMobKlassForType(this.type) 
+    let mobKlass = this.sector.getMobKlassForType(this.type)
     return mobKlass.prototype.hasCategory("worker")
   }
 
@@ -370,7 +369,7 @@ class Corpse extends BaseEntity {
     }
 
     if (options.isChunkPositionChanged) {
-      SocketUtil.broadcast(this.sector.getSocketIds(), "ChunkPositionChanged", { row: options.chunkRow, col: options.chunkCol, entityId: this.getId() })      
+      this.getSocketUtil().broadcast(this.sector.getSocketIds(), "ChunkPositionChanged", { row: options.chunkRow, col: options.chunkCol, entityId: this.getId() })
     }
 
 

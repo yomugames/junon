@@ -1,7 +1,6 @@
 const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
 const Protocol = require('../../common/util/protocol')
-const SocketUtil = require("junon-common/socket_util")
 
 class Flow extends BaseCommand {
   getUsage() {
@@ -9,7 +8,7 @@ class Flow extends BaseCommand {
       "/flow [entity_id]",
     ]
   }
-  
+
   perform(player, args) {
     const entityId = args[0]
     let entity = this.game.getEntity(entityId)
@@ -23,7 +22,7 @@ class Flow extends BaseCommand {
 
     if (flowField) {
       this.sector.pathFinder.addFlowSubscription(flowField, player)
-      SocketUtil.emit(player.getSocket(), "FlowField", flowField.toJson())
+      this.getSocketUtil().emit(player.getSocket(), "FlowField", flowField.toJson())
     }
   }
 

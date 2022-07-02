@@ -1,6 +1,5 @@
 const Sector = require('./sector')
 const FirebaseAdminHelper = require("./firebase_admin_helper")
-const SocketUtil = require("junon-common/socket_util")
 const LOG = require('junon-common/logger')
 const PendingSector = require("./pending_sector")
 
@@ -8,6 +7,7 @@ class Server {
   constructor(node, data) {
     this.node = node
     this.region = node.region
+    this.matchmaker = this.region.matchmaker
     this.host = data.host
     this.revision = data.revision
     this.data = data
@@ -141,7 +141,7 @@ class Server {
 
     this.isRestarting = true
 
-    SocketUtil.emit(this.getSocket(), "Restart", {})
+    this.matchmaker.socketUtil.emit(this.getSocket(), "Restart", {})
   }
 
   restartIfOldRevisionAndZeroPlayers() {
@@ -175,7 +175,7 @@ class Server {
     //9am and above
     let shouldRestartNow = false //(new Date()).getHours() > 13
     if (shouldRestartNow) {
-      SocketUtil.emit(this.getSocket(), "Restart", {
+      this.matchmaker.socketUtil.emit(this.getSocket(), "Restart", {
         isDelayed: true,
         reason: "Server Update Available. Rebooting",
         seconds: 150

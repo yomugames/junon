@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "junon-common": "*",
     "@dagrejs/graphlib": "^2.1.4",
     "@fingerprintjs/fingerprintjs": "^3.0.1",
     "aws-sdk": "^2.562.0",
@@ -25,7 +26,6 @@
     "firebase": "^7.15.5",
     "firebase-admin": "^8.2.0",
     "get-port": "^5.0.0",
-    "junon-common": "github:yomugames/junon-common.git#master",
     "lodash": "^4.17.4",
     "minipass": "2.7.0",
     "node-polyglot": "^2.4.0",

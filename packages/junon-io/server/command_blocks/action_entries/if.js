@@ -1,6 +1,5 @@
 const Node = require("../node")
 const Comparison = require("../comparison")
-const SocketUtil = require("junon-common/socket_util")
 
 class If extends Node {
   constructor(parent, data) {
@@ -52,8 +51,8 @@ class If extends Node {
     let node = new Comparison(this, data)
 
     if (node) {
-      SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
-        id: node.id, 
+      this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
+        id: node.id,
         operation: "add",
         value: "",
         tempId: data.tempId

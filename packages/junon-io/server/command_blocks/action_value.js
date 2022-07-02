@@ -1,10 +1,9 @@
-const SocketUtil = require("junon-common/socket_util")
 const Node = require("./node")
 
 class ActionValue extends Node {
   constructor(actionEntry, data) {
     super(actionEntry.game, data)
-    
+
     this.actionEntry = actionEntry
 
     this.value = data.value
@@ -23,7 +22,7 @@ class ActionValue extends Node {
   }
 
   onValueChanged() {
-    SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", { 
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
       operation: "edit",
       id: this.id,
       value: this.value

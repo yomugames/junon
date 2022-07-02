@@ -2,7 +2,6 @@ const Constants = require('../../../common/constants.json')
 const Protocol = require('../../../common/util/protocol')
 const BaseBuilding = require("./base_building")
 const RailTram = require("./../transports/rail_tram")
-const SocketUtil = require("junon-common/socket_util")
 
 class RailStop extends BaseBuilding {
 
@@ -48,7 +47,7 @@ class RailStop extends BaseBuilding {
   }
 
   getConnectedTracks() {
-    let tramCenter = this.getTramCenter()  
+    let tramCenter = this.getTramCenter()
     let angle = this.getAngle()
 
     let trackLocations = {
@@ -73,7 +72,7 @@ class RailStop extends BaseBuilding {
         break
     }
 
-    let tracks = [] 
+    let tracks = []
 
     for (let direction in trackLocations) {
       let location = trackLocations[direction]
@@ -84,7 +83,7 @@ class RailStop extends BaseBuilding {
         tracks.push(entity)
       }
     }
-    
+
     return tracks
   }
 
@@ -177,7 +176,7 @@ class RailStop extends BaseBuilding {
   }
 
   sendRailDestinations(player, destinationMap) {
-    SocketUtil.emit(player.getSocket(), "RailDestinations", { destinationMap: destinationMap })
+    this.getSocketUtil().emit(player.getSocket(), "RailDestinations", { destinationMap: destinationMap })
   }
 
   getControlPanel() {
@@ -258,7 +257,7 @@ class RailStop extends BaseBuilding {
       lastBreaker.showError("Rail Network is currently in use")
       return
     }
-    
+
     super.breakBuilding(lastBreaker)
   }
 

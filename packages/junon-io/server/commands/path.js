@@ -2,7 +2,6 @@ const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
 const Protocol = require('../../common/util/protocol')
 const Region = require("../entities/region")
-const SocketUtil = require("junon-common/socket_util")
 
 class Path extends BaseCommand {
 
@@ -98,7 +97,7 @@ class Path extends BaseCommand {
         this.sector.renamePath(pathName, newPathName)
         player.showChatSuccess(`renamed path ${pathName} to ${newPathName} `)
         break
-      default: 
+      default:
         player.showChatError("No such subcommand /region " + subcommand)
         break
     }

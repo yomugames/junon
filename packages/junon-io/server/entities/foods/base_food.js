@@ -1,5 +1,4 @@
 const BaseTransientEntity = require("./../base_transient_entity")
-const SocketUtil = require("junon-common/socket_util")
 const Protocol = require('../../../common/util/protocol')
 const Constants = require('../../../common/constants.json')
 const Helper = require('../../../common/helper')
@@ -34,7 +33,7 @@ class BaseFood extends BaseTransientEntity {
     let cost = this.prototype.getConstants().cost
     return cost ? cost.gold : 2
   }
-  
+
   static getType() {
     return this.prototype.getType()
   }
@@ -88,7 +87,7 @@ class BaseFood extends BaseTransientEntity {
     let boundingBox = user.getNeighborBoundingBox(range)
     let players = user.sector.playerTree.search(boundingBox)
     players.forEach((player) => {
-      SocketUtil.emit(player.getSocket(), "PlaySound", { id: Protocol.definition().SoundType.Eating })
+      this.getSocketUtil().emit(player.getSocket(), "PlaySound", { id: Protocol.definition().SoundType.Eating })
     })
   }
 

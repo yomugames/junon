@@ -1,6 +1,5 @@
 const Constants = require('../../common/constants.json')
 const Protocol = require('../../common/util/protocol')
-const SocketUtil = require("junon-common/socket_util")
 const ChunkRegion = require("./chunk_region")
 const ExceptionReporter = require("junon-common/exception_reporter")
 
@@ -32,6 +31,10 @@ class Chunk {
 
     this.changedPlayers = {}
     this.changedProjectiles = {}
+  }
+
+  getSocketUtil() {
+    return this.game.server.socketUtil
   }
 
   rebuildRegions() {
@@ -93,7 +96,7 @@ class Chunk {
         let isFillable = this.isChunkRegionFillable(hit)
         let isEmpty = !hit.entity
         hit.remove()
-        
+
         if (isFillable || isEmpty) {
           regionsCreated += 1
           let chunkRegion = new ChunkRegion(this, { isSky: isEmpty })
@@ -146,16 +149,16 @@ class Chunk {
 
     if (hit.entity) {
        if (!hit.entity.hasCategory("wall") &&
-           hit.previousEntity && 
+           hit.previousEntity &&
            hit.previousEntity.hasCategory("wall")) {
          return false
        }
 
       if (hit.entity.hasCategory('rail_stop')) return false
-         
+
       return hit.entity.isPathFindBlocker()
     }
- 
+
     return false
   }
 
@@ -165,14 +168,14 @@ class Chunk {
     // if structure is beside wall and not included, but it has neighbor floor
     // that is actually part of chunkRegion, then revisit it
     if (!hit.entity.hasCategory("wall") &&
-        hit.previousEntity && 
+        hit.previousEntity &&
         hit.previousEntity.hasCategory("wall")) {
       return true
     }
 
     return false
   }
-  
+
   getRandomRow() {
     return this.tileStartRow + Math.floor(Math.random() * Constants.chunkRowCount)
   }
@@ -215,7 +218,7 @@ class Chunk {
       if (isWall) {
         let edgeOfOtherChunkRegion = neighbors.find((neighbor) => {
           let isPassable = this.sector.pathFinder.isPassable(neighbor, sourceEntity)
-          return isPassable && 
+          return isPassable &&
                  neighbor.entity &&
                  neighbor.entity.getChunkRegion() !== chunkRegion
         })
@@ -436,7 +439,7 @@ class Chunk {
     brokenBuildingList.forEach((building) => {
       this.forEachSubscribers((player) => {
         // console.log("broken: " + building.id + " - " + building.getBreakProgress())
-        SocketUtil.emit(player.getSocket(), "BreakBuilding", { id: building.id, progress: building.getBreakProgress() })
+        this.getSocketUtil().emit(player.getSocket(), "BreakBuilding", { id: building.id, progress: building.getBreakProgress() })
       })
     })
 
@@ -445,13 +448,13 @@ class Chunk {
 
   sendEquipmentAnimation(entity) {
     this.forEachSubscribers((player) => {
-      SocketUtil.emit(player.getSocket(), "Animate", { entityId: entity.getId() })
+      this.getSocketUtil().emit(player.getSocket(), "Animate", { entityId: entity.getId() })
     })
   }
 
   stopEquipmentAnimation(entity) {
     this.forEachSubscribers((player) => {
-      SocketUtil.emit(player.getSocket(), "Animate", { entityId: entity.getId(), shouldStop: true })
+      this.getSocketUtil().emit(player.getSocket(), "Animate", { entityId: entity.getId(), shouldStop: true })
     })
   }
 
@@ -461,12 +464,12 @@ class Chunk {
     if (this.sector.isFovMode()) {
       this.forEachSubscribers((player) => {
         if (player.shouldSkipFov()) {
-          SocketUtil.emit(player.getSocket(), "EntityUpdated", { corpses: this.changedCorpses })
+          this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { corpses: this.changedCorpses })
         }
       })
     } else {
       this.forEachSubscribers((player) => {
-        SocketUtil.emit(player.getSocket(), "EntityUpdated", { corpses: this.changedCorpses })
+        this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { corpses: this.changedCorpses })
       })
     }
 
@@ -477,7 +480,7 @@ class Chunk {
     if (Object.keys(this.changedTransports).length === 0) return
 
     this.forEachSubscribers((player) => {
-      SocketUtil.emit(player.getSocket(), "EntityUpdated", { transports: this.changedTransports })
+      this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { transports: this.changedTransports })
     })
 
     this.clearChangedCorpses()
@@ -487,7 +490,7 @@ class Chunk {
     if (Object.keys(this.changedMobs).length === 0) return
 
     this.forEachSubscribers((player) => {
-      SocketUtil.emit(player.getSocket(), "EntityUpdated", { mobs: this.changedMobs })
+      this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { mobs: this.changedMobs })
     })
 
     this.clearChangedMobs()
@@ -497,7 +500,7 @@ class Chunk {
     if (Object.keys(this.changedPickups).length === 0) return
 
     this.forEachSubscribers((player) => {
-      SocketUtil.emit(player.getSocket(), "EntityUpdated", { pickups: this.changedPickups })
+      this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { pickups: this.changedPickups })
     })
 
     this.clearChangedPickups()
@@ -528,7 +531,7 @@ class Chunk {
       players = this.sector.getPlayersByChunk(this)
       corpses = this.sector.getCorpsesByChunk(this)
     }
-    
+
     let projectiles = this.sector.getProjectilesByChunk(this)
     let rooms = this.getRooms()
 
@@ -553,7 +556,7 @@ class Chunk {
     let data = this.getAllData(player.shouldSkipFov())
     // console.log("sent chunk  " + [this.row, this.col].join("-") + " size: " + Helper.roughSizeOfObject(data))
 
-    SocketUtil.emit(player.getSocket(), "Chunk", data)
+    this.getSocketUtil().emit(player.getSocket(), "Chunk", data)
 
 
     if (this.sector.pathFinder.isDebugSubscriber(player)) {
@@ -569,7 +572,7 @@ class Chunk {
       json.push(chunkRegion.toJson())
     }
 
-    SocketUtil.emit(player.getSocket(), "UpdateChunkRegion", { chunkRegions: json })
+    this.getSocketUtil().emit(player.getSocket(), "UpdateChunkRegion", { chunkRegions: json })
   }
 
   getSubscriberCount() {
@@ -583,7 +586,7 @@ class Chunk {
           Object.keys(this.changedBuildings).length) {
         this.forEachSubscribers((player) => {
           let deltaChangedBuildings = player.getDeltaJson("buildings", this.changedBuildings)
-          SocketUtil.emit(player.getSocket(), "EntityUpdated", { buildings: deltaChangedBuildings, terrains: this.changedTerrains })
+          this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { buildings: deltaChangedBuildings, terrains: this.changedTerrains })
         })
       }
     }
@@ -596,7 +599,7 @@ class Chunk {
     if (Object.keys(this.changedRoomTiles).length === 0) return
 
     this.forEachSubscribers((player) => {
-      SocketUtil.emit(player.getSocket(), "EntityUpdated", { roomTiles: this.changedRoomTiles })
+      this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { roomTiles: this.changedRoomTiles })
     })
 
     this.clearChangedRoomTiles()
@@ -606,7 +609,7 @@ class Chunk {
     if (Object.keys(this.changedProjectiles).length === 0) return
 
     this.forEachSubscribers((player) => {
-      SocketUtil.emit(player.getSocket(), "EntityUpdated", { projectiles: this.changedProjectiles })
+      this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { projectiles: this.changedProjectiles })
     })
 
     this.clearChangedProjectiles()
@@ -619,7 +622,7 @@ class Chunk {
       this.forEachSubscribers((player) => {
         if (player.shouldSkipFov()) {
           this.safeExecute(() => {
-            SocketUtil.emit(player.getSocket(), "EntityUpdated", { players: this.changedPlayers })
+            this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { players: this.changedPlayers })
           })
         }
       })
@@ -627,7 +630,7 @@ class Chunk {
       this.forEachSubscribers((player) => {
         this.safeExecute(() => {
           // sometimes player.health is not integer. guard against it and continue processing others
-          SocketUtil.emit(player.getSocket(), "EntityUpdated", { players: this.changedPlayers })
+          this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { players: this.changedPlayers })
         })
       })
     }

@@ -1,5 +1,3 @@
-const SocketUtil = require("junon-common/socket_util")
-
 class Objective {
   constructor(sector, options = {}) {
     this.sector = sector
@@ -67,7 +65,7 @@ class Objective {
   }
 
   unregister() {
-    delete this.sector.objectives[this.name] 
+    delete this.sector.objectives[this.name]
   }
 
   setDescription(description) {
@@ -81,7 +79,11 @@ class Objective {
 
     this.game.triggerEvent("ObjectiveCompleted", { name: this.name })
 
-    SocketUtil.emit(this.player.getSocket(), "Objective", { name: this.name, isCompleted: true })
+    this.getSocketUtil().emit(this.player.getSocket(), "Objective", { name: this.name, isCompleted: true })
+  }
+
+  getSocketUtil() {
+    return this.game.server.socketUtil
   }
 
 }

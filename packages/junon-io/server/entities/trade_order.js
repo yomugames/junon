@@ -9,7 +9,6 @@ const Mobs = require("./mobs/index")
 const Item = require("./item")
 const Helper = require("./../../common/helper")
 const Protocol = require('../../common/util/protocol')
-const SocketUtil = require("junon-common/socket_util")
 
 const Constants = require('../../common/constants.json')
 
@@ -45,11 +44,15 @@ class TradeOrder {
 
       // vending machine count should always be 1
       if (this.seller.hasCategory("vending_machine")) {
-        this.count = 1 
+        this.count = 1
       }
     }
 
 
+  }
+
+  getSocketUtil() {
+    return this.game.server.socketUtil
   }
 
   canBuy() {
@@ -165,7 +168,7 @@ class TradeOrder {
   }
 
   hasSellPrivilege(player) {
-    if (!player.getTeam()) return false 
+    if (!player.getTeam()) return false
 
     return player.getRole().isAllowedTo("SellToTrader")
   }
@@ -175,7 +178,7 @@ class TradeOrder {
     if (typeName === "Gold") return
 
     if (!this.hasSellPrivilege(this.customer)) {
-      this.customer.showError("You dont have permission to sell", { isWarning: true })    
+      this.customer.showError("You dont have permission to sell", { isWarning: true })
       return
     }
 
@@ -191,7 +194,7 @@ class TradeOrder {
 
         let itemCount = this.customer.inventory.getItemCount(this.type)
         if (itemCount < this.count) {
-          this.customer.showError("Not enough items available", { isWarning: true })    
+          this.customer.showError("Not enough items available", { isWarning: true })
           return
         }
 
@@ -209,7 +212,7 @@ class TradeOrder {
         if (!item) return
 
         if (item.count < this.count) {
-          this.customer.showError("Not enough items available", { isWarning: true })    
+          this.customer.showError("Not enough items available", { isWarning: true })
           return
         }
 
@@ -226,7 +229,7 @@ class TradeOrder {
       itemType: typeName,
       count: this.count
     })
-    SocketUtil.emit(this.customer.getSocket(), "CraftSuccess", { name: "Gold", count: goldAmount })
+    this.getSocketUtil().emit(this.customer.getSocket(), "CraftSuccess", { name: "Gold", count: goldAmount })
   }
 
   isPurchasableFromTrader(klass) {
@@ -236,7 +239,7 @@ class TradeOrder {
 
   executeBuy() {
     if (!this.canBuy()) {
-      this.customer.showError("Not enough Resource", { isWarning: true })    
+      this.customer.showError("Not enough Resource", { isWarning: true })
       return
     }
 
@@ -245,12 +248,12 @@ class TradeOrder {
 
     if (this.seller) {
       itemSold = this.seller.getSellStorage()[this.index]
-      if (!itemSold) return 
+      if (!itemSold) return
 
       let validation = this.seller.validateSellable(this.customer, itemSold, this.count)
 
       if (validation.error) {
-        this.customer.showError(validation.error, { isWarning: true })    
+        this.customer.showError(validation.error, { isWarning: true })
         return
       }
     }
@@ -264,12 +267,12 @@ class TradeOrder {
       if (!shouldProceed) return
 
       let mobs = this.sector.spawnMob({
-        type: this.klass.name, 
+        type: this.klass.name,
         owner: this.customer.getTeam(),
         master: this.customer.getTeamApprovedMember(),
         count: this.count,
         x: this.customer.getX() + Constants.tileSize,
-        y: this.customer.getY() 
+        y: this.customer.getY()
       })
       product = mobs[0]
     } else {
@@ -289,7 +292,7 @@ class TradeOrder {
           this.customer.inventory.store(item)
         }
       }
-      
+
       product = item
     }
 
@@ -319,7 +322,7 @@ class TradeOrder {
       itemSold.reduceCount(this.count)
 
       if (this.seller.isBuildingStorage()) {
-        SocketUtil.emit(this.customer.getSocket(), "RenderStorage", { id: this.seller.id, inventory: this.seller })
+        this.getSocketUtil().emit(this.customer.getSocket(), "RenderStorage", { id: this.seller.id, inventory: this.seller })
       }
     }
 
@@ -331,7 +334,7 @@ class TradeOrder {
       count: this.count
     })
 
-    SocketUtil.emit(this.customer.getSocket(), "CraftSuccess", { name: product.getTypeName(), count: this.count })
+    this.getSocketUtil().emit(this.customer.getSocket(), "CraftSuccess", { name: product.getTypeName(), count: this.count })
   }
 
   getPurchaseTypeName() {

@@ -1,7 +1,6 @@
 const Constants = require('../../common/constants.json')
 const BaseTransientEntity = require("./base_transient_entity")
 const BoundingBox = require("../../common/interfaces/bounding_box")
-const SocketUtil = require("junon-common/socket_util")
 
 class Region extends BaseTransientEntity {
   constructor(sector, data = {}) {
@@ -35,7 +34,7 @@ class Region extends BaseTransientEntity {
   static isBoundsValid(sector, startRow, startCol, endRow, endCol) {
     if (isNaN(startRow) || isNaN(startCol) || isNaN(endRow) || isNaN(endCol)) return false
 
-    if (sector.isOutOfBounds(startRow, startCol) || 
+    if (sector.isOutOfBounds(startRow, startCol) ||
         sector.isOutOfBounds(endRow, endCol)) return false
 
     if (Math.abs(startRow - endRow) < 0) return false
@@ -113,7 +112,7 @@ class Region extends BaseTransientEntity {
   }
 
   rename(name, newName) {
-    delete this.sector.regions[this.name] 
+    delete this.sector.regions[this.name]
 
     this.setName(newName)
 
@@ -122,7 +121,7 @@ class Region extends BaseTransientEntity {
   }
 
   remove() {
-    delete this.sector.regions[this.name] 
+    delete this.sector.regions[this.name]
     this.sector.removeEntityFromTreeByName(this, "regions")
     super.remove()
 
@@ -170,8 +169,8 @@ class Region extends BaseTransientEntity {
   }
 
   onEntityLeave(entity) {
-    let data = { 
-      entityId: entity.getId(), 
+    let data = {
+      entityId: entity.getId(),
       region: this.name,
       player: "",
       playerRole: "",
@@ -189,8 +188,8 @@ class Region extends BaseTransientEntity {
   }
 
   onEntityEnter(entity) {
-    let data = { 
-      entityId: entity.getId(), 
+    let data = {
+      entityId: entity.getId(),
       region: this.name,
       player: "",
       playerRole: "",
@@ -203,13 +202,13 @@ class Region extends BaseTransientEntity {
     } else if (entity.isMob()) {
       data['entityType'] = entity.getTypeName()
     }
-    
+
     this.game.triggerEvent("RegionEnter", data)
   }
 
   onStateChanged() {
     this.game.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), "RegionUpdated", { region: this })
+      this.getSocketUtil().emit(player.getSocket(), "RegionUpdated", { region: this })
     })
   }
 

@@ -62,7 +62,8 @@ global.appRoot = path.resolve(__dirname + '/../')
 debugMode = (env === 'development' || env === 'test') ? true : false
 
 if (debugMode) {
-  let protocolDirectory = "node_modules/junon-common/protocol"
+  let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
+  let protocolDirectory = nodeModulesPath + "/junon-common/protocol"
   let protocolContents        = require('child_process').execSync(`cat ${protocolDirectory}/enum.proto ${protocolDirectory}/base.proto ${protocolDirectory}/app.proto`).toString()
   global.protocolHash = require('crypto').createHash('md5').update(protocolContents).digest("hex").substring(0,8)
 }
@@ -353,8 +354,8 @@ class Server {
     // prime servers are cheaper ovh servers with
     // lots 8 cores/16 threads + 64gb memory ($100 CAD/month)
     // can host 320 players??
-    if (process.env.PRIME) return "prime" 
-    if (process.env.MINIGAME) return "mini" 
+    if (process.env.PRIME) return "prime"
+    if (process.env.MINIGAME) return "mini"
 
     return "game"
   }
@@ -547,7 +548,6 @@ class Server {
     if (options.creatorUid) {
       game.setCreatorUid(options.creatorUid)
     } else if (options.idToken) {
-      debugger
       let uid = await this.getUidFromRequest(options.idToken, options.uid)
       if (uid) {
         game.setCreatorUid(uid)
@@ -617,7 +617,7 @@ class Server {
   }
 
   getSocketInstance() {
-    return SocketUtil
+    return this.socketUtil
   }
 
   getSentryInstance() {
@@ -762,7 +762,7 @@ class Server {
           return
         }
         this.protocol = protocol
-        SocketUtil.init({ protocol: protocol })
+        this.socketUtil = new SocketUtil({ protocol: protocol })
         resolve()
       })
     })
@@ -793,7 +793,7 @@ class Server {
     this.matchmakerClient.onmessage = this.onMatchmakerMessage.bind(this)
 
     this.matchmakerClient.on('open', () => {
-      // console.log("GameServer connected to matchmaker via " + url)
+      console.log("GameServer connected to matchmaker via " + url)
       setTimeout(() => {
         this.informMatchmaker()
       }, 3000)
@@ -1046,7 +1046,7 @@ class Server {
 
     // register events
     for (let eventName in Protocol.definition().MessageWrapper.fields) {
-      SocketUtil.on(eventName, this.onSocketMessage.bind(this, eventName))
+      this.socketUtil.on(eventName, this.onSocketMessage.bind(this, eventName))
     }
 
     let app
@@ -1063,18 +1063,18 @@ class Server {
       maxPayloadLength: 16 * 1024 * 1024,
       idleTimeout: 120,
       open: (ws, req) => {
-        SocketUtil.registerSocket(ws)
+        this.socketUtil.registerSocket(ws)
       },
       message: (ws, message, isBinary) => {
         if (isBinary) {
-          SocketUtil.onMessage(ws, message)
+          this.socketUtil.onMessage(ws, message)
         } else {
-          SocketUtil.onTextMessage(ws, message)
+          this.socketUtil.onTextMessage(ws, message)
         }
       },
       close: (ws, code, message) => {
         ws.isClosed = true
-        SocketUtil.unregisterSocket(ws)
+        this.socketUtil.unregisterSocket(ws)
         this.onClientDisconnect(ws)
       }
     })
@@ -1282,7 +1282,7 @@ class Server {
       if (ban.createdAt <  (Date.now() - microSeconds)) {
         // past expiry
         return true
-      } 
+      }
     }
 
     return false

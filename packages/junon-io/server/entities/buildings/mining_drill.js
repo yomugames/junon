@@ -1,6 +1,5 @@
 const Constants = require('../../../common/constants.json')
 const Protocol = require('../../../common/util/protocol')
-const SocketUtil = require("junon-common/socket_util")
 const BaseBuilding = require("./base_building")
 const Helper = require('../../../common/helper')
 const BaseProcessor = require("./base_processor")
@@ -10,7 +9,7 @@ class MiningDrill extends BaseProcessor {
   onBuildingPlaced() {
     if (this.getPlacer()) {
       let team = this.getPlacer().getTeam()
-      this.prevMiningDrillCount = team.getMiningDrillCount()  
+      this.prevMiningDrillCount = team.getMiningDrillCount()
     }
 
     super.onBuildingPlaced()
@@ -28,7 +27,7 @@ class MiningDrill extends BaseProcessor {
 
   onStorageChanged(item, index) {
     super.onStorageChanged(item, index)
-    
+
     if (this.canProceed()) {
       this.addProcessor(this)
     }
@@ -43,7 +42,7 @@ class MiningDrill extends BaseProcessor {
         team.forEachMember((player) => {
           player.showError("Awoken The Spiders You Have")
         })
-      } 
+      }
     }
   }
 
@@ -73,7 +72,7 @@ class MiningDrill extends BaseProcessor {
       let team = this.owner.isPlayer() ? this.owner.getTeam() : this.owner
       prevMiningDrillCount = team.getMiningDrillCount()
     }
-    
+
     super.remove()
 
     if (this.owner) {
@@ -94,7 +93,7 @@ class MiningDrill extends BaseProcessor {
     if (!Protocol.definition().BuildingType[ore]) {
       return null
     }
-    
+
     return this.sector.createItem(ore, { count: 1 })
   }
 

@@ -1,6 +1,5 @@
 const BaseEquipment = require("./../base_equipment")
 const Protocol = require('../../../../common/util/protocol')
-const SocketUtil = require("junon-common/socket_util")
 
 class ArmorEquipment extends BaseEquipment {
   applyVelocity(player, velocity) {
@@ -41,7 +40,7 @@ class ArmorEquipment extends BaseEquipment {
   getRole() {
     return Protocol.definition().EquipmentRole.Armor
   }
-  
+
   getImmunity() {
     return []
   }
@@ -81,7 +80,7 @@ class ArmorEquipment extends BaseEquipment {
       oxygen: oxygen
     }
 
-    SocketUtil.emit(player.getSocket(), "UpdateStats", data)
+    this.getSocketUtil().emit(player.getSocket(), "UpdateStats", data)
   }
 
   getMaxOxygen() {

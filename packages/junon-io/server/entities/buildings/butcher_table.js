@@ -1,6 +1,5 @@
 const Constants = require('../../../common/constants.json')
 const Protocol = require('../../../common/util/protocol')
-const SocketUtil = require("junon-common/socket_util")
 const BaseBuilding = require("./base_building")
 
 class ButcherTable extends BaseBuilding {
@@ -21,7 +20,7 @@ class ButcherTable extends BaseBuilding {
       return true
     }
 
-    if (!user.hasDragTarget()) { 
+    if (!user.hasDragTarget()) {
       user.showError("Corpse Required")
       return false
     }
@@ -34,7 +33,7 @@ class ButcherTable extends BaseBuilding {
         return false
       }
     }
-    
+
     let workPosition = this.getWorkPosition()
     if (!workPosition) return false
 
@@ -49,13 +48,13 @@ class ButcherTable extends BaseBuilding {
     this.activeCorpse.setPosition(this.getX(), this.getY())
 
     let workPositionAngle = (workPosition.radAngle * 180 / Math.PI)
-    
+
     user.setIsWorking(true)
 
     if (user.isPlayer()) {
       user.setEquipIndex(-1)
     }
-    
+
     user.setAngle(workPositionAngle)
 
     this.activeUser = user
@@ -76,7 +75,7 @@ class ButcherTable extends BaseBuilding {
 
   onCorpseRemoved() {
     let data = {
-      corpseType: this.activeCorpse.type, 
+      corpseType: this.activeCorpse.type,
       entityId: this.activeUser.getId(),
       player: ""
     }
@@ -84,14 +83,14 @@ class ButcherTable extends BaseBuilding {
     if (this.activeUser.isPlayer()) {
       data.player = this.activeUser.getName()
     }
-    
+
     this.game.triggerEvent("CorpseButchered", data)
 
     this.activeCorpse = null
 
     if (this.activeUser) {
       this.activeUser.unsetDragTarget()
-      
+
       if (this.activeUser.isPlayer()) {
         this.activeUser.progressTutorial("corpse", 2)
         this.activeUser.walkthroughManager.handle("butcher_slime")
@@ -105,7 +104,7 @@ class ButcherTable extends BaseBuilding {
       }
       this.activeUser = null
     }
-    
+
     this.container.removeProcessor(this)
     this.usage = 0
   }
@@ -160,7 +159,7 @@ class ButcherTable extends BaseBuilding {
     } else {
       this.usage = usage
     }
-    
+
     this.onStateChanged("usage")
   }
 

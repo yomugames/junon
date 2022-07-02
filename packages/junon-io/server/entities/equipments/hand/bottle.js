@@ -3,7 +3,6 @@ const MeleeEquipment = require("./melee_equipment")
 const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
 const Drainable = require('./../../../../common/interfaces/drainable')
-const SocketUtil = require("junon-common/socket_util")
 
 class Bottle extends MeleeEquipment {
 
@@ -30,8 +29,6 @@ class Bottle extends MeleeEquipment {
     relativeBox.w = meleeRange*2
     relativeBox.h = meleeRange*2
 
-    // SocketUtil.emit(player.getSocket(), "DebugRange", { box: relativeBox })
-
     // search platform tiles
     let hits = player.sector.platformMap.hitTestTile(relativeBox)
     let drainableHit = hits.find((hit) => {
@@ -44,7 +41,7 @@ class Bottle extends MeleeEquipment {
       drainableHit = hits.find((hit) => {
         return hit.entity && hit.entity.isBottleFillable()
       })
-    } 
+    }
 
     // search terrain tiles
     if (!drainableHit) {
@@ -92,7 +89,7 @@ class Bottle extends MeleeEquipment {
   }
 
   isLegacyBottleWithWater() {
-    return this.content === "Water" 
+    return this.content === "Water"
   }
 
   draw(user, entity) {
@@ -112,7 +109,7 @@ class Bottle extends MeleeEquipment {
         } else {
           this.fill(sample, 20)
         }
-        
+
       } else if (sample === 'Water') {
         if (this.constructor.name !== 'WaterBottle') {
           this.convertToWaterBottle()
@@ -165,7 +162,7 @@ class Bottle extends MeleeEquipment {
     if (owner.inventory) {
       owner.inventory.storeAt(prevStorageIndex, newItem)
     }
-    
+
     owner.setHandEquipment(newItem)
     newItem.instance.setUsage(newItem.instance.getUsageCapacity())
   }
@@ -179,7 +176,7 @@ class Bottle extends MeleeEquipment {
   }
 
   hasEnoughWater() {
-    return false 
+    return false
   }
 
   getType() {

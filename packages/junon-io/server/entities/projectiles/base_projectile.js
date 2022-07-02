@@ -4,7 +4,6 @@ const Protocol = require('../../../common/util/protocol')
 const Movable = require('../../../common/interfaces/movable')
 const Helper = require('../../../common/helper')
 const BaseEntity = require('../base_entity')
-const SocketUtil = require("junon-common/socket_util")
 
 class BaseProjectile extends BaseEntity {
   static build(data) {
@@ -77,7 +76,7 @@ class BaseProjectile extends BaseEntity {
 
   isObstructed(source, point) {
     let entityToIgnore = source
-    let distance = this.game.distance(source.getX(), source.getY(), point[0], point[1]) 
+    let distance = this.game.distance(source.getX(), source.getY(), point[0], point[1])
     let hit = source.getContainer().raycast(source.getX(), source.getY(), point[0], point[1], distance, entityToIgnore)
     return hit
   }
@@ -85,14 +84,14 @@ class BaseProjectile extends BaseEntity {
   accountForObstacles() {
     let container = this.getContainer()
     let entityToIgnore = this
-    let distance = this.game.distance(this.source.x, this.source.y, this.destination.x, this.destination.y) 
+    let distance = this.game.distance(this.source.x, this.source.y, this.destination.x, this.destination.y)
 
     let hit = container.raycast(this.source.x, this.source.y, this.destination.x, this.destination.y, distance, entityToIgnore)
 
     if (hit && hit.entity.isCollidableBuildingOrTerrain()) {
       let canDamageBuilding = hit.entity.isBuilding() && this.canDamage(hit.entity)
       if (canDamageBuilding) return
-        
+
       this.destinationEntity = hit.entity
       if (hit.entity.shouldCollideEdge()) {
         this.destination = { x: hit.x, y: hit.y }
@@ -140,7 +139,7 @@ class BaseProjectile extends BaseEntity {
 
   getContainer() {
     if (!this.owner) return this.sector
-      
+
     return this.owner.ship || this.owner.container || this.sector
   }
 
@@ -247,7 +246,7 @@ class BaseProjectile extends BaseEntity {
 
     this.remove(this)
   }
-  
+
   onVelocitySetByPosition() {
     this.determineMovementComplete()
   }
@@ -288,7 +287,7 @@ class BaseProjectile extends BaseEntity {
     if (entity.isOwnedBy(this.owner)) return false
     if (entity.hasCategory("ghost")) return false
 
-    const isWeaponDestroyed = this.owner && this.owner.isSector() 
+    const isWeaponDestroyed = this.owner && this.owner.isSector()
     const isSelfHit = entity === this.owner || (isWeaponDestroyed && entity.isPlayer())
     const isUnownedBuilding = entity.isBuilding() && !entity.hasOwner()
     const isDistribution = entity.isDistribution()
@@ -399,7 +398,7 @@ class BaseProjectile extends BaseEntity {
     this.repositionOnProjectileTree()
 
     if (options.isChunkPositionChanged) {
-      SocketUtil.broadcast(this.sector.getSocketIds(), "ChunkPositionChanged", { row: options.chunkRow, col: options.chunkCol, entityId: this.getId() })
+      this.getSocketUtil().broadcast(this.sector.getSocketIds(), "ChunkPositionChanged", { row: options.chunkRow, col: options.chunkCol, entityId: this.getId() })
     }
 
     this.onStateChanged()

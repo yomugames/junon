@@ -1,7 +1,6 @@
 const BaseEntity = require("./base_entity")
 const Item = require("./item")
 const Constants = require('../../common/constants.json')
-const SocketUtil = require("junon-common/socket_util")
 
 class Pickup extends BaseEntity {
   constructor(container, data) {
@@ -26,7 +25,7 @@ class Pickup extends BaseEntity {
     // required: either "item" or "sector", "type", "count"
 
     let sector = item ? item.getSector() : options.sector
-    let type = item ? item.type : options.type 
+    let type = item ? item.type : options.type
     let count = item ? item.count : options.count
     let instance = item ? item.instance : null
 
@@ -55,7 +54,7 @@ class Pickup extends BaseEntity {
   }
 
   onPickupCreated() {
-    this.createTimestamp = this.game.timestamp 
+    this.createTimestamp = this.game.timestamp
 
     this.container.addPickup(this)
     this.sector.insertEntityToTreeByName(this, "pickups")
@@ -98,7 +97,7 @@ class Pickup extends BaseEntity {
     if (player.inventory.isFullyStored()) {
       let item = player.inventory.getStackableItem(this.item.type)
       if (!item) return false
-        
+
       if (this.item.count + item.count > Constants.maxStackCount) {
         player.showError("Inventory Full")
         return false

@@ -1,4 +1,3 @@
-const SocketUtil = require("junon-common/socket_util")
 const _ = require("lodash")
 const LOG = require('junon-common/logger')
 
@@ -123,7 +122,7 @@ class Sector {
 
     let socketIds = this.getEnvironmentSocketIds()
 
-    SocketUtil.broadcast(socketIds, "Team", data)
+    this.matchmaker.socketUtil.broadcast(socketIds, "Team", data)
   }
 
   updateStatus(data) {
@@ -138,7 +137,7 @@ class Sector {
     let socketIds = this.getEnvironmentSocketIds()
     let json = Object.assign({}, { id: this.id }, this.data)
     delete json["creatorIp"]
-    SocketUtil.broadcast(socketIds, "SectorUpdated", json)
+    this.matchmaker.socketUtil.broadcast(socketIds, "SectorUpdated", json)
 
     if (newPlayerCount !== oldPlayerCount) {
       this.onPlayerCountChanged(oldPlayerCount, newPlayerCount)
@@ -183,7 +182,7 @@ class Sector {
     this.server.onSectorRemoved(this.id)
 
     let socketIds = this.getEnvironmentSocketIds()
-    SocketUtil.broadcast(socketIds, "RemoveSector", this.toJson())
+    this.matchmaker.socketUtil.broadcast(socketIds, "RemoveSector", this.toJson())
 
     if (this.isMiniGame()) {
       let miniGame = this.getMiniGame()

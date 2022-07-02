@@ -1,6 +1,5 @@
 const Command = require("../command")
 const ActionEntry = require("./action_entry")
-const SocketUtil = require("junon-common/socket_util")
 
 class CommandActionEntry extends ActionEntry {
   static create(trigger, data) {
@@ -11,7 +10,7 @@ class CommandActionEntry extends ActionEntry {
 
   static isValid(trigger, actionKey) {
     if (trigger.hasAction(actionKey)) return false
-      
+
     this.validKeys = ["commands"]
     return this.validKeys.indexOf(actionKey) !== -1
   }
@@ -45,8 +44,8 @@ class CommandActionEntry extends ActionEntry {
     let tempId = data.tempId
     let value = data.value
     if (!Command.isValid(value)) {
-      SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
-        id: this.id, 
+      this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
+        id: this.id,
         error: "invalid command"
       })
       return
@@ -54,8 +53,8 @@ class CommandActionEntry extends ActionEntry {
 
     let actionValue = new Command(this, { value: value })
 
-    SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
-      id: actionValue.id, 
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
+      id: actionValue.id,
       operation: "add",
       value: actionValue.value,
       tempId: tempId

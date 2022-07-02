@@ -1,6 +1,5 @@
 const Constants = require('../../common/constants.json')
 const SAT = require('sat')
-const SocketUtil = require("junon-common/socket_util")
 const LOG = require('junon-common/logger')
 const ExceptionReporter = require('junon-common/exception_reporter')
 const Helper = require('../../common/helper')
@@ -54,11 +53,11 @@ class Game {
       this.origSectorUid = sectorData.origSectorUid
       this.sectorUid  = this.id   = sectorData.id
 
-      let sectorName 
+      let sectorName
       if (sectorData.name) {
         sectorName = this.replaceBadWords(sectorData.name).replace(/\*/g, "")
       }
-      
+
       this.sectorName = this.name = sectorName || `Sector ${this.sectorUid}`
 
       if (sectorData.name) {
@@ -140,7 +139,7 @@ class Game {
 
   createKit(name, options = {}) {
     if (this.getKitCount() >= 20) return
-      
+
     let kit = new Kit(this, name)
 
     if (options.kitData) {
@@ -232,7 +231,7 @@ class Game {
   playScene(name, options = {}) {
     let scene = this.scenes[name]
     if (!scene) return
-    
+
     scene.play(options)
   }
 
@@ -355,8 +354,8 @@ class Game {
 
   async uploadImageRemotely(key, data) {
     const params = {
-      Body: data, 
-      Bucket: bucketName, 
+      Body: data,
+      Bucket: bucketName,
       Key: key,
       ACL: 'public-read',
       ContentType: 'image/jpeg'
@@ -384,7 +383,7 @@ class Game {
 
   deleteImageRemotely(key) {
     const params = {
-      Bucket: bucketName, 
+      Bucket: bucketName,
       Key: key
     }
 
@@ -533,7 +532,7 @@ class Game {
     }
 
     if (this.isPvP()) {
-      FirebaseAdminHelper.setPvPSector(this.sector.uid)      
+      FirebaseAdminHelper.setPvPSector(this.sector.uid)
     }
   }
 
@@ -541,10 +540,14 @@ class Game {
     this.forceRestart = true
     this.serverRestartTimestamp = this.timestamp + (Constants.physicsTimeStep * seconds)
     this.restartReason = reason
-    SocketUtil.broadcast(this.getSocketIds(), "ServerRestartCountdown", {
+    this.getSocketUtil().broadcast(this.getSocketIds(), "ServerRestartCountdown", {
       timestamp: this.serverRestartTimestamp,
       reason: reason
     })
+  }
+
+  getSocketUtil() {
+    return this.server.socketUtil
   }
 
   generateName() {
@@ -588,7 +591,7 @@ class Game {
     this.dialogueMap[entityId].dialogues[locale] = text || ""
 
     this.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), "DialogueUpdated", {
+      this.getSocketUtil().emit(player.getSocket(), "DialogueUpdated", {
         dialogueMap: this.dialogueMap
       })
     })
@@ -713,7 +716,7 @@ class Game {
       if (shouldExpire) {
         playerData.removeOwnerships()
         playerData.remove()
-      } 
+      }
     }
   }
 
@@ -862,7 +865,7 @@ class Game {
     // let blueprintData = this.getLobbyBlueprintData()
     // let saveData = this.convertLobbyBlueprintToSaveData(blueprintData)
 
-    let saveData = { 
+    let saveData = {
       metadata: {
         uid: this.sectorUid,
         name: "Tutorial Lobby",
@@ -913,16 +916,16 @@ class Game {
 
     this.isSaving = true
 
-    SocketUtil.broadcast(this.getSocketIds(), "SaveProgress", { finished: false })
+    this.getSocketUtil().broadcast(this.getSocketIds(), "SaveProgress", { finished: false })
 
     await WorldSerializer.saveSector(this.sector)
 
     this.isSaving = false
-    SocketUtil.broadcast(this.getSocketIds(), "SaveProgress", { finished: true })
+    this.getSocketUtil().broadcast(this.getSocketIds(), "SaveProgress", { finished: true })
   }
 
   async initSector(options = {}) {
-    let gameMode = options.gameMode 
+    let gameMode = options.gameMode
 
     let rowCount = gameMode === 'pvp' ? 512 : options.rowCount
     let colCount = gameMode === 'pvp' ? 512 : options.colCount
@@ -936,7 +939,7 @@ class Game {
       let compressed = require("fs").readFileSync(global.appRoot + "/common/tutorial.sav.gz")
       let buffer = await this.decompressGzip(compressed)
       if (!buffer) return
- 
+
       let version = WorldSerializer.parseSaveFileVersion(buffer)
       let sectorData = WorldSerializer.parseSaveGame(buffer, version)
       this.initLobby(sectorData)
@@ -1027,7 +1030,7 @@ class Game {
   }
 
   triggerEvent(eventName, params = {}) {
-    if (!this.isGameReady) return 
+    if (!this.isGameReady) return
     this.sector && this.sector.eventHandler.trigger(eventName, params)
   }
 
@@ -1073,13 +1076,13 @@ class Game {
         delete this.timers[timer.name]
         this.sector.eventHandler.triggerTimerEnd(timer)
       }
-    }  
+    }
   }
 
   onRoundStarted() {
     this.sendToMatchmaker({ event: "RoundStarted", data: this.getSectorData() })
     this.forEachPlayer((player) => {
-      SocketUtil.emit(player.socket, "RoundStarted", {})
+      this.getSocketUtil().emit(player.socket, "RoundStarted", {})
     })
   }
 
@@ -1111,14 +1114,14 @@ class Game {
     if (!this.gameMode || this.gameMode === 'default') {
       await SectorModel.update({
         gameMode: gameMode,
-      }, { 
+      }, {
         where: { uid: this.getSectorUid() }
       })
 
       this.gameMode = gameMode
       this.sector.setGameMode(gameMode)
 
-      SocketUtil.broadcast(this.getSocketIds(), "SectorUpdated", {
+      this.getSocketUtil().broadcast(this.getSocketIds(), "SectorUpdated", {
         gameMode: this.gameMode
       })
     }
@@ -1312,7 +1315,7 @@ class Game {
       // horizontal acceleration
       body.entity.move(deltaTime)
       body.entity.integratePreviousVerticalSpeed()
-      
+
       this.integrateForce(body)
       body.entity.applyGravity()
 
@@ -1432,7 +1435,7 @@ class Game {
 
       this.remove()
       return
-    } 
+    }
 
 
     this.preSaveWorldBeforeGameShutdown()
@@ -1456,7 +1459,7 @@ class Game {
   }
 
   delay(time) {
-    return new Promise(function(resolve) { 
+    return new Promise(function(resolve) {
        setTimeout(resolve.bind(null), time)
     })
   }
@@ -1480,8 +1483,8 @@ class Game {
 
     // for now, clear all object pools to avoid unwanted memory references
     // tbd: object pool per game
-    ObjectPool.reset() 
-  
+    ObjectPool.reset()
+
     this.forEachPlayer((player) => {
       player.remove()
     })
@@ -1491,7 +1494,7 @@ class Game {
     this.sendToMatchmaker({ event: "SectorRemoved", data: sectorData })
 
     if (this.isPvP()) {
-      await FirebaseAdminHelper.removePvPSector(this.sector.uid)      
+      await FirebaseAdminHelper.removePvPSector(this.sector.uid)
     }
 
 
@@ -1702,7 +1705,7 @@ class Game {
           this.gameInfo["camera"] = player.getCamera().toJson()
         }
 
-        SocketUtil.emit(player.socket, "GameState", this.gameInfo)
+        this.getSocketUtil().emit(player.socket, "GameState", this.gameInfo)
       }
     }
 
@@ -1728,7 +1731,7 @@ class Game {
 
     for(let id in this.players) {
       let player = this.players[id]
-      SocketUtil.emit(player.socket, "Leaderboard", { rankings: topTeams, playerRankings: topPlayers })
+      this.getSocketUtil().emit(player.socket, "Leaderboard", { rankings: topTeams, playerRankings: topPlayers })
     }
   }
 
@@ -1762,7 +1765,7 @@ class Game {
 
   stepWorld() {
     if (!this.isGameReady) return
-    
+
     // fixedTimeStep = seconds per frame
     this.platformerWorldStep(this.fixedTimeStep)
     this.cleanupPlayers()
@@ -1834,8 +1837,8 @@ class Game {
 
     let role = (player.getRole() && player.getRole().name) || "Guest"
 
-    this.triggerEvent("PlayerLeft", { 
-      playerId: player.getId(), 
+    this.triggerEvent("PlayerLeft", {
+      playerId: player.getId(),
       player: player.getName(),
       playerRole: player.getRoleName()
     })
@@ -1862,9 +1865,9 @@ class Game {
   }
 
   onPlayerJoined(player) {
-    this.triggerEvent("PlayerJoined", { 
-      playerId: player.getId(), 
-      playerName: player.getName(), 
+    this.triggerEvent("PlayerJoined", {
+      playerId: player.getId(),
+      playerName: player.getName(),
       player: player.getName(),
       playerRole: player.getRoleName()
     })
@@ -1930,7 +1933,7 @@ class Game {
 
       playerData.transferOwnershipsTo(player)
       playerData.remove()
-      
+
       return player
     } catch(e) {
       this.captureException(e)
@@ -2010,7 +2013,7 @@ class Game {
 
   formatBanMsg(ipBan) {
     let msg = "Banned"
-  
+
     let remaining = this.remainingDays(ipBan)
     if (remaining) {
       msg += ` for ${remaining} days.`
@@ -2030,13 +2033,13 @@ class Game {
     socket.locale = data.locale
 
     if (!this.isGameReady) {
-      SocketUtil.emit(socket, "CantJoin", { message: "Server initializing. Try again after a few seconds." })
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "Server initializing. Try again after a few seconds." })
       return
     }
 
     if (this.isPvP()) {
       if (this.getPlayerCount() >= 50) {
-        SocketUtil.emit(socket, "CantJoin", { message: "Server is full" })
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "Server is full" })
         return
       }
     }
@@ -2044,9 +2047,9 @@ class Game {
     if (this.isMiniGame()) {
       if (this.sector.eventHandler.isRoundStarted &&
           !this.sector.miniGame.canAcceptPlayersMidGame()) {
-        SocketUtil.emit(socket, "CantJoin", { message: "Round already started" })
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "Round already started" })
         return
-      } 
+      }
 
       let ipAddress = Helper.getSocketRemoteAddress(socket)
       let requestId = base64id.generateId()
@@ -2055,7 +2058,7 @@ class Game {
         playerRemoteAddress: ipAddress,
         fingerprint: data.fingerprint,
         requestId: requestId,
-        gameId: this.id 
+        gameId: this.id
       }
       this.sendToMatchmaker({ event: "CanPlayerJoin", data: options })
       return
@@ -2071,10 +2074,10 @@ class Game {
     delete this.pendingMatchmakerChecks[requestId]
 
     if (!canJoin && !debugMode) {
-      SocketUtil.emit(data.socket, "CantJoin", { message: "Already in another game" })
+      this.getSocketUtil().emit(data.socket, "CantJoin", { message: "Already in another game" })
       return
     }
- 
+
     await this.performJoinGame(data.socket, data.data)
   }
 
@@ -2142,7 +2145,7 @@ class Game {
       if (this.server.isBanExpired(ipBan)) {
         this.server.removeBan({ ip: [ipBan.ip] })
       } else {
-        SocketUtil.emit(socket, "CantJoin", {
+        this.getSocketUtil().emit(socket, "CantJoin", {
           message: this.formatBanMsg(ipBan)
         })
 
@@ -2155,17 +2158,16 @@ class Game {
     let uid
 
     if (data.idToken) {
-      debugger
       uid = await this.server.getUidFromRequest(data.idToken, data.uid)
       if (!uid) {
-        SocketUtil.emit(socket, "CantJoin", { message: "Player credentials are invalid. Unable to load save file." })
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "Player credentials are invalid. Unable to load save file." })
 
         let signInAlert = `[performJoinGame] ${ipAddress} used invalid idToken ${data.idToken}`
         ExceptionReporter.captureException(new Error(signInAlert))
         LOG.info(signInAlert)
         return
       }
-      
+
       let userModel = await User.findOne({ where: { uid: uid } })
       if (!userModel) {
         ExceptionReporter.captureException(new Error("used missing uid " + uid + " idToken: " + data.idToken))
@@ -2179,13 +2181,13 @@ class Game {
         if (this.server.isBanExpired(userBan)) {
           this.server.removeBan({ ip: [userBan.ip] })
         } else {
-          SocketUtil.emit(socket, "CantJoin", {
+          this.getSocketUtil().emit(socket, "CantJoin", {
             message: this.formatBanMsg(userBan)
           })
 
           return
         }
-      } 
+      }
 
       let existingPlayer = this.getPlayerByUID(uid)
       if (existingPlayer) {
@@ -2196,10 +2198,10 @@ class Game {
       let playerData = this.getPlayerData(uid)
       if (playerData) {
         if (data.username) {
-          playerData.name = data.username 
+          playerData.name = data.username
           playerData.data.name = data.username
         }
-        
+
         if (data.isNewTeam && this.isPvP()) {
           let team = playerData.getTeam()
           team.removeOfflineMember(playerData.data)
@@ -2210,7 +2212,7 @@ class Game {
           let team = playerData.getTeam()
 
           if (team && team.isBanned(Helper.getSocketRemoteAddress(socket), uid)) {
-            SocketUtil.emit(socket, "CantJoin", { message: "Previously kicked or banned from the team. Unable to join" })
+            this.getSocketUtil().emit(socket, "CantJoin", { message: "Previously kicked or banned from the team. Unable to join" })
             return
           }
 
@@ -2230,7 +2232,7 @@ class Game {
       isTaken = await User.isUsernameTaken(data.username)
       let isTakenInServer = this.isUsernameTakenInServer(data.username)
       if (isTaken || isTakenInServer) {
-        SocketUtil.emit(socket, "CantJoin", { message: "username is already taken" })
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
         return
       }
 
@@ -2241,13 +2243,13 @@ class Game {
 
     if (teamToJoin) {
       if (teamToJoin.isBanned(Helper.getSocketRemoteAddress(socket), uid)) {
-        SocketUtil.emit(socket, "CantJoin", { message: "Previously kicked or banned from the team. Unable to join" })
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "Previously kicked or banned from the team. Unable to join" })
         return
       }
     }
 
     if (this.sector.isFull()) {
-      SocketUtil.emit(socket, "CantJoin", { message: "Colony Full" })
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "Colony Full" })
       return
     }
 
@@ -2284,7 +2286,7 @@ class Game {
     //     this.setCreatorUid(player.getUid())
     //     this.creator = player
     // }
- 
+
     await this.broadcastPlayerJoin(player)
     this.announceEvents(player)
 
@@ -2390,12 +2392,12 @@ class Game {
       })
     }
 
-    SocketUtil.emit(player.getSocket(), "JoinGame", payload)
+    this.getSocketUtil().emit(player.getSocket(), "JoinGame", payload)
     let topTeams = this.getTopTeams()
-    SocketUtil.emit(player.socket, "Leaderboard", { rankings: topTeams })
+    this.getSocketUtil().emit(player.socket, "Leaderboard", { rankings: topTeams })
 
     if (!options.playerOnly) {
-      SocketUtil.broadcast(player.sector.getSocketIds(), "OtherPlayerJoined", { player: player }, { excludeSocketId: player.getSocketId() })
+      this.getSocketUtil().broadcast(player.sector.getSocketIds(), "OtherPlayerJoined", { player: player }, { excludeSocketId: player.getSocketId() })
     }
 
     this.requestTeamPositions(player)
@@ -2447,7 +2449,7 @@ class Game {
 
   requestTeamPositions(player) {
     if (this.sector.isFovMode()) return
-      
+
     let team = player.getTeam()
 
     if (team) {
@@ -2491,7 +2493,7 @@ class Game {
     if (typeof name === 'string') {
       name = name.replace(/'/g, "")
     }
-    
+
     let player = this.getPlayerByName(name)
     if (player) return player
 
@@ -2568,7 +2570,7 @@ class Game {
       existingPlayer.removeChunkSubscriptions()
       existingPlayer.requestNewChunks()
     } else {
-      SocketUtil.emit(socket, "SessionResume", {})
+      this.getSocketUtil().emit(socket, "SessionResume", {})
     }
   }
 
@@ -2579,7 +2581,7 @@ class Game {
   async resumeIdToken(socket, idToken, userUid) {
     const uid = await this.server.getUidFromRequest(idToken, userUid)
     if (!uid) {
-      SocketUtil.emit(socket, "CantJoin", {
+      this.getSocketUtil().emit(socket, "CantJoin", {
         message: "Player credentials are invalid. Unable to load save file."
       })
       return null
@@ -2593,21 +2595,21 @@ class Game {
 
     let playerData = this.getPlayerData(uid)
     if (!playerData) {
-      SocketUtil.emit(socket, "CantJoin", { message: "Player Data not found in save file." })
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "Player Data not found in save file." })
       return
-    } 
+    }
 
     let team = playerData.getTeam()
     if (!team) {
       if (this.isPvP()) {
         delete playerData.data["team"]
       } else {
-        SocketUtil.emit(socket, "CantJoin", { message: "Team not found in save file." })
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "Team not found in save file." })
         return null
       }
     } else {
       if (team.isFull() && this.isPvP()) {
-        SocketUtil.emit(socket, "TeamFull", { team: team })
+        this.getSocketUtil().emit(socket, "TeamFull", { team: team })
         return
       }
     }
@@ -2783,7 +2785,7 @@ class Game {
 
   getAlivePlayers(condition) {
     let players = {}
-    
+
     this.forEachPlayer((player) => {
       if (!player.isDestroyed()) {
         if (condition) {

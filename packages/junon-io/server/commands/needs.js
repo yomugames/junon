@@ -1,6 +1,5 @@
 const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
-const SocketUtil = require("junon-common/socket_util")
 const Protocol = require('../../common/util/protocol')
 
 class Needs extends BaseCommand {

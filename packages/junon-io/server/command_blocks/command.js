@@ -1,6 +1,5 @@
 const ActionValue = require("./action_value")
 const Commands = require("../commands/index")
-const SocketUtil = require("junon-common/socket_util")
 
 class Command extends ActionValue {
   static isValid(value) {
@@ -11,15 +10,15 @@ class Command extends ActionValue {
 
     if (!Commands[cmd]) {
       return false
-    } 
+    }
 
     return true
   }
 
   edit(value, player) {
     if (!Command.isValid(value)) {
-      SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
-        id: this.id, 
+      this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
+        id: this.id,
         error: "Invalid command"
       })
       return

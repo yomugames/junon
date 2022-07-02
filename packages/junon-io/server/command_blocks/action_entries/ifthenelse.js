@@ -1,5 +1,4 @@
 const ActionEntry = require("./action_entry")
-const SocketUtil = require("junon-common/socket_util")
 const If = require('./if')
 const Else = require('./else')
 const Then = require('./then')
@@ -43,8 +42,8 @@ class IfThenElse extends ActionEntry {
     }
 
     if (node) {
-      SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
-        id: node.id, 
+      this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
+        id: node.id,
         operation: "add",
         value: "",
         tempId: data.tempId

@@ -4,7 +4,6 @@ const FloodFillManager = require("./../../common/entities/flood_fill_manager")
 const Buildings = require("./../entities/buildings/index")
 const Terrains = require("./../entities/terrains/index")
 const ChunkRegionPath = require("./chunk_region_path")
-const SocketUtil = require("junon-common/socket_util")
 const TileHit = require("../entities/tile_hit")
 const Helper = require("../../common/helper")
 
@@ -45,11 +44,15 @@ class PathFinder {
     this.initChunkRegionFloodFillManager()
   }
 
+  getSocketUtil() {
+    return this.game.server.socketUtil
+  }
+
   initPassableTypes() {
     this.SKY_PASSABLE_TYPES = new Set()
     this.SKY_PASSABLE_TYPES.add(0)
 
-    this.GROUND_PASSABLE_TYPES = new Set() 
+    this.GROUND_PASSABLE_TYPES = new Set()
     let buildingTypes = Buildings.getPassableTileTypes()
     let groundTypes = Terrains.getPassableTileTypes()
     for (let i = 0; i < buildingTypes.length; i++) {
@@ -184,7 +187,7 @@ class PathFinder {
         if (flowField) {
           targetDestinationChunkRegion = destinationChunkRegion
           break
-        } 
+        }
       }
     }
 
@@ -211,7 +214,7 @@ class PathFinder {
 
   cacheFlowField(flowFieldCacheKey, flowField) {
     if (!flowField) return
-      
+
     this.flowFieldCache[flowFieldCacheKey] = {
       flowField: flowField,
       lastUsedTimestamp: this.game.timestamp
@@ -236,7 +239,7 @@ class PathFinder {
 
     let destinationChunkRegions = targetEntity.getChunkRegions()
 
-    let isOnSameChunkRegion  = sourceChunkRegion && 
+    let isOnSameChunkRegion  = sourceChunkRegion &&
                                destinationChunkRegions[sourceChunkRegion.getId()]
 
     let notInChunkRegion = !sourceChunkRegion || Object.keys(destinationChunkRegions).length === 0
@@ -246,13 +249,13 @@ class PathFinder {
       if (flowField) {
         this.cacheFlowField(flowFieldCacheKey, flowField)
       }
-      
+
       return flowField
     } else {
       let result = this.getFlowFieldToReachDifferentChunkRegion(sourceEntity, sourceChunkRegion, destinationChunkRegions, sourceEntity, targetEntity)
 
       if (targetEntity.isBuilding()) {
-        // before getting flowField to different chunkRegion of a building, check targetEntity can be reached from gates of its chunkRegion 
+        // before getting flowField to different chunkRegion of a building, check targetEntity can be reached from gates of its chunkRegion
         // TBD: this probably needs to stay synchronou..
         let flowField = this.getFlowFieldToReachSameChunkRegion(targetEntity)
         if (!flowField.isInitialized()) return null
@@ -275,7 +278,7 @@ class PathFinder {
   isTargetReachableFromItsChunkRegion(chunkRegion, flowField) {
     let gateCoord = chunkRegion.getRandomGateCoord()
     if (!gateCoord) return true
-      
+
     return flowField.hasFlow(gateCoord.row, gateCoord.col)
   }
 
@@ -357,7 +360,7 @@ class PathFinder {
     if (!flowField) {
       flowField = this.createFlowFieldForDifferentBiomeChunkRegions(sourceChunkRegion, destinationChunkRegion)
     }
-    
+
     return flowField
   }
 
@@ -398,14 +401,14 @@ class PathFinder {
 
     let neighborDestinationChunkRegions = destinationChunkRegion.getNeighbors({sameBiome: false, passThroughWall: true})
 
-    let exit 
+    let exit
 
     let preferredExitChunkRegions = neighborDestinationChunkRegions.filter((neighborChunkRegion) => {
       let isExitChunkRegion = exitChunkRegions[neighborChunkRegion.getId()]
       return isExitChunkRegion
     })
 
-    let isAtPreferredExitChunkRegion = preferredExitChunkRegions.find((exitChunkRegion) => { 
+    let isAtPreferredExitChunkRegion = preferredExitChunkRegions.find((exitChunkRegion) => {
       return exitChunkRegion === chunkRegion
     })
 
@@ -414,7 +417,7 @@ class PathFinder {
     } else if (preferredExitChunkRegions.length > 0) {
       exit = preferredExitChunkRegions[0]
     } else if (exitChunkRegions[chunkRegion.getId()]) {
-      exit = chunkRegion // if chunkRegion im on is on SkyLand edge, make it exit 
+      exit = chunkRegion // if chunkRegion im on is on SkyLand edge, make it exit
     } else {
       exit = Object.values(exitChunkRegions)[0]
     }
@@ -441,7 +444,7 @@ class PathFinder {
       if (sourceContinent !== destinationContinent) {
         if (this.canBeReachedFromEdgesOfContinent(destinationChunkRegion, destinationContinent)) {
           nextChunkRegion = this.getNextChunkRegionToReachDifferentContinent(sourceChunkRegion, destinationChunkRegion, sourceContinent, destinationContinent)
-        } 
+        }
       }
     }
 
@@ -527,7 +530,7 @@ class PathFinder {
   createFlowFieldForDifferentBiomeChunkRegions(sourceChunkRegion, nextChunkRegion) {
     let transitionEdges = nextChunkRegion.getLandSkyTransitionEdges()
     let transitionEdgeList = Object.keys(transitionEdges)
-    if (transitionEdgeList.length === 0) return null 
+    if (transitionEdgeList.length === 0) return null
 
     transitionEdges
 
@@ -643,7 +646,7 @@ class PathFinder {
         isPassable = this.isPassable(hit, sourceEntity)
       }
     }
-    
+
     if (!isPassable) return true
 
     let hitChunkRegion = this.game.sector.getChunkRegionAt(hit.row, hit.col)
@@ -670,7 +673,7 @@ class PathFinder {
       if (!hit.entity) return true
       isPassable = this.isPassable(hit, sourceEntity)
     }
-    
+
     if (!isPassable) return true
 
     let hitChunkRegion = this.game.sector.getChunkRegionAt(hit.row, hit.col)
@@ -740,7 +743,7 @@ class PathFinder {
 
     if (this.getDebugSubscriberIds().length > 0) {
       let socketIds = this.getDebugSubscriberIds()
-      SocketUtil.broadcast(socketIds, "UpdateChunkRegionPath", { chunkRegionPaths: [chunkRegionPath.toJson()] })
+      this.getSocketUtil().broadcast(socketIds, "UpdateChunkRegionPath", { chunkRegionPaths: [chunkRegionPath.toJson()] })
     }
 
     return chunkRegionPath
@@ -758,7 +761,7 @@ class PathFinder {
     if (entity) {
       this.flowFields[this.getFlowFieldKey(entity, flowField.target)] = flowField
     }
-    
+
     this.onFlowFieldAdded(flowField)
   }
 
@@ -772,7 +775,7 @@ class PathFinder {
 
     for (let playerId in subscribers) {
       let player = subscribers[playerId]
-      SocketUtil.emit(player.getSocket(), "FlowField", json)
+      this.getSocketUtil().emit(player.getSocket(), "FlowField", json)
     }
   }
 
@@ -787,7 +790,7 @@ class PathFinder {
 
     for (let playerId in subscribers) {
       let player = subscribers[playerId]
-      SocketUtil.emit(player.getSocket(), "FlowField", json)
+      this.getSocketUtil().emit(player.getSocket(), "FlowField", json)
     }
   }
 
@@ -855,7 +858,7 @@ class PathFinder {
         if (flowField) {
           flowField.removeCacheDependency(cacheKey)
         }
-        
+
         delete this.flowFieldCache[cacheKey]
       }
     }
@@ -897,7 +900,7 @@ class PathFinder {
     })
 
     this.getDebugSubscribers().forEach((player) => {
-      SocketUtil.emit(player.getSocket(), "UpdateChunkRegion", { chunkRegions: changedChunkedRegionsJson })
+      this.getSocketUtil().emit(player.getSocket(), "UpdateChunkRegion", { chunkRegions: changedChunkedRegionsJson })
     })
 
     delete this.chunkInvalidations[chunk.getId()]
@@ -918,7 +921,7 @@ class PathFinder {
     }
 
     this.getDebugSubscribers().forEach((player) => {
-      SocketUtil.emit(player.getSocket(), "UpdateChunkRegionPath", { chunkRegionPaths: changedChunkedRegionPathsJson })
+      this.getSocketUtil().emit(player.getSocket(), "UpdateChunkRegionPath", { chunkRegionPaths: changedChunkedRegionPathsJson })
     })
   }
 
@@ -999,7 +1002,7 @@ class PathFinder {
 
     this.removeInactiveFlowFields()
     this.cleanupStaleCache()
-  } 
+  }
 
   processPendingFlowFieldUpdates(flowField) {
     for (let id in this.pendingFlowFieldUpdates) {
@@ -1025,7 +1028,7 @@ class PathFinder {
   }
 
   removePendingFlowFieldUpdate(flowField) {
-    delete this.pendingFlowFieldUpdates[flowField.getId()] 
+    delete this.pendingFlowFieldUpdates[flowField.getId()]
   }
 
   // when we want to update someone's flowField, we request temp flowField
@@ -1083,7 +1086,7 @@ class PathFinder {
 
   isPassable(hit, sourceEntity) {
     if (!hit) return true
-      
+
     if (hit.entity && hit.entity.isBuilding() && hit.entity.isConstructionInProgress()) {
       // still under construction, so passable
       return true
@@ -1094,7 +1097,7 @@ class PathFinder {
     if (hit.entity && hit.entity.hasCategory("partially_passable")) {
       return hit.entity.isHitPassable(hit)
     }
-    return this.getPassableTypes(sourceEntity).has(type) 
+    return this.getPassableTypes(sourceEntity).has(type)
   }
 
   // depends on where targetEntity/flood-fill origin is sky or not
@@ -1117,7 +1120,7 @@ class PathFinder {
   }
 
   isTileGroundPassable(tileType) {
-    return this.GROUND_PASSABLE_TYPES.has(tileType) 
+    return this.GROUND_PASSABLE_TYPES.has(tileType)
   }
 
   isOutOfBounds(row, col) {
@@ -1284,7 +1287,7 @@ class PathFinder {
 
     return farthest
   }
-  
+
   findSpawnGround(spawnChunkRegion) {
     let tile
 

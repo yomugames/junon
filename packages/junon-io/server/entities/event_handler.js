@@ -2,7 +2,6 @@
   eval is dangerous. add whitelist..
 */
 
-const SocketUtil = require("junon-common/socket_util")
 const Trigger = require("./trigger")
 const Protocol = require('../../common/util/protocol')
 const Helper = require('../../common/helper')
@@ -21,6 +20,10 @@ class EventHandler {
     this.BREAK_EXPRESSION = "debug" + "ger" // avoid git hook from detecting
     this.isRoundStarted = false
     this.isRoundStarting = false
+  }
+
+  getSocketUtil() {
+    return this.game.server.socketUtil
   }
 
   delayNextCommands(seconds) {
@@ -54,7 +57,7 @@ class EventHandler {
 
   shouldPreventTimer(timer) {
     if (timer.name === "RoundStartTimer") {
-      return this.isRoundStarted 
+      return this.isRoundStarted
     }
 
     return false
@@ -367,14 +370,14 @@ class EventHandler {
       let isColorTaken = false
 
       this.game.forEachPlayer((player) => {
-        if (player.getArmorEquipment() && 
+        if (player.getArmorEquipment() &&
             player.getArmorEquipment().content === color) {
           isColorTaken = true
         }
       })
 
       return !isColorTaken
-    })   
+    })
   }
 
   reduceFov() {
@@ -484,7 +487,7 @@ class EventHandler {
   }
 
   getVariable(key) {
-    return this.variables[key] 
+    return this.variables[key]
   }
 
   hasVariable(key) {
@@ -518,26 +521,26 @@ class EventHandler {
   }
 
   getLocale(playerId) {
-    let player = this.getPlayer(playerId) 
+    let player = this.getPlayer(playerId)
     if (!player) return "en"
     return player.locale
   }
 
   getRole(playerId) {
-    let player = this.getPlayer(playerId) 
+    let player = this.getPlayer(playerId)
     if (!player) return ""
     if (!player.getRole()) return ""
     return player.getRole().name
   }
 
   getPlayer(playerId) {
-    let player = this.game.getPlayerByNameOrId(playerId) 
+    let player = this.game.getPlayerByNameOrId(playerId)
     if (!player) return null
     return player
   }
 
   getPlayerName(playerId) {
-    let player = this.getPlayer(playerId) 
+    let player = this.getPlayer(playerId)
     if (!player) return null
     return player.getName()
   }
@@ -549,7 +552,7 @@ class EventHandler {
   }
 
   getFollowingId(entityId) {
-    let mob = this.game.getEntity(entityId) 
+    let mob = this.game.getEntity(entityId)
     if (!mob) return
     if (!mob.master) return
 
@@ -562,7 +565,7 @@ class EventHandler {
       return player.health
     }
 
-    let entity = this.game.getEntity(entityId) 
+    let entity = this.game.getEntity(entityId)
     if (!entity) return 0
 
     return entity.health
@@ -574,7 +577,7 @@ class EventHandler {
       return player.getRow()
     }
 
-    let entity = this.game.getEntity(entityId) 
+    let entity = this.game.getEntity(entityId)
     if (!entity) return 0
 
     return entity.getRow()
@@ -586,7 +589,7 @@ class EventHandler {
       return player.getCol()
     }
 
-    let entity = this.game.getEntity(entityId) 
+    let entity = this.game.getEntity(entityId)
     if (!entity) return 0
 
     return entity.getCol()
@@ -598,7 +601,7 @@ class EventHandler {
       return player.getMaxHealth()
     }
 
-    let entity = this.game.getEntity(entityId) 
+    let entity = this.game.getEntity(entityId)
     if (!entity) return 0
 
     return entity.getMaxHealth()
@@ -638,7 +641,7 @@ class EventHandler {
   endRoundStart() {
     this.isRoundEnding = true
     this.game.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), "EndGame", { isCountdown: true })
+      this.getSocketUtil().emit(player.getSocket(), "EndGame", { isCountdown: true })
     })
   }
 
@@ -648,7 +651,7 @@ class EventHandler {
 
   endRound() {
     this.game.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), "EndGame", {})
+      this.getSocketUtil().emit(player.getSocket(), "EndGame", {})
     })
 
     this.game.onRoundEnded()
@@ -715,30 +718,30 @@ class EventHandler {
     switch(operator) {
       case "==":
         result = safeValue1 == safeValue2
-        break 
+        break
       case "!=":
         result = safeValue1 != safeValue2
-        break  
+        break
       case ">":
         result = parseInt(safeValue1) > parseInt(safeValue2)
-        break  
+        break
       case "<":
         result = parseInt(safeValue1) < parseInt(safeValue2)
-        break  
+        break
       case ">=":
         result = parseInt(safeValue1) >= parseInt(safeValue2)
-        break  
+        break
       case "<=":
         result = parseInt(safeValue1) <= parseInt(safeValue2)
-        break  
+        break
       case "=~":
         result = !!safeValue1.toString().includes(safeValue2.toString())
-        break  
+        break
       default:
         return false
     }
 
-    let message = `[${result}] ` + [safeValue1, operator, safeValue2].join(" ") 
+    let message = `[${result}] ` + [safeValue1, operator, safeValue2].join(" ")
     this.queueLog({ type: 'condition', message: message })
 
     return result
@@ -781,7 +784,7 @@ class EventHandler {
     try {
       if (trigger.constructor.name === 'Trigger') {
         this.runActions(trigger.actions, params)
-        return   
+        return
       }
 
 
@@ -806,7 +809,7 @@ class EventHandler {
         }
       }
     } catch(e) {
-      this.game.captureException(e)      
+      this.game.captureException(e)
       this.queueLog({ type: 'error', message: 'unknown error' })
     }
   }
@@ -816,7 +819,7 @@ class EventHandler {
     let totalTasks = this.getObjectivesCountForRole('crew')
 
     this.game.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), "UpdateStats", {
+      this.getSocketUtil().emit(player.getSocket(), "UpdateStats", {
         totalTasks: totalTasks,
         taskCompleted: taskCompleted
       })
@@ -874,7 +877,7 @@ class EventHandler {
         } else {
           newCommand = this.interpolate(command, params)
         }
-        
+
         this.queueLog({ type: 'command', message: newCommand })
         this.game.executeCommand(this.sector, newCommand, this.commandDelay)
       })
@@ -898,7 +901,7 @@ class EventHandler {
     if (!creator) return
 
     this.logs.push(data)
-  }    
+  }
 
   flushLogs() {
     const isOneSecondInterval = this.game.timestamp % Constants.physicsTimeStep === 0
@@ -906,7 +909,7 @@ class EventHandler {
 
     if (this.logs.length > 0) {
       this.forEachPlayersWithCommands((player) => {
-        SocketUtil.emit(player.getSocket(), "CommandEventLogList", { logs: this.logs })
+        this.getSocketUtil().emit(player.getSocket(), "CommandEventLogList", { logs: this.logs })
       })
 
       this.logs = []
@@ -930,7 +933,7 @@ class EventHandler {
     if (!max) {
       max = parseInt(min)
       if (isNaN(max)) return 0
-      return Math.floor(Math.random() * max) 
+      return Math.floor(Math.random() * max)
     }
 
     min = parseInt(min)
@@ -947,7 +950,7 @@ class EventHandler {
   interpolateVariables(result, params, options = {}) {
     for (let key in params) {
       if (this.isVariableInvalid(key)) continue
-        
+
       let value = params[key]
 
       if (typeof value === 'string') {
@@ -1049,7 +1052,7 @@ class EventHandler {
   buildFunctionMatchRegex() {
     let list = this.getFunctionList().map((funcName) => {
       return funcName.replace("$", "\\$")
-    }) 
+    })
 
     let functions = "(" + list.join("|") + ")"
     let argument = "\\((.*?)\\)"
@@ -1145,7 +1148,7 @@ class EventHandler {
         if (isFuncFound) {
           let funcName = args.shift()
           if (this.hasFunction(funcName)) {
-            let result = this.runFunction(funcName, args) 
+            let result = this.runFunction(funcName, args)
             stack.push(result)
           } else {
             this.queueLog({ type: 'error', message: "Does not have function named: " + funcName })
@@ -1169,9 +1172,9 @@ class EventHandler {
     result = this.interpolateFunctions(result)
 
     if (!this.isImportedFromCommandBlock) {
-      result = result.replace(/{.*?}/g, (x) => { 
+      result = result.replace(/{.*?}/g, (x) => {
         try {
-          let evaluated = eval(x) 
+          let evaluated = eval(x)
           return evaluated
         } catch(e) {
           return ''

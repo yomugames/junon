@@ -1,4 +1,3 @@
-const SocketUtil = require("junon-common/socket_util")
 
 const ActionContainer = () => {
 }
@@ -6,7 +5,7 @@ const ActionContainer = () => {
 ActionContainer.prototype = {
   initActionContainer(data) {
     this.actions = []
-    this.parseActions(data.actions) 
+    this.parseActions(data.actions)
   },
 
   hasAction(name) {
@@ -49,8 +48,8 @@ ActionContainer.prototype = {
 
     let actionEntry = this.commandBlock.getActionEntryFor(actionKey).build(this, { actionKey: actionKey})
     if (actionEntry) {
-      SocketUtil.broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
-        id: actionEntry.id, 
+      this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
+        id: actionEntry.id,
         operation: "add",
         value: actionEntry.actionKey,
         tempId: tempId

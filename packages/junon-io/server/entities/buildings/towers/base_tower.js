@@ -4,7 +4,6 @@ const Constants = require('../../../../common/constants.json')
 const Destroyable = require('../../../../common/interfaces/destroyable')
 const Attacker = require('../../../../common/interfaces/attacker')
 const BaseBuilding = require("./../base_building")
-const SocketUtil = require("junon-common/socket_util")
 const Protocol = require('../../../../common/util/protocol')
 
 class BaseTower extends BaseBuilding {
@@ -67,7 +66,7 @@ class BaseTower extends BaseBuilding {
 
   notifyViewSubscribers() {
     Object.values(this.getViewSubscribers()).forEach((viewSubscriber) => {
-      SocketUtil.emit(viewSubscriber.getSocket(), "RenderStorage", {
+      this.getSocketUtil().emit(viewSubscriber.getSocket(), "RenderStorage", {
         id: this.id,
         inventory: this
       })
@@ -97,7 +96,7 @@ class BaseTower extends BaseBuilding {
 
     return storageItem.isAmmo()
   }
-  
+
   getDefaultTargets() {
     let result = 0
 
@@ -106,7 +105,7 @@ class BaseTower extends BaseBuilding {
     }
 
     result += (1 << Protocol.definition().AttackTargetType.Player)
-    
+
     return result
   }
 
@@ -169,7 +168,7 @@ Object.assign(BaseTower.prototype, Attacker.prototype, {
   shouldChooseTarget(target) {
     if (this.isFriendlyUnit(target)) return false
     if (target.hasCategory("ghost")) return false
-      
+
     if (target.isMob()) {
       // let mobNotFromRaidAndNotAttackingAnyone = !target.getRaid() && !target.desiredAttackTarget
       // if (mobNotFromRaidAndNotAttackingAnyone) return false
@@ -193,7 +192,7 @@ Object.assign(BaseTower.prototype, Attacker.prototype, {
     }
 
     if (target.isPlayer()) {
-      return true 
+      return true
     }
 
     return false

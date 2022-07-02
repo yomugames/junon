@@ -1,4 +1,3 @@
-const SocketUtil = require("junon-common/socket_util")
 const BadWordsFilter = require("../util/bad_words_filter")
 const Helper = require("../../common/helper")
 
@@ -44,6 +43,10 @@ class Role {
     if (options.kitName) {
       this.kitName = options.kitName
     }
+  }
+
+  getSocketUtil() {
+    return this.team.getSocketUtil()
   }
 
   applyPermissions(permissions) {
@@ -108,16 +111,16 @@ class Role {
   }
 
   onRoleChanged() {
-    SocketUtil.broadcast(this.team.getSocketIds(), "RoleUpdated", { teamId: this.team.id, role: this })
+    this.getSocketUtil().broadcast(this.team.getSocketIds(), "RoleUpdated", { teamId: this.team.id, role: this })
   }
-      
+
   canBeDeleted() {
     return !this.isReserved()
   }
 
   remove() {
     this.unregisterRole()
-    SocketUtil.broadcast(this.team.getSocketIds(), "RoleUpdated", { teamId: this.team.id, role: this, clientShouldDelete: true })
+    this.getSocketUtil().broadcast(this.team.getSocketIds(), "RoleUpdated", { teamId: this.team.id, role: this, clientShouldDelete: true })
   }
 
 }

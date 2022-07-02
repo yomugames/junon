@@ -1,6 +1,5 @@
 const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
-const SocketUtil = require("junon-common/socket_util")
 
 class Dialogue extends BaseCommand {
 
@@ -49,7 +48,7 @@ class Dialogue extends BaseCommand {
           player.showChatError("Not a mob: " + entityId)
           return
         }
-        
+
         text = args.slice(2).join(" ")
 
         if (this.isJson(text)) {
@@ -58,7 +57,7 @@ class Dialogue extends BaseCommand {
         } else {
           this.game.assignDialogue(entityId, text)
         }
-        
+
         break
       default:
         player.showChatError("No such subcommand /dialogue " + subcommand)

@@ -7,6 +7,10 @@ class BaseCommand {
     this.sector = game.sector
   }
 
+  getSocketUtil() {
+    return this.game.server.socketUtil
+  }
+
   getUsage() {
     return []
   }

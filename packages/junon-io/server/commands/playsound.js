@@ -1,6 +1,5 @@
 const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
-const SocketUtil = require("junon-common/socket_util")
 const Protocol = require('../../common/util/protocol')
 
 class Playsound extends BaseCommand {
@@ -28,7 +27,7 @@ class Playsound extends BaseCommand {
     }
 
     this.game.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), "PlaySound", { id: soundId } )
+      this.getSocketUtil().emit(player.getSocket(), "PlaySound", { id: soundId } )
     })
   }
 

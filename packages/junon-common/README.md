@@ -1,16 +1,6 @@
 Junon Common
 ======
 
-To make changes and test it locally on junon-io and junon-matchmaker, use `yalc`
-
-    npm install yalc -g
-
-    in ~/junon-common
-    yalc push
-
-    in ~/junon-io
-    yalc link junon-common --pure
-
 create migrations
 -------
 

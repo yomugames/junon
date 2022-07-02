@@ -15,7 +15,6 @@ const Buildings = require("../buildings/index")
 const Terrains = require("../terrains/index")
 const Goal = require("./../../ai/goal")
 const Corpse = require("./../corpse")
-const SocketUtil = require("junon-common/socket_util")
 const EventBus = require('eventbusjs')
 const ExceptionReporter = require('junon-common/exception_reporter')
 const Item = require("../item")
@@ -134,7 +133,7 @@ class BaseMob extends BaseEntity {
     }
 
     if (data.tasks) {
-      this.tasks = data.tasks      
+      this.tasks = data.tasks
     } else if (this.getDefaultTasks()) {
       this.tasks = this.getDefaultTasks()
     }
@@ -193,7 +192,7 @@ class BaseMob extends BaseEntity {
     }
 
     if (data.attackables) {
-      this.attackables = data.attackables  
+      this.attackables = data.attackables
     }
 
     if (data.mapDisplay) {
@@ -201,7 +200,7 @@ class BaseMob extends BaseEntity {
     }
 
     if (data.hasOwnProperty("allowTaming")) {
-      this.allowTaming = data.allowTaming 
+      this.allowTaming = data.allowTaming
     }
 
     if (data.hasOwnProperty("hunger"))  this.hunger = data.hunger
@@ -293,7 +292,7 @@ class BaseMob extends BaseEntity {
     let separator = "@__@"
     let log = this.getId() + separator + message
     if (team && team.leader) {
-      SocketUtil.emit(team.leader.getSocket(), "RenderDebug", { type: 'mob', data: log })
+      this.getSocketUtil().emit(team.leader.getSocket(), "RenderDebug", { type: 'mob', data: log })
     }
   }
 
@@ -429,7 +428,7 @@ class BaseMob extends BaseEntity {
   }
 
   onTamed(tamer) {
-    this.game.triggerEvent("MobTamed", { 
+    this.game.triggerEvent("MobTamed", {
       entityId: this.getId(),
       entityType: this.getTypeName(),
       playerId: tamer.getId(),
@@ -444,7 +443,7 @@ class BaseMob extends BaseEntity {
   release(player) {
     if (this.master !== player) return
 
-    this.game.triggerEvent("MobRelease", { 
+    this.game.triggerEvent("MobRelease", {
       entityId: this.getId(),
       entityType: this.getTypeName(),
       playerId: player.getId(),
@@ -471,11 +470,11 @@ class BaseMob extends BaseEntity {
   }
 
   triggerMobFeed(player, item) {
-    let data = { 
-      entityId: this.getId(), 
-      entityType: this.getTypeName(), 
+    let data = {
+      entityId: this.getId(),
+      entityType: this.getTypeName(),
       itemType: item.getTypeName(),
-      playerId: player.getId(), 
+      playerId: player.getId(),
       player: player.getName()
     }
 
@@ -505,7 +504,7 @@ class BaseMob extends BaseEntity {
     }
 
     if (this.hasNeed() && this.satisfiesNeed(item)) {
-      SocketUtil.broadcast(this.sector.getSocketIds(), "Animate", { entityId: this.getId(), animation: "heart" })
+      this.getSocketUtil().broadcast(this.sector.getSocketIds(), "Animate", { entityId: this.getId(), animation: "heart" })
       this.game.triggerEvent("NeedSatisfied", { entityId: this.getId(), itemType: item.type, actorId: player.getId() })
       item.consume()
       this.nextFeedTimestamp = this.game.timestamp + this.getFeedTimestampInterval()
@@ -513,7 +512,7 @@ class BaseMob extends BaseEntity {
       this.triggerMobFeed(player, item)
       return
     }
-    
+
     if (!item.isFood()) return
     if (!item.isEdible()) return
     if (!this.isTamable()) return
@@ -825,18 +824,18 @@ class BaseMob extends BaseEntity {
   }
 
   mobMount(user) {
-    this.game.triggerEvent("MobMount", { 
+    this.game.triggerEvent("MobMount", {
       entityId: this.getId(),
       entityType: this.getTypeName(),
       playerId: user.getId(),
       player: user.getName()
     })
     this.mount(user)
-    
+
     if (user.isPlayer()) {
       user.onStateChanged()
     }
-    
+
   }
 
   mobUnmount() {
@@ -844,7 +843,7 @@ class BaseMob extends BaseEntity {
 
     const user = this.passenger
 
-    this.game.triggerEvent("MobUnmount", { 
+    this.game.triggerEvent("MobUnmount", {
       entityId: this.getId(),
       entityType: this.getTypeName(),
       playerId: user.getId(),
@@ -1877,7 +1876,7 @@ class BaseMob extends BaseEntity {
       chunkRegion.unregister("mobs", this)
     }
   }
-  
+
   onPositionChanged(options = {}) {
     let currChunkRegion = this.getChunkRegion()
 
@@ -1909,7 +1908,7 @@ class BaseMob extends BaseEntity {
     }
 
     if (options.isChunkPositionChanged) {
-      SocketUtil.broadcast(this.sector.getSocketIds(), "ChunkPositionChanged", { row: options.chunkRow, col: options.chunkCol, entityId: this.getId() })
+      this.getSocketUtil().broadcast(this.sector.getSocketIds(), "ChunkPositionChanged", { row: options.chunkRow, col: options.chunkCol, entityId: this.getId() })
     }
 
     this.onStateChanged("x")
@@ -2075,7 +2074,7 @@ class BaseMob extends BaseEntity {
   }
 
   editContent(content) {
-    this.content = content    
+    this.content = content
     this.onContentChanged()
   }
 
@@ -2166,7 +2165,7 @@ class BaseMob extends BaseEntity {
         damage = this.sector.mobCustomStats[this.type].damage
       }
     }
-    
+
     let damageMultiplier = this.getDamageMultiplier(attackTarget)
 
     return Math.floor(damageMultiplier * damage)
@@ -2296,7 +2295,7 @@ Object.assign(BaseMob.prototype, Destroyable.prototype, {
         } else if (attacker.getPlayer()) {
           this.counterAttack(attacker.getPlayer())
         }
-        
+
       }
     }
 
@@ -2350,7 +2349,7 @@ Object.assign(BaseMob.prototype, Destroyable.prototype, {
 
     this.remove()
 
-    let mobKilledData = { 
+    let mobKilledData = {
       entityId: this.getId(),
       entityType: this.getTypeName(),
       killingPlayer: "",
@@ -2382,8 +2381,8 @@ Object.assign(BaseMob.prototype, Destroyable.prototype, {
     this.onStateChanged("health")
 
     let data = {
-      "entityId": this.id, 
-      "entityType": this.getTypeName(), 
+      "entityId": this.id,
+      "entityType": this.getTypeName(),
       "playerId": "",
       "player": "",
       "previous": (this.health - delta),
@@ -2404,7 +2403,7 @@ Object.assign(BaseMob.prototype, Destroyable.prototype, {
     }
 
     if (this.customMaxHealth) return this.customMaxHealth
-      
+
     let health = this.getStats().health
     let level = this.level || 0
     return health + level * 10
@@ -2549,7 +2548,7 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
       if (duration < Constants.physicsTimeStep * 3) {
         return
       }
-    } 
+    }
 
     this.lastLongRangeCheckTime = this.game.timestamp
 
@@ -2583,7 +2582,7 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
         let structure = chunkRegion.getRandomAttackableStructure()
         if (structure) {
           this.setDesiredAttackTarget(structure)
-          return 
+          return
         }
       }
     }
@@ -2909,7 +2908,7 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
     }
 
     if (this.attackables) return this.attackables
-    
+
     if (this.getConstants().attackGroups) {
       return this.getConstants().attackGroups
     }

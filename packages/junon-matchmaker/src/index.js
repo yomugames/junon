@@ -63,7 +63,7 @@ class MatchmakerServer {
     FirebaseAdminHelper.init()
     WorldSerializer.initSerializer()
 
-    SocketUtil.init({ isTextMode: true })
+    this.socketUtil = new SocketUtil({ isTextMode: true })
 
     this.init()
   }
@@ -291,7 +291,7 @@ class MatchmakerServer {
       if (socket.uid) {
         delete this.onlinePlayers[socket.uid]
         this.forEachOnlinePlayer((playerSocket) => {
-          SocketUtil.emit(playerSocket, "PlayerOffline", { uid: socket.uid })
+          this.socketUtil.emit(playerSocket, "PlayerOffline", { uid: socket.uid })
         })
       }
     } catch(e) {
@@ -735,7 +735,7 @@ class MatchmakerServer {
       open: (ws, req) => {
         ws.remoteAddress = getSocketRemoteAddress(ws)
 
-        SocketUtil.registerSocket(ws)
+        this.socketUtil.registerSocket(ws)
       },
       message: (ws, message, isBinary) => {
         let textMessage = this.decodeArrayBufferAsString(message)
@@ -743,7 +743,7 @@ class MatchmakerServer {
       },
       close: (ws, code, message) => {
         ws.isClosed = true
-        SocketUtil.unregisterSocket(ws)
+        this.socketUtil.unregisterSocket(ws)
         this.onPlayerDisconnect(ws)
       }
     })
@@ -759,7 +759,7 @@ class MatchmakerServer {
       let gameServerSocket = this.gameServerSockets[sectorData.host]
       if (gameServerSocket) {
         if (!data.stress) {
-          SocketUtil.emit(gameServerSocket, "RemovePlayer", {
+          this.socketUtil.emit(gameServerSocket, "RemovePlayer", {
             ipAddress: ip,
             idToken: data.idToken,
             uid: data.uid
@@ -778,10 +778,10 @@ class MatchmakerServer {
       this.onlinePlayers[uid] = socket
       socket.uid = uid
 
-      SocketUtil.emit(socket, "OnlineList", { online: Object.keys(this.onlinePlayers) })
+      this.socketUtil.emit(socket, "OnlineList", { online: Object.keys(this.onlinePlayers) })
 
       this.forEachOnlinePlayer((playerSocket) => {
-        SocketUtil.emit(playerSocket, "PlayerOnline", { uid: uid })
+        this.socketUtil.emit(playerSocket, "PlayerOnline", { uid: uid })
       })
     } catch(e) {
       ExceptionReporter.captureException(e)
@@ -806,7 +806,7 @@ class MatchmakerServer {
       let ip   = socket.remoteAddress
       let region = this.getRegion({ region: data.region })
       if (!region) {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: "Invalid region " + data.region
         })
         delete this.latencyProfiles[requestId]
@@ -826,7 +826,7 @@ class MatchmakerServer {
       }
 
       if (!node) {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: "Servers full. Unable to create game."
         })
 
@@ -836,7 +836,7 @@ class MatchmakerServer {
 
       let server = node.getAvailableServer({ isTutorial: data.isTutorial })
       if (!server) {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: "Available Servers full. Unable to create game."
         })
 
@@ -871,7 +871,7 @@ class MatchmakerServer {
           let sectorCount = result[0].sectorCount
           let maxSectorCount = 20
           if (sectorCount >= maxSectorCount) {
-            SocketUtil.emit(socket, responseEventName, {
+            this.socketUtil.emit(socket, responseEventName, {
               error: "Max Colony limit reached. Please delete your old colonies to create more space"
             })
 
@@ -922,11 +922,11 @@ class MatchmakerServer {
 
       this.latencyProfiles[requestId].matchmakerRequestGame = Date.now()
 
-      SocketUtil.emit(gameServerSocket, "CreateGame", gameParams)
+      this.socketUtil.emit(gameServerSocket, "CreateGame", gameParams)
     } catch(e) {
       delete this.latencyProfiles[requestId]
       ExceptionReporter.captureException(e)
-      SocketUtil.emit(socket, responseEventName, {
+      this.socketUtil.emit(socket, responseEventName, {
         error: "Unable to create colony"
       })
     }
@@ -1017,7 +1017,7 @@ class MatchmakerServer {
         this.removeBan({ ip: [ban.ip] })
         return false
       } else {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: this.formatBanMsg(ban)
         })
 
@@ -1040,7 +1040,7 @@ class MatchmakerServer {
       })
 
       if (!sectorId) {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: "Minigame not found."
         })
       }
@@ -1058,7 +1058,7 @@ class MatchmakerServer {
       if (sector && !data.hostPrivateGame) {
         // found a joinable game instance
         sector.addPlayerJoinQueue(requestId)
-        SocketUtil.emit(socket, responseEventName, { success: true, host: sector.server.host, sectorId: sector.id })
+        this.socketUtil.emit(socket, responseEventName, { success: true, host: sector.server.host, sectorId: sector.id })
         return
       }
 
@@ -1072,7 +1072,7 @@ class MatchmakerServer {
       // boot a game instance and if success join it
       let server = region.getAvailableMiniGameServer()
       if (!server) {
-        SocketUtil.emit(socket, responseEventName, { error: "Minigame Servers Full" })
+        this.socketUtil.emit(socket, responseEventName, { error: "Minigame Servers Full" })
         return
       }
 
@@ -1080,7 +1080,7 @@ class MatchmakerServer {
 
       let isPrivate = data.hostPrivateGame || data.isPrivate
 
-      SocketUtil.emit(gameServerSocket, "CreateGame", {
+      this.socketUtil.emit(gameServerSocket, "CreateGame", {
         sectorId: sectorId,
         socketId: socket.id,
         isMiniGame: true,
@@ -1100,7 +1100,7 @@ class MatchmakerServer {
       pendingSector.addQueue(socket)
     } catch (e) {
       ExceptionReporter.captureException(e)
-      SocketUtil.emit(socket, responseEventName, {
+      this.socketUtil.emit(socket, responseEventName, {
         error: "Unable to boot sector"
       })
     }
@@ -1116,7 +1116,7 @@ class MatchmakerServer {
       let sectorId = data.sectorId
 
       if (!sectorId) {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: "Missing sectorId."
         })
 
@@ -1129,7 +1129,7 @@ class MatchmakerServer {
       })
 
       if (!sectorModel) {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: "Sector " + sectorId + " not found"
         })
 
@@ -1138,7 +1138,7 @@ class MatchmakerServer {
       }
 
       if (sectorModel.gameMode === 'pvp') {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: "Sector " + sectorId + " cannot be manually booted"
         })
 
@@ -1149,7 +1149,7 @@ class MatchmakerServer {
       let ip   = socket.remoteAddress
       let region = this.getRegion({ region: data.region })
       if (!region) {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: "Invalid region " + data.region
         })
         delete this.latencyProfiles[requestId]
@@ -1166,14 +1166,14 @@ class MatchmakerServer {
       // check if sector is already online, can't have two instances (save file overwrite each other..)
       let onlineSector = region.getExistingSector(sectorId)
       if (onlineSector) {
-        SocketUtil.emit(socket, responseEventName, { success: true, host: onlineSector.data.host, sectorId: sectorId, sector: onlineSector.data })
+        this.socketUtil.emit(socket, responseEventName, { success: true, host: onlineSector.data.host, sectorId: sectorId, sector: onlineSector.data })
         return
       }
 
       let uid = await this.getUidFromRequest(data.idToken, data.uid)
       let isSectorBanned = await this.isBannedFromSector(sectorId, socket.remoteAddress, uid)
       if (isSectorBanned) {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: "You are banned from sector " + sectorId
         })
 
@@ -1187,7 +1187,7 @@ class MatchmakerServer {
       if (data.targetHost) {
         server = region.getServerByHost(data.targetHost)
         if (!server) {
-          SocketUtil.emit(socket, responseEventName, {
+          this.socketUtil.emit(socket, responseEventName, {
             error: "Target Server invalid. Unable to create game."
           })
 
@@ -1204,7 +1204,7 @@ class MatchmakerServer {
         }
 
         if (!node) {
-          SocketUtil.emit(socket, responseEventName, {
+          this.socketUtil.emit(socket, responseEventName, {
             error: "Servers full. Unable to create game."
           })
 
@@ -1214,7 +1214,7 @@ class MatchmakerServer {
 
         server = node.getAvailableServer({ isTutorial: isTutorial })
         if (!server) {
-          SocketUtil.emit(socket, responseEventName, {
+          this.socketUtil.emit(socket, responseEventName, {
             error: "Available Servers full. Unable to create game."
           })
 
@@ -1224,7 +1224,7 @@ class MatchmakerServer {
       }
 
       if (this.isImportInProgress(sectorId)) {
-        SocketUtil.emit(socket, responseEventName, {
+        this.socketUtil.emit(socket, responseEventName, {
           error: "Cannot boot. Save file being uploaded. "
         })
 
@@ -1237,7 +1237,7 @@ class MatchmakerServer {
       this.latencyProfiles[requestId].matchmakerRequestGame = Date.now()
 
       let gameServerSocket = this.gameServerSockets[server.host]
-      SocketUtil.emit(gameServerSocket, "CreateGame", {
+      this.socketUtil.emit(gameServerSocket, "CreateGame", {
         sectorId: sectorId,
         creatorIp: ip,
         socketId: socket.id,
@@ -1248,7 +1248,7 @@ class MatchmakerServer {
       delete this.latencyProfiles[requestId]
 
       ExceptionReporter.captureException(e)
-      SocketUtil.emit(socket, responseEventName, {
+      this.socketUtil.emit(socket, responseEventName, {
         error: "Unable to boot sector"
       })
     }
@@ -1272,7 +1272,7 @@ class MatchmakerServer {
       maxPayloadLength: 16 * 1024 * 1024,
       idleTimeout: 120,
       open: (ws, req) => {
-        SocketUtil.registerSocket(ws)
+        this.socketUtil.registerSocket(ws)
       },
       message: (ws, message, isBinary) => {
         let textMessage = textDecoder.decode(message)
@@ -1280,7 +1280,7 @@ class MatchmakerServer {
       },
       close: (ws, code, message) => {
         ws.isClosed = true
-        SocketUtil.unregisterSocket(ws)
+        this.socketUtil.unregisterSocket(ws)
         this.onGameServerDisconnect(ws)
       }
     })
@@ -1408,14 +1408,14 @@ class MatchmakerServer {
   onCanPlayerJoin(data, socket) {
     let playerIdentifier = [data.playerRemoteAddress, data.fingerprint].join("-")
     if (this.onlinePlayersByIp[playerIdentifier]) {
-      SocketUtil.emit(socket, "CanPlayerJoinResponse", {
+      this.socketUtil.emit(socket, "CanPlayerJoinResponse", {
         requestId: data.requestId,
         fingerprint: data.fingerprint,
         gameId: data.gameId,
         canJoin: false
       })
     } else {
-      SocketUtil.emit(socket, "CanPlayerJoinResponse", {
+      this.socketUtil.emit(socket, "CanPlayerJoinResponse", {
         requestId: data.requestId,
         fingerprint: data.fingerprint,
         gameId: data.gameId,
@@ -1496,7 +1496,7 @@ class MatchmakerServer {
         this.onPvpGameCreateStatus(data)
         return
       }
-      let playerSocket = SocketUtil.getSocket(data.socketId)
+      let playerSocket = this.socketUtil.getSocket(data.socketId)
       if (!playerSocket) return
 
       let eventName 
@@ -1523,7 +1523,7 @@ class MatchmakerServer {
             pendingSector.onCreateSuccess({ success: true, host: data.host, sectorId: data.sectorId, profile: profile, sector: data.sector, isGameReady: data.isGameReady })
           }
         } else {
-          SocketUtil.emit(playerSocket, eventName, { success: true, host: data.host, sectorId: data.sectorId, profile: profile, sector: data.sector, isGameReady: data.isGameReady })
+          this.socketUtil.emit(playerSocket, eventName, { success: true, host: data.host, sectorId: data.sectorId, profile: profile, sector: data.sector, isGameReady: data.isGameReady })
         }
       } else {
         if (data.isMiniGame) {
@@ -1534,7 +1534,7 @@ class MatchmakerServer {
             pendingSector.onCreateError({ error: data.error })
           }
         } else {
-          SocketUtil.emit(playerSocket, eventName, { error: data.error })
+          this.socketUtil.emit(playerSocket, eventName, { error: data.error })
         }
 
         if (eventName === "PlayerCreateSectorStatus") {
@@ -1725,14 +1725,14 @@ class MatchmakerServer {
       }
     })
 
-    SocketUtil.emit(socket, "SectorList", { region: 'nyc1', sectors: sectors })
+    this.socketUtil.emit(socket, "SectorList", { region: 'nyc1', sectors: sectors })
   }
 
   async onGetSector(data, socket) {
     let environment = this.getEnvironment()
     let sector = environment.findSector(data.sectorId)
     if (sector) {
-      SocketUtil.emit(socket, "SectorInfo", { sector: sector.toJson() })
+      this.socketUtil.emit(socket, "SectorInfo", { sector: sector.toJson() })
       return
     }
 
@@ -1741,11 +1741,11 @@ class MatchmakerServer {
     })
 
     if (sectorModel) {
-      SocketUtil.emit(socket, "SectorInfo", { sector: this.convertModelToSectorJson(sectorModel) })
+      this.socketUtil.emit(socket, "SectorInfo", { sector: this.convertModelToSectorJson(sectorModel) })
       return
     }
 
-    SocketUtil.emit(socket, "SectorInfo", { sector: null })
+    this.socketUtil.emit(socket, "SectorInfo", { sector: null })
   }
 
   convertModelToSectorJson(sectorModel) {
@@ -1756,7 +1756,7 @@ class MatchmakerServer {
   }
 
   onPing(data, socket) {
-    SocketUtil.emit(socket, "1", { })
+    this.socketUtil.emit(socket, "1", { })
   }
 
   initMiniGames() {
@@ -2021,7 +2021,7 @@ class MatchmakerServer {
     
     if (this.onlinePlayers[receiverUid]) {
       let socket = this.onlinePlayers[receiverUid]
-      SocketUtil.emit(socket, "FriendRequest", result)
+      this.socketUtil.emit(socket, "FriendRequest", result)
     }
   }
 
@@ -2089,7 +2089,7 @@ class MatchmakerServer {
   notifyFriendshipAccepted(friendRequest) {
     let socket = this.onlinePlayers[friendRequest.userUid]
     if (socket) {
-      SocketUtil.emit(socket, "FriendAccepted", friendRequest)
+      this.socketUtil.emit(socket, "FriendAccepted", friendRequest)
     }
   }
 

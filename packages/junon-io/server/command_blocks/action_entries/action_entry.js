@@ -1,5 +1,4 @@
 const Node = require("../node")
-const SocketUtil = require("junon-common/socket_util")
 
 class ActionEntry extends Node {
   static build(parent, data) {

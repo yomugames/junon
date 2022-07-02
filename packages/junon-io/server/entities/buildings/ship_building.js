@@ -1,5 +1,4 @@
 const BaseBuilding = require("./base_building")
-const SocketUtil = require("junon-common/socket_util")
 
 class ShipBuilding extends BaseBuilding {
   static isPositionValid(container, x, y, w, h, angle, player) {

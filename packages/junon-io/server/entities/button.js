@@ -1,6 +1,5 @@
 const Constants = require('../../common/constants.json')
 const BaseTransientEntity = require("./base_transient_entity")
-const SocketUtil = require("junon-common/socket_util")
 
 class Button extends BaseTransientEntity {
   constructor(sector, data = {}) {
@@ -45,13 +44,13 @@ class Button extends BaseTransientEntity {
   }
 
   detach(typeName) {
-    delete this.attachments[typeName] 
+    delete this.attachments[typeName]
     this.onStateChanged()
   }
 
   onStateChanged() {
     this.game.forEachPlayer((player) => {
-      SocketUtil.emit(player.getSocket(), "ButtonUpdated", { button: this })
+      this.getSocketUtil().emit(player.getSocket(), "ButtonUpdated", { button: this })
     })
   }
 

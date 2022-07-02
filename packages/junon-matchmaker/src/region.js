@@ -3,7 +3,6 @@ const Server = require('./server')
 const Node = require('./node')
 const FirebaseAdminHelper = require("./firebase_admin_helper")
 const ExceptionReporter = require("junon-common/exception_reporter")
-const SocketUtil = require("junon-common/socket_util")
 const LOG = require('junon-common/logger')
 
 class Region {
@@ -430,14 +429,14 @@ class Region {
   }
 
   sendChatHistory(socket) {
-    SocketUtil.emit(socket, "ChatHistory", this.chatHistory)
+    this.matchmaker.socketUtil.emit(socket, "ChatHistory", this.chatHistory)
   }
 
   broadcastMessage(chatMessage) {
     for (let socketId in this.sockets) {
       let socket = this.sockets[socketId]
 
-      SocketUtil.emit(socket, "ServerChat", chatMessage)
+      this.matchmaker.socketUtil.emit(socket, "ServerChat", chatMessage)
     }    
   }
 

@@ -2,7 +2,6 @@ const MeleeEquipment = require("./melee_equipment")
 
 const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
-const SocketUtil = require("junon-common/socket_util")
 const ExceptionReporter = require('junon-common/exception_reporter')
 
 
@@ -27,7 +26,7 @@ class SurvivalTool extends MeleeEquipment {
     let isBuilding = targetEntity && targetEntity.isBuilding()
     if (!isBuilding) return false
 
-    let hasOwner = targetEntity.owner 
+    let hasOwner = targetEntity.owner
     if (!hasOwner) return false
 
     if (targetEntity.hasCategory("storage") &&
@@ -35,11 +34,11 @@ class SurvivalTool extends MeleeEquipment {
       return false
     }
 
-    let regionBuildPermission = player.getRegionBuildPermission(targetEntity.getX(), 
-                                                                targetEntity.getY(), 
-                                                                targetEntity.getRotatedWidth(), 
+    let regionBuildPermission = player.getRegionBuildPermission(targetEntity.getX(),
+                                                                targetEntity.getY(),
+                                                                targetEntity.getRotatedWidth(),
                                                                 targetEntity.getRotatedHeight())
-    let byPassRoleBuildPermission 
+    let byPassRoleBuildPermission
     if (regionBuildPermission) {
       if (!player.canBuildInRegion(regionBuildPermission)) {
         return false
@@ -62,7 +61,7 @@ class SurvivalTool extends MeleeEquipment {
 
   hasMiningPrivilege(player) {
     if (player.sector.isLobby()) return true
-    if (!player.getTeam()) return false 
+    if (!player.getTeam()) return false
 
     return player.getRole().isAllowedTo("MineAsteroids")
   }
@@ -92,12 +91,12 @@ class SurvivalTool extends MeleeEquipment {
     if (!isStoredSuccessfully) {
       player.showError("Inventory Full")
     } else {
-      this.game.triggerEvent("AsteroidMined", { 
-        type: dropType, 
+      this.game.triggerEvent("AsteroidMined", {
+        type: dropType,
         player: player.getName(),
         remaining: targetEntity.health
       })
-      SocketUtil.emit(player.getSocket(), "GainResource", { amount: increment * this.sector.miningSpeed, type: dropType })
+      this.getSocketUtil().emit(player.getSocket(), "GainResource", { amount: increment * this.sector.miningSpeed, type: dropType })
     }
   }
 

@@ -6,7 +6,7 @@ const ExceptionReporter = require("./exception_reporter")
 
 class SocketUtil {
 
-  static init(options = {}) {
+  constructor(options = {}) {
     this.sockets = {}
     this.handlers = {}
 
@@ -14,7 +14,7 @@ class SocketUtil {
     this.isTextMode = options.isTextMode 
   }
 
-  static broadcast(socketIds, eventName, payload, options) {
+  broadcast(socketIds, eventName, payload, options) {
     options = options || {}
 
     socketIds = socketIds || Object.keys(this.sockets)
@@ -29,7 +29,7 @@ class SocketUtil {
     }
   }
 
-  static emit(socket, eventName, payload) {
+  emit(socket, eventName, payload) {
     if (this.isTextMode) {
       this.emitText(socket, eventName, payload)
     } else {
@@ -37,7 +37,7 @@ class SocketUtil {
     }
   }
 
-  static emitText(socket, eventName, payload) {
+  emitText(socket, eventName, payload) {
     if (socket.isClosed) return
 
     let data = { event: eventName, data: payload }
@@ -46,15 +46,15 @@ class SocketUtil {
     socket.send(JSON.stringify(data), isBinary)
   }
 
-  static removeSocketById(socketId) {
+  removeSocketById(socketId) {
     delete this.sockets[socketId]
   }
 
-  static markSocketAsClosed(socket) {
+  markSocketAsClosed(socket) {
     socket.isClosed = true
   }
 
-  static emitBinary(socket, eventName, payload) {
+  emitBinary(socket, eventName, payload) {
     if (typeof socket === "undefined") return
     if (socket.isClosed) return
 
@@ -84,12 +84,12 @@ class SocketUtil {
     socket.send(buffer, isBinary)
   }
 
-  static on(eventName, handler) {
+  on(eventName, handler) {
     // register handler if never registered before
     this.handlers[eventName] = this.handlers[eventName] || handler
   }
 
-  static registerSocket(socket) {
+  registerSocket(socket) {
     if (this.sockets[socket.id]) return; // already initialized
 
     socket.id = base64id.generateId()
@@ -97,15 +97,15 @@ class SocketUtil {
     this.sockets[socket.id] = socket
   }
 
-  static getSocket(socketId) {
+  getSocket(socketId) {
     return this.sockets[socketId]
   }
 
-  static unregisterSocket(socket) {
+  unregisterSocket(socket) {
     delete this.sockets[socket.id]
   }
 
-  static onClientDisconnect(socket, handler) {
+  onClientDisconnect(socket, handler) {
     socket.on("close", () => {
       try {
         handler(socket)
@@ -116,7 +116,7 @@ class SocketUtil {
     })
   }
 
-  static onTextMessage(socket, message) {
+  onTextMessage(socket, message) {
     try {
       let data = JSON.parse(message)
       this.handlers[data.event](data, socket)
@@ -126,7 +126,7 @@ class SocketUtil {
   }
 
   // https://github.com/uNetworking/bindings/blob/master/nodejs/examples/echo.js
-  static onMessage(socket, arrayBuffer) {
+  onMessage(socket, arrayBuffer) {
     try {
       const uint8Array = new Uint8Array(arrayBuffer)
 

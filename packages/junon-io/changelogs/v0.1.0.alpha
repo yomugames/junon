@@ -1,0 +1,15 @@
+{
+  "version": "v0.1.0.alpha",
+  "date": "Aug 2, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix bed spawn not working when part of team",
+      "Fix vacuum not detected properly when structures are built beside airlock"
+    ],
+    "features": [
+      "Added Social Login",
+      "Load/Resume is enabled for registered users"
+    ]
+  }
+}

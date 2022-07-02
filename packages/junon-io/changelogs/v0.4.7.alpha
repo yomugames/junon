@@ -1,0 +1,17 @@
+{
+  "version": "v0.4.7.alpha",
+  "date": "Jan 17, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix player stuck in webtrap",
+      "Fix username spoofing"
+    ],
+    "features": [
+      "Added Tesla Coil tower",
+      "New commands /fly /gold /stat",
+      "Added PocketTrader for instant buy and sell"
+    ]
+  }
+}
+

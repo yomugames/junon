@@ -1,0 +1,17 @@
+{
+  "version": "v0.4.17.alpha",
+  "date": "Jul 7, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "You can add/remove friends",
+      "You can search worlds",
+      "new function $getEquipId",
+      "new trigger PlayerKeyboard",
+      "increase max players to 20 per world"
+    ]
+  }
+}
+

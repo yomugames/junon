@@ -1,0 +1,25 @@
+{
+  "version": "v0.3.12.alpha",
+  "date": "July 27, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix passing through walls on map border",
+      "Fix being able to build airlocks on enemy walls", 
+      "Fix bullets not hitting enemy structures on the sides at times", 
+      "Can split stack of grenade/poison grenades",
+      "Hide from new/top when sector goes private",
+      "Save playerdata when guest receives gold in co-op"
+    ],
+    "features": [
+      "Door limit of 50 per team in pvp",
+      "Can tame bioraptors and mount on them for faster travel", 
+      "Add bread as new cooking recipe", 
+      "Stimpack doubles attack speed instead of damage",
+      "Team + Player leaderboard",
+      "pet/cleanbot can only open doors that belong to team",
+      "Enable slaves on pvp (max 3 per team)"
+    ]
+  }
+}
+

@@ -1,0 +1,17 @@
+{
+  "version": "v0.3.4.alpha",
+  "date": "June 15, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix slaves not using other stoves for cooking",
+      "Fix cleanbot dancing around together"
+    ],
+    "features": [
+      "Add user permissions to Steel Crate. Can limit to admin/members/everyone.",
+      "Disable Sealed Door functionality. Just a normal door now",
+      "Increase kick immunity to 3 minutes"
+    ]
+  }
+}
+

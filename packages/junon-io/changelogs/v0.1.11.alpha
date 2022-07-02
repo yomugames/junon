@@ -1,0 +1,13 @@
+{
+  "version": "v0.1.11.alpha",
+  "date": "Nov 4, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix team ownerships from old save files"
+    ],
+    "features": [
+      "Enable login/logout for mobile browsers"
+    ]
+  }
+}

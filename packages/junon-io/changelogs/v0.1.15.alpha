@@ -1,0 +1,16 @@
+{
+  "version": "v0.1.15.alpha",
+  "date": "Dec 13, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix wires/pipes render ordering",
+      "Fire extinguisher can clear corpse fire"
+    ],
+    "features": [
+      "Item Stack Split/Merge has been added",
+      "Food heals over a time duration instead of being instant",
+      "Death has a restart countdown"
+    ]
+  }
+}

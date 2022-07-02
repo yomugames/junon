@@ -1,0 +1,16 @@
+{
+  "version": "v0.1.17.alpha",
+  "date": "Dec 30, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix bug where grenades would sometimes damage own property",
+      "Fix inventory dragging bugs",
+      "Refinery would stop refining if gold is fully stacked",
+      "Fix gold amount of circuitboard"
+    ],
+    "features": [
+      "Cannibalism incurs negative relationship with Empire"
+    ]
+  }
+}

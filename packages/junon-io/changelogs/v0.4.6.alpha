@@ -1,0 +1,17 @@
+{
+  "version": "v0.4.6.alpha",
+  "date": "Dec 23, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix region build flag not working on roles"
+    ],
+    "features": [
+      "Add christmas tree, presents, and santa hat",
+      "Weapon countdown paused when inside underground vent",
+      "Faster map loading for minigames",
+      "Poison Spider spawns on spider infestation"
+    ]
+  }
+}
+

@@ -1,0 +1,12 @@
+{
+  "name": "junon",
+  "scripts": {
+    "client": "npm run client --workspace packages/junon-io",
+    "dev": "nodemon start_server.js",
+    "inspect": "nodemon --inspect start_server.js"
+  },
+  "workspaces": ["packages/*"],
+  "nodemonConfig": {
+    "ext": "js, json, proto"
+  }
+}

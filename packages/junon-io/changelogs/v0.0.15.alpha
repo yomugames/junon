@@ -1,0 +1,26 @@
+{
+  "version": "v0.0.15.alpha",
+  "date": "Jun 18, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix bullets not passing through corpses and spike traps",
+      "Fix players gettting stuck after reviving when held by another player prior",
+      "Fix mobs not disappearing properly sometimes"
+    ],
+    "features": [
+      "Animal Taming enabled for Slimes/Brood",
+      "CryoTube would resurrect dead pets",
+      "Fiber plant would regrow when less than 100 in land",
+      "Added Drill equipment for faster asteroid mining",
+      "Bottle can draw water from liquid tank",
+      "Mob spawns are limited by area per day",
+      "Corpses decay in 30 minutes",
+      "Item Pickups decay in 5 minutes",
+      "Turrets can attack through walls/obstacles",
+      "Netcode overhaul to improve GC/lag",
+      "Worldsaving overhaul to improve GC/lag"
+    ]
+  }
+}
+

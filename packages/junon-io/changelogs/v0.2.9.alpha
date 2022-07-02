@@ -1,0 +1,17 @@
+{
+  "version": "v0.2.9.alpha",
+  "date": "Mar 24, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added SealedDoor - can limit room entry to admin/members/everyone",
+      "Gold is now virtual. All physical gold items are converted automatically",
+      "Destroyed storages would now drop the items inside it instead of destroying them",
+      "Shotgun bullets are now piercing and would go through multiple enemies",
+      "Refinery is removed and would no longer work. Sell to Trader to earn money instead",
+      "Pickups are persisted across saves"
+    ]
+  }
+}

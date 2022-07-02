@@ -1,0 +1,17 @@
+{
+  "version": "v0.4.4.alpha",
+  "date": "Dec 6, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Double click to change suit color",
+      "Added cat that can be bought from trader",
+      "Improve client side performance",
+      "Show player command logs",
+      "Add kick/ban permission to roles"
+    ]
+  }
+}
+

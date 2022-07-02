@@ -1,0 +1,17 @@
+{
+  "version": "v0.4.3.alpha",
+  "date": "Nov 28, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Owner can kick players from other teams"
+    ],
+    "features": [
+      "Added BedWars minigame by Skylynx",
+      "Multicolored suits on minigames",
+      "Added TimerBomb",
+      "Custom trader currency"
+    ]
+  }
+}
+

@@ -1,0 +1,13 @@
+{
+  "version": "v0.1.7.alpha",
+  "date": "Oct 1, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fixed bioraptor unable to pathfind to player"
+    ],
+    "features": [
+      "Add support for Mobile Browsers with custom controls"
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "version": "v0.3.13.alpha",
+  "date": "Aug 6, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added Custom Roles with custom permissions for players and storage access",
+      "Added Flamethrower Turret that requires Fuel/Power to operate",
+      "Added NameTag for changing pet names. Can be bought from Trader",
+      "Improved client performance by replacing Text with BitmapText"
+    ]
+  }
+}
+

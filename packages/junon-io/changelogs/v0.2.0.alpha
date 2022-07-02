@@ -1,0 +1,15 @@
+{
+  "version": "v0.2.0.alpha",
+  "date": "Jan 14, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added BloodPack, can heal player and also a crafting ingredient",
+      "Added Stimpack, which 2x attack damage for 15 seconds",
+      "Player can collect blood using bottle",
+      "Show player status buffs on top-left corner"
+    ]
+  }
+}

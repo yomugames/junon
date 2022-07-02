@@ -1,0 +1,14 @@
+{
+  "version": "v0.5.2.alpha",
+  "date": "Jan 18, 2022",
+  "title": "",
+  "content": {
+    "bugs": [
+      "fix player save not loading when joining a world with 10+ players",
+      "fix not able to screenshot on imported backup world",
+      "fix web not paralyzing player + can use paralyze in /effect"
+    ],
+    "features": [
+    ]
+  }
+}

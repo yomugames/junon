@@ -1,0 +1,15 @@
+{
+  "version": "v0.3.1.alpha",
+  "date": "May 20, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "When mobs are caught inside structures/walls, teleport them to nearby platform",
+      "Fix no oxygen on beacon/rail stop",
+      "Fix ATM money glitch"
+    ],
+    "features": [
+      "Can sell slaves/pets/bots to slave trader"
+    ]
+  }
+}

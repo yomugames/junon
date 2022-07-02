@@ -1,0 +1,17 @@
+{
+  "version": "v0.3.22.alpha",
+  "date": "Oct 11, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix meteorite creating rocks when removed from water"
+    ],
+    "features": [
+      "Field of Vision system that can be toggled in colony menu",
+      "Allow owners to modify/remove terrains in peaceful mode",
+      "Toggle zoom on/off",
+      "Show reason/duration when player is banned"
+    ]
+  }
+}
+

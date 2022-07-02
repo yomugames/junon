@@ -1,0 +1,14 @@
+{
+  "version": "v0.4.0.alpha",
+  "date": "Nov 2, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added Imposter game mode",
+      "Added new sandbox commands force, fill, spawnmob, sethealth, dialogue"
+    ]
+  }
+}
+

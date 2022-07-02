@@ -1,0 +1,15 @@
+{
+  "version": "v0.3.17.alpha",
+  "date": "Aug 28, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Add perma ban/unban to colony menu",
+      "Allow slaves to collect ores from mining drills",
+      "Infinite ammo for turrets in PvP so that players can survive raids when their basea are offline"
+    ]
+  }
+}
+

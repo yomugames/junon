@@ -1,0 +1,15 @@
+{
+  "version": "v0.2.5.alpha",
+  "date": "Feb 24, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Raids can travel on space and go to other islands",
+      "New AssaultRifle weapon. Burst shot of 5 rounds",
+      "Allow Members to edit Signs",
+      "Allow making pet as Livestock in order to butcher them"
+    ]
+  }
+}

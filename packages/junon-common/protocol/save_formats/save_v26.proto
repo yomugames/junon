@@ -1,0 +1,293 @@
+package app;
+syntax = "proto3";
+
+import "../enum.proto";
+
+message SaveState {
+  Metadata metadata = 1;
+  Entities entities = 2;
+}
+
+message Metadata {
+  uint32 version = 1;
+  uint32 rowCount = 2;
+  uint32 colCount = 3;
+  string uid = 4;
+  string name = 5;
+  uint64 timestamp = 6;
+  string gameMode = 7;
+}
+
+message Entities {
+  repeated uint32 terrains = 1;
+  repeated Tile terrainEntities = 2;
+  repeated Building buildings = 3;
+  map<uint32,Mob> mobs = 4;
+  repeated Raid raids = 5;
+  map<uint32,Team> teams = 6;
+  map<uint32,Corpse> corpses = 7;
+  map<uint32,Player> players = 8;
+  map<string,PlayerData> playerDataMap = 9;
+  map<string,Transport> transports = 10;
+  map<uint32,Pickup> pickups = 11;
+  map<string,bool> settings = 12;
+  map<string,ActivityLogEntry> activityLogEntries = 13;
+  map<string,Kit> kits = 14;
+  map<string,Sellable> sellables = 15;
+}
+
+message Sellable {
+  string group = 1;
+  uint32 type = 2;
+  uint32 cost = 3;
+}
+
+message Kit {
+  string name = 1;
+  map <string,KitItem> items = 2;
+}
+
+message KitItem {
+  uint32 type = 1;
+  uint32 count = 2;
+}
+
+message ActivityLogEntry {
+  repeated ActivityLog activityLogs = 1;
+}
+
+message ActivityLog {
+  uint64 timestamp = 1;
+  string username = 2;
+  ActivityType activityType  = 3;
+  uint32 entityId = 4;
+  uint32 entityType = 5;
+  EntityGroup entityGroup = 6;
+  uint32 row = 7;
+  uint32 col = 8;
+}
+
+message Tile {
+  uint32 row = 1;
+  uint32 col = 2;
+  TerrainType type = 3;
+  uint32 health = 4;
+  map<string, uint32> effects = 5;
+}
+
+message Transport {
+  uint32 id = 1;
+  uint32  x  = 2;
+  uint32  y  = 3;
+  TransportType type = 4;
+  map<uint32, PassengerRef> passengers = 5;
+  BuildingRef source = 6;
+  BuildingRef destination = 7;
+}
+
+message Building {
+  uint32 id = 1;
+  uint32 x  = 2;
+  uint32 y  = 3;
+  uint32 health = 4;
+  BuildingType type = 5;
+  int32 angle = 6;
+  int32 origAngle = 7;
+  bool isHarvestable = 8;
+  bool isOpen = 9;
+  bool isPowered = 10;
+  map<string, uint32> effects = 11;
+  string content = 12;
+  OwnerRef owner = 13;
+  bool isWatered = 14;
+  PlacerRef placer = 15;
+  RaidRef raid = 16;
+  map<string, ResourceStorage> resourceStorages = 17;
+  map<uint32,Item> storage = 18;
+  uint32 buildProgress = 19;
+  bool isUnderConstruction = 20;
+  uint32 decayStartTimestamp = 21;
+  uint32 accessType = 22;
+  bool   isCustomAccess = 23;
+  uint32 level = 24;
+  uint32 colorIndex = 25;
+  uint32 textureIndex = 26;
+}
+
+message RaidRef {
+  uint32 id = 1;
+}
+
+message ResourceStorage {
+  uint32 usage = 1;
+}
+
+message OwnerRef {
+  uint32 id = 1;
+}
+
+message TransportStopRef {
+  uint32 id = 1;
+}
+
+message PassengerRef {
+  uint32 id = 1;
+}
+
+message PlacerRef {
+  uint32 id = 1;
+}
+
+message Item {
+  uint32 id = 1;
+  uint32 type = 2;
+  uint32 count = 3;
+  uint32 index = 4;
+  ItemInstance instance = 5;
+}
+
+message Pickup {
+  uint32 id = 1;
+  Item item = 2;
+  uint32 x = 3;
+  uint32 y = 4;
+}
+
+message ItemInstance {
+  uint32 usage = 1;
+  string content = 2;
+}
+
+message Mob {
+  uint32 id = 1;
+  uint32 x  = 2;
+  uint32 y  = 3;
+  uint32 health = 4;
+  MobType type = 5;
+  bool   isKnocked = 6;
+  int32 angle = 7;
+  uint32 faith = 8;
+  MasterRef master = 9;
+  OwnerRef owner = 10;
+  repeated Goal goals = 11;
+  map<string, uint32> effects = 12;
+  RaidRef raid = 13;
+  bool isDormant = 14;
+  string name = 15;
+  bool isLivestock = 16;
+  Equipments equipments = 17;
+  uint32 hunger = 18;
+  uint32 stamina = 19;
+  uint32 oxygen = 20;
+  uint32 tasks = 21;
+  uint32 level = 22;
+}
+
+message MasterRef {
+  uint32 id = 1;
+}
+
+message Goal {
+  GoalTargetRef targetEntity = 1;
+}
+
+message GoalTargetRef {
+  uint32 id = 1;
+}
+
+message Raid {
+  uint32 id = 1;
+  uint32 spawnGroundRow = 2;
+  uint32 spawnGroundCol = 3;
+  TeamRef team = 4;
+  BuildingRef targetStructure = 5;
+  uint64 occurTimestamp = 6;
+}
+
+message TeamRef {
+  uint32 id = 1;
+}
+
+message BuildingRef {
+  uint32 id = 1;
+}
+
+message Team {
+  uint32 id = 1;
+  string name = 2;
+  string leaderUid = 3;
+  LeaderRef leader = 4;
+  bool isInviteOnly = 5;
+  bool isPublic = 6;
+  uint32 dayCount = 7;
+  bool joinable = 8;
+  string creatorUid = 9;
+  string creatorName = 10;
+  map<string, uint32> deeds = 11;
+  map<uint32, Role> roles = 13;
+  map<string, uint32> permissions = 14;
+}
+
+message Role {
+  uint32 id = 1;
+  string name = 2;
+  map<string, bool> permissions = 3;
+  string kitName = 4;
+}
+
+message LeaderRef {
+  uint32 id = 1;
+}
+
+message Corpse {
+  uint32 id = 1;
+  uint32 x = 2;
+  uint32 y = 3;
+  int32 angle = 4;
+  MobType type = 5;
+  map<string, uint32> effects = 6;
+  uint32 aliveDurationInTicks = 7;
+  OwnerRef owner = 8;
+  string name = 9;
+}
+
+message Player {
+  uint32 id = 1;
+  uint32 x  = 2;
+  uint32 y  = 3;
+  uint32 health = 4;
+  int32 angle = 5;
+  string name = 7;
+  string uid = 8;
+  uint32 aliveDurationInTicks = 9;
+  int32 equipIndex = 10;
+  Inventory inventory = 11;
+  Equipments equipments = 12;
+  TeamRef defaultTeam = 13;
+  TeamRef team = 14;
+  uint32 hunger = 15;
+  uint32 stamina = 16;
+  uint32 oxygen = 17;
+  map<string, uint32> effects = 18;
+  string sessionId = 19;
+  uint64 joinTimestamp = 20;
+  map<string, int32> tutorialIndex = 21;
+  bool isVisitor = 22;
+  uint32 gold = 23;
+  uint32 roleType = 24;
+  uint32 score = 25;
+}
+
+message PlayerData {
+  string uid = 1;
+  string name = 2;
+  Player data = 3;
+}
+
+message Inventory {
+  map<uint32,Item> storage = 1;
+}
+
+message Equipments {
+  map<uint32,Item> storage = 1;
+}

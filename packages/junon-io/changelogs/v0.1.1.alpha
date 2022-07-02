@@ -1,0 +1,13 @@
+{
+  "version": "v0.1.1.alpha",
+  "date": "Aug 4, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix bug where starting new colony on a sector with existing save would overwrite the save instead of resuming it",
+      "Fix bug where loaded player save files are getting deleted by server (old code not removed)"
+    ],
+    "features": [
+    ]
+  }
+}

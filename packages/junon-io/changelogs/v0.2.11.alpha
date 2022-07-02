@@ -1,0 +1,19 @@
+{
+  "version": "v0.2.11.alpha",
+  "date": "Apr 1, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix bug where air alarm goes red after loading game",
+      "Dont allow corpse/entity drag when player is dead",
+      "Fix load game menu showing after clicking back on settings",
+      "Fix melee weapon not hitting structures at times"
+    ],
+    "features": [
+      "Structures inside Sealed Door cannot be dismantled if you dont have proper permissions",
+      "Increase Wheat and Potato price",
+      "Allow highlighting/selecting chat text",
+      "Performance optimizations server and client side"
+    ]
+  }
+}

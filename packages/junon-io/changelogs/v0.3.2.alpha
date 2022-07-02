@@ -1,0 +1,16 @@
+{
+  "version": "v0.3.2.alpha",
+  "date": "June 4, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Game invite links are now permanent and will work even if server is offline",
+      "Server performance optimizations - slaves and cleanbot AI are now queued to avoid cpu slowdown. Add queuing to save file loading/saving",
+      "Re-architected game to fit more players in server",
+      "Replaced server monitoring/deployment infrastructure with custom one thats simpler and easier to manage."
+    ]
+  }
+}
+

@@ -1,0 +1,15 @@
+{
+  "version": "v0.1.4.alpha",
+  "date": "Sep 1, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added Trader which sells wood and a pet monkey",
+      "Added Refinery which converts ores/bars into gold (currency)",
+      "Spacesuit can now be crafted and re-equipped to player body",
+      "Added back lobby station as a tutorial (work in progress)"
+    ]
+  }
+}

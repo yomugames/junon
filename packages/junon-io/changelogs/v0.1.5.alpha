@@ -1,0 +1,23 @@
+{
+  "version": "v0.1.5.alpha",
+  "date": "Sep 15, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Kicking logged-in players should now work properly",
+      "Tutorial Index is now loaded properly across saving/loading",
+      "Fix certain ores having ridiculously high gold conversion amount",
+      "Refinery should only process ores",
+      "Fix save file loading where storage with drill inventory doesnt appear on the game",
+      "Spike trap will retrigger in 5 seconds instead of 50",
+      "Spike trap no longer catches fire",
+      "Fixed corpse dragging not working well"
+    ],
+    "features": [
+      "Server Infrastructure Change. Better isolation for each game instance in terms of CPU/Memory",
+      "Added Guest/Member permissions to limit privileges of initial visitors",
+      "Storage Menu now shows player full inventory for transferring items",
+      "Enabled stacking items when dragging over similar item types"
+    ]
+  }
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Junon.io | Changelogs </title>
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Junon.io">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimum-scale=1, width=device-width, height=device-height">
+
+    <style>
+        body {
+            font-family: monospace;
+        }
+
+        p {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        a {
+            display: block;
+        }
+
+        #partners a {
+            margin-left: 50px;
+
+        }
+        
+    </style>
+</head>
+
+<body >
+    <div id='changelogs'>
+        <h3>Junon.io - Changelogs</h3>
+        <% for (let i = 0; i < changeLogs.length; i++) { %>
+            <% let changeLog = changeLogs[i] %>
+            <div>
+                <p class='date'><%= changeLog.date %> - <%= changeLog.version %></p>
+                <% if (changeLog.content.features.length > 0) { %>
+                    <ul>
+                        <% for (let i = 0; i < changeLog.content.features.length; i++) { %>
+                            <% let feature = changeLog.content.features[i] %>
+                            <li><%= feature %></li>                    
+                        <% } %>
+                    </ul>
+                <% } %>
+                <% if (changeLog.content.bugs.length > 0) { %>
+                    <ul>
+                        <% for (let i = 0; i < changeLog.content.bugs.length; i++) { %>
+                            <% let bug = changeLog.content.bugs[i] %>
+                            <li><%= bug %></li>                    
+                        <% } %>
+                    </ul>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>

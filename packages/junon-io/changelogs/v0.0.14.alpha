@@ -1,0 +1,17 @@
+{
+  "version": "v0.0.14.alpha",
+  "date": "Jun 6, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "When server is performing restart, user will now be notified of its progress",
+      "Fix not being able to build near chat overlay"
+    ],
+    "features": [
+      "World will now autosave every 3 minutes and uploaded to cloud storage",
+      "Server will autoload from latest save in case of server crash",
+      "map size is now 256x256 instead of 300x300"
+    ]
+  }
+}
+

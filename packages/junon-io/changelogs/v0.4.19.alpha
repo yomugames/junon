@@ -1,0 +1,13 @@
+{
+  "version": "v0.4.19.alpha",
+  "date": "Sep 22, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Allow import/export of save files"
+    ]
+  }
+}
+

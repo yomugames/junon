@@ -1,0 +1,16 @@
+{
+  "version": "v0.2.3.alpha",
+  "date": "Feb 6, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Improved Raid Spawning algorithm (less likely to spawn inside base)",
+      "Walls can now be destroyed by Guards/Chemists",
+      "Mobs can now walk on water/oil",
+      "Large raids are split into multiple groups with different attack priorities",
+      "Reduce Chemist attack rate from 4 seconds to 8 seconds"
+    ]
+  }
+}

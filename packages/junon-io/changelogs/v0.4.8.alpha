@@ -1,0 +1,14 @@
+{
+  "version": "v0.4.8.alpha",
+  "date": "Mar 23, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added Command Blocks menu that supports triggers and commands/ifthenelse/timer actions",
+      "New commands such as spawncorpse/timer/caption/sidebar"
+    ]
+  }
+}
+

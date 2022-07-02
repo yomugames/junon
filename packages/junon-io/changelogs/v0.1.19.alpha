@@ -1,0 +1,17 @@
+{
+  "version": "v0.1.19.alpha",
+  "date": "Jan 9, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix inventory disappearing when using right-click to move them",
+      "Fix bioraptor spawning in middle of base",
+      "Fix mobs attempting to chase players on space when in floors"
+    ],
+    "features": [
+      "Mining Drills can only work when placed above asteroid grounds",
+      "Spiders no longer spawn on dirt. Instead, they spawn randomly on asteroid grounds when mining drill count is above 6",
+      "Pets would not open manual airlocks"
+    ]
+  }
+}

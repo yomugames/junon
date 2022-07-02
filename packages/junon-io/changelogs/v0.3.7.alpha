@@ -1,0 +1,16 @@
+{
+  "version": "v0.3.7.alpha",
+  "date": "July 1, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix admins losing inventory when logging back in",
+      "Fix not losing oxygen when riding rail tram without suit",
+      "Fix dismantled cryotube freezing stored mob"
+    ],
+    "features": [
+      "ATM allows transfer of gold to other players"
+    ]
+  }
+}
+

@@ -1,0 +1,904 @@
+@media only screen and (max-width: 1200px) {
+    .team_entry_row {
+        min-height: 210px;
+    }
+
+    .middle_container {
+        width: calc(100% - 470px);
+    }
+    
+    .other_game_ad_square {
+        transform: scale(0.7);
+        transform-origin: top right;
+        top: 220px;
+    }
+
+    .junon_ad_square_1 {
+        transform: scale(0.7);
+        transform-origin: bottom right;
+    }
+
+    .junon_ad_square_2 {
+        transform: scale(0.7);
+    }
+
+}
+
+/* tablet version */
+@media only screen and (max-width: 1000px) {
+    .other_game_ad,
+    .io_game_promo,
+    #changelogs {
+        display: none;
+    }
+
+    .team_entry_row {
+        min-height: 190px;
+    }
+}
+
+
+
+@media only screen and (max-width: 900px) {
+    .junon_ad_square {
+        display: none;
+    }
+
+    .middle_container {
+        width: 500px;
+    }
+
+}
+
+@media only screen and (max-width: 900px) {
+    .team_entry_row {
+        min-height: 170px;
+    }
+}
+
+
+@media only screen and (max-width: 640px) {
+    .team_entry_row {
+        min-height: 150px;
+    }
+
+    #welcome_container {
+        min-width: unset;
+    }
+
+}
+
+@media only screen and (max-height: 600px) {
+    .main_colony_list {
+        max-height: 160px;
+        overflow-y: scroll;
+    }
+
+    #chat_container.vote_mode {
+        left: 0px !important;
+        top: 0px !important;
+        background-color: black;
+        bottom: 0px;
+        margin-left: 0px !important;
+        width: 300px !important;
+    }
+
+    #chat_container.vote_mode #chat_group_tab_content {
+        height: calc(100% - 70px);
+    }
+
+    #chat_container.vote_mode .chat_history {
+        height: calc(100% - 30px);
+        width: 300px;
+    }
+
+    #vote_menu {
+        left: 300px !important;
+        top: 0px !important;
+        width: calc(100% - 350px) !important;
+        height: calc(100% - 50px) !important;
+        padding: 20px !important;
+    }
+
+    .other_game_ad,
+    .io_game_promo,
+    #changelogs {
+        display: none;
+
+    }
+}
+
+@media (max-height:600px) and (min-height:450px) {
+
+    .member_management_container {
+        max-height: 150px;
+    }
+
+    .colony_preview_popup img {
+        width: 240px;
+        height: 200px;
+    }
+
+    #chat_container {
+        bottom: 10px;
+    }
+
+    #welcome_container {
+        padding-top: 10px;
+    }
+
+    #game_list_action_container {
+        top: -55px;
+        left: -60px;
+        bottom: unset;
+    }
+}
+
+/* mobile-version */
+@media only screen and (max-width: 640px), screen and (max-height: 450px) {
+
+    #more_io_games {
+        display: none !important;
+    }
+
+    .minigame_title {
+        font-size: 16px;
+    }
+
+    .minigame_description {
+        font-size: 16px;
+    }
+
+    .minigame_thumbnail_2 {
+        display: none;
+    }
+
+    .game_mode_description {
+        font-size: 14px;
+    }
+
+    .game_mode {
+        height: 80px;
+        padding: 3px;
+    }
+
+    #bottom_bar_container {
+        height: 45px;
+    }
+
+    #player_quick_inventory_menu {
+        height: 45px;
+    }
+
+    html[lang='ja'] span, 
+    html[lang='ja'] div {
+        font-size: 12px;
+    }
+
+    html[lang='ja'] #time_label {
+        top: 55px;
+    }
+
+    #mini_map_player_pos_label {
+        top: 135px;
+        left: 20px;
+        right: unset;
+    }
+
+    #team_request_menu {
+        right: 20px;
+    }
+
+    .leaderboard_tab {
+        font-size: 14px;
+    }
+
+    #leaderboard_menu {
+        right: 10px;
+        width: 140px;
+        font-size: 12px;
+        top: 60px;
+    }
+
+    .leaderboard_entry {
+        font-size: 12px;
+        height: 12px;
+    }
+
+    .leaderboard_entry .team_name {
+        max-width: 80px;
+    }
+
+    .middle_container {
+        width: calc(100% - 200px);
+    }
+
+    #total_online_count {
+        display: none;
+    }
+
+    #status_list_menu {
+        display: none;
+    }
+
+    #sector_action_menu {
+        display: none !important;
+    }
+
+    .mobile_username_container.logged_in {
+        display: block;
+    }
+
+    #welcome_hud .game_info {
+        font-size: 11px;
+/*        margin: auto;
+        position: relative;
+        display: block;
+        text-align: center;
+*/        
+        margin-left: -150px;
+        left: 50%;
+        bottom: 20px;
+    }
+
+    body.imposter_mode #welcome_hud .game_info {
+        margin-left: -100px !important;
+    }
+
+    .back_main_menu_btn {
+        margin-right: 0px;
+        margin-top: 0px;
+        position: absolute;
+        right: 0px;
+        /*z-index: 5;*/
+    }
+
+    #region_selector {
+    }
+
+    #chat_container {
+        width: 220px;
+    }    
+
+    .chat_history {
+        width: 200px;
+        height: 40px;
+    }
+
+    #region_select {
+        font-size: 20px;
+        width: 110px;
+        margin-right: 10px;
+    }
+
+    .mobile_authentication_container {
+        display: block;
+    }
+
+    #firebaseui-auth-container {
+        left: 50%;
+        margin-left: -125px;
+    }
+
+    #home_user_account_container {
+    }
+
+    #logged_in_menu_container {
+        display: none !important;
+    }
+
+
+    #game_list_action_container {
+    }
+
+    .main_menu_navigator {
+        margin-top: 10px;
+    }
+
+    #chat_input_container {
+        /*margin-top: -110px;*/
+    }
+
+    #chat_container {
+        right: 15px;
+        top: 180px;
+        bottom: unset;
+    }
+
+    .chat_message {
+        font-size: 12px;    
+    }
+
+
+    .hud_btn:hover {
+        opacity: 1;
+    }
+
+    #trade_menu .error_message {
+        bottom: 40px;
+    }
+
+    #product_main_container {
+        width: 130px;
+    }
+
+    #blueprint_main_container {
+        width: calc(100% - 155px);
+    }
+
+    .product_container {
+        margin: 0px;
+    }
+
+    #blueprint_container_header {
+        font-size: 14px;
+    }
+
+    .blueprint_description {
+        font-size: 10px;
+        margin-top: 5px;
+    }
+
+    #product_main_container .inventory_header {
+        margin-top: 15px;
+    }
+
+    #product_main_container .requirement_row {
+        height: 12px;
+        margin-bottom: 5px;
+    }
+
+    #product_main_container .requirement_name {
+        font-size: 9px;
+        margin-left: 5px;
+        width: 70px;
+    }
+
+    #product_main_container .requirement_supply {
+        font-size: 9px;
+        margin-left: 5px;
+    }
+
+    #product_main_container .craft_count,
+    #product_main_container .craft_btn {
+        margin-top: 10px;
+        vertical-align: middle;
+        font-size: 12px;
+    }
+
+    .template_row img {
+        height: 12px;
+    }
+
+    .template_name {
+        font-size: 10px !important;
+    }
+
+    .construction_category {
+        height: 185px;
+    }
+
+    .product_container .blueprint_image {
+        display: none;
+    }
+
+    .product_container .blueprint_name {
+        display: none;
+    }
+
+    .product_container .inventory_header {
+        display: none;
+    }
+
+    #welcome_menu .blurb {
+        font-size: 20px;
+    }
+
+    .member_list_container {
+        height: unset;
+    }
+
+    #time_label {
+        font-size: 8px;
+        width: 90px;
+        top: 155px;
+        background: none;
+        left: 15px;
+    }
+
+    #player_quick_inventory {
+        border: none;
+        background: none;
+    }
+
+    #team_status_menu {
+        display: none !important;
+    }
+
+    .login_description {
+        display: none;
+    }
+
+    .social_links {
+        display: none;
+    }
+
+
+    .colony_list_container .team_name {
+        font-size: 12px;
+    }
+
+    .team_action_btn {
+        font-size: 16px;
+        padding: 5px;
+    }
+
+    #mini_map {
+        width: 100px;
+        height: 100px;
+    }
+
+    .inventory_slot {
+    }
+
+    #player_stats {
+        font-size: 12px;
+    }
+
+
+    #tutorial_menu {
+        top: 130px;
+    }
+
+    .tutorial_text {
+        font-size: 12px;
+        padding: 0px;
+        padding-bottom: 2px;
+        padding-right: 2px;
+    }
+
+    .stat_container {
+        width: auto;
+        height: 12px;
+    }
+
+    .stat_container .label {
+        font-size: 8px;
+        vertical-align: top;
+    }
+
+    .stat_container .label img {
+        width: 14px;
+    }
+
+    .stat_container .bar_container {
+        width: 60px;
+        height: 8px;
+        border: solid 1px #444;
+        vertical-align: top;
+    }
+
+    .resources.stat_container {
+        width: 75px;
+    }
+
+    .player_inventory_slot {
+        border: none;
+    }
+
+    .player_inventory_slot:before {
+        display: none;
+    }
+
+    .inventory_slot {
+        width: 25px;
+        height: 25px;
+    }
+
+    #player_quick_inventory_menu {
+        width: 100%;
+        left: unset;
+        margin-left: unset;
+    }
+
+
+    .modal_menu:not(.fixed) {
+        left: 0px !important;
+        width: 100% !important;
+        padding: 0px;
+        top: 40px !important;
+        margin: 0px !important;
+        max-width: unset !important;
+    }
+
+    .modal_menu {
+        height: 100% !important;
+    }
+
+    .modal_menu:not(.fixed) .cancel_btn {
+        right: 10px;
+
+/*        font-size: 16px;
+        top: 0px;
+        width: 30px;
+        height: 30px;
+        background-image: none;
+        background: none;
+        font-weight: bold;
+        color: red;
+        opacity: 1;
+*/
+    }
+
+    #map_terrain_canvas, #map_entity_canvas {
+        height: unset;
+        width: 100vw;
+    }
+
+    .inventory_slot.active {
+        border: solid 2px #777;
+    }
+
+    #welcome_menu {
+        height: auto !important;
+        min-height: 90px;
+        bottom: 45px !important;
+        top: unset !important;
+        padding-bottom: 15px;
+        padding-top: 10px;
+    }
+
+    #inventory_menu {
+        height: calc(100% - 120px) !important;
+    }
+
+    #welcome_container {
+        padding-top: 10px;
+    }
+
+    #mini_map_menu {
+        width: 100px;
+        height: 100px;
+        display: none !important;
+    }
+
+    #entity_menu {
+        top: 45px;
+        right: 0px;
+        border-top: solid 2px #333;
+        width: 150px;
+    }
+
+    .debug_container,
+    #entity_menu .entity_name,
+    .entity_stats,
+    .entity_action {
+        font-size: 10px;
+    }
+
+    .entity_stats_entry {
+        font-size: 14px;
+    }
+
+    
+}
+
+/* mobile portrait version */
+@media only screen and (max-width: 500px), screen and (max-height: 450px) {
+    #home_footer {
+        display: none;
+    }
+
+    .left_sidebar {
+        position: relative;
+        padding: 0px;
+        padding-left: 10px;
+    }
+
+    .middle_container {
+        clear: both;
+        width: 100%;
+    }
+
+    .left_sidebar .settings_menu_btn,
+    .left_sidebar .tutorial_menu_btn {
+        clear: none;
+    }
+
+    .game_info a {
+        clear: none;
+    }
+
+    #security_camera_menu {
+        left: 0px;
+        margin-left: 0px;
+    }
+
+    #minigame_invite_container {
+        padding: 5px;
+        margin-left: -195px;
+        bottom: 0px;
+    }
+
+    #minigame_invite_container .invite_link_input {
+        width: 200px;
+        font-size: 14px;
+    }
+
+    #minigame_invite_container .start_minigame_btn, 
+    #minigame_invite_container .invite_link_copy_btn {
+        font-size: 14px;
+    }
+
+    .minigame_thumbnail {
+        width: 150px !important;
+    }
+
+    .home_menu,
+    .main_game_mode_selector {
+        width: 100%;
+    }
+
+    .main_game_mode_selector {
+        margin-bottom: 10px;
+        margin-top: 10px;
+        margin-left: unset;
+    }
+
+    .main_game_mode_entry {
+        margin-right: unset;
+    }
+
+    .game_mode_thumb img {
+        width: 100px;
+    }
+
+    .game_mode_name {
+        font-size: 16px;
+    }
+
+    #sidebar_menu {
+        /*right: 160px;*/
+        max-width: 120px;
+        width: 120px;
+        right: 0px;
+        top: 50px;
+        font-size: 12px;
+    }
+
+    .top_right_menu {
+        top: 0px;
+        right: 0px;
+    }
+
+
+    #quest_menu {
+        top: 140px;
+        max-height: 100px;
+        overflow-y: scroll;
+    }
+
+    .quest_label {
+        font-size: 12px;
+    }
+
+    .sidebar_text ul {
+        font-size: 12px;
+    }
+
+    #error_title {
+        font-size: 36px !important;
+    }
+
+    #error_menu_content {
+        font-size: 20px !important;
+    }
+
+    .total_task_stat {
+        width: 200px;
+    }
+
+    .total_task_stat .label {
+        font-size: 14px;
+        display: block;
+    }
+
+    .total_task_stat .bar_container {
+        height: 12px;
+        width: 120px;
+    }
+
+    .home_menu_controls .tutorial_menu_btn,
+    .home_menu_controls .settings_menu_btn {
+        float: none;
+        margin-bottom: 10px;
+    }
+
+    .load_game_menu_btn {
+        /*display: none;*/
+    }
+
+    .settings_menu_btn {
+        display: none;
+    }
+
+    #player_quick_inventory {
+        width: 90%;
+    }
+
+    #authentication_container {
+        text-align: center;
+    }
+
+    #logged_in_menu_container {
+        display: none !important;
+    }
+
+    #welcome_container #login_btn {
+    }
+
+    .login_description {
+        display: none;
+    }
+
+    .firebaseui-page-provider-sign-in {
+        float: none;
+    }
+
+    .sectors_tab,
+    .colonies_tab {
+        display: none;
+    }
+
+    .regions_tab {
+        display: none;
+        float: none;
+    }
+
+    #name_input {
+        font-size: 20px;
+        width: 150px;
+    }
+
+    .colony_list_container {
+        margin-right: 20px;
+        margin-left: 20px;
+    }
+
+
+    #play_btn {
+        font-size: 22px;
+    }
+
+
+
+    .room_oxygen_stat {
+        display: none;
+    }
+
+/*    #time_label {
+        top: unset;
+        bottom: 10px;
+        width: 110px;
+        right: 20px;
+        font-size: 12px;
+    }
+*/
+    .blueprint_name {
+        display: none;
+    }
+
+    .construction_tab {
+        overflow: hidden;
+    }
+
+    #player_stats {
+        font-size: 12px;
+    }
+
+    .hud_btn_shortcut {
+        display: none;
+    }
+
+    #error_menu {
+        top: 180px;
+    }
+
+    #error_menu_content {
+        font-size: 24px;
+    }
+
+    #inventory_menu {
+        height: 300px;
+    }
+
+
+}
+
+/* landscape but not portrait */
+@media (max-width:900px) and (min-width:450px) and (max-height:450px) {
+    #vote_menu .menu_main_header {
+        font-size: 16px;
+    }
+
+    .vote_player_cell  {
+        font-size: 14px;
+    }
+
+    .vote_player_cell img  {
+        width: 24px;
+    }
+
+    .vote_player_list {
+        max-height: 240px;
+        overflow-y: scroll;
+    }
+
+    #quest_menu {
+        top: 95px;
+    }
+
+    #sidebar_menu {
+        right: 0px;
+        top: 50px;
+        left: unset;
+    }
+
+    .top_right_menu {
+        top: 0px;
+        right: 0px;
+    }
+}
+
+/* mobile-landscape */
+@media only screen and (max-height: 450px) {
+
+    .main_menu {
+        margin-top: 10px;
+    }
+    
+    .member_management_container {
+        max-height: 120px;
+    }
+
+    #chat_container {
+        left: 50%;
+        top: 50px;
+        margin-left: -120px;
+    }
+
+    .save_list_container {
+        height: 250px;
+    }
+
+    #error_menu {
+        top: 100px;
+    }
+
+    .load_game_menu_btn {
+        /*display: none;*/
+    }
+
+    .settings_menu_btn {
+        display: none;
+    }
+
+    .main_menu_btn {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .game_info {
+        right: 10px !important;
+        left: unset !important;
+        bottom: 15px !important;
+        margin-left: 0px !important;
+    }
+
+    .social_links {
+        display: none;
+    }
+
+}
+
+

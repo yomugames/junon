@@ -1,0 +1,14 @@
+{
+  "version": "v0.2.7.alpha",
+  "date": "Mar 13, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Prevent grenade from going over walls"
+    ],
+    "features": [
+      "Added Japanese translation",
+      "Global Chat with players on same region"
+    ]
+  }
+}

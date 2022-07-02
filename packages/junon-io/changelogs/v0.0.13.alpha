@@ -1,0 +1,18 @@
+{
+  "version": "v0.0.13.alpha",
+  "date": "May 31, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix players reconnecting properly after disconnection",
+      "Fix structure ownership showing None incorrectly",
+      "Core will vanish when player leaves to avoid spamming",
+      "Fix microsoft edge error - Object doesn't support property or method 'closest'"
+    ],
+    "features": [
+      "Basic bad words filter in username/teamnames",
+      "Instruct user to refresh browser when game client is outdated"
+    ]
+  }
+}
+

@@ -1,0 +1,16 @@
+{
+  "version": "v0.3.18.alpha",
+  "date": "Sep 21, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Meteor shower event would sometimes drop meteorite asteroids",
+      "Energy sword weapon can be crafted using meteorite",
+      "Add Vodka and Drunk screen warp effect when player drinks beer",
+      "Add /tp and /event commands in peaceful mode for teleport and event creation"
+    ]
+  }
+}
+

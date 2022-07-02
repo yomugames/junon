@@ -1,0 +1,16 @@
+{
+  "version": "v0.4.20.alpha",
+  "date": "Oct 11, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix projectiles getting stuck at edge"
+    ],
+    "features": [
+      "Added plasma gun",
+      "Added cultist suit",
+      "Added SquidLord boss (appear every 15 days on survival)"
+    ]
+  }
+}
+

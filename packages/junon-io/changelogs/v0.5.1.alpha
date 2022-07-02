@@ -1,0 +1,18 @@
+{
+  "version": "v0.5.1.alpha",
+  "date": "Jan 13, 2022",
+  "title": "",
+  "content": {
+    "bugs": [
+      "fix player bouncing from door"
+    ],
+    "features": [
+      "Added /wait command to add delay between commands",
+      "Added AlienJuice which adds Invisible effect to player",
+      "Added EnergyDrink which adds Haste effect to player",
+      "Added weapon RocketLauncher",
+      "Added Fries (art by Ptat0Nerd#0290)",
+      "modify weapon attack speed via /stat reload:[100-10000]"
+    ]
+  }
+}

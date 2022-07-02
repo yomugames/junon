@@ -1,0 +1,21 @@
+{
+  "version": "v0.1.18.alpha",
+  "date": "Jan 3, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix water pump not working after loading from save file",
+      "Fix game freezing when messenger arrives",
+      "Fix corpse disappearing sometimes when moving out of view then back into view",
+      "Fix right click on equipments creating a new copy instead of doing a transferring",
+      "Fix stamina bar not showing correctly in beginning",
+      "Fix not being able to place structures on mixed platforms/ground",
+      "Fix cleanbot not cleaning dirty floors"
+    ],
+    "features": [
+      "Increase Poison Damage from 5 to 10",
+      "Movement speed is increased when not weaing a spacesuit",
+      "Change dirt algorithm. Only accumulate when walking on asteroids/soil"
+    ]
+  }
+}

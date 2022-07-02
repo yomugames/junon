@@ -1,0 +1,15 @@
+{
+  "version": "v0.2.2.alpha",
+  "date": "Feb 2, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Filter out bad words in chat",
+      "Let user choose private/public mode before loading save file",
+      "Guests cannot mine asteroid if owner is offline",
+      "Flamethrower cannot destroy team's own structure"
+    ]
+  }
+}

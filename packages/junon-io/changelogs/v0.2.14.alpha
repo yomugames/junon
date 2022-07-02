@@ -1,0 +1,16 @@
+{
+  "version": "v0.2.14.alpha",
+  "date": "Apr 20, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Add Vending Machine to sell food/drinks",
+      "Add ATM Machine to transfer gold across sectors",
+      "Database Architecture change - replace firebase with mysql",
+      "Fix combat armor being stacked when bought in multiple quantities",
+      "Increase Beer/Cola price"
+    ]
+  }
+}

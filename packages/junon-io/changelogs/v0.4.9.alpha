@@ -1,0 +1,16 @@
+{
+  "version": "v0.4.9.alpha",
+  "date": "Mar 27, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "/sidebar command can display scoreboards",
+      "Can use functions in command blocks",
+      "/score command added",
+      "=~ operator added which tests wheter string contains another string"
+    ]
+  }
+}
+

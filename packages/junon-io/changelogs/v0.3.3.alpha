@@ -1,0 +1,17 @@
+{
+  "version": "v0.3.3.alpha",
+  "date": "June 11, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix raid not occuring",
+      "Fix trader not showing up when trading table placed"
+    ],
+    "features": [
+      "Slaves can harvest crops and cook meals",
+      "Can toggle slave individual tasks on/off",
+      "gzip compression on save files to save space"
+    ]
+  }
+}
+

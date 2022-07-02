@@ -1,0 +1,15 @@
+{
+  "version": "v0.2.15.alpha",
+  "date": "Apr 23, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added Coffee Drink which requires Coffee seeds/beans",
+      "Add more Floors/Walls",
+      "Lamp color can be changed to various basic colors",
+      "3 new flowers which can be placed on pots. Need to buy corresponding seeds from trader"
+    ]
+  }
+}

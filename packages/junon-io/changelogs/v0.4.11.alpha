@@ -1,0 +1,18 @@
+{
+  "version": "v0.4.11.alpha",
+  "date": "Apr 19, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix walls becoming white sometimes"
+    ],
+    "features": [
+      "mute/unmute commands",
+      "More triggers - PlayerMessage,MobFeed,OxygenChanged, etc",
+      "More functions - $getRow, $getTeamMemberCount, etc",
+      "Can change wall colors",
+      "Disable blood setting"
+    ]
+  }
+}
+

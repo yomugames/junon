@@ -1,0 +1,16 @@
+{
+  "version": "v0.4.5.alpha",
+  "date": "Dec 10, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Add Lights Sabotage in imposter mode",
+      "Add PowerSwitch and Terminal",
+      "Add UndergroundVent",
+      "Add Wall Lights and Custom Colored lights"
+    ]
+  }
+}
+

@@ -1,0 +1,19 @@
+{
+  "version": "v0.3.14.alpha",
+  "date": "Aug 10, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix previous offline members showing up after visiting new colony",
+      "Fix stacking more than 99",
+      "Fix slave picking up 99 wheat and using all to cook 1 bread"
+    ],
+    "features": [
+      "Added upvote/downvote to colonies",
+      "Added fence to restrict movement of pets/bots/slaves but not players",
+      "Private mode is now permanent and private colonies will not be shown on new/top",
+      "Bring back sealed door functionality"
+    ]
+  }
+}
+

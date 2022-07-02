@@ -1,0 +1,16 @@
+{
+  "version": "v0.0.11.alpha",
+  "date": "May 21, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Room oxygen levels now displays properly",
+      "Fuel pipes can now be broken/salvaged",
+      "Equipments with 0 durability will break/disappear"
+    ],
+    "features": [
+      "Taking off spacesuit when sleeping increases stamina restore rate x3",
+      "Can directly invite players to your team"
+    ]
+  }
+}

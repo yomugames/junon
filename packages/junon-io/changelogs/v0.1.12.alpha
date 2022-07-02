@@ -1,0 +1,16 @@
+{
+  "version": "v0.1.12.alpha",
+  "date": "Nov 15, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix mobs wandering through water/oil"
+    ],
+    "features": [
+      "Added Spider mob thats attracted to dirt",
+      "Platforms now accumulate dirt overtime",
+      "Added Beacon structure, which acts as a visitor spawn point",
+      "Mob Taming difficulty is proportional to their health"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "version": "v0.2.4.alpha",
+  "date": "Feb 12, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix building rotation - must snap to grid",
+      "Fix floor/soil replacement causing rendering problems",
+      "Fix Trader spawning not appearing at certain conditions"
+    ],
+    "features": [
+      "Added Signs - displays custom messages written by users",
+      "Added WebTraps - immobilize target for 5 seconds",
+      "Spiders now drop webs",
+      "Increase health of Airlocks and make it resistant to melee damage just like walls"
+    ]
+  }
+}

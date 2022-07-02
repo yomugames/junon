@@ -1,0 +1,38 @@
+{
+  "version": "v0.3.10.alpha",
+  "date": "July 19, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix players zooming out using ctrl +/-",
+      "Fix sign indestructible in pvp",
+      "Fix bed/slavers table teleport across wall",
+      "Fix bullets going through buildings",
+      "Fix wall healthbar not updating when damaged",
+      "Fix team losing ownerships when a team member leaves while there are still offline members",
+      "Fix team member position showing up even after leaving team",
+      "Allow reattempt to join team if previously rejected"
+    ],
+    "features": [
+      "Can buy grenade/poison grenade in PvP",
+      "PvP allow user to restart character from scratch",
+      "Remove cores in pvp",
+      "Turrets can shoot through walls",
+      "PvP stamina increased from 100 to 300",
+      "Players who exit game/browser will have delay of 5 seconds before player gets removed in game",
+      "Wall limit of 400 per team and spike limit of 50 per team in pvp",
+      "Reduce health of wall to 200 and spiketrap to 50 in pvp",
+      "Players who return to game spawn at their last position",
+      "Survival tool can salvage enemy wires/pipes",
+      "Allow harvest of enemy crop in pvp",
+      "Allow placing buildings (except wall/floors) on enemy floors",
+      "No background music in pvp",
+      "Reduce core sell price to 125",
+      "If team is full, allow player to create new team and join others while retaining inventory",
+      "Improve player spawn position in beginning",
+      "Only admin can accept join requests",
+      "Admins can assign member/admin roles"
+    ]
+  }
+}
+

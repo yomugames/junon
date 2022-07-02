@@ -1,0 +1,17 @@
+{
+  "version": "v0.4.14.alpha",
+  "date": "Jun 8, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Allow admin to kick team members in domination minigame",
+      "Fix quickswitch of melee weapons"
+    ],
+    "features": [
+      "Added new mobs Golem/Mantis/Mutant",
+      "Added new Hazmat Suit which can be crafted from forge",
+      "PlayerMove trigger"
+    ]
+  }
+}
+

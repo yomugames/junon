@@ -1,0 +1,21 @@
+{
+  "version": "v0.3.11.alpha",
+  "date": "July 24, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix item stack disappearing after storing into container even when not fully depleted",
+      "Fix score overflowing"
+    ],
+    "features": [
+      "Allow turrets to choose attack target (player/mob)",
+      "Grenade x2 damage",
+      "Longer poison gas duration and longer poison duration",
+      "Upgradable walls/doors in PvP",
+      "Corpse can be resurrected at most 3 times",
+      "PvP map auto-resets every 300 in-game days",
+      "Respawn duration changed from 10 to 15"
+    ]
+  }
+}
+

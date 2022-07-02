@@ -1,0 +1,18 @@
+{
+  "version": "v0.2.12.alpha",
+  "date": "Apr 8, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix inventory item not showing up when being dragged",
+      "Remove memory leak when creating/removing a game instance",
+      "Prevent pickups from appearing in walls/unreachable spots",
+      "Mobile landscape mode - fix action buttons being blocked by chat menu",
+      "Prevent seeds from growing on water/oil"
+    ],
+    "features": [
+      "Make bot clean 5x faster",
+      "Improved cleanbot performance for large rooms with multiple dirty floors"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "version": "v0.4.1.alpha",
+  "date": "Nov 8, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added Lava terrain",
+      "Spectator Ghost mode",
+      "Add ability to Host Private Minigames",
+      "Prevent multipe browser tabs on same computer from joining same minigame",
+      "Fix client side memory leak",
+      "Added Total Completed tasks bar"
+    ]
+  }
+}
+

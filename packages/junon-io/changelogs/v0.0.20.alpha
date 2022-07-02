@@ -1,0 +1,14 @@
+{
+  "version": "v0.0.20.alpha",
+  "date": "Jul 7, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "fix queued buildings showing incomplete state when player goes out of view",
+      "guns wont lose durability if no bullets are fired",
+      "reduce memory leak for player, item, building, flowField"
+    ],
+    "features": [
+    ]
+  }
+}

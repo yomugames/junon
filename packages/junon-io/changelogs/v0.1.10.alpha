@@ -1,0 +1,17 @@
+{
+  "version": "v0.1.10.alpha",
+  "date": "Oct 27, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix bioraptors not attacking",
+      "Prevent new leader being from being autoassigned on owned-colonies"
+    ],
+    "features": [
+      "Allow visiting offline colonies as guest",
+      "Show actual sector day count on top-right corner",
+      "Make save file formats backwards compatible",
+      "Improve member/guest listing on colony menu"
+    ]
+  }
+}

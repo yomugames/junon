@@ -1,0 +1,17 @@
+{
+  "version": "v0.4.16.alpha",
+  "date": "Jun 21, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix meteor creating holes"
+    ],
+    "features": [
+      "Added 'Use command' permission for roles",
+      "Corpse Enabled + Mutant Enabled settings",
+      "/give can work on storages",
+      "Chicken drops egg"
+    ]
+  }
+}
+

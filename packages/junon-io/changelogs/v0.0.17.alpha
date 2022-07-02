@@ -1,0 +1,22 @@
+{
+  "version": "v0.0.17.alpha",
+  "date": "Jun 27, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "fix day count being overwritten when new players join",
+      "fix incorrect chunk boundingBox calculation which causes client desync bugs",
+      "fix session-resume player inventory not working bug",
+      "fix oxygen meter overflowing",
+      "fix bug where crops are included in power network",
+      "fix turret having non-integer row/col count after loading from save file",
+      "fix mining drills not mining after loading from save file",
+      "prevent player from crafting stacked equipments",
+      "destroy suit armor stand (cant be destroyed unless no armor)",
+      "prevent buildings from being placed right on edge of map"
+    ],
+    "features": [
+    ]
+  }
+}
+

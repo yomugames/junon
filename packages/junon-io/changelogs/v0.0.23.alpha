@@ -1,0 +1,14 @@
+{
+  "version": "v0.0.23.alpha",
+  "date": "Jul 27, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix bug where turret cant hit mobs",
+      "Fix raid not spawning due to not being able to find a spawn spot. "
+    ],
+    "features": [
+      "Raids would now prioritize to attack structures that are inside bases. Makes it more likely for them to go through your killbox."
+    ]
+  }
+}

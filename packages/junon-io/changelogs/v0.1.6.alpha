@@ -1,0 +1,16 @@
+{
+  "version": "v0.1.6.alpha",
+  "date": "Sep 20, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fixed bug where player inventory disappears when i click/drag on same inventory spot",
+      "Fixed shotgun bullets having incorrect trajectory",
+      "Fixed pathfinding bugs"
+    ],
+    "features": [
+      "Traders will always seek to nearby trading tables or leave if none is available",
+      "Traders no longer spawn corpse"
+    ]
+  }
+}

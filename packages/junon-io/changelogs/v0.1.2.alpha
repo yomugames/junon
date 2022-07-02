@@ -1,0 +1,13 @@
+{
+  "version": "v0.1.2.alpha",
+  "date": "Aug 7, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix bug where raids sometime spawn inside pressurized base",
+      "Fix bug where you can access other's storage by creating a group that is their username"
+    ],
+    "features": [
+    ]
+  }
+}

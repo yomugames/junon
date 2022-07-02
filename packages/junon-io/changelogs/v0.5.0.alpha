@@ -1,0 +1,17 @@
+{
+  "version": "v0.5.0.alpha",
+  "date": "Jan 4, 2022",
+  "title": "",
+  "content": {
+    "bugs": [
+      "fix useCommand not working with custom roles"
+    ],
+    "features": [
+      "Added Gravity (can be toggled on/off)",
+      "Added SquidStaff (art by PoTATo.0#3442)",
+      "Added SquidLordHeart (art by Ptat0Nerd#0290)",
+      "New Triggers StoragePut/StorageGet for detecting item retrieval/store",
+      "New function - modulo "
+    ]
+  }
+}

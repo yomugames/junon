@@ -1,0 +1,15 @@
+{
+  "version": "v0.2.1.alpha",
+  "date": "Jan 26, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Railway System added for fast transportion. Can craft Rail Track and Stops",
+      "Fix Pathfinding bug where mob would flipflop between 2 regions",
+      "Floors cannot replace soil with crops on it",
+      "Fix user getting stuck in front of butcher table"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "version": "v0.4.2.alpha",
+  "date": "Nov 18, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added Security Camera and Monitor",
+      "/team and /respawn command added",
+      "Beacon can limit which role/team spawns in it",
+      "Make assassins knife never miss target",
+      "Corpse is now hidden properly when field of view is applied",
+      "Food/Drinks/Drugs 3 sec progress circle to avoid accidental consumption",
+      "Private minigame that ended would restart with the same link and same players"
+    ]
+  }
+}
+

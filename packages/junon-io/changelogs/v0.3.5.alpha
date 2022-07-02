@@ -1,0 +1,15 @@
+{
+  "version": "v0.3.5.alpha",
+  "date": "June 19, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix player losing survival tool when traveling to different sector",
+      "Fix mobile web building rotation"
+    ],
+    "features": [
+      "Reworked game tutorial"
+    ]
+  }
+}
+

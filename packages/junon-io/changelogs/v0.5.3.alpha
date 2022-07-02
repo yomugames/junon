@@ -1,0 +1,15 @@
+{
+  "version": "v0.5.3.alpha",
+  "date": "Apr 5, 2022",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix /clear not removing picked item",
+      "Fix not able to unmount bioraptor in mobile"
+    ],
+    "features": [
+      "Add Scar-17, Bomber Turret, Bowl, Miso Soup, Potato Soup (arts by PX#2230)",
+      "Add Firebat (art by Sykerpelt#0802)"
+    ]
+  }
+}

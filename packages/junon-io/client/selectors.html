@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>Junon.io | Selectors</title>
+      <meta charset="utf-8">
+       <meta name="mobile-web-app-capable" content="yes">
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <meta name="apple-mobile-web-app-title" content="Junon.io">
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+      <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+      <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimum-scale=1, width=device-width, height=device-height">
+
+      <style>
+          body {
+              font-family: monospace;
+              font-size: 20px;
+          }
+
+          #partners a {
+            text-decoration: none;
+          }
+
+      </style>
+    </head>
+
+    <body>
+      <div id='partners'>
+        <h3>Selectors</h3>
+        <ul>
+          <li>@a - all players</li>
+          <li>@m - all mobs</li>
+          <li>@b - all buildings</li>
+          <li>@b[type=MiningDrill] - all buildings that are mining drills</li>
+          <li>@r - random player</li>
+        </ul>
+        <h3>Examples</h3>
+        <ul>
+          <li>/give @a MiniTurret - give everyone miniturret</li>
+          <li>/tp @a 20 20  - teleport everyone to coord 20,20</li>
+          <li>/clear @b[type=MiningDrill] - empty all inventory of mining drills</li>
+          <li>/caption @a[health<20] title danger - send caption to players who have less than 20 health</li>
+          <li>/kill @a[gold>=1000] - kill all players who have gold value of 1000 or more</li>
+          <li>/tp @m[region=jail] 20 20 - teleport all mobs in jail region to coordinate 20 20</li>
+        </ul>
+
+        <h3>Selector Arguments</h3>
+        <p>Selector arguments reduce the number of players/mobs/buildings being selected. @a[role=police] will only select players who have a police role.</p>
+        <ul>
+          <li>@a arguments - region, role, team, health, stamina, oxygen, hunger, speed, gold, score</li>
+          <li>@b arguments - region, type, health, owner, team</li>
+          <li>@m arguments - region, type, health, owner, team, hunger, speed</li>
+        </ul>
+      </div>
+    </body>
+</html>

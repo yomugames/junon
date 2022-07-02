@@ -1,0 +1,14 @@
+{
+  "version": "v0.0.21.alpha",
+  "date": "Jul 25, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Multiple maps + Sector unloading",
+      "New Sector/Colony browser in homepage",
+      "Reworked server infrastructure to allow multiple games in server"
+    ]
+  }
+}

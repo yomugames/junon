@@ -1,0 +1,16 @@
+{
+  "version": "v0.2.13.alpha",
+  "date": "Apr 11, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added Combat Armor - reduces damage by 4",
+      "Added Russian Translation",
+      "Added Searching in Craft Menu",
+      "Flamethrower starts at 0 fuel",
+      "Server Performance - Dont send room tile data to client. Also, change mob AI target finding to be faster and CPU friendly"
+    ]
+  }
+}

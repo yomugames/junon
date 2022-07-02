@@ -1,0 +1,20 @@
+{
+  "version": "v0.0.12.alpha",
+  "date": "May 28, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix oxygen generator not refillable",
+      "Fix raid not attacking buildings"
+    ],
+    "features": [
+      "Make the state of watered plants more visible",
+      "Chat shows persistently on left",
+      "Path Finding Optimization: Heirarchical Region Based Flow Field",
+      "Server Update Optimization: Dont listen to server chunk updates that are far away",
+      "F6 toggles cinematic mode",
+      "Random world seed"
+    ]
+  }
+}
+

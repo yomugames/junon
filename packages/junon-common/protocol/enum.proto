@@ -1,0 +1,482 @@
+package app;
+syntax = "proto3";
+
+enum BuildingType {
+  None = 0;
+  Turret = 1;
+  Core = 2;
+  Cannon = 3;
+  Reactor = 4;
+  VoidRay = 5;
+  MissileTurret = 6;
+  ShieldGenerator = 7;
+  MineralMiner = 8;
+  Wall = 9;
+  IonCannon = 10;
+  Fighter = 11;
+  Thruster = 12;
+  DockingBay = 13;
+  Bridge = 14;
+  MineralStorage = 15;
+  Lattice = 16;
+  SealedDoor = 17;
+  Airlock = 18;
+  SolarPanel = 19;
+  OxygenTank = 20;
+  Conveyor = 21;
+  Wire = 22;
+  Soil = 23;
+  WheatSeed = 24;
+  Fridge = 25;
+  WoodFloor = 26;
+  CarpetFloor = 27;
+  TiledFloor = 28;
+  Bed = 29;
+  WaterPump = 30;
+  Ventilator = 31;
+  SurvivalTool  = 32;
+  IceOre  = 33;
+  Pistol  = 34;
+  AlienMeat  = 35;
+  Steak  = 36;
+  Stove  = 37;
+  SteelCrate  = 38;
+  BulletAmmo  = 39;
+  LeadPipe  = 40;
+  SpaceSuit  = 41;
+  FireExtinguisher  = 42;
+  Terminal  = 43;
+  Cage  = 44;
+  Syringe  = 45;
+  Beaker  = 46;
+  ShipyardConstructor  = 47;
+  HangarCornerBlock  = 48;
+  HangarController  = 49;
+  Hangar  = 50;
+  Dismantler  = 51;
+  CopperOre  = 52;
+  NitroSeed  = 53;
+  NitroPowder = 54;
+  Wheat = 55;
+  AmmoPrinter = 56;
+  MiniTurret = 57;
+  Table = 58;
+  Chair = 59;
+  SteelFloor = 60;
+  ResearchTable = 61;
+  FlameThrower = 62;
+  PurpleFloor = 63;
+  PlatedFloor = 64;
+  StripePlatedFloor = 65;
+  GreenFloor = 66;
+  Television = 67;
+  Pot = 68;
+  RedCarpet = 69;
+  SteelOre  = 70;
+  AirAlarm  = 71;
+  GasPipe  = 72;
+  ManualAirlock  = 73;
+  SmallOxygenTank  = 74;
+  Mop  = 75;
+  Lamp  = 76;
+  Bottle  = 77;
+  Furnace  = 78;
+  CopperBar  = 79;
+  SteelBar  = 80;
+  Glass  = 81;
+  Sand  = 82;
+  Refinery  = 83;
+  Gold  = 84;
+  Workshop  = 85;
+  LiquidPipe  = 86;
+  LiquidTank  = 87;
+  CircuitBoard  = 88;
+  Wood  = 89;
+  CottonSeed  = 90;
+  Cloth  = 91;
+  Shotgun  = 92;
+  SuitStation  = 93;
+  Shower  = 94;
+  OxygenGenerator  = 95;
+  Lighter  = 96;
+  CryoTube  = 97;
+  FiberSeed  = 98;
+  PlantFiber  = 99;
+  Antidote  = 100;
+  Poison  = 101;
+  BaseStarter  = 102;
+  EscapePod  = 103;
+  FirstAidKit = 104;
+  IronOre  = 105;
+  IronBar  = 106;
+  MiningDrill  = 107;
+  ChemistryStation  = 108;
+  Gel  = 109;
+  Gelatin  = 110;
+  Beer  = 111;
+  Cola  = 112;
+  Brewery  = 113;
+  OilRefinery = 114;
+  FuelTank = 115;
+  PowerGenerator = 116;
+  FuelPipe = 117;
+  StunBaton = 118;
+  PotatoSeed = 119;
+  Potato = 120;
+  SpikeTrap = 121;
+  Drill  = 122;
+  TradingTable  = 123;
+  Beacon = 124;
+  ButcherTable = 125;
+  HumanMeat = 126;
+  AnimalMeat = 127;
+  HotDog = 128;
+  Katana = 129;
+  VeganPizza = 130;
+  SlimyMeatPizza = 131;
+  LectersDinner = 132;
+  MolotovCocktail = 133;
+  Grenade = 134;
+  PoisonGrenade = 135;
+  BloodBottle  = 136;
+  BloodPack  = 137;
+  Stimpack  = 138;
+  RailTrack = 139;
+  RailTram  = 140;
+  RailStop  = 141;
+  Sign  = 142;
+  Web  = 143;
+  WebTrap  = 144;
+  AssaultRifle  = 145;
+  RifleAmmo  = 146;
+  ShotgunShell  = 147;
+  CombatArmor = 148;
+  LargeTable = 149;
+  FoodVendingMachine = 150;
+  DrinksVendingMachine = 151;
+  Atm = 152;
+  CoffeeSeed = 153;
+  CoffeeBean = 154;
+  Coffee = 155;
+  YellowFloor = 156;
+  BronzeFloor = 157;
+  LightBlueFloor = 158;
+  BlueFloor = 159;
+  GrayFloor = 160;
+  GrassFloor = 161;
+  PinkFloor = 162;
+  BlueWall = 163;
+  GreenWall = 164;
+  IvoryWall = 165;
+  SunflowerSeed = 166;
+  Sunflower = 167;
+  BlueSeed = 168;
+  BlueLotus = 169;
+  PoppySeed = 170;
+  Poppy = 171;
+  FarmController = 172;
+  WaterBottle  = 173;
+  SlaversTable  = 174;
+  Bread = 175;
+  FlamethrowerTurret = 176;
+  NameTag = 177;
+  Fence = 178;
+  DeepDrill = 179;
+  SulfurOre  = 180;
+  Explosives  = 181;
+  Missile = 182;
+  Vodka = 183;
+  Meteorite  = 184;
+  BlueEnergySword  = 185;
+  GreenEnergySword = 186;
+  RedEnergySword = 187;
+  Forge = 188;
+  Disinfectant = 189;
+  Floor = 190;
+  Wrench = 191;
+  Oil = 201;
+  Rock = 202;
+  LavaRock = 203;
+  Lava = 204;
+  Water = 205;
+  Ice = 206;
+  Asteroid = 207;
+  IceAsteroid = 208;
+  CopperAsteroid = 209;
+  SteelAsteroid = 210;
+  IronAsteroid = 211;
+  Vine = 212;
+  Sky = 213;
+  MeteoriteAsteroid = 214;
+  Radio = 215;
+  WoodTable = 216;
+  WoodChair = 217;
+  AssassinsKnife = 218;
+  EmergencyButton = 219;
+  SecurityCamera = 220;
+  SecurityMonitor = 221;
+  TimerBomb = 222;
+  PowerSwitch = 223;
+  UndergroundVent = 224;
+  WallLamp = 225;
+  SantaHat = 226;
+  RedPresent = 227;
+  BluePresent = 228;
+  GreenPresent = 229;
+  ChristmasTree = 230;
+  PocketTrader = 231;
+  TeslaCoil = 232;
+  Tree = 233;
+  HazmatSuit = 234;
+  Egg = 235;
+  PrisonerSuit = 236;
+  PoliceSuit = 237;
+  LabCoat = 238;
+  Omelette = 239;
+  CultistSuit = 240;
+  PlasmaGun = 241;
+  PlasmaCell = 242;
+  SquidLordHeart = 243;
+  SquidStaff = 244;
+  EnergyDrink = 245;
+  AlienJuice = 246;
+  Fries = 247;
+  RocketLauncher = 248;
+  Scar17 = 249;
+  Bowl = 250;
+  PotatoSoup = 251;
+  SlimeBroth = 252;
+  MisoSoup = 253;
+  Carrot = 254;
+  Landmine = 255;
+  BomberTurret = 256;
+}
+
+enum TerrainType {
+  None = 0;
+  Oil = 201;
+  Rock = 202;
+  LavaRock = 203;
+  Lava = 204;
+  Water = 205;
+  Ice = 206;
+  Asteroid = 207;
+  IceAsteroid = 208;
+  CopperAsteroid = 209;
+  SteelAsteroid = 210;
+  IronAsteroid = 211;
+  Vine = 212;
+  Sky = 213;
+  MeteoriteAsteroid = 214;
+}
+
+enum ProjectileType {
+  CannonBall = 0;
+  BasicLaser = 1;
+  LightLaser = 2;
+  VoidRayLight = 3;
+  Missile = 4;
+  IonBeam = 5;
+  Rock = 6;
+  MiningBeam = 7;
+  BlasterLaser = 8;
+  Bullet = 9;
+  CarbonGas = 10;
+  Flame = 11;
+  AcidSpit = 12;
+  Spike = 13;
+  Grenade = 14;
+  Explosion = 15;
+  PoisonGrenade = 16;
+  PoisonGas = 17;
+  RifleBullet = 18;
+  ShotgunBullet = 19;
+  Meteor = 20;
+  DisinfectingGas = 21;
+  TeslaLaser = 22;
+  MolotovCocktail = 23;
+  PlasmaBullet = 24;
+  Bubble = 25;
+}
+
+enum MobStatus {
+  Hostile = 0;
+  Neutral = 1;
+  Obedient = 2;
+  Guardian = 3;
+}
+
+enum BackgroundType {
+  Planet = 0;
+  Star = 1;
+  Ring = 2;
+}
+
+enum EventType {
+  Raid = 0;
+  TraderArrived = 1;
+  SpiderInfestation = 2;
+  TaxCollection = 3;
+  RaidWarning = 4;
+  RaidEnd = 5;
+  SlaveTraderArrived = 6;
+  MeteorShower = 7;
+  MeteorShowerImmediate = 8;
+  Alarm = 9;
+  AlarmEnd = 10;
+  FixLights = 11;
+  FixLightsEnd = 12;
+}
+
+enum BehaviorType {
+  Clean = 0;
+  Seek = 1;
+  SeekFood = 2;
+  Idle = 3;
+  SeekTable = 4;
+  Eat = 5;
+  MoveCorpseToButcher = 6;
+  MoveCorpseToGraveyard = 7;
+  RefillTurret = 8;
+  SeekAmmo = 9;
+  SeekTurret = 10;
+  SeekButcherTable = 11;
+  Butcher = 12;
+  SeekCorpse = 13;
+  SeekSeed = 14;
+  SeekSoil = 15;
+  SeekBottle = 16;
+  SeekWater = 17;
+  ReturnItem = 18;
+  SeekBed = 19;
+  Sleep = 20;
+  HarvestCrop = 21;
+  SeekStove = 22;
+  Cook = 23;
+  Repair = 24;
+  SeekIngredient = 25;
+  SeekMiner = 26;
+}
+
+enum MobType {
+  Drone = 0;
+  Catapult = 1;
+  Reaver = 2;
+  Slime = 3;
+  Transporter = 4;
+  Spider = 5;
+  Human = 6;
+  Cat = 7;
+  Pirate = 8;
+  Mutant = 9;
+  Trader = 10;
+  Monkey = 11;
+  FirstBot = 12;
+  CleanBot = 13;
+  GuardBot = 14;
+  Ghost = 15;
+  PoisonSpider = 16;
+  BioRaptor = 17;
+  Brood = 18;
+  Guard = 19;
+  Trooper = 20;
+  Chicken = 21;
+  Chemist = 22;
+  Messenger = 23;
+  SlaveTrader = 25;
+  NuuSlave = 26;
+  PixiSlave = 27;
+  GaramSlave = 28;
+  DummyPlayer = 29;
+  Golem = 30;
+  Mantis = 31;
+  Prisoner = 32;
+  SquidLord = 33;
+  Firebat = 34;
+}
+
+enum EntityType {
+  Player = 0;
+  Mob = 1;
+  Slave = 2;
+}
+
+
+enum EquipmentRole {
+  Armor = 0;
+  Extra = 1;
+  Accessory = 2;
+  Hand = 3;
+}
+
+enum PlayerState {
+  Normal = 0;
+}
+
+enum NetworkType {
+  Oxygen = 0;
+  Power = 1;
+  Liquid = 2;
+  Fuel  = 3;
+}
+
+enum EffectType {
+  Fire   = 0;
+  Blood  = 1;
+  Water  = 2;
+  Slime  = 3;
+  Web    = 4;
+  Rubble = 5;
+  Dirt   = 6;
+  Poison = 7;
+  Rage   = 8;
+  Miasma = 9;
+}
+
+enum StackOperationType {
+  Split = 0;
+  Merge = 1;
+}
+
+enum TransportType {
+  RailTram = 0;
+}
+
+enum SoundType {
+  Pickup = 0;
+  HarvestPlant = 1;
+  MeleeHit = 2;
+  Eating = 3;
+  Alert = 4;
+  Meeting = 5;
+}
+
+enum RoleType {
+  Everyone = 0;
+  Member = 1;
+  Admin = 2;
+}
+
+enum TaskType {
+  PlantSeed = 0;  
+  WaterCrop = 1;  
+  HarvestCrop = 2;
+  ButcherCorpse = 3;
+  Cook = 4;
+  RefillTurret = 5;
+  CollectMiner = 6;
+}
+
+enum AttackTargetType {
+  Mob = 1;
+  Player = 2;
+}
+
+enum ActivityType {
+  Deconstruct = 0;
+  Build = 1;
+}
+
+enum EntityGroup {
+  Building = 0;
+}

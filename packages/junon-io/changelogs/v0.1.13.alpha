@@ -1,0 +1,15 @@
+{
+  "version": "v0.1.13.alpha",
+  "date": "Nov 20, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added ButcherTable for harvesting meat from corpses",
+      "Added HotDog, a new food that requires wheat and animal meat",
+      "Added Wheat and WheatSeed, which can be bought from a Trader",
+      "Mobs would no longer drop pickups by default. They would need to be butchered first"
+    ]
+  }
+}

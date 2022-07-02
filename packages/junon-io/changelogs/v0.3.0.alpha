@@ -1,0 +1,15 @@
+{
+  "version": "v0.3.0.alpha",
+  "date": "May 17, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix clean bots getting stuck in walls"
+    ],
+    "features": [
+      "Can buy slaves from slave trader",
+      "Can craft Farm Controller which specifies what crops to grow on soil",
+      "Toggle quests on/off"
+    ]
+  }
+}

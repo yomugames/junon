@@ -1,0 +1,18 @@
+{
+  "version": "v0.4.10.alpha",
+  "date": "Apr 4, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+      "fix $getHealth function not working"
+    ],
+    "features": [
+      "$random + $getRole function added",
+      "/help spawnmob shows flags that can be used",
+      "Added PlayerAttacked, MobAttacked, BuildingAttacked triggers",
+      "/stat works with player maxhealth",
+      "show usage of @a, @b, @r target selectors in commands trigger action"
+    ]
+  }
+}
+

@@ -1,0 +1,13 @@
+{
+  "version": "v0.2.8.alpha",
+  "date": "Mar 19, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Can travel between colonies while inside game",
+      "Clicking username on chat brings up user profile"
+    ]
+  }
+}

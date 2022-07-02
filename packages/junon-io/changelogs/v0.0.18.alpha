@@ -1,0 +1,20 @@
+{
+  "version": "v0.0.18.alpha",
+  "date": "Jul 3, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "fix bug where mob gets stuck on chunkRegion edge",
+      "fix mob memory leak",
+      "fix player socket leak when reconnecting on disconnect"
+    ],
+    "features": [
+      "allow players to choose server region",
+      "flowField reduce memory footprint"
+    ]
+  }
+}
+
+
+
+    

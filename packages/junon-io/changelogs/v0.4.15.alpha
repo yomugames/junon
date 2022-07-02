@@ -1,0 +1,18 @@
+{
+  "version": "v0.4.15.alpha",
+  "date": "Jun 15, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix $damage not set properly on MobAttacked for guards",
+      "/give no longer stacks unstackable items",
+      "Fix meteor creating rocks underneath"
+    ],
+    "features": [
+      "Command block variables are now case sensitive",
+      "allow /stat weapons",
+      "/kill pickup"
+    ]
+  }
+}
+

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Junon.io | Bans </title>
+
+    <meta property="og:site_name" content="Junon.io" />
+    <meta property="og:image" content="https://i.imgur.com/RtYeylB.png" />
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Junon.io">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimum-scale=1, width=device-width, height=device-height">
+
+    <style type="text/css">
+
+    </style>
+    <script>
+      window.env = "<%= nodeEnv %>"
+    </script>
+</head>
+<body style=''>
+  <h3 class='title'>Bans</h3>
+  <div class='bans_container'>
+    Authenticating..
+  </div>
+
+  <script type="text/javascript">
+    var httpRequest = function(url, cb) {
+      var xhttp = new XMLHttpRequest()
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+           cb.success(xhttp.responseText)
+        }
+      }
+      xhttp.onerror = cb.error
+      xhttp.open("GET", url, true)
+      xhttp.send()
+
+      return xhttp
+    }
+
+    var renderBans = function(result) {
+      if (result.error) {
+        document.querySelector(".bans_container").innerText = "Unauthorized"
+        return
+      }
+      
+      let el = ""
+      document.querySelector(".bans_container").innerHTML = el
+    }
+
+    let matchmakerUrls = {
+      "development": "http://dev.junon.io:3000/",
+      "staging": "https://staging-matchmaker.junon.io/",
+      "production": "https://matchmaker.junon.io/"
+    }
+
+    let url = matchmakerUrls[window.env] + "bans"
+
+    httpRequest(url, {
+      success: (data) => {
+        let result = JSON.parse(data)
+        renderBans(result)
+      },
+      error: (data) => {
+        alert("Error fetching bans")
+      }
+    })
+    
+  </script>
+</body>
+</html>

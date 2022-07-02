@@ -1,0 +1,20 @@
+{
+  "version": "v0.0.19.alpha",
+  "date": "Jul 5, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "fix spike traps not working",
+      "prevent players from placing floors on another players floor",
+      "interact key 'e' should now work for international keyboard inputs",
+      "fix raid appearing inside non-pressurized areas at times",
+      "fix drill memory leak"
+    ],
+    "features": [
+      "structures can no longer be placed on a tile that has a player/mob present",
+      "buildings that block path will now have a queued construction time",
+      "limit building placement range to 7 tiles from player position",
+      "disable long range bed teleport"
+    ]
+  }
+}

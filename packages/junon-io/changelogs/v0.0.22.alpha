@@ -1,0 +1,14 @@
+{
+  "version": "v0.0.22.alpha",
+  "date": "Jul 26, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix bug where plants cant be harvested by team mates",
+      "Fix player reconnect game when server reboots after crash"
+    ],
+    "features": [
+      "Mini Turret/Bullets/Lead Pipe can only hit 1 enemy at a time"
+    ]
+  }
+}

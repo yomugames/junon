@@ -1,0 +1,7 @@
+node_modules
+tags
+.DS_Store
+packages/junon-io/client/dist/
+packages/junon-io/dist
+packages/junon-io/sourcemaps
+packages/junon-io/client/assets/screenshots

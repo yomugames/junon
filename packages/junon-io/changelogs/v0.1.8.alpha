@@ -1,0 +1,13 @@
+{
+  "version": "v0.1.8.alpha",
+  "date": "Oct 5, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Enabled Chat + Zooming in mobile browsers",
+      "Improved Inventory Slot Dragging in mobile browsers"
+    ]
+  }
+}

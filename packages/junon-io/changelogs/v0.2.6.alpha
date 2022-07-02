@@ -1,0 +1,14 @@
+{
+  "version": "v0.2.6.alpha",
+  "date": "Feb 28, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added background music and other sound effects",
+      "Shotgun requires shotgun shells",
+      "Take Along other pets would replace current follower"
+    ]
+  }
+}

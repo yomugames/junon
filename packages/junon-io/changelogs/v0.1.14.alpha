@@ -1,0 +1,16 @@
+{
+  "version": "v0.1.14.alpha",
+  "date": "Nov 29, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added CleanBot that automatically cleans dirty floors. Purchasable from trader",
+      "Added Katana weapon, wider range and cat hit 3 enemies at once",
+      "Added Chicken pet",
+      "Added vegan pizza + slimy meat pizza",
+      "Spider can inflict fear (reduced damage + walking speed) on players"
+    ]
+  }
+}

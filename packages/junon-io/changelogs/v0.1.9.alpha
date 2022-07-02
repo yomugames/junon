@@ -1,0 +1,14 @@
+{
+  "version": "v0.1.9.alpha",
+  "date": "Oct 12, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix high gold amount for certain ores"
+    ],
+    "features": [
+      "Added settings menu for changing keyboard controls",
+      "Interacting with 02 tank refills suit oxygen"
+    ]
+  }
+}

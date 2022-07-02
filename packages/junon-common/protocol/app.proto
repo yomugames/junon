@@ -1,0 +1,76 @@
+package app;
+syntax = "proto3";
+
+import "base.proto";
+
+message Building {
+  uint32 id = 1;
+  uint32  x  = 2;
+  uint32  y  = 3;
+  uint32 health = 4;
+  BuildingType type = 5;
+  uint32 level = 6;
+  int32 angle = 7;
+  int32 origAngle = 8;
+  repeated Point collider = 9;
+  bool isLaunched = 10;
+  uint32 usage = 11;
+  bool isHarvestable = 12;
+  bool isOpen = 13;
+  bool isPowered = 14;
+  map<string, uint32> effects = 15;
+  string content = 16;
+  uint32 w = 17;
+  uint32 h = 18;
+  bool isOxygenated = 20;
+  OwnerRef owner = 22;
+  bool clientMustDelete = 23;
+  bool isWatered = 24;
+  map<string, ResourceStorage> resourceStorages = 25; 
+  uint32 buildProgress = 26;
+  bool isUnderConstruction = 27;
+  uint32 decayStartTimestamp = 28;
+  bool unowned = 29;
+  bool isProcessing = 30;
+  uint32 accessType = 31;
+  uint32 targets = 32;
+  bool   isCustomAccess = 33;
+  uint32 colorIndex = 34;
+  uint32 textureIndex = 35;
+  map<string,string> localeContents = 36;
+  uint32 neighbors = 37;
+  string name = 38;
+}
+
+message Mob {
+  uint32 id = 1;
+  uint32  x  = 2;
+  uint32  y  = 3;
+  uint32 health = 5;
+  MobType type = 6;
+  bool   isKnocked = 7;
+  uint32 level = 8;
+  int32 angle = 9;
+  ShipRef ship = 10;
+  MobStatus status = 11;
+  uint32 faith = 12;
+  uint32 nextFeedTime = 13;
+  MasterRef master = 14;
+  OwnerRef owner = 15;
+  map<string, uint32> effects = 16;
+  BuildingType weaponType = 17;
+  uint32 relativeX = 18;
+  uint32 relativeY = 19;
+  string name = 20;
+  bool clientMustDelete = 21;
+  BehaviorType behavior = 22;
+  bool   isLivestock = 23;
+  uint32 hunger = 24;
+  uint32 stamina = 25;
+  uint32 oxygen = 26;
+  bool isSleeping = 27;
+  uint32 tasks = 28;
+  uint32 happiness = 29;
+  string content = 30;
+}
+

@@ -1,0 +1,20 @@
+{
+  "version": "v0.1.16.alpha",
+  "date": "Dec 28, 2019",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix trader purchase bug (takes more amount sometimes)",
+      "Private games would not be listed on top colony list"
+    ],
+    "features": [
+      "New Chemist Mob that throws grenades, poison gas and destroys traps",
+      "Antidote can be crafted at chemistry station",
+      "Can now Sell items to Trader",
+      "Peaceful mode can be achieved by paying Taxes to the Messenger everyday",
+      "Empire Relationship system that changes from Hostile/Friendly based on actions",
+      "Raid has a timer countdown before actual spawn",
+      "Turrets would not attack wandering mobs"
+    ]
+  }
+}

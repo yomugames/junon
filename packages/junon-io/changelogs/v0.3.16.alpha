@@ -1,0 +1,15 @@
+{
+  "version": "v0.3.16.alpha",
+  "date": "Aug 23, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Add missile turret",
+      "Add deep drill to generate sulfure ore",
+      "Can craft explosives in chemistry station which is an ingredient for missiles and grenades."
+    ]
+  }
+}
+

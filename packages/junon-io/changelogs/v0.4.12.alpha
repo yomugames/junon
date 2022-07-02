@@ -1,0 +1,21 @@
+{
+  "version": "v0.4.12.alpha",
+  "date": "Apr 28, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix weapon quickswitch",
+      "Fix pvp allow not working in region"
+    ],
+    "features": [
+      "/variable command creates variables for use in command blocks",
+      "/suitcolor command and setting to disable changing suits",
+      "@a[region=blue] region/speed/hunger/oxygen/stamina selector added",
+      "Can use <,>,>=,<= operations in attribute selectors @a[health<50]",
+      "/clear [player] [item] [count] allows you to remove specific item from inventory with specified count",
+      "@b mob selector added",
+      "Added new triggers - ScoreChanged, ItemBuy, ItemSell, ItemConsumed, ItemPickup, etc.."
+    ]
+  }
+}
+

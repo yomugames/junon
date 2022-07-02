@@ -1,0 +1,2074 @@
+<canvas id='game_canvas'></canvas>
+
+<div id='more_io_games'><a href="/partners.html" target="_blank" id='partners_link'><%= t('More IO games') %></a></div>
+
+<div id='home_background'></div>
+<div class='loading_modal modal_menu'>
+    <div class='loading_modal_message'>Loading</div>
+    <div class='loading_modal_spinner lds-ring'><div></div><div></div><div></div><div></div></div>
+</div>
+
+<div id='welcome_container'>
+    <div id='home_footer'>
+        <a href="/changelogs.html" target="_blank" class='game_version'><%= gameVersion %></a> 
+        <a href="/partners.html" target="_blank" id='partners_link'><%= t('Partners') %></a> 
+        <a href="/privacy.html" target="_blank" id='privacy_link'><%= t('Privacy') %></a>
+        <a href="/rules.html" target="_blank" id='rules_link'><%= t('Rules') %></a>
+        <a href="/credits.html" target="_blank" id='credits_link'><%= t('Credits') %></a>
+    </div>
+    <div id='username_form_container' class='modal_menu'>
+        <div id='username_form_description'>Choose a username</div>
+        <input type="text" id='username_input' class='menu_input'>
+        <button id='set_username_btn'>Submit</button>
+        <div id='username_errors'></div>
+    </div>
+
+    <div class='left_sidebar'>
+        <div id='home_user_account_container' class='home_menu_container'>
+            <div id='login_cookies'>Cookies must be enabled to Login</div>
+            <div id='auth_in_progress'>
+                <span>Authenticating...</span>
+            </div>
+            <div id='username_container'>
+                <div id='username'></div>
+                <div id='logout_btn' class='logout_container home_menu_container'><%= t('Logout') %></div>
+            </div>
+            <div id='authentication_container'>
+                <div id='login_btn' class='btn'><%= t('Login') %></div>
+                <div class='login_error'>
+                    <div class='login_error_header'>Login Error</div>
+                    <div class='login_error_message'></div>
+                </div>
+            </div>
+        </div>
+
+        <div class='left_sidebar_contents'>
+            <div class="io_game_promo">
+                <a href="https://archerfall.io" target="_blank">
+                    <span class="also_play">Also Play</span>
+                    <img src="https://i.imgur.com/xwm3IKV.png">
+                </a>
+            </div>
+            <div id='changelogs'>
+                <% let changeLog = changeLogs[0] %>
+                <div>
+                    <p class='date'><%= changeLog.date %></p>
+                    <% if (changeLog.content.bugs.length > 0) { %>
+                        <ul>
+                            <% changeLog.content.bugs = changeLog.content.bugs.slice(0,1) %>
+                            <% for (let i = 0; i < changeLog.content.bugs.length; i++) { %>
+                                <% let bug = changeLog.content.bugs[i] %>
+                                <li><%= bug %></li>                    
+                            <% } %>
+                        </ul>
+                    <% } %>
+                    <% if (changeLog.content.features.length > 0) { %>
+                        <ul>
+                            <% changeLog.content.features = changeLog.content.features.slice(0,2) %>
+                            <% for (let i = 0; i < changeLog.content.features.length; i++) { %>
+                                <% let feature = changeLog.content.features[i] %>
+                                <li><%= feature %></li>                    
+                            <% } %>
+                        </ul>
+                    <% } %>
+                    <a href="/changelogs.html" target="_blank" id='changelog_link'>(See More)</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+        <div id='home_error_message'></div>
+        <div id='connecting_message'><%= t('Connecting') %> <div class="lds-ring"><div></div><div></div><div></div><div></div></div></div>
+
+
+    <div id='social_login_container'>
+        <div class='google_login_btn'>
+            <img src="/assets/images/google_white_icon.png">
+            <span class='login_btn_label'>Signin with Google</span>
+        </div>
+
+        <div class='facebook_login_btn'>
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/facebook.svg">
+            <span class='login_btn_label'>Signin with Facebook</span>
+        </div>
+    </div>
+
+    <div id='firebaseui-auth-container'></div>
+
+    <p id='game_caption'>JUNON . IO </p>    
+    <div class='middle_container'>
+        <div class='home_user_action_container'>
+            <div class='home_action_row'>
+                <div class='default_play_btn btn'>
+                    <span><%= t('Play') %></span>
+                    <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
+                </div>
+
+                <div class='tutorial_menu_btn btn'>
+                    <span><%= t('Tutorial') %></span>
+                    <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
+                </div>
+
+                <div class='settings_menu_btn btn'>
+                    <img src="/assets/images/settings_icon.png" />
+                </div>
+            </div>
+
+            <div id='language_selector'>
+                <img src="/assets/images/language_icon.png" class='language_icon' />
+                <select id='language_select'>
+                    <option value='en'>English</option>
+                    <option value='ru'>Русский</option>
+                    <option value='ja'>日本語</option>
+                </select>
+            </div>
+
+            <a class='discord_link' href="https://discord.gg/T6rPXtw" target="_blank"><img src="/assets/images/background/discord_small_icon.png"></a>
+
+            <button class='open_ban_list_btn ui_btn'>Manage Bans</button>
+                
+        </div>
+
+        <div class='survival_list_container'>
+            <div class='minigame_list_header'>
+                <input class='search_world_input' type="text" name="" placeholder="Enter world name">
+                <button class='search_world_btn'>Search</button>
+            </div>
+        </div>
+        <div class='browse_games_container'>
+            <div class='game_list_container'>
+                <div class='game_list_header'>
+                    <div class='colony_filter_tab minigames_tab '><%= t('Games') %></div>
+                    <div class='colony_filter_tab online_colonies_tab selected' data-tab='worlds'><%= t('Worlds') %></div>
+                    <div class='colony_filter_tab new_colonies_tab' data-tab='new'><%= t('New') %></div>
+                    <div class='colony_filter_tab top_colonies_tab' data-tab='top'><%= t('Top') %></div>
+                    <div class='colony_filter_tab favorite_colonies_tab'><%= t('Favorites') %></div>
+                    <img class='gallery_mode_btn' src='/assets/images/gallery_view_icon.png' />
+                    <img class='list_mode_btn' src='/assets/images/list_view_icon.png' />
+                    <div class='colony_filter_tab mine_colonies_tab '><%= t('MineColony') %></div>
+                </div>
+                <div id='minigames_tab_content'>
+                    <div class='main_game_mode_selector'>
+                        <div class='main_game_mode_entry  imposter_game_mode_entry' data-id='Ap9OYBkw3dQvJ'>
+                            <div class='game_mode_thumb'><img src="/assets/images/background/imposter_thumbnail.jpg"></div>
+                            <div class='game_mode_name'>Find the Imposter</div>
+                            <div class='minigame_creator'>kuroro</div>
+                            <div class="minigame_player_count">0 players</div>
+                        </div>
+                        <div class='main_game_mode_entry  domination_game_mode_entry' data-id='PnGkJd5xZsb0v'>
+                            <div class='game_mode_thumb'><img src="/assets/images/background/grey_thumb.png"></div>
+                            <div class='game_mode_name'>Domination</div>
+                            <div class='minigame_creator'>kuroro</div>
+                            <div class="minigame_player_count">0 players</div>
+                        </div>
+                        <div class='main_game_mode_entry  bed_wars_game_mode_entry' data-id='uLHpXWb2koXYe'>
+                            <div class='game_mode_thumb'><img src="/assets/images/background/bedwars_thumbnail.jpg"></div>
+                            <div class='game_mode_name'>Bed Wars</div>
+                            <div class='minigame_creator'>Skylynx</div>
+                            <div class="minigame_player_count">0 players</div>
+                        </div>
+                        <div class='main_game_mode_entry  tower_defense_game_mode_entry' data-id='YcdqgbswlAqRi'>
+                            <div class='game_mode_thumb'><img style='object-fit: contain;' src="/assets/images/background/td_thumb.png"></div>
+                            <div class='game_mode_name'>Tower Defense</div>
+                            <div class='minigame_creator'>Starmancer</div>
+                            <div class="minigame_player_count">0 players</div>
+                        </div>
+                    </div>
+                </div>
+                <div id='region_tab_content'>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id='background'></div>
+
+    <div id='name_input_container' style=''>
+        <div id='name_input_message'></div>
+        <input id='name_input' type='text' placeholder='name'>
+        <div id='play_btn' class='btn'>
+            <span>Play</span>
+            <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
+        </div>
+        <div id='survival_btn' class='btn'>
+            <span>Survival</span>
+            <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
+        </div>
+    </div>
+
+    <div id='ban_manager_container' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'>Ban List</div>
+        <div class='ban_status_message'>Authorizing..</div>
+        <div class='global_ban_list_container'>
+            <div class='global_ban_list_header'>
+                <div class='global_ban_list_header_col'>Username</div>
+                <div class='global_ban_list_header_col duration_col'>Days</div>
+                <div class='global_ban_list_header_col reason_col'>Reason</div>
+                <div class='global_ban_list_header_col'>Date</div>
+            </div>
+            <div class='global_ban_list_body'></div>
+        </div>
+        <div class='ban_user_form'>
+            <div class='ban_username'>
+                <label>Username</label>
+                <input type="text" class='black_input'>
+            </div>
+            <div class='ban_duration'>
+                <label>Duration (Days)</label>
+                <input type="number" class='black_input'>
+            </div>
+            <div class='ban_reason'>
+                <label>Reason</label>
+                <input type="text" class='black_input'>
+            </div>
+            <button class='global_ban_btn ui_btn'>Ban</button>
+        </div>
+    </div>
+
+    <div class='home_menu'>
+        <div class='home_menu_controls'>
+            <div id='region_selector'>
+                <select id='region_select'>
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+    <div class='main_menu'>
+        <div class='mobile_authentication_container'>
+            <div class='btn mobile_login_btn'><%= t('Login') %></div>    
+            <div class='btn mobile_logout_btn'><%= t('Logout') %></div>    
+        </div>
+
+        <div class='mobile_username_container'>
+            <div class='username'></div>
+        </div>
+
+        <div class='resume_menu_btn main_menu_btn'><%= t('Resume') %></div>
+        <div class='settings_menu_btn main_menu_btn'><%= t('Settings') %></div>
+        <div class='exit_game_menu_btn main_menu_btn'><%= t('Exit Game') %></div>
+    </div>
+
+    <a class='other_game_ad_square' href='https://uchu.io' target="_blank">
+        <img src="">
+    </a>
+    <div class='junon_ad_square junon_ad_square_1'>
+        <div id='junon-io_300x250'>
+        </div>
+    </div>
+    <div class='junon_ad_square junon_ad_square_2 middle'>
+        <div id='junon-io_300x250_2'>
+        </div>
+    </div>
+    
+    <div class='main_menu_navigator'>
+        <div class='back_main_menu_btn'>
+            <img src="/assets/images/arrow_back_icon.png" />
+            <%= t('Back') %>
+        </div>
+
+        <div class='game_invite_container'>
+            <div class='game_invite_name'></div>
+            <div id="join_game_btn" data-disabled='true'>Join Game</div>
+            <img class='game_invite_screenshot' src="" />
+            <div class='game_invite_details'>
+                <div class='game_invite_day_count'>
+                    <span><%= t('ColonyDay') %>: </span>
+                    <span class="team_days_alive">22</span>
+                </div>
+                <div class='game_invite_player_count'>
+                    <span><%= t('ColonyOnline') %>: </span>
+                    <span class="team_member_count">0 / 20</span>
+                </div>
+            </div>
+        </div>
+
+        <div class='pvp_games_container'>
+            <table class='pvp_colony_list colony_list' cellspacing='0' cellpadding='0'>
+              <thead>
+                <tr>
+                  <th class='info_name'><%= t('ColonyName') %></th>
+                  <th class='days_alive_header'><%= t('ColonyDay') %></th>
+                  <th class='colony_list_member_count'><%= t('ColonyOnline') %></th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+        </div>
+
+        <div class='minigame_details_container'>
+            <div class='minigame_title'>Find the Imposter</div>
+            <p class='minigame_description'>
+                Crewmates win by completing tasks and voting out imposter.
+                Imposter wins by killing everyone.
+            </p>
+            <img class='minigame_poster' />
+            <div class='minigame_chat_language'>
+                <label>Chat</label>
+                <select class='minigame_chat_language_select ui_select'>
+                    <option value='en'>English</option>
+                    <option value='ru'>Русский</option>
+                    <option value='ja'>日本語</option>
+                </select>
+            </div>
+            <div class='join_minigame_btn ui_btn'><%= t('Join') %></div>
+            <div class='host_minigame_btn ui_btn'><%= t('Host Private Game') %></div>
+            <div class='minigame_thumbnails'>
+                <a class='minigame_thumbnail_1' href="/assets/images/background/role_crew.jpg" target='_blank'>
+                    <img class='minigame_thumbnail' src='/assets/images/background/role_crew.jpg' />
+                </a>
+                <a class='minigame_thumbnail_2' href="/assets/images/background/meeting.jpg" target='_blank'>
+                    <img class='minigame_thumbnail' src='/assets/images/background/meeting.jpg' />
+                </a>
+            </div>
+        </div>
+
+        <div class='load_game_settings_container'>
+            <label class='load_game_settings_header'><%= t('Game Settings') %></label>
+            <div class='load_game_save_name'></div>
+            <div class='load_game_settings_row'>
+                <label><%= t('Visibility') %></label>
+                <select class='visibility_select'>
+                    <option value='public'><%= t('Public') %></option>
+                    <option value='private'><%= t('Private') %></option>
+                </select>
+            </div>
+
+            <div>
+                <button class='main_menu_btn continue_game_btn'>
+                    <span><%= t('Start Game') %></span>
+                    <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
+                </button>
+            </div>
+        </div>
+        <div class='save_list_container'>
+            <div class='save_list_content'></div>
+            <div class='save_list_empty_container'>
+                <%= t('No Saves Found') %>
+            </div>
+        </div>
+
+        <div class='new_game_container'>
+            <div class='menu_main_header'><%= t('New Colony') %></div>
+            <input type="text" name="" class='new_colony_name_input black_input' placeholder='<%= t('Enter Colony Name') %>'>
+            <div class='new_game_row_count'>
+                <label>Row Count</label>
+                <select class='row_count_select ui_select'>
+                    <option value='32'>32</option>
+                    <option value='64'>64</option>
+                    <option value='96'>96</option>
+                    <option value='128' selected>128</option>
+                </select>
+            </div>
+            <div class='new_game_col_count'>
+                <label>Col Count</label>
+                <select class='col_count_select ui_select'>
+                    <option value='32'>32</option>
+                    <option value='64'>64</option>
+                    <option value='96'>96</option>
+                    <option value='128' selected>128</option>
+                </select>
+            </div>
+            <div class='new_colony_menu_btn main_menu_btn'>
+                <span><%= t('Start') %></span>
+                <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
+            </div>
+        </div>
+
+        <div class='settings_container'>
+            <div class='sounds_container'>
+                <div class='menu_main_header'><%= t('Sound') %></div>
+                <div>
+                    <%= t('Background Volume') %>
+                    <div class='volume_slider_container'>
+                        <input type="range" min="0" max="10" value="5" class="background_volume_slider">
+                        <span class='background_volume_value volume_value'></span>
+                    </div>
+                </div>
+                <div>
+                    <%= t('Effects Volume') %>
+                    <div class='volume_slider_container'>
+                        <input type="range" min="0" max="10" value="5" class="effects_volume_slider">
+                        <span class='effects_volume_value volume_value'></span>
+                    </div>
+                </div>
+            </div>
+            <div class='key_bindings_container'>
+                <div class='menu_main_header'><%= t('Controls') %></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id='death_screen_container'>
+    <div id='death_screen_content' class='center'>
+        <div id='death_screen_content_message'><%= t('You Died') %></div>
+        <div id='death_screen_action_container'>
+            <div id='restart_countdown'>
+                <%= t('Restart in') %>
+                <span id='restart_countdown_number'></span>
+            </div>
+            <button id='restart_btn' class=''><%= t('Respawn') %></button>
+        </div>
+        <div id='death_minigame_action_container'>
+            <button class='play_again_btn' class=''><%= t('Play Again') %></button>
+            <button class='exit_minigame_btn' class=''><%= t('Exit Game') %></button>
+            <button class='spectate_btn' class=''><%= t('Spectate') %></button>
+        </div>
+    </div>
+    <div class='junon_ad_banner'>
+        <div id='junon-io_728x90'>
+        </div>
+    </div>
+</div>
+
+
+<div id='confirm_menu' class='modal_menu'>
+    <div class='cancel_btn'></div>
+    <div class='confirm_message'></div>
+    <button class='confirm_cancel_btn ui_btn'><%= t('No') %></button>
+    <button class='confirm_ok_btn ui_btn'><%= t('Yes') %></button>
+</div>
+
+<div id='import_sector_menu' class='modal_menu'>
+    <div class='cancel_btn'></div>
+    <h3>Replace Save File</h3>
+    <div class='sector_name'></div>
+    <div class='import_warning'>Make sure to backup your save before overwriting with a new one</div>
+    <img src="" class='sector_thumbnail'>
+    <input type="file" name="file">
+    <button class='import_sector_btn ui_btn'><%= t('Upload') %></button>
+</div>
+
+<div id='select_difficulty_menu' class='modal_menu'>
+    <div class='cancel_btn'></div>
+    <div class='game_modes_list' tabindex="0">
+        <div class='menu_main_header'><%= t('Choose a Game Mode') %></div>
+        <div class='game_mode' data-mode='peaceful'>
+            <h3><%= t('Sandbox') %></h3>
+            <div class='game_mode_description'><%= t('PeacefulModeDescription') %></div>
+        </div>
+        <div class='game_mode' data-mode='survival'>
+            <h3><%= t('Survival') %></h3>
+            <div class='game_mode_description'><%= t('SurvivalModeDescription') %></div>
+        </div>
+        <div class='game_mode' data-mode='hardcore'>
+            <h3><%= t('Hardcore') %></h3>
+            <div class='game_mode_description'><%= t('HardcoreModeDescription') %></div>
+        </div>
+    </div>
+    <div class='game_mode_action_container'>
+        <div class="game_mode_warning"><%= t('GameModeWarning') %></div>
+        <div class="accept_game_mode_btn ui_btn"><%= t('AcceptDecide') %></div>
+    </div>
+</div>
+
+<div id='team_full_menu' class='modal_menu'>
+    <div class='cancel_btn'></div>
+    <div class='menu_main_header'><%= t('Team Full') %></div>
+    <div class='team_full_action_container'>
+        <div class='team_full_description'></div>
+        <div class='team_full_member_names'></div>
+        <div class='team_full_action'>
+            <span class='create_new_team_btn ui_btn'>Join a new Team</span>
+        </div>
+    </div>
+</div>
+
+<div id='rules_menu' class='modal_menu'>
+    <div class='menu_main_header'><%= t('Rules') %></div>
+    <div class='rules_description'>
+      <div>Breaking rules below might result in a ban. Please read carefully. If you see anyone breaking rule, visit our <a target="_blank" href='https://discord.com/invite/T6rPXtw'>discord channel</a> and report the offending user to one of our moderators. Include screenshots if appropriate.</div>
+
+      <h3>Respect players</h3>
+      <ul>
+        <li>No malicious griefing (destroying/spamming buildings without owners permission)</li>
+        <li>No racist, homophopic, hateful speech or excessive swearing. Any harassments, threats, and bullying will not be tolerated.</li>
+        <li>No NSFW (or sexually suggestive or implied) or explicit content</li>
+        <li>No teaming in minigames that disallow teaming</li>
+        <li>No talking about self-harm, or other deeply negative experiences</li>
+        <li>No encouraging violence or hatred towards other players</li>
+        <li>No threating to hack other players</li>
+        <li>No copying other player made games block by block and claiming it as your own.</li>
+      </ul>
+      <h3>Cheating and Exploits</h3>
+      <ul>
+        <li>No hacking allowed. Such as using unexposed api from the server.</li>
+        <li>No exploiting the game to gain unfair advantage. This could include item duplications, infinite gold, or spawning items or mob freely unless the gamemode allows it.</li>
+        <li>Report exploitable bugs to our <a target="_blank" href='https://discord.com/invite/T6rPXtw'>discord channel</a> to one of our moderators. And if its significant such gold glitch or item duplication, you'll be credited with finding the bug in changelog.</li>
+      </ul>
+    </div>
+    <div class='ui_btn rules_accept_btn'>Accept</div>
+</div>
+
+<div id="base_hud" class="base_menu">
+    <div id='top_bar_container'>
+        
+    </div>
+
+    <div id='bottom_bar_container'>
+        
+    </div>
+
+    <div class='game_sector_name'>
+        <div class='game_sector_name_content'></div>
+    </div>
+
+    <div class="disconnected_msg"><%= t('DisconnectedReconnecting') %> ...<span class='reconnect_countdown'></span></div>
+
+    <div id="player_stats" class='galaxy_menu'>
+        <div class="health_stat stat_container">
+            <span class='label'><img src='/assets/images/heart.png'></span>
+            <div class='bar_container'>
+                <div class='bar_label'>100</div>
+                <div class='bar_fill'></div>
+            </div>
+        </div>
+        <div class="oxygen_stat stat_container">
+            <span class='label'>O2</span>
+            <div class='bar_container'>
+                <div class='bar_label'>0</div>
+                <div class='bar_fill'></div>
+            </div>
+        </div>
+        <div class="stamina_stat stat_container">
+            <span class='label'><img src='/assets/images/stamina_icon.png'></span>
+            <div class='bar_container'>
+                <div class='bar_label'>0</div>
+                <div class='bar_fill'></div>
+            </div>
+        </div>
+        <div class="hunger_stat stat_container">
+            <span class='label'><img src='/assets/images/hunger_status.png'></span>
+            <div class='bar_container'>
+                <div class='bar_label'>0</div>
+                <div class='bar_fill'></div>
+            </div>
+        </div>
+        <div class="shield_stat stat_container">
+            <span class='label'>Shield</span>
+            <div class='bar_container'>
+                <div class='bar_label'>0</div>
+                <div class='bar_fill'></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="total_task_stat stat_container">
+        <span class='label'><%= t('Total Tasks Completed') %></span>
+        <div class='bar_container'>
+            <div class='bar_label'>0</div>
+            <div class='bar_fill' style='width: 0%;'></div>
+        </div>
+    </div>
+
+    <div class="resources stat_container">
+        <div>
+            <span class='gold_resource_icon resource_icon'></span>
+            <span class='gold resource_count'>0</span>
+        </div>
+    </div>
+    <div id='time_label'>
+    </div>
+
+    <div id='light_path_menu'></div>
+
+    <div id='sector_description_menu' class="galaxy_menu">
+        <div id='sector_description_menu_content'>Sector 2</div>
+        <div class='wave_container'>
+            <div id='wave_level_menu'>Wave <span id='wave_level'>1</span></div>
+            <div id='wave_remaining_time'>Incoming in <span id='wave_remaining_time_value'> </span> seconds</div>
+        </div>
+    </div>
+
+    <div id='range_toggle_btn' class='galaxy_menu'>
+
+    </div>
+
+    <div id='server_announcement_bar'>
+        <div id='server_announcement_message'></div>    
+    </div>
+
+    <div id='mini_map_player_pos_label'></div>
+
+    <div id='mini_map_menu' class="galaxy_menu">
+        <canvas id='mini_map_terrain_canvas' width="512" height="512"></canvas>
+        <canvas id='mini_map_entity_canvas' width="512" height="512"></canvas>
+        <div id='mini_map_player_pos'></div>
+    </div>
+
+    <div id='game_sticky_announcement'></div>
+
+    <div id='preview_capture_menu'>
+        <div class='preview_capture_overlay'></div>
+        <div class='preview_capture_box'></div>
+    </div>
+
+    <div id='map_menu' class="modal_menu">
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'><%= t('Map') %></div>
+        <div id='map_menu_frame'>
+            <canvas id='map_terrain_canvas' width="512" height="512"></canvas>
+            <canvas id='map_entity_canvas'  width="512" height="512"></canvas>
+        </div>
+    </div>
+
+    <div class='top_right_menu'>
+        <div id='sector_action_menu'>
+            <div class='sector_upvote_container'>
+                <div class='upvote_btn'>
+                    <div class='upvote_action_icon'></div>    
+                    <div class='upvote_count'>0</div>
+                </div>
+            </div>
+            <div class='sector_favorite_action_container'>
+                <div class='sector_favorite_btn'>
+                    <div class='bookmark_action_icon'></div>    
+                </div>
+            </div>
+        </div>
+
+        <div id="sidebar_menu">
+            <div class='sidebar_text'></div>
+        </div>
+    </div>
+
+
+    <div id='performance_stats'>
+        <div id='tick'><span>server tick </span><span class='value'></span></div>
+        <div id='server_memory'><span>server memory </span><span class='value'></span></div>
+        <div id='upstream'><span>upstream </span><span class='value'></span></div>
+        <div id='ping'><span>ping </span><span class='value'></span></div>
+    </div>
+
+    <div id="leaderboard_menu">
+        <div class='leaderboard_tab_container'>
+            <div class='leaderboard_tab selected' data-tab='team'><%= t('Team') %></div>
+            <div class='leaderboard_tab' data-tab='player'><%= t('Player') %></div>
+        </div>
+        <div class="team_ranking leaderboard_tab_content" style='display: block;' data-tab='team'></div>
+        <div class="player_ranking leaderboard_tab_content" data-tab='player'></div>
+    </div>
+
+    <div id='ship_stats' class='base_menu'>
+        <div><span>Speed </span><div class='ship_stat ship_stat_speed'></div></div>
+        <div><span>Hull</span><div class='ship_stat ship_stat_health'></div></div>
+        <div><span>Shield</span><div class='ship_stat ship_stat_shield'></div></div>
+        <div><span>Energy</span><div class='ship_stat ship_stat_energy'></div></div>
+        <div><span>Mining Rate</span><div class='ship_stat ship_stat_mining_rate'></div></div>
+    </div>
+
+    <div id='chat_container' class='read_mode'>
+        <div id='chat_group_tab_container'>
+            <div class='local_chat_tab chat_tab selected' data-chat='local'>
+                <span class='chat_tab_label'><%= t('Local') %></span>
+                <span class='chat_unread_count'></span>
+            </div>
+            <div class='team_chat_tab chat_tab' data-chat='team'>
+                <span class='chat_tab_label'>Team</span>
+                <span class='chat_unread_count'></span>
+            </div>
+            <div class='global_chat_tab chat_tab' data-chat='global'>
+                <span class='chat_tab_label'>Global</span>
+                <span class='chat_unread_count'></span>
+            </div>
+        </div>
+        <div id='chat_group_tab_content'>
+            <div class='local_chat_history chat_history selected'></div>
+            <div class='team_chat_history chat_history'></div>
+            <div class='global_chat_history chat_history'></div>
+        </div>
+        <div id='chat_input_container'>
+            <input type="text" id='chat_input' autocomplete="nope" placeholder="send message">
+        </div>
+    </div>
+
+    <div id='debug_menu'>
+        <div class='cancel_btn'></div>
+        <div id='debug_network_graph'></div>
+    </div>
+
+    <div id='player_menu' class='base_menu modal_menu ' >
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'>Player</div>
+        <div class="add_player_team_container" >
+            <div class='add_player_btn team_action_btn'>Add to Colony</div>
+        </div>
+        <div class="kick_player_team_container" >
+            <div class='kick_player_btn team_action_btn'>Kick</div>
+        </div>
+    </div>
+
+    <div id='team_request_menu'></div>
+
+    <div id='end_game_menu' class='modal_menu'>
+        <p>Would you like to play another round?</p>
+        <button class='ui_btn play_again_btn'><%= t('Play Again') %></button>
+        <button class='ui_btn spectate_btn'><%= t('Spectate') %></button>
+    </div>
+
+    <div id='vote_menu' class='modal_menu'>
+        <div class='menu_main_header'><%= t('Vote the Imposter') %></div>
+        <div class='vote_player_list'>
+            
+        </div>
+        <div class='vote_action_container'>
+            <button class='ui_btn vote_btn'><%= t('Vote') %></button>
+            <button class='ui_btn skip_vote_btn'><%= t('Skip Vote') %></button>
+        </div>
+        <div class='vote_timer'></div>
+    </div>
+
+    <div id='command_block_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'><%= t('Command Blocks') %></div>
+        <div class='command_block_tab_container'>
+            <div class='command_block_tab selected' data-view='triggers'><%= t('Triggers') %></div>
+            <div class='command_block_tab' data-view='logs'><%= t('Logs') %> </div>
+            <div class='command_block_tab' data-view='functions'><%= t('Functions') %></div>
+        </div>
+        <div class='command_block_tab_content'>
+            <div class='commands_container tab-pane active' data-view='triggers'>
+                <div class='enable_trigger_toggle'>
+                    <label for='enable_triggers'><%= t('Enable Triggers') %>: </label>
+                    <input type="checkbox" name="enable_triggers" id='enable_triggers'>
+                </div>
+                <div class='add_trigger_btn'>
+                    <img src="/assets/images/add_icon.png">
+                    <span><%= t('New Trigger') %></span>
+                </div>
+                <div class='triggers_container'>
+                    
+                </div>
+            </div>
+            <div class='commands_event_log tab-pane' data-view='logs'></div>
+            <div class='commands_event_log functions_guide tab-pane' data-view='functions'>
+                <div>
+                    <h3><%= t('Usage') %></h3>
+                    <div>
+                        <p><%= t('Function.Usage1') %></p>
+                        <p><span class='code'>$getGold($player)</span></p>
+                        <p><%= t('Function.Usage2') %></p> 
+                    </div>
+                </div>
+                <div>
+                    <h3>List of functions</h3>
+                    <table class='function_table' cellspacing="0">
+                        <tr>
+                            <th><%= t('Function') %></th>
+                            <th><%= t('Arguments') %></th>
+                            <th><%= t('Returns') %></th>
+                        </th>
+                        <tr>
+                            <td class='function_name'>$getGold</td>
+                            <td>$player</td>
+                            <td>The amount of gold player currently has</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getTeam</td>
+                            <td>$player</td>
+                            <td>The name of team player belongs to</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getRole</td>
+                            <td>$player</td>
+                            <td>The name of role that player belongs to</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getScore</td>
+                            <td>$player</td>
+                            <td>The score of player</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getEquip</td>
+                            <td>$player</td>
+                            <td>The name of current equip player is holding</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getEquipId</td>
+                            <td>$player</td>
+                            <td>The id of current equip player is holding</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getRow</td>
+                            <td>$player</td>
+                            <td>The row position of player</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getCol</td>
+                            <td>$player</td>
+                            <td>The col position of player</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getSpeed</td>
+                            <td>$player</td>
+                            <td>The speed of player</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getHealth</td>
+                            <td>$player</td>
+                            <td>The amount of health player currently has</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getStamina</td>
+                            <td>$player</td>
+                            <td>The amount of stamina player currently has</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getOxygen</td>
+                            <td>$player</td>
+                            <td>The amount of oxygen player currently has</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getHunger</td>
+                            <td>$player</td>
+                            <td>The amount of hunger player currently has</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getMaxHealth</td>
+                            <td>$player</td>
+                            <td>The max amount of health player currently has</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getMaxStamina</td>
+                            <td>$player</td>
+                            <td>The max amount of stamina player currently has</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getMaxOxygen</td>
+                            <td>$player</td>
+                            <td>The max amount of oxygen player currently has</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getMaxHunger</td>
+                            <td>$player</td>
+                            <td>The max amount of hunger player currently has</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getOwner</td>
+                            <td>buildingId</td>
+                            <td>The id of owner</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$random</td>
+                            <td>min, max</td>
+                            <td>A random number between min and max. Ex. $random(2,5)</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$formatTime</td>
+                            <td>seconds</td>
+                            <td>A formatted time. Ex. $formatTime(60)</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getTeamMemberCount</td>
+                            <td>teamName</td>
+                            <td>Number of members in a team. Ex. $getTeamMemberCount(owner)</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getRoleMemberCount</td>
+                            <td>roleName</td>
+                            <td>Number of members with role. Ex. $getRoleMemberCount(innocent)</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getRegionPlayerCount</td>
+                            <td>regionName</td>
+                            <td>Number of players in a region. Ex. $getRegionPlayerCount(cafe)</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getPlayerCount</td>
+                            <td>None</td>
+                            <td>Number of players in game. Ex. $getPlayerCount()</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getRegion</td>
+                            <td>playerName or entityId</td>
+                            <td>name of region for player or entity</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getEquipCount</td>
+                            <td>playerName</td>
+                            <td>count of equipped item</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getInventoryItemCount</td>
+                            <td>playerName, itemName</td>
+                            <td>total count of item in inventory. ex. $getInventoryItemCount(kuroro,steak)</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getArmorEquip</td>
+                            <td>playerName</td>
+                            <td>name of equipped armor</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$add</td>
+                            <td>value1, value2</td>
+                            <td>add two numbers</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$subtract</td>
+                            <td>value1, value2</td>
+                            <td>subtract two numbers</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$multiply</td>
+                            <td>value1, value2</td>
+                            <td>multiply two numbers</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$divide</td>
+                            <td>value1, value2</td>
+                            <td>divide two numbers</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$round</td>
+                            <td>value</td>
+                            <td>round a number</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$modulo</td>
+                            <td>value1, value2</td>
+                            <td>modulo gives the remaining of a division</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$isLoggedIn</td>
+                            <td>$player</td>
+                            <td>true if logged in. false if not.</td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <p></p>
+                    <h3>Examples</h3>
+                    <p>On a PlayerDestroyed trigger, you can run this command</p>
+                    <p><span class='code'>/caption subtitle $player was killed with $getEquip($killingPlayer)</span></p> 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id='command_block_tooltip' class='tooltip top'>
+        <div class='event_name'></div>
+        <div class='event_description'></div>
+        <h3>Variables: </h3>
+        <div class='variables'></div>
+    </div>
+
+    <div id='chat_player_tooltip' class='tooltip top'>
+        <div class='chat_player_action mute_player_btn'>Block player</div>
+    </div>
+
+    <div id='command_block_picker' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'><%= t('Triggers') %></div>
+        <div class='left_content'></div>
+        <div class='right_content'>
+            <div class='trigger_details'>
+                <h3>Description: </h3>
+                <div class='event_description'></div>
+                <h3>Variables: </h3>
+                <div class='variables'></div>
+            </div>
+            <div class='action_details'>
+                <h3>Description: </h3>
+                <div class='action_description'></div>
+                <h3>Example: </h3>
+                <div class='examples'></div>
+            </div>
+        </div>
+        <div class='action_container'>
+            <div class='create_block_item_btn ui_btn'><%= t('Create') %></div>
+        </div>
+    </div>
+
+    <div id='trade_menu' class='base_menu modal_menu ' >
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'><%= t('Trade') %></div>
+        <div class="trade_inventory" >
+            <div class="trade_type_tab_container">
+                <div class='trade_type_tab selected' data-trade-type='buy'><%= t('Buy') %></div>
+                <div class='trade_type_tab' data-trade-type='sell'><%= t('Sell') %></div>
+            </div>
+            <div class="buy_trade_content tab-pane" data-trade-type='buy'></div>
+            <div class="sell_trade_content tab-pane" data-trade-type='sell'></div>
+        </div>
+        <div class='error_message'></div>
+        <button class='trade_btn ui_btn' data-trade-type='buy' ><%= t('Buy') %></button>
+        <input class="buy_count" maxlength="4" type="number" min="1" max="9999" value="1">
+
+        <div class='player_gold_count_container'>
+            <label><%= t('Gold') %></label>
+            <span class='player_gold_count_value'>0</span>
+        </div>
+    </div>
+
+    <div id='security_camera_menu'>
+        <div class='security_camera_title'><%= t('Camera') %></div>
+        <div class='camera_feed_navigator'>
+            <div class='camera_feed_item'>Bar</div>
+            <div class='camera_feed_item'>Engine</div>
+            <div class='camera_feed_item'>Prison</div>
+            <div class='camera_feed_item'>Medbay</div>
+            <div class='camera_feed_item'>Armory</div>
+        </div>
+    </div>
+
+    <div id='slave_trade_menu' class='base_menu modal_menu ' >
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'><%= t('Trade Slaves') %></div>
+        <div class="trade_inventory" >
+            <div class="trade_type_tab_container">
+                <div class='trade_type_tab selected' data-trade-type='buy'><%= t('Buy') %></div>
+                <div class='trade_type_tab' data-trade-type='sell'><%= t('Sell') %></div>
+            </div>
+            <div class="buy_trade_content tab-pane" data-trade-type='buy'></div>
+            <div class="sell_trade_content tab-pane" data-trade-type='sell'></div>
+        </div>
+        <div class='error_message'></div>
+        <button class='trade_btn ui_btn' data-trade-type='buy' ><%= t('Buy') %></button>
+
+        <div class='player_gold_count_container'>
+            <label><%= t('Gold') %></label>
+            <span class='player_gold_count_value'>0</span>
+        </div>
+    </div>
+
+    <div id='inventory_menu' class='base_menu modal_menu ' >
+        <div id='player_inventory_cancel_btn' class='cancel_btn'></div>
+        <div id='player_equipment' class="storage" data-storage-id='2'>
+            <div id='player_inventory_header' class='menu_main_header'><%= t('Suit') %></div>
+            <div class='equipment_slot inventory_slot armor' data-index='0'><img src=''></div>
+            <div class='equipment_slot inventory_slot goggles' data-index='1'><img src=''></div>
+            <div class='equipment_slot inventory_slot accessory' data-index='2'><img src=''></div>
+        </div>
+        <div id='player_inventory_header' class='menu_main_header'><%= t('Inventory') %></div>
+        <div class='center_container'>
+            <div id='player_inventory' class="storage" data-storage-id='1'></div>
+        </div>
+        <div class='player_gold_count_container'>
+            <label>Gold</label>
+            <span class='player_gold_count_value'>0</span>
+        </div>
+    </div>
+
+    <div id='gamepad_joystick'></div>
+
+    <div id='player_quick_inventory_menu' >
+        <div id='player_quick_inventory' class='storage' data-storage-id='1'>
+        </div>
+    </div>
+
+    <div id='blueprint_menu' class='modal_menu'>
+        <div id='blueprint_container_header' class='menu_main_header'><%= t('Crafting') %></div>
+        <div id='blueprint_container_cancel_btn' class='cancel_btn'></div>
+        <div id='blueprint_main_container' class=''></div>
+        <div id='product_main_container' class=''>
+            <div class='product_container'>
+                <img class='blueprint_image' src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="/>
+                <div class='blueprint_name'></div>    
+                <div class='blueprint_description'></div>    
+            </div>
+            <div class='inventory_header'><%= t('Ingredients') %></div>
+            <div class='crafting_requirements'></div>
+            <input class='craft_count' maxlength="2" type='number' min='1' max='99' value='1' />
+            <button class='craft_btn' ><%= t('Craft') %></button>
+            <div class='product_unavailable_notice'></div>
+        </div>
+    </div>
+
+    <div id='zoom_in_btn' class='hud_btn'>
+        <img src='/assets/images/zoom_in_icon.png'>
+    </div>
+
+    <div id='zoom_out_btn' class='hud_btn'>
+        <img src='/assets/images/zoom_out_icon.png'>
+    </div>
+
+    <div id='hud_action_container'>
+        <div id='chat_toggle_btn' class='hud_btn'>
+            <img src='/assets/images/chat_bubble_icon.png'>
+            <div class='hud_btn_shortcut'>Z</div>
+        </div>
+
+        <div id='blueprint_open_btn' class='hud_btn'>
+            <img src='/assets/images/blueprint_icon.png'>
+            <div class='hud_btn_shortcut'>C</div>
+        </div>
+
+        <div id='inventory_open_btn' class='hud_btn'>
+            <img src='/assets/images/tshirt_icon.png'>
+            <div class='hud_btn_shortcut'>I</div>
+        </div>
+
+        <div id='map_open_btn' class='hud_btn'>
+            <img src='/assets/images/map_icon.png'>
+            <div class='hud_btn_shortcut'>M</div>
+        </div>
+
+        <div id='manage_team_btn' class='hud_btn'>
+            <img src='/assets/images/flag_icon.png'>
+            <div class='hud_btn_shortcut'>P</div>
+        </div>
+
+        <div id='friends_btn' class='hud_btn'>
+            <img src='/assets/images/party_icon.png'>
+            <div class='hud_btn_shortcut'>F</div>
+        </div>
+
+        <div id='visit_colony_hud_btn' class='hud_btn'>
+            <img src='/assets/images/language_icon.png'>
+            <div class='hud_btn_shortcut'>V</div>
+        </div>
+
+        <div id='command_block_hud_btn' class='hud_btn'>
+            <img src='/assets/images/chunk_icon.png'>
+            <div class='hud_btn_shortcut'>K</div>
+        </div>
+
+        <div id='debug_control_panel' >
+            <div id='room_display_toggle_btn' class='hud_btn'>
+                <img src='/assets/images/room_icon.png'>
+            </div>
+
+            <div id='home_area_display_toggle_btn' class='hud_btn'>
+                <img src='/assets/images/structures_icon.png'>
+            </div>
+            <div id='chunk_toggle_btn' class='hud_btn'>
+                <img src='/assets/images/chunk_icon.png'>
+            </div>
+        </div>
+
+    </div>
+
+    <div id='welcome_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='blurb'>
+            <span class='welcome_menu_header'><%= t('Welcome') %></span>
+            <p></p>
+            <span class='welcome_menu_description'><%= t('SurvivalWelcomeMessage') %></span>
+            <span class='welcome_menu_warning_description'></span>
+        </div>
+    </div>
+
+    <div id='walkthrough_menu' class=''>
+        <div class='walthrough_content'>
+        </div>
+    </div>
+
+    <div id='tutorial_toggle_btn'>Q</div>
+    
+
+    <div id='tutorial_menu'>
+        <div class='cancel_btn'></div>
+        <div class='tutorial_text main' style='opacity: 1;'></div>
+        <div class='tutorial_text corpse' style='opacity: 1;'></div>
+    </div>
+
+    <div id='quest_menu'>
+        <div class='quest_list'></div>
+    </div>
+
+    <div class='minigame_controls_container'>
+        <a href="" target="_blank" class='launch_minigame_btn ui_btn'>Launch Minigame</a>
+    </div>
+
+    <div id='minigame_invite_container'>
+        <input class='invite_link_input black_input' readonly type="text" value=''>    
+        <span class='start_minigame_btn ui_btn'><%= t('Start Game') %></span>
+         <span class='invite_link_copy_btn ui_btn'><%= t('Invite') %></span>
+    </div>
+
+    <div id='events_menu'>
+    </div>
+
+    <div class='room_oxygen_stat'>
+        <div class='bar_container'>
+            <div class='bar_label'>
+                <span id='oxygen_percentage_label'>O2: </span>
+                <span id='oxygen_percentage_value'>0</span>
+                <span>%</span>
+            </div>
+            <div class='bar_fill'></div>
+        </div>
+    </div>
+
+    <div id='storage_menu' class='modal_menu'>
+        <div id='storage_container_header' class='menu_main_header'>Fridge</div>
+        <div id='storage_container_cancel_btn' class='cancel_btn'></div>
+        <div class='center_container'>
+            <div class='menu_description'></div>
+            <div id='storage_inventory' class='storage'></div>
+        </div>
+        <div id='storage_container_header' class='menu_main_header'><%= t('Inventory') %></div>
+        <div class='center_container'>
+            <div class='storage_player_inventory storage' data-storage-id='1'></div>
+        </div>
+    </div>
+
+    <div id='vending_machine_menu' class='modal_menu'>
+        <div id='storage_container_header' class='menu_main_header'>Vending Machine</div>
+        <div id='storage_container_cancel_btn' class='cancel_btn'></div>
+        <div class='vending_machine_tab_container'>
+            <div class='vending_machine_tab selected' data-tab='purchase'><%= t('Purchase') %></div>
+            <div class='vending_machine_tab' data-tab='manage'><%= t('Manage') %></div>
+        </div>
+        <div class='vending_machine_tab_content active' data-tab='purchase'>
+            <div class="purchase_empty_state"><%= t('VendingEmpty') %></div>
+            <div class="purchasable_items_list"></div>
+
+            <div class='error_message'></div>
+            <button class='buy_btn ui_btn'><%= t('Buy') %></button>
+            <div class='player_gold_count_container'>
+                <label><%= t('Gold') %></label>
+                <span class='player_gold_count_value'>0</span>
+            </div>
+        </div>
+        <div class='vending_machine_tab_content' data-tab='manage'>
+            <div class='collected_money_container'>
+                <div class='collected_money_label'><%= t('Total Gold') %></div>
+                <div class='collected_money_value'></div>
+                <div class='collect_money_btn ui_btn'><%= t('Withdraw') %></div>
+            </div>
+            <div class='menu_main_header'><%= t('VendingStorage') %></div>
+            <div class='center_container'>
+                <div class='menu_description'></div>
+                <div id='storage_inventory' class='storage'></div>
+            </div>
+            <div id='storage_container_header' class='menu_main_header'><%= t('Inventory') %></div>
+            <div class='center_container'>
+                <div class='storage_player_inventory storage' data-storage-id='1'></div>
+            </div>
+        </div>
+    </div>
+
+    <div id='oxygen_tank_menu' class='modal_menu'>
+        <div class='menu_main_header'>Oxygen Tank</div>
+        <div class='cancel_btn'></div>
+        <div class='entity_description'>
+            <div class='oxygen_remaining'>
+                <span class='key'>Oxygen Remaining: </span><span class="value">150/200</span>
+            </div>
+            <div class='oxygen_remaining_time'>
+                <span class='key'>Time till Depeltion: </span><span class="value">1 min 30 seconds</span>
+            </div>
+        </div>
+        <div class='inventory_header'>Bottles</div>
+        <div class='center_container'>
+            <div class='storage'></div>
+        </div>
+    </div>
+
+    <div id='craft_menu' class='modal_menu'>
+        <div id='crafting_container_header' class='menu_main_header'><%= t('Stove') %></div>
+        <div id='crafting_container_cancel_btn' class='cancel_btn'></div>
+        <div id='crafting_template_container'></div>
+        <div id='crafting_status_message'></div>
+        <div id='product_main_container' class=''>
+            <div class='product_container'>
+                <img class='blueprint_image' src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="/>
+                <div class='blueprint_name'></div>    
+                <div class='blueprint_description'></div>    
+            </div>
+            <div class='inventory_header'><%= t('Ingredients') %></div>
+            <div class='crafting_requirements'></div>
+            <input class='craft_count' maxlength="2" type='number' min='1' max='99' value='1' />
+            <button class='craft_btn' ><%= t('Craft') %></button>
+        </div>
+    </div>
+
+    <div id='processor_menu' class='modal_menu'>
+        <div class='menu_main_header'><%= t('Processor') %></div>
+        <div class='cancel_btn'></div>
+        <div class='menu_description'></div>
+        <div class='processor_status_message'></div>
+        <div class='processor_storage storage'>
+            <div class='input_inventory inventory_slot' data-index='0'><img src=''></div>
+            <div class='processor_progress_bar'>
+                <div class='processor_progress_bar_container'>
+                    <div class='processor_progress_bar_fill'></div>
+                </div>
+                <div class='arrow-right'></div>
+            </div>
+            <div class='output_inventory inventory_slot' data-index='1'><img src=''></div>
+        </div>
+        <div id='processor_menu_player_inventory_container'>
+            <div id='storage_container_header' class='menu_main_header'><%= t('Inventory') %></div>
+            <div class='center_container'>
+                <div class='storage_player_inventory storage' data-storage-id='1'></div>
+            </div>
+        </div>
+    </div>
+
+    <div id='hangar_controller_menu' class='modal_menu'>
+        <div class='menu_main_header'>Hangar Controller</div>
+        <div id='hangar_controller_cancel_btn' class='cancel_btn'></div>
+        <div id='hangar_list'>
+        </div>
+        <div id='hangar_build_mode_btn' >Add Hangar</div>
+    </div>
+
+    <div id='player_action_tooltip' class=''>
+        <div id='shortcut_btn'>E</div>
+        <div id='action_tooltip_message'></div>
+    </div>
+
+    
+    <div id='team_status_menu'></div>
+
+    <div class='hud_alert_container'>
+        <div class='hud_alert_title'>Fire Alert</div>
+        <div class='hud_alert_subtitle'>危険</div>
+    </div>
+
+    <div id='send_money_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='team_header menu_main_header'><%= t('Send Money') %></div>
+        <div class='recepient_name_container'>
+            <%= t('To') %>: 
+            <select class='recepient_name_select ui_select'></select>
+        </div>
+        <input type="number" name="" maxlength="10" class='send_money_input' />
+        <button class='send_money_btn ui_btn'><%= t('Send') %></button>
+        <div class='player_gold_count_container'>
+            <label><%= t('Gold') %></label>
+            <span class='player_gold_count_value'></span>
+        </div>
+    </div>
+
+    <div id='atm_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='team_header menu_main_header'><%= t('ATM') %></div>
+        <div class='atm_invalid_access'>
+            <%= t('You must login to use this.') %>
+        </div>
+        <div class='atm_content_container'>
+            <div class="atm_tab_container">
+                <div class='atm_tab selected' data-tab='account'><%= t('Account') %></div>
+                <div class='atm_tab' data-tab='transfer'><%= t('Transfer') %></div>
+            </div>
+            <div class='atm_content' data-tab='account'>
+                <div class='atm_row'>
+                    <div class='atm_left'><%= t('Balance') %></div>
+                    <span class='atm_right atm_balance_value'></span>
+                </div>
+                <div class='atm_row'>
+                    <div class='atm_left'><%= t('Gold') %></div>
+                    <span class='atm_right local_gold_value'></span>
+                </div>
+                <div class='atm_row atm_action_row'>
+                    <div class='atm_left'>
+                        <input type="number" name="" maxlength="10" class='atm_money_input' value='0' />  
+                    </div>
+                    <div class='atm_right'>
+                        <button class='atm_withdraw_btn ui_btn'><%= t('Withdraw') %></button>
+                        <button class='atm_deposit_btn ui_btn'><%= t('Deposit') %></button>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class='atm_content' data-tab='transfer'>
+                <div class='atm_transfer_row'>
+                    <label><%= t('To') %>:</label>
+                    <select class='recepient_name_select ui_select'></select>
+                </div>
+                <div class='atm_transfer_row'>
+                    <label><%= t('Amount') %>:</label>
+                    <input type="number" name="" maxlength="10" class='send_money_input' />
+                </div>
+                <div class='atm_action_row'>
+                    <div class='player_gold_count_container'>
+                        <label><%= t('Gold') %></label>
+                        <span class='player_gold_count_value'></span>
+                    </div>
+                    <button class='send_money_btn ui_btn'><%= t('Send') %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id='change_name_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='team_header menu_main_header'><%= t('Change Name') %></div>
+        <input class='change_name_input menu_input' maxlength='40' type='text' > 
+        <button class='set_name_btn ui_btn'><%= t('Set') %></button>
+    </div>
+
+    <div id='sign_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='team_header menu_main_header'><%= t('Message') %></div>
+        <div class='sign_message'></div>
+        <textarea class='sign_message_input menu_input' maxlength='300' type='text' placeholder='Enter Text'> 
+        </textarea>
+        <button class='edit_sign_message_btn ui_btn'><%= t('Edit') %></button>
+        <button class='done_sign_edit_btn ui_btn'><%= t('Done') %></button>
+        <button class='cancel_sign_edit_btn ui_btn'><%= t('Cancel') %></button>
+    </div>
+
+    <div id='soil_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='team_header menu_main_header'><%= t('Choose Crop to Grow') %></div>
+        <div class='crop_selection_container'></div>
+        <div class='crop_selection_name'></div>
+        <div class='farm_controller_tip'>
+            * <%= t('FarmControllerTip') %>
+        </div>
+    </div>
+
+    <div id='stove_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='food_selection_name'></div>
+        <div class='food_selection_container'></div>
+        <div class='stove_selection_notice'>* <%= t('StoveSlaveNotice') %></div>
+        <div class='requirements_label'><%= t('Ingredients') %></div>
+        <div class='crafting_requirements'></div>
+        <div class='cook_btn ui_btn'><%= t('Cook') %></div>
+        <div class='stove_status_message'></div>
+        <div class='stove_progress_bar'>
+            <div class='stove_progress_bar_container'>
+                <div class='stove_progress_bar_fill'></div>
+            </div>
+        </div>
+    </div>
+
+    <div id='slave_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='team_header menu_main_header'><%= t('Tasks') %></div>
+    </div>
+
+    <div id='permissions_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='team_header menu_main_header'><%= t('Permissions') %></div>
+        <div class='access_permissions_container'>
+            <div><%= t('Allow Access:') %></div>
+            <select class='allow_access_select ui_select'>
+            </select>
+        </div>
+    </div>
+
+    <div id='user_profile_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='username_header menu_main_header'></div>
+        <div class='user_profile_details'>
+            <div class='tags'></div>
+            <div class='user_location'>
+                <label><%= t('Location') %>:</label>
+                <div class='colony_name'></div>
+                <button class='visit_colony_btn ui_btn'><%= t('Visit') %></button>
+            </div>
+            <div class='location_day_count'>
+                <label><%= t('ColonyDay') %>:</label>
+                <div class='colony_day_count'></div>
+            </div>
+            <div class='owned_colonies'>
+                <label>Colonies:</label>
+                <div class='user_colonies'></div>
+            </div>
+        </div>
+        <div class='guest_account_label'>Guest Account</div>
+    </div>
+
+    <div id='rail_stop_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='colony_info_container'>
+            <div class='colony_info_entry colony_name_entry'>
+                <label><%= t('RailStationName') %></label>
+                <span class='stop_info_name colony_info_entry_value'></span>
+                <input class='stop_name_input menu_input' maxlength='25' type='text' /> 
+                <div class='rename_btn'>
+                  <img src='/assets/images/edit_icon.png'>
+                </div>
+            </div>
+        </div>
+
+        <div class='rail_destination_header'><%= t('Destination') %></div>
+        <div class='destination_list'></div>
+        <div id='rail_status_message'></div>
+        <button class='go_destination_btn ui_btn' data-disabled="true"><%= t('Go') %></button>
+    </div>
+
+    <div id='manage_team_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='member_list_container'>
+            <div class='team_header menu_main_header'><%= t('Colony') %></div>
+            <div class='colony_info_tab_container'>
+                <div class='colony_tab colony_info_tab selected' data-tab='info'><%= t('Info') %></div>
+                <div class='colony_tab colony_roles_tab' data-tab='roles'><%= t('Permissions') %></div>
+                <div class='colony_tab colony_screenshot_tab' data-tab='screenshots'><%= t('Preview') %></div>
+                <div class='colony_tab colony_logs_tab' data-tab='logs'><%= t('Logs') %></div>
+                <div class='colony_tab command_logs_tab' data-tab='commands'><%= t('Commands') %></div>
+                <div class='colony_tab colony_settings_tab' data-tab='settings'><%= t('Settings') %></div>
+                <div class='colony_tab colony_teams_tab' data-tab='teams'><%= t('Teams') %></div>
+            </div>
+            <div class='colony_menu_tab_content'>
+                <div class='colony_info_container colony_tab_content active' data-tab='info'>
+                    <div class='colony_info_entry colony_name_entry'>
+                        <label><%= t('ColonyName') %></label>
+                        <span class='colony_info_name colony_info_entry_value'></span>
+                        <input class='colony_name_input menu_input' maxlength='40' type='text' /> 
+                        <div class='rename_btn'>
+                          <img src='/assets/images/edit_icon.png'>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_creator_name_entry'>
+                        <label><%= t('Owner') %></label>
+                        <span class='colony_info_creator_name colony_info_entry_value'></span>
+                    </div>
+                    <div class='colony_info_entry alliance_entry'>
+                        <label><%= t('Empire') %></label>
+                        <span class='colony_info_alliance colony_info_entry_value'></span>
+                    </div>
+                    <div class='colony_info_entry colony_mode_entry'>
+                        <label><%= t('Mode') %></label>
+                        <span class='colony_game_mode colony_info_entry_value'>Survival</span>
+                    </div>
+                    <div class='menu_main_header'></div>
+                    <div class='member_management_container'>
+                        <div class='online_members_header members_header'><%= t('MemberList') %></div>
+                        <div class='member_list'></div>
+                        <div class='offline_member_list_container'>
+                            <div class='offline_members_header members_header'><%= t('Offline') %></div>
+                            <div class='offline_member_list'></div>
+                        </div>
+                        <div class='ban_member_list_container'>
+                            <div class='ban_members_header members_header'><%= t('Bans') %></div>
+                            <div class='ban_member_list'></div>
+                        </div>
+                    </div>
+                    <div class='invite_link_container'>
+                        <div class='menu_main_header'></div>
+                        <input class='invite_link_input black_input' readonly type="text" value=''>    
+                        <span class='team_private_status'><%= t('Private') %></span>
+                    </div>
+                    <div class='team_leave_container'>
+                        <div id='leave_team_btn' class='team_action_btn'>Leave Colony</div>
+                    </div>
+                </div>
+
+                <div class='colony_screenshots_container colony_tab_content' data-tab='screenshots'>
+                    <div class='add_screenshot_btn'></div>
+                    <div class='colony_screenshots_gallery'>
+                    </div>
+                </div>
+
+
+                <div class='colony_settings_container colony_tab_content' data-tab='settings'>
+                    <div class='colony_info_entry colony_pvp_mode'>
+                        <label><%= t('Allow PvP') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_pvp" name='allow_pvp' value='yes'>
+                            <label for='enable_pvp'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_pvp" name='allow_pvp' value='no'>
+                            <label for='disable_pvp'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_zoom'>
+                        <label><%= t('Allow Zoom') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_zoom" name='allow_zoom' value='yes'>
+                            <label for='enable_zoom'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_zoom" name='allow_zoom' value='no'>
+                            <label for='disable_zoom'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_fov'>
+                        <label><%= t('Field of View') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_fov" name='field_of_view' value='yes'>
+                            <label for='enable_fov'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_fov" name='field_of_view' value='no'>
+                            <label for='disable_fov'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_minimap'>
+                        <label><%= t('Show Minimap') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_minimap" name='show_minimap' value='yes'>
+                            <label for='enable_minimap'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_minimap" name='show_minimap' value='no'>
+                            <label for='disable_minimap'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_playerlist'>
+                        <label><%= t('Show Player List') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_playerlist" name='show_playerlist' value='yes'>
+                            <label for='enable_playerlist'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_playerlist" name='show_playerlist' value='no'>
+                            <label for='disable_playerlist'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_team_join'>
+                        <label><%= t('Show Team Join') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_team_join" name='show_team_join' value='yes'>
+                            <label for='enable_team_join'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_team_join" name='show_team_join' value='no'>
+                            <label for='disable_team_join'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_mob_autospawn'>
+                        <label><%= t('Mob Autospawn') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_mob_autospawn" name='is_mob_autospawn' value='yes'>
+                            <label for='enable_mob_autospawn'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_mob_autospawn" name='is_mob_autospawn' value='no'>
+                            <label for='disable_mob_autospawn'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_floor_autodirt'>
+                        <label><%= t('Floor Autodirt') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_floor_autodirt" name='is_floor_autodirt' value='yes'>
+                            <label for='enable_floor_autodirt'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_floor_autodirt" name='is_floor_autodirt' value='no'>
+                            <label for='disable_floor_autodirt'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_stamina_bar'>
+                        <label><%= t('Enable Stamina') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_stamina" name='is_stamina_enabled' value='yes'>
+                            <label for='enable_stamina'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_stamina" name='is_stamina_enabled' value='no'>
+                            <label for='disable_stamina'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_hunger_bar'>
+                        <label><%= t('Enable Hunger') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_hunger" name='is_hunger_enabled' value='yes'>
+                            <label for='enable_hunger'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_hunger" name='is_hunger_enabled' value='no'>
+                            <label for='disable_hunger'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_oxygen_bar'>
+                        <label><%= t('Enable Oxygen') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_oxygen" name='is_oxygen_enabled' value='yes'>
+                            <label for='enable_oxygen'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_oxygen" name='is_oxygen_enabled' value='no'>
+                            <label for='disable_oxygen'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry colony_chat_allowed'>
+                        <label><%= t('Enable Chat') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_chat" name='is_chat_enabled' value='yes'>
+                            <label for='enable_chat'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_chat" name='is_chat_enabled' value='no'>
+                            <label for='disable_chat'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_infinite_ammo'>
+                        <label><%= t('Infinite Ammo') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_infinite_ammo" name='is_infinite_ammo' value='yes'>
+                            <label for='enable_infinite_ammo'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_infinite_ammo" name='is_infinite_ammo' value='no'>
+                            <label for='disable_infinite_ammo'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_infinite_power'>
+                        <label><%= t('Infinite Power') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_infinite_power" name='is_infinite_power' value='yes'>
+                            <label for='enable_infinite_power'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_infinite_power" name='is_infinite_power' value='no'>
+                            <label for='disable_infinite_power'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_shadows_enabled'>
+                        <label><%= t('Day Night Cycle') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_shadows" name='is_shadows_enabled' value='yes'>
+                            <label for='enable_shadows'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_shadows" name='is_shadows_enabled' value='no'>
+                            <label for='disable_shadows'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_player_saving_enabled'>
+                        <label><%= t('Enable Player Saving') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_player_saving" name='is_player_saving_enabled' value='yes'>
+                            <label for='enable_player_saving'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_player_saving" name='is_player_saving_enabled' value='no'>
+                            <label for='disable_player_saving'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_crafting_enabled'>
+                        <label><%= t('Enable Crafting') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_crafting" name='is_crafting_enabled' value='yes'>
+                            <label for='enable_crafting'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_crafting" name='is_crafting_enabled' value='no'>
+                            <label for='disable_crafting'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_blood_enabled'>
+                        <label><%= t('Enable Blood') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_blood" name='is_blood_enabled' value='yes'>
+                            <label for='enable_blood'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_blood" name='is_blood_enabled' value='no'>
+                            <label for='disable_blood'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_suit_change_enabled'>
+                        <label><%= t('Enable Suit Change') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_suit_change" name='is_suit_change_enabled' value='yes'>
+                            <label for='enable_suit_change'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_suit_change" name='is_suit_change_enabled' value='no'>
+                            <label for='disable_suit_change'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_drop_inventory_on_death'>
+                        <label><%= t('Drop Inventory on Death') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_drop_inventory_on_death" name='is_drop_inventory_on_death' value='yes'>
+                            <label for='enable_drop_inventory_on_death'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_drop_inventory_on_death" name='is_drop_inventory_on_death' value='no'>
+                            <label for='disable_drop_inventory_on_death'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_corpse_enabled'>
+                        <label><%= t('Enable Corpse') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_corpse" name='is_corpse_enabled' value='yes'>
+                            <label for='enable_corpse'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_corpse" name='is_corpse_enabled' value='no'>
+                            <label for='disable_corpse'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_mutant_enabled'>
+                        <label><%= t('Enable Mutant') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_mutant" name='is_mutant_enabled' value='yes'>
+                            <label for='enable_mutant'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_mutant" name='is_mutant_enabled' value='no'>
+                            <label for='disable_mutant'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class='colony_info_entry is_gravity_enabled'>
+                        <label><%= t('Enable Gravity') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_gravity" name='is_gravity_enabled' value='yes'>
+                            <label for='enable_gravity'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_gravity" name='is_gravity_enabled' value='no'>
+                            <label for='disable_gravity'><%= t('No') %></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class='colony_logs_container colony_tab_content' data-tab='logs'>
+                    <div class='colony_logs_refresh_btn'></div>
+                    <div class='colony_logs_list'></div>
+                </div>
+
+                <div class='command_logs_container colony_tab_content' data-tab='commands'>
+                    <div class='command_logs_refresh_btn'></div>
+                    <div class='command_logs_list'></div>
+                </div>
+
+                <div class='colony_teams_container colony_tab_content' data-tab='teams'>
+                    <div class='team_list_container'></div>
+                    <div class='empty_teams_container'>
+                        <%= t('No Teams Found') %>
+                    </div>
+                    <div class='team_list_action_container'>
+                    </div>
+                    
+                </div>
+
+                <div class='colony_roles_container colony_tab_content' data-tab='roles'>
+                    <div class='role_list_container'>
+                        <div class='role_list'></div>
+                        <div class='role_action_container'>
+                            <button class='new_role_btn'>+ <%= t('New Role') %></button>
+                        </div>
+                    </div>
+                    <div class='role_permissions_container'>
+                        <div class='role_name'>
+                            <div class='role_name_label'>
+                                <%= t('RoleName') %>: 
+                                <span class='role_name_label_value'></span>
+                            </div>
+                            <span class='role_name_edit'>
+                                Name: <input type="text" class="role_name_input menu_input" autocomplete="off"/>    
+                            </span>
+                        </div>
+                        <div class='role_permissions'></div>
+                        <div class='role_edit_action'>
+                            <button class='delete_role_btn'><%= t('Delete Role') %></button>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div id='alliance_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'><%= t('Alliance') %></div>
+        <div class='colony_info_container'>
+            <div class='colony_info_entry'>
+                <label><%= t('AllianceName') %></label>
+                <span class='colony_info_entry_value'><%= t('Empire') %></span>
+            </div>    
+            <div class='colony_info_entry'>
+                <label><%= t('Status') %></label>
+                <span class='alliance_relationship_status colony_info_entry_value'>
+                    <%= t('Friendly') %>
+                </span>
+            </div>    
+            <div class='colony_info_entry'>
+                <label><%= t('Relationship') %></label>
+                <span class='alliance_relationship_percentage colony_info_entry_value'>
+                    60/100
+                </span>
+            </div>    
+            <div class='alliance_relationship_details'>
+            </div>
+        </div>
+    </div>
+
+    <div id='friend_request_menu'>
+    </div>
+
+    <div id='friends_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'><%= t('Friends') %></div>
+        <div class="friends_tab_container">
+            <div class='friend_tab' data-tab='search_players'><%= t('Search Users') %></div>
+            <div class='friend_tab selected' data-tab='my_friends'><%= t('Friends') %></div>
+            <div class='friend_tab pending_request_tab' data-tab='pending_requests'>Requests</div>
+        </div>
+        <div class='tab_content'>
+            <div class="search_players_content tab-pane" data-tab='search_players'>
+                <input type="text" name="" class='player_search_input' placeholder="Enter username" />
+                <button class='player_search_btn'>Search</button>
+                <div class='player_search_results'></div>
+            </div>
+            <div class="my_friends_content tab-pane active" data-tab='my_friends'>
+            </div>
+            <div class="pending_requests_content tab-pane" data-tab='pending_requests'>
+
+            </div>
+        </div>
+    </div>
+
+    <div id='npc_dialog_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'></div>
+        <div class='npc_choices_container'>
+        </div>
+
+        <button class='confirm_npc_choice_btn ui_btn'><%= t('Confirm') %></button>
+    </div>
+
+    <div id='vent_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='leave_vent_btn ui_btn'>Leave Vent</div>
+        <div class='previous_vent_btn ui_btn'>Previous</div>
+        <div class='next_vent_btn ui_btn'>Next</div>
+    </div>
+
+    <div id='terminal_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'><%= t('Terminal') %></div>
+        <div class="terminal_tab_container">
+            <div class='terminal_tab selected' data-tab='chat'><%= t('Chat') %></div>
+            <div class='terminal_tab' data-tab='hack'><%= t('Hack') %></div>
+        </div>
+        <div class='terminal_tab_content'>
+            <div class='terminal_chat_container tab_content_entry selected' data-tab='chat'>
+                <div class='terminal_chat_content'></div>
+                <input class='terminal_chat_input menu_input' type='text' placeholder="type something" />
+                <button class='terminal_chat_send_btn ui_btn'>Send</button>
+            </div>
+            <div class='terminal_choices_container tab_content_entry' data-tab='hack'>
+                <div data-choice='lights_off' class='terminal_choice'>[Hack] Turn off Lights</div>
+                <button class='confirm_choice_btn ui_btn'><%= t('Confirm') %></button>
+            </div>
+        </div>
+    </div>
+
+    <div id='error_menu'>
+        <div id="error_title">
+        </div>
+        <div id="error_menu_content">
+        </div>
+    </div>
+
+    <div id='notice_board'>
+        
+    </div>
+
+    <div id='color_picker_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'><%= t('Customize') %></div>
+        <div class="color_picker_tab_container">
+            <div class='picker_tab selected' data-customize='color'><%= t('Color') %></div>
+            <div class='picker_tab' data-customize='texture'><%= t('Texture') %></div>
+        </div>
+        <div class='tab_content'>
+            <div class="color_content tab-pane selected" data-customize='color'>
+                <div class='color_picker_grid'></div>
+            </div>
+            <div class="texture_content tab-pane" data-customize='texture'>
+                <div class='texture_picker_grid'></div>
+            </div>
+        </div>
+        <div class='color_picker_summary'>
+            <div class='picker_stat picker_color_stat'>
+                <span class='picker_label'>Color: </span>
+                <span class='picker_color_value'></span>
+            </div>
+            <div class='picker_stat picker_texture_stat'>
+                <span class='picker_label'>Texture: </span>
+                <span class='picker_texture_value'></span>
+            </div>
+        </div>
+    </div>
+
+    <div id='suit_color_menu' class='modal_menu'>
+        <div class='cancel_btn'></div>
+        <div class='menu_main_header'><%= t('Customize') %></div>
+        <div class="color_picker_tab_container">
+            <div class='picker_tab selected' data-customize='color'><%= t('Color') %></div>
+        </div>
+        <div class='tab_content'>
+            <div class="color_content tab-pane selected" data-customize='color'>
+                <div class='color_picker_grid'></div>
+            </div>
+        </div>
+        <div class='color_picker_summary'>
+            <div class='picker_stat picker_color_stat'>
+                <span class='picker_label'>Color: </span>
+                <span class='picker_color_value'></span>
+            </div>
+        </div>
+    </div>
+
+    <div id='building_menu_tooltip' class='tooltip top'>
+        <div class='entity_name'>
+            <span class='entity_name_label'>Platform</span>
+            <span class='entity_id'></span>
+        </div>
+        <div class='entity_description'>Allows players to move around on and place additional buildings</div>
+        <div class='entity_stats_target_growth'>
+            <div class='stats_growth'>
+                <div class='stats_type'>Health</div>
+                <div class='stats_before'>5</div>
+                -
+                <div class='stats_after'>10</div>
+            </div>
+        </div>
+        <span class='upgrade_cost'>
+            <div class='upgrade_cost_gold'></div>
+            <div class='upgrade_cost_energy'></div>
+        </span>
+        <div class="tooltip-arrow"></div>
+    </div>
+
+    <div id='mobile_action_menu'>
+        <div id='mobile_primary_action_btn'>
+            <span class="centerer"></span>
+            <img src="" class='noselect'>
+        </div>
+        <div id='mobile_action_btn' class='noselect'></div>
+    </div>
+
+    <div id='entity_menu' class=''>
+        <div id='entity_menu_content'>
+            <div class='entity_tab_content entity_info_tab'>
+                <div class='debug_container'>
+                    <div class='entity_id'></div>
+                    <div class='entity_pos_x'></div>
+                    <div class='entity_pos_y'></div>
+                    <div class='entity_row'></div>
+                    <div class='entity_col'></div>
+                    <div class='entity_light_ambient_color'></div>
+                    <div class='entity_light_brightness'></div>
+                    <div class='entity_light_color'></div>
+                </div>
+                <div class='entity_name'>
+                    <div class='entity_name_label'>Wall</div>
+                </div>
+                <div class='entity_stats'>
+                    <div class='entity_stats_entry'>
+                        <div class='stats_type'>Health</div>
+                        <div class='stats_value'>45/50</div>
+                    </div>
+                    <div class='entity_stats_entry'>
+                        <div class='stats_type'>Attack</div>
+                        <div class='stats_value'>5</div>
+                    </div>
+                </div>
+                <div class='entity_action'></div>
+                <div class='entity_permissions_container'>
+                    <div class='entity_allow_access_label'><%= t('Permissions') %></div>
+                    <select class='custom_access_select ui_select'>
+                       <option value='default'>Default</option>
+                       <option value='custom'>Custom</option>
+                    </select>
+                    <div class='entity_permission_roles'></div>
+                </div>
+                <div class='spawn_select_container'>
+                    <div class='spawn_select_label'><%= t('Spawn Point for') %></div>
+                    <select class='spawn_select ui_select'>
+                    </select>
+                </div>
+            </div>
+
+            <div class='entity_tab_content entity_task_tab'>
+                <div class='entity_name'>
+                    <div class='entity_name_label'></div>
+                </div>
+                <div class='slave_task_container'>
+                </div>
+            </div>
+
+            <div class='entity_tab_content entity_targets_tab'>
+                <div class='entity_name'>
+                    <div class='entity_name_label'></div>
+                </div>
+                <div class='attack_type_container'>
+                </div>
+            </div>
+
+            <div class='entity_tabs'>
+                <div class='entity_tab' data-tab='entity_info_tab'><%= t('Info') %></div>
+                <div class='entity_tab' data-tab='entity_task_tab'><%= t('Tasks') %></div>
+                <div class='entity_tab' data-tab='entity_targets_tab'><%= t('Targets') %></div>
+            </div>
+            <div class='entity_logs'></div>
+        </div>
+    </div>
+
+    <div id='status_list_menu'>
+        
+    </div>
+
+    <div id='save_progress'>Saving world...</div>
+</div>
+
+<div class='colony_preview_popup'>
+    
+</div>
+
+<div id="preroll_container">
+    <div id="preroll"></div>
+</div>
+
+<div id='welcome_hud'>
+    <div id="total_online_count">0 online</div>
+
+</div>

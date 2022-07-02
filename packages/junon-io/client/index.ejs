@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="<%= language %>">
+<head>
+    <meta charset="UTF-8" />
+    <title>Junon.io | Space Colony Survival </title>
+
+    <meta name="description" content="Multiplayer Space Colony Survival - Inspired by Space Station 13 and Rimworld. Playable right in your browser!" />
+    <meta property="og:url" content="http://junon.io" />
+    <meta property="og:title" content="junon.io" />
+    <meta property="og:description" content="Multiplayer Space Colony Survival - Inspired by Space Station 13 and Rimworld. Playable right in your browser!" />
+    <meta property="og:site_name" content="Junon.io" />
+    <meta property="og:image" content="https://i.imgur.com/RtYeylB.png" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Junon.io">
+    <meta name="twitter:description" content="Multiplayer Space Colony Survival - Inspired by Space Station 13 and Rimworld. Playable right in your browser!">
+    <meta property="fb:app_id" content="2510663989161946">
+    <meta property="og:type" content="website">
+
+    <meta name="keywords" content="junonio, junon, space station, amongus, ss13, rimworld, minecraft space, io, html5">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Junon.io">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="icon" type="image/png" href="/assets/images/background/favicon.png">
+
+    <link rel="stylesheet" href="/stylesheets/<%= assetPath('application.css') %>">
+
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimum-scale=1, width=device-width, height=device-height">
+    <script>
+        window.env = "<%= nodeEnv %>"
+        window.revision = "<%= revision %>"
+        window.protocolHash = "<%= protocolHash %>"
+        window.test_vm = "<%= test_vm %>"
+    </script>
+
+    <!-- AdinPlay Ads -->
+    <script>
+        var aiptag = aiptag || {};
+        aiptag.cmd = aiptag.cmd || [];
+        aiptag.cmd.display = aiptag.cmd.display || [];
+        aiptag.cmd.player = aiptag.cmd.player || [];
+
+        aiptag.gdprShowConsentTool = true;
+        aiptag.gdprConsentToolPosition = "bottom";
+    </script>
+    <script async src="//api.adinplay.com/libs/aiptag/pub/KKK/junon.io/tag.min.js"></script>
+</head>
+<body style='' class='<%= nodeEnv %>'>
+    <div class="wrapper">
+        <% include ./main %>
+    </div>
+    <script type="text/javascript">
+        if (window.location.href.match("impy=true")) {
+            document.querySelector("#game_caption").innerText = "IMPY.IO"    
+            document.querySelector("#game_caption").style.fontFamily = "monospace"    
+            document.querySelector("#parent_project").innerText = "made by junon.io"
+        }
+    </script>
+    <script src="/<%= assetPath('vendor.js') %>"></script>
+    <script src="/<%= assetPath('app.js') %>"   ></script>
+
+</body>
+<div id="fb-root"></div>
+</html>

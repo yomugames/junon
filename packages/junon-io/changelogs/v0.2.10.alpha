@@ -1,0 +1,16 @@
+{
+  "version": "v0.2.10.alpha",
+  "date": "Mar 28, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix player getting stuck at corner of map",
+      "Fix bot + pet count limit "
+    ],
+    "features": [
+      "Owners can take screenshots of their colony which will be displayed as preview on Visit Colony menu",
+      "Melee Attack + Flamethrower/Fire Extinguisher cannot go through walls",
+      "Players can send money to each other"
+    ]
+  }
+}

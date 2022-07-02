@@ -1,0 +1,1490 @@
+package app;
+syntax = "proto3";
+
+import "enum.proto";
+
+message MessageWrapper {
+  oneof kind {
+    Ping Ping = 1;
+    Pong Pong = 2;
+    JoinGame JoinGame = 3;
+    WindowResized WindowResized = 4;
+    GameState GameState = 5;
+    PlayerInput PlayerInput = 6;
+    OtherPlayerJoined OtherPlayerJoined = 7;
+    CeilingHit CeilingHit = 8;
+    RequestGame RequestGame = 9;
+    Leaderboard Leaderboard = 10;
+    Build Build = 13;
+    Upgrade Upgrade = 14;
+    Trade Trade = 15;
+    StartWave StartWave = 16;
+    WaveLevel WaveLevel = 17;
+    TeleportRequest TeleportRequest = 18;
+    Teleport Teleport = 19;
+    PlayerDestroyed PlayerDestroyed = 20;
+    SpawnMob  SpawnMob = 22;
+    BuildMode BuildMode = 23;
+    Repair    Repair = 24;
+    SaveDesign SaveDesign = 25;
+    PilotShip PilotShip = 26;
+    CollisionDetected CollisionDetected = 27;
+    WaveEnd WaveEnd = 28;
+    RepairStarted RepairStarted = 29;
+    PlayerTarget PlayerTarget = 30;
+    Act Act = 31;
+    RetrieveMinerals RetrieveMinerals = 32;
+    MineralCapacityReached MineralCapacityReached = 33;
+    ChangeEquip ChangeEquip = 34;
+    SwapInventory SwapInventory = 36;
+    ViewStorage ViewStorage = 37;
+    RenderStorage RenderStorage = 38;
+    MineResource MineResource = 39;
+    ViewCraftingQueue ViewCraftingQueue = 40;
+    Craft Craft = 41;
+    ErrorMessage ErrorMessage = 42;
+    ResumeGame ResumeGame = 43;
+    InteractTarget InteractTarget = 44;
+    TakeAlong TakeAlong = 45;
+    Release Release = 46;
+    SetHangar SetHangar = 47;
+    EditShip EditShip = 48;
+    ShowStarMap ShowStarMap = 49;
+    ClientChat ClientChat = 50;
+    ServerChat ServerChat = 51;
+    CraftSuccess CraftSuccess = 52;
+    RenderDebug RenderDebug = 53;
+    DebugRoom DebugRoom = 54;
+    CloseStorage CloseStorage = 55;
+    CameraFocusTarget CameraFocusTarget = 57;
+    GainResource GainResource = 59;
+    Chunk Chunk = 60;
+    PlayerReady PlayerReady = 61;
+    SetTutorialIndex SetTutorialIndex = 64;
+    CantJoin CantJoin = 65;
+    SetAdmin SetAdmin = 66;
+    Event Event = 67;
+    UpdateStats UpdateStats = 68;
+    BreakBuilding BreakBuilding = 69;
+    DebugRange DebugRange = 71;
+    Animate Animate = 72;
+    CircleCollision CircleCollision = 73;
+    CreateTeam CreateTeam = 74;
+    JoinTeam JoinTeam = 75;
+    LeaveTeam LeaveTeam = 76;
+    TeamUpdated TeamUpdated = 77;
+    MapPositions MapPositions = 78;
+    ServerRestartCountdown ServerRestartCountdown = 79;
+    RespawnRequest RespawnRequest = 80;
+    Respawn Respawn = 81;
+    TeamRequest TeamRequest = 84;
+    AcceptTeamRequest AcceptTeamRequest = 85;
+    FlowField FlowField = 86;
+    UpdateTeamHealth UpdateTeamHealth = 87;
+    EnterSector EnterSector = 89;
+    UpdateHomeArea UpdateHomeArea = 90;
+    AFK AFK = 91;
+    EditTeam EditTeam = 92;
+    RequestChunkRegions RequestChunkRegions = 93;
+    UpdateChunkRegion UpdateChunkRegion = 94;
+    UpdateChunkRegionPath UpdateChunkRegionPath = 95;
+    Debug Debug = 96;
+    InviteToTeam InviteToTeam = 97;
+    TeamInvitation TeamInvitation = 98;
+    SessionResume SessionResume = 99;
+    LeaveGame LeaveGame = 100;
+    InventoryChanged InventoryChanged = 102;
+    EquipIndexChanged EquipIndexChanged = 103;
+    EntityUpdated EntityUpdated = 104;
+    SaveProgress SaveProgress = 105;
+    ChunkPositionChanged ChunkPositionChanged = 106;
+    LeaveSector LeaveSector = 107;
+    RoomHovered RoomHovered = 108;
+    RequestEntityChunkRegionPath RequestEntityChunkRegionPath = 109;
+    EntityChunkRegionPath EntityChunkRegionPath = 110;
+    TeamMemberAction TeamMemberAction = 111;
+    PlayerKick PlayerKick = 112;
+    RemovedFromGame RemovedFromGame = 113;
+    ManageStack ManageStack = 114;
+    NPCClientMessage NPCClientMessage = 115;
+    NPCServerMessage NPCServerMessage = 116;
+    EditBuilding EditBuilding = 117; 
+    RailDestinations RailDestinations = 118; 
+    SetLivestock SetLivestock = 119;
+    PlaySound PlaySound = 120;
+    SendMoney SendMoney = 121;
+    AddScreenshot AddScreenshot = 122;
+    RemoveScreenshot RemoveScreenshot = 123;
+    ScreenshotUpdated ScreenshotUpdated = 124;
+    AtmAction AtmAction = 125;
+    AccountBalance AccountBalance = 126;
+    SectorAction SectorAction = 127;
+    FavoriteUpdated FavoriteUpdated = 129;
+    TeamResidentsUpdated TeamResidentsUpdated = 130;
+    EditTask EditTask = 131;
+    WalkthroughUpdated WalkthroughUpdated = 132;
+    EditMob EditMob = 133; 
+    TeamFull TeamFull = 134;
+    RestartCharacter RestartCharacter = 135;
+    EditRole EditRole = 136;
+    RoleUpdated RoleUpdated = 137;
+    SectorUpdated SectorUpdated = 138;
+    TeamLogs TeamLogs = 139;
+    SellableUpdated SellableUpdated = 140;
+    EditTexture EditTexture = 141;
+    RegionUpdated RegionUpdated = 142;
+    SendVote SendVote = 143;
+    VoteUpdated VoteUpdated = 144;
+    StartScene StartScene = 145;
+    EndScene EndScene = 146;
+    EndGame EndGame = 147;
+    StartVote StartVote = 148;
+    SidebarUpdated SidebarUpdated = 149;
+    Objective Objective = 150;
+    DialogueUpdated DialogueUpdated = 151;
+    RoundStarted RoundStarted = 152;
+    EndVote EndVote = 153;
+    ProgressCircle ProgressCircle = 154;
+    StartRound StartRound = 155;
+    TeamAssignmentChanged TeamAssignmentChanged = 156;
+    CameraFeedUpdated CameraFeedUpdated = 157;
+    ViewCamera ViewCamera = 158;
+    RenderCamera RenderCamera = 159; 
+    MapAction MapAction = 160;
+    TerminalUpdated TerminalUpdated = 161;
+    CustomStats CustomStats = 162;
+    MenuAction MenuAction = 163;
+    ButtonUpdated ButtonUpdated = 164;
+    ButtonClick   ButtonClick = 165;
+    EditCommandBlock EditCommandBlock = 166;
+    CommandBlockUpdated CommandBlockUpdated = 167;
+    CommandEventLog CommandEventLog = 168;
+    CommandBlockTimerUpdated CommandBlockTimerUpdated = 169;
+    CommandEventLogList CommandEventLogList = 170;
+  }
+}
+
+message CommandEventLogList {
+  repeated CommandEventLog logs = 1;
+}
+
+message CommandEventLog { 
+  uint64 timestamp = 1;
+  string type = 2;
+  string message = 3;
+}
+
+message EditCommandBlock {
+  uint32 id = 1;
+  string operation = 2;
+  string value = 3;
+  string tempId = 4;
+  uint32 parentId = 5; 
+  string type = 6;
+}
+
+message CommandBlockUpdated {
+  string fullJson = 1;
+  uint32 id = 2;
+  string operation = 3;
+  string value = 4;
+  string tempId = 5;
+  string error = 6;
+  bool isEnabled = 7;
+}
+
+message MenuAction {
+  string action = 1;
+  string menu = 2;
+}
+
+message MapAction {
+  string action = 1;
+  uint32 row = 2;
+  uint32 col = 3;
+}
+
+message FullMap {
+  repeated Chunk chunks = 1;
+}
+
+message TerminalUpdated {
+  string message = 1;
+}
+
+message ViewCamera {
+  uint32 id = 1;
+}
+
+message RenderCamera {
+  
+}
+
+message CustomStats {
+  string group = 1;
+  uint32 type = 2;
+  map<string, uint32> stats = 3;
+}
+
+message ButtonUpdated {
+  Button button = 1;
+}
+
+message ButtonClick {
+  string name = 1;
+  uint32 entityId = 2;
+}
+
+message Button {
+  uint32 id = 1;
+  string name = 2;
+  string label = 3;
+  string description = 4;
+  map<string,bool> attachments = 5;
+  bool clientMustDelete = 6;
+}
+
+message StartRound {
+}
+
+message ProgressCircle {
+  uint32 completeTimestamp = 1;
+  bool clientMustDelete = 2;
+}
+
+message TeamLogs {
+  repeated ActivityLog activityLogs = 1;
+  repeated CommandLog commandLogs = 2;
+}
+
+message DialogueUpdated {
+  map<uint32, EntityDialogues> dialogueMap = 1;
+}
+
+message CommandBlockTimerUpdated {
+  map<uint32, CommandBlockTimer> commandBlockTimers = 1;
+}
+
+message CommandBlockTimer {
+  uint32 id = 1;
+  Timer timer = 2;
+  bool clientMustDelete = 3;
+}
+
+message Timer {
+  string name = 1;
+  uint32 duration = 2;
+}
+
+message EntityDialogues {
+  map<string, string> dialogues = 1;
+}
+
+message EndGame {
+  bool isCountdown = 1;
+}
+
+message RoundStarted {
+  
+}
+
+message SendVote {
+  uint32 targetPlayerId = 1;
+}
+
+message StartVote {
+  uint64 votingEndTimestamp = 1;
+}
+
+message EndVote {
+}
+
+message VoteUpdated {
+  map<uint32, uint32> voteResults = 1;
+  bool isFinal = 2;
+}
+
+message StartScene {
+  string name = 1;
+}
+
+message EndScene {
+  string name = 1;
+}
+
+message Sidebar {
+  string title = 1;
+  bool isVisible = 2;
+  map<uint32,string> rows = 3;
+}
+
+message SidebarUpdated {
+  bool isVisible = 1;
+  string title = 2;
+  map<uint32,string> rows = 3;
+}
+
+message ObjectiveUpdated {
+  string name = 1;
+  string description = 2;
+  bool isCompleted = 3;
+  map<string,string> translations = 4;
+}
+
+message EditTexture {
+  uint32 colorIndex = 1;
+  uint32 textureIndex = 2;
+  uint32 entityId = 3;
+}
+
+message TeamAssignmentChanged {
+  map<uint32, Role> roles = 1;
+}
+
+message ActivityLog {
+  uint64 timestamp = 1;
+  string username = 2;
+  ActivityType activityType  = 3;
+  uint32 entityId = 4;
+  uint32 entityType = 5;
+  EntityGroup entityGroup = 6;
+  uint32 row = 7;
+  uint32 col = 8;
+}
+
+message CommandLog {
+  uint64 timestamp = 1;
+  string username = 2;
+  string command = 3;
+}
+
+message TeamFull {
+  Team team = 1;
+  map<uint32,Team> teams = 2;
+}
+
+message RestartCharacter {
+}
+
+message SectorAction { 
+  string action = 1;
+  string sectorId = 2;
+  string key = 3;
+  string value = 4;
+}
+
+message NPCClientMessage {
+  uint32 entityId = 1;
+  uint32 choice = 2;
+}
+
+message AtmAction {
+  string action = 1;
+  uint32 gold = 2;
+}
+
+message AccountBalance {
+  uint32 balance = 1;
+}
+
+message PlaySound {
+  SoundType id = 1;  
+}
+
+message SendMoney {
+  uint32 playerId = 1;
+  uint32 gold = 2;
+}
+
+message TeamResidentsUpdated {
+  map<uint32,Mob> residents = 1;
+}
+
+message AddScreenshot {
+  string imageData = 1;
+  uint32 position = 2;
+}
+
+message RemoveScreenshot {
+  string id = 1;
+}
+
+message ScreenshotUpdated {
+  string id = 1;
+  uint32 position = 2;
+  bool clientMustDelete = 3;
+}
+
+message RailDestinations {
+  map<uint32,string> destinationMap = 1;
+}
+
+message NPCServerMessage {
+  uint32 entityId = 1;
+  uint32 choice = 2;
+  string message = 3;
+}
+
+message ManageStack {
+  uint32 storageId = 1;
+  uint32 index = 2;
+  StackOperationType mode = 3;
+  uint32 count = 4;
+}
+
+message RequestEntityChunkRegionPath {
+  uint32 entityId = 1;
+}
+
+message EntityChunkRegionPath {
+  uint32 entityId = 1;
+  ChunkRegionPath chunkRegionPath = 2;
+}
+
+message RoomHovered {
+  uint32 id = 1;
+}
+
+message SaveProgress {
+  bool finished = 1;
+}
+
+message SessionResume {
+
+}
+
+message Debug {
+  string type = 1;
+}
+
+message EnterSector {
+  Player player = 1;
+}
+
+message LeaveSector {
+  Player player = 1;
+}
+
+message RespawnRequest {
+}
+
+message ChunkPositionChanged {
+  uint32 entityId = 1;
+  uint32 row = 2;
+  uint32 col = 3;
+}
+
+message Respawn {
+  uint32 x = 1;
+  uint32 y = 2;
+}
+
+message ServerRestartCountdown {
+  uint32 timestamp = 1;
+  string reason = 2;
+}
+
+message TeamUpdated {
+  Team team = 1;
+}
+
+message UpdateHomeArea {
+  repeated Tile tiles = 1;
+}
+
+message Team {
+  uint32 id = 1;
+  string name = 2;
+  map<uint32,TeamMember> members = 3;
+  TeamMember leader = 4;
+  string ip = 5;
+  bool isPrivate = 6;
+  bool clientMustDelete = 7;
+  string creatorUid = 8;
+  string creatorName = 9;
+  map<string, uint32> deeds = 10;
+  uint32 dayCount = 11;
+  map<string, uint32> permissions = 12;
+  map<uint32,TeamMember> offlineMembers = 13;
+  string prefix = 14;
+}
+
+message Role {
+  uint32 id = 1;
+  string name = 2;
+  map<string, bool> permissions = 3;
+}
+
+message EditRole {
+  uint32 teamId = 1;
+  uint32 roleId = 2;
+  string permission = 3;
+  bool   isEnabled = 4;
+  string name = 5;
+  bool   shouldDelete = 6;
+}
+
+message RoleUpdated {
+  uint32 teamId = 1;
+  Role   role = 2;
+  bool   clientShouldDelete = 3;
+}
+
+message EditTeam {
+  uint32 id = 1;
+  string name = 2;
+  bool isPrivate = 3;
+  string permission = 4;
+  uint32 roleId = 5;
+  bool isEnabled = 6;
+}
+
+message EditMob {
+  uint32 id = 1;
+  string name = 2;
+  string content = 3;
+}
+
+message EditBuilding {
+  uint32 id = 1;
+  string content = 2;
+  uint32 accessType = 3;
+  string action = 4;
+  AttackTargetType targetType = 5; 
+  bool   isTargetEnabled = 6;
+  uint32 roleType = 7; 
+  bool   isRoleEnabled = 8;
+  bool   isCustomAccess = 9;
+}
+
+message TeamMemberAction {
+  string action = 1;
+  uint32 memberId = 2;
+  uint32 roleType = 3;
+  uint32 banId = 4;
+}
+
+message PlayerKick {
+  bool isBan = 1;
+}
+
+message UpdateTeamHealth {
+  uint32 entityId = 1;
+  uint32 health = 2;
+}
+
+message MapPosition {
+  uint32 id = 1;
+  EntityType type = 2;
+  uint32 x = 3;
+  uint32 y = 4;
+  bool clientMustDelete = 5;
+}
+
+message MapPositions {
+  repeated MapPosition positions = 1;
+}
+
+message TeamMember {
+  uint32 id = 1;
+  string name = 2;
+  bool   isVisitor = 3;
+  uint32 daysAlive = 4;
+  uint32 roleType = 5;
+  string uid = 6;
+  bool   isMuted = 7;
+}
+
+message CreateTeam {
+  string name = 1;
+  bool isPrivate = 2;
+}
+
+message JoinTeam {
+  uint32 id = 1;
+}
+
+message TeamRequest {
+  uint32 playerId = 1;
+  string playerName = 2;
+  bool   clientMustDelete = 3;
+}
+
+message InviteToTeam {
+  uint32 playerId = 1;
+}
+
+message AcceptTeamRequest {
+  uint32 playerId = 1;
+  bool isReject = 2;
+}
+
+message TeamInvitation {
+  uint32 teamId = 1;
+  bool isReject = 2;
+}
+
+message LeaveTeam {
+  uint32 id = 1;
+}
+
+message LeaveGame {
+}
+
+message RemovedFromGame {
+  uint32 playerId = 1;
+  string playerName = 2;
+}
+
+message Animate {
+  uint32 entityId = 1;
+  string animation = 2;
+  bool   shouldStop = 3;
+}
+
+message BreakBuilding {
+  uint32 id = 1;
+  uint32 progress = 2;
+}
+
+message UpdateStats {
+  uint32 gold = 1;
+  uint32 stamina = 2;
+  uint32 oxygen = 3;
+  uint32 hunger = 4;
+  uint32 thirst = 5;
+  uint32 entityId = 6;
+  uint32 colorIndex = 7;
+  uint32 textureIndex = 8;
+  uint32 taskCompleted = 9;
+  uint32 totalTasks = 10;
+}
+
+message CircleCollision {
+  repeated Circle circles = 1;
+}
+
+message Circle {
+  float x = 1;
+  float y = 2;
+  uint32 radius = 3;
+}
+
+message Event {
+  EventType type = 1;
+  string eventData = 2;
+}
+
+message CantJoin {
+  string message = 1;
+}
+
+message Ping {
+}
+
+message Pong {
+}
+
+message SetTutorialIndex {
+  string name = 1;
+  int32 tutorialIndex = 2;
+}
+
+message WalkthroughUpdated {
+  uint32 index = 1;
+  string step = 2;
+}
+
+message PlayerReady {
+
+}
+
+message DebugRoom {
+  uint32 id = 1;
+}
+
+message RenderDebug {
+  string type = 1;
+  string data = 2;
+}
+
+message CraftSuccess {
+  string name = 1;
+  uint32 count = 2;
+  bool   isHarvested = 3;
+}
+
+message ClientChat {
+  string message = 1;
+  bool isGlobal = 2;
+  bool isTeam = 3;
+}
+
+message ServerChat {
+  uint32 playerId = 1;
+  string message = 2;
+  string username = 3;
+  string uid = 4;
+  bool isTeam = 5;
+}
+
+message Chunk {
+  uint32 row = 1;
+  uint32 col = 2;
+  repeated Terrain terrains = 3;
+  repeated Building buildings = 4;
+  repeated Corpse corpses = 5;
+  repeated Room rooms = 6;
+  repeated Mob mobs = 7;
+  repeated Pickup pickups = 8;
+  repeated Player players = 9;
+  repeated Projectile projectiles = 10;
+  repeated Transport transports = 11;
+}
+
+message ShowStarMap {
+
+}
+
+message SetHangar {
+  uint32 id = 1;
+  uint32 x = 2;
+  uint32 y = 3;
+  uint32 w = 4;
+  uint32 h = 5;
+}
+
+message EditShip {
+  uint32 id = 1;
+}
+
+message EditTask {
+  uint32 entityId = 1;
+  TaskType taskType = 2;
+  bool isEnabled = 3;
+}
+
+message SetLivestock {
+  uint32 id = 1;
+  bool isLivestock = 2;
+}
+
+message TakeAlong {
+  uint32 id = 1;
+}
+
+message Release {
+  uint32 id = 2;
+}
+
+message InteractTarget {
+  uint32 id = 1;
+  string action = 2;
+  string content = 3;
+}
+
+message ResumeGame {
+  string uid = 1;
+  uint32 screenWidth = 2;
+  uint32 screenHeight = 3;
+  string sessionId = 4;
+  string idToken = 5;
+  string sectorId = 6;
+  string locale = 7;
+}
+
+message ErrorMessage {
+  string message = 1;
+  bool isWarning = 2;
+  bool isTransparent = 3;
+  string color = 4;
+  uint32 size = 5;
+  bool isTitle = 6;
+  bool isSuccess = 7;
+}
+
+message Craft {
+  uint32 storageId = 1;
+  BuildingType type = 2;
+  uint32 count = 3;
+  uint32 sourceStorageId = 4;
+}
+
+message ViewCraftingQueue {
+  uint32 id = 1;
+}
+
+message MineResource {
+  uint32 row = 1;
+  uint32 col = 2;
+}
+
+message ViewStorage {
+  uint32 id = 1;
+}
+
+message CloseStorage {
+  uint32 id = 1;
+}
+
+message RenderStorage {
+  uint32 id = 1;
+  Inventory inventory = 2;
+  uint32 progress = 3;
+}
+
+message ChangeEquip {
+  sint32 index = 1;
+}
+
+message SwapInventory {
+  uint32 sourceStorageId = 1;
+  uint32 sourceIndex = 2;
+  uint32 destinationStorageId = 3;
+  uint32 destinationIndex = 4;
+}
+
+message EntityUpdated {
+  map<uint32,Building> buildings = 1;
+  map<string,Terrain> terrains = 2;
+  map<uint32,Projectile> projectiles = 3;
+  map<uint32,Player> players = 4;
+  map<uint32,Room> rooms = 5;
+  map<uint32,RoomTileMap> roomTiles = 6;
+  map<uint32,Corpse> corpses = 7;
+  map<uint32,Mob> mobs = 8;
+  map<uint32,Pickup> pickups = 9;
+  map<uint32,Transport> transports = 10;
+}
+
+message Pickup {
+  uint32 id = 1;
+  ItemTypeCount item = 2;
+  uint32 x = 3;
+  uint32 y = 4;
+  bool clientMustDelete = 5;
+}
+
+message ItemTypeCount {
+  uint32 type = 1;
+  uint32 count = 2;
+}
+
+message RoomTileMap {
+  map<string,Tile> tiles = 1;
+}
+
+message GameState {
+  uint32 timestamp = 1;
+  uint32 hour = 2;
+  uint32 day = 3;
+  double tick = 4;
+  uint32 memory = 5;
+  Camera camera = 6;
+}
+
+message InventoryChanged {
+  Item inventory = 1;
+}
+
+message EquipIndexChanged {
+  uint32 equipIndex = 1;
+}
+
+message RequestChunkRegions {
+  string chunkId = 1;
+}
+
+message UpdateChunkRegion {
+  repeated ChunkRegion chunkRegions = 1;
+}
+
+message UpdateChunkRegionPath {
+  repeated ChunkRegionPath chunkRegionPaths = 1;
+}
+
+message ChunkRegionPath {
+  string id = 1;
+  repeated ChunkRegionPathNode nodes = 2;
+  bool clientMustDelete = 3;
+}
+
+message ChunkRegionPathNode {
+  string chunkRegionId = 1;
+  uint32 distance = 2;
+}
+
+message ChunkRegion {
+  string id = 1;
+  string chunkId = 2;
+  repeated Tile tiles = 3;
+  repeated ChunkGate gates = 4;
+  bool clientMustDelete = 5;
+}
+
+message ChunkGate {
+  string id = 1;
+  GridCoord start = 2;
+  GridCoord end = 3;
+}
+
+message GridCoord {
+  uint32 row = 1;
+  uint32 col = 2;
+}
+
+message CameraFocusTarget {
+  uint32 id = 1;
+  uint32 row = 2;
+  uint32 col = 3;
+}
+
+message SetAdmin {
+  bool isAdminMode = 1;
+}
+
+message Camera {
+  uint32 x = 1;
+  uint32 y = 2;
+}
+
+message RegionUpdated {
+  Region region = 1;
+  bool displayRegion = 2;
+  uint32 playerId = 3;
+}
+
+message Region {
+  uint32 id = 1;
+  string name = 2;
+  uint32 x  = 3;
+  uint32 y  = 4;
+  uint32 w  = 5;
+  uint32 h  = 6;
+  map<string,string> flags = 7;
+  bool clientMustDelete = 8;
+}
+
+message Room {
+  uint32 id = 1;
+  uint32 oxygenPercentage = 2;
+  bool isOxygenated = 3;
+  bool clientMustDelete = 6;
+  uint32 x = 7;
+  uint32 y = 8;
+}
+
+message RoomWithTiles {
+  uint32 id = 1;
+  uint32 oxygenPercentage = 2;
+  bool isOxygenated = 3;
+  map<string,Tile> tiles = 4;
+  map<string,Tile> edgeTiles = 5;
+  bool clientMustDelete = 6;
+  uint32 x = 7;
+  uint32 y = 8;
+}
+
+message Tile {
+  uint32 row = 1;
+  uint32 col = 2;
+  bool clientMustDelete = 3;
+}
+
+message MineralCapacityReached {
+}
+
+message PlayerTarget {
+  int32 angle = 1;
+  uint32 row = 2;
+  uint32 col = 3;
+}
+
+message RetrieveMinerals {
+  uint32 shipId = 1;
+  uint32 buildingId = 2;
+}
+
+message SaveDesign {
+}
+
+message PilotShip {
+  uint32 bridgeId = 1;
+}
+
+message GainResource {
+  BuildingType type = 1;
+  uint32 amount = 2;
+}
+
+message PlayerDestroyed {
+  uint32 id = 1;
+  bool   canRespawn = 2;
+  uint32 restartCooldown = 3;
+}
+
+message TeleportRequest {
+  string sectorId = 1;
+}
+
+message BuildMode {
+}
+
+message Repair {
+}
+
+message RepairStarted {
+}
+
+message Teleport {
+  uint32 playerId = 1;
+  map<uint32,Player> players = 2;
+  repeated Background backgrounds = 3;
+  Sector sector = 4;
+  bool isOnBase = 5;
+  Inventory inventory = 6;
+  uint32 equipIndex = 7;
+}
+
+message StartWave {
+}
+
+message WaveEnd {
+  uint32 nextWaveTime = 1;
+  uint32 level = 2;
+}
+
+message WaveLevel {
+  uint32 level = 1;
+}
+
+message Build {
+  BuildingType type = 1;
+  int32 angle = 2;
+  uint32 x = 3;
+  uint32 y = 4;
+  uint32 w = 5;
+  uint32 h = 6;
+  uint32 containerId = 7;
+}
+
+message Upgrade {
+  uint32 id = 1;
+  string type = 2;
+}
+
+message Trade {
+  string group = 1;
+  uint32 type = 2;
+  uint32 count = 3;
+  bool sell = 4;
+  uint32 index = 5;
+  uint32 recipientId = 6;
+  uint32 id = 7;
+}
+
+message SpawnMob {
+  uint32 x = 1;
+  uint32 y = 2;
+}
+
+
+message Leaderboard {
+  message Ranking {
+    uint32 id = 1;
+    string name = 2;
+    uint32 score = 3;
+  }
+
+  repeated Ranking rankings = 1;
+  repeated Ranking playerRankings = 2;
+}
+
+message PlayerInput {
+  uint32 controlKeys = 1;
+  int32 angle = 2;
+  bool  idle = 3;
+  uint32 pressedKey = 4;
+}
+
+message RequestGame {
+  string username = 1;
+  uint32 screenWidth = 2;
+  uint32 screenHeight = 3;
+  string sectorId = 4;
+  uint32 teamId = 5;
+  bool isTroubleshooter = 6;
+  string idToken = 7;
+  string sessionId = 8;
+  string locale = 9;
+  bool   isNewTeam = 10;
+  string fingerprint = 11;
+  string uid = 12;
+}
+
+message JoinGame {
+  uint32 playerId = 1;
+  string uid = 2;
+  Sector sector = 3;
+  map<uint32,Player> players = 4;
+  repeated Terrain terrains = 5;
+  map<uint32,Team> teams = 6;
+  uint32 oxygen = 7;
+  uint32 hunger = 8;
+  uint32 serverRestartTimestamp = 9;
+  Inventory inventory = 10;
+  uint32 equipIndex = 11;
+  uint32 gold = 12;
+  string creatorUid = 13;
+  string podName = 14;
+  uint32 stamina = 15;
+  string playerUid = 16;
+  string host = 17;
+  uint32 pid = 18;
+  string restartReason = 19;
+  map<uint32, Role> roles = 20;
+  string revision = 21;
+  string version = 22;
+  bool hasUpvoted = 23;
+  uint32 day = 24;
+  uint32 hour = 25;
+  bool isMiniGame = 26;
+  Sidebar sidebar = 27;
+  map<string, Objective> objectives = 28;
+  map<uint32, EntityDialogues> dialogueMap = 29;
+  FullMap fullMap = 30;
+}
+
+message Objective {
+  string name = 1;
+  string description = 2; 
+  bool isCompleted = 3; 
+  map<string,string> translations = 4;
+}
+
+message SectorBan {
+  uint32 id        = 1;
+  string username  = 3;
+  string sectorUid = 4;
+}
+
+message Inventory {
+  map<uint32,Item> storage = 1;
+}
+
+message AFK {
+}
+
+message SectorUpdated {
+  uint32 upvoteCount = 1;
+  uint32 downvoteCount = 2;
+  map<string, bool> settings = 3;
+  string gameMode = 4;
+  repeated SectorBan sectorBans = 5;
+  bool isPrivate = 6;
+  uint32 buildSpeed = 7;
+}
+
+message SellableUpdated {
+  map<string,Sellable> sellables = 1;
+  map<string,Sellable> purchasables = 2;
+  bool isCustomSell = 3;
+}
+
+message FavoriteUpdated {
+  uint32 favoriteCount = 1;
+  uint32 upvoteCount = 2;
+  string userUid = 3;
+  bool isRemoved = 4;
+}
+
+message Sector {
+  uint32 id = 1;
+  string uid = 2;
+  uint32 rowCount = 3;
+  uint32 colCount = 4;
+  string name = 5;
+  map<string, uint32> screenshots = 6;
+  uint32 favoriteCount = 7;
+  string gameMode = 8;
+  uint32 upvoteCount = 9;
+  uint32 downvoteCount = 10;
+  map<string, bool> settings = 11;
+  uint32 createdAt = 12;
+  repeated SectorBan sectorBans = 13;
+  map<string,Sellable> sellables = 14;
+  bool isPrivate = 15;
+  map<string,Sellable> purchasables = 16;
+  bool isCustomSell = 17;
+  map<uint32, CameraFeed> cameraFeeds = 18; 
+  map<uint32, CustomStat> mobCustomStats = 19; 
+  map<uint32, CustomStat> buildingCustomStats = 20; 
+  map<uint32, CustomStat> entityCustomStats = 21; 
+  map<string, Button> buttons = 22;
+  map<uint32, CommandBlockTimer> commandBlockTimers = 23; 
+  uint32 buildSpeed = 24;
+}
+
+message CustomStat {
+  uint32 health = 1;
+  uint32 damage = 2;
+  uint32 speed = 3;
+  uint32 range = 4;
+}
+
+message CameraFeedUpdated {
+  map<uint32, CameraFeed> cameraFeeds = 1; 
+}
+
+message CameraFeed {
+  uint32 id = 1;
+  string content = 2;
+}
+
+message Sellable {
+  string group = 1;
+  uint32 type = 2;
+  uint32 cost = 3;
+  string itemName = 4;
+}
+
+message StarmapLocation {
+  uint32 id = 1;
+  string name = 2;
+}
+
+message Background {
+  uint32 x = 1;
+  uint32 y = 2;
+  uint32 w = 3;
+  uint32 h = 4;
+  BackgroundType type = 5;
+}
+
+message Corpse {
+  uint32 id = 1;
+  uint32  x  = 2;
+  uint32  y  = 3;
+  MobType type = 4;
+  int32 angle = 5;
+  string name = 6;
+  map<string, uint32> effects = 7;
+  bool clientMustDelete = 8;
+}
+
+message CeilingHit {
+  uint32 row = 1;
+  uint32 col = 2;
+}
+
+message OtherPlayerJoined {
+  Player player = 1;
+}
+
+message Projectile {
+  uint32 id = 1;
+  uint32  x  = 2;
+  uint32  y  = 3;
+  uint32  endX  = 4;
+  uint32  endY  = 5;
+  ProjectileType type = 6;
+  int32 angle = 7;
+  uint32 playerId = 8;
+  uint32 width = 9;
+  bool clientMustDelete = 10;
+}
+
+message Transport {
+  uint32 id = 1;
+  uint32  x  = 2;
+  uint32  y  = 3;
+  TransportType type = 4;
+  bool clientMustDelete = 5;
+}
+
+message Player {
+  uint32 id = 1;
+  uint32  x  = 2;
+  uint32  y  = 3;
+  uint32 health = 4;
+  int32 angle = 5;
+  bool   isInvulnerable = 6;
+  string name = 7;
+  uint32 experience = 8;
+  ShipRef ship = 13;
+  uint32 relativeX = 16;
+  uint32 relativeY = 17;
+  bool isPilot = 18;
+  Equipments equipments = 19;
+  bool isSleeping = 21;
+  map<string, uint32> effects = 22;
+  TeamRef team = 23;
+  uint32 daysAlive = 24;
+  string sectorId = 25;
+  bool clientMustDelete = 26;
+  bool isVisitor = 27;
+  DragTargetRef dragTarget = 28;
+  bool isWorking = 29;
+  string uid = 30;
+  uint32 roleType = 31;
+  ContainerRef container = 32;
+  MountedRef mounted = 33;
+  bool isAngleLocked = 34;
+  bool isHidden = 35;
+  uint32 viewDistance = 36;
+}
+
+message DragTargetRef {
+  uint32 id = 1;
+}
+
+message TeamRef {
+  uint32 id = 1;
+}
+
+message Equipments {
+  map<uint32,Item> storage = 1;
+}
+
+message Ship {
+  uint32 id = 1;
+  uint32  x  = 2;
+  uint32  y  = 3;
+  uint32 health = 4;
+  int32 angle = 5;
+  uint32 energyUsage = 6;
+  uint32 energyCapacity = 7;
+  repeated Building buildings = 8;
+  repeated Item pickups = 13;
+  Shield   shield = 15;
+  uint32   speed = 16;
+  uint32   ownerId = 18;
+  uint32   rowCount = 19;
+  uint32   colCount = 20;
+  repeated Point collider = 21;
+  bool clientMustDelete = 22;
+}
+
+message Shield {
+  uint32 health = 1;
+  uint32 level = 2;
+}
+
+message ShipRef {
+  uint32 id = 1;
+}
+
+message ContainerRef {
+  uint32 id = 1;
+}
+
+message MountedRef {
+  uint32 id = 1;
+}
+
+message OwnerRef {
+  uint32 id = 1;
+  string name = 2;
+}
+
+message MasterRef {
+  uint32 id = 1;
+}
+
+message ResourceStorage {
+  uint32 usage = 1;
+}
+
+message Effect {
+  EffectType key = 1;
+  uint32 value = 2;
+}
+
+message Gather {
+  uint32 id = 1;
+}
+
+message Item {
+  uint32 id = 1;
+  uint32 type = 2;
+  uint32 count = 3;
+  uint32 index = 4;
+  uint32 x = 5;
+  uint32 y = 6;
+  uint32 progress = 7;
+  string content = 8;
+  uint32 usage = 9;
+  ItemInstance instance = 10;
+  bool clientMustDelete = 11;
+  uint32 lastUsedTimestamp = 12;
+}
+
+message ItemInstance {
+  uint32 usage = 1;
+  string content = 2;
+}
+
+message Point {
+  uint32 x = 1;
+  uint32 y = 2;
+}
+
+message Terrain {
+  uint32 health = 1;
+  TerrainType type = 2;
+  bool clientMustDelete = 3;
+  uint32 row = 4;
+  uint32 col = 5;
+  map<string, uint32> effects = 6;
+}
+
+message FlowField {
+  uint32 id = 1;
+  Tile goal = 3;
+  repeated Flow locations = 4;
+  bool clientMustDelete = 5;
+}
+
+message Flow {
+  uint32 row = 1;
+  uint32 col = 2;
+  uint32 distance = 3;
+  Direction direction = 4;
+}
+
+message Direction {
+  float x = 1;
+  float y = 2;
+}
+
+message Act {
+  uint32 targetEntityId = 1;
+  uint32 targetX = 2;
+  uint32 targetY = 3;
+}
+
+message CollisionDetected {
+  Box sourceBox = 1;
+  Box otherBox = 2;
+}
+
+message DebugRange {
+  Box box = 1;
+}
+
+message Box {
+  Pos pos = 1;
+  uint32 w = 2;
+  uint32 h = 3;
+}
+
+message Pos {
+  uint32  x  = 1;
+  uint32  y  = 2;
+}
+
+message WindowResized {
+  uint32 screenWidth = 1;
+  uint32 screenHeight = 2;
+  bool isZoom = 3;
+}

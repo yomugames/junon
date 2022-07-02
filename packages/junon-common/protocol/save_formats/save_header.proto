@@ -1,0 +1,18 @@
+package app;
+syntax = "proto3";
+
+import "../enum.proto";
+
+message SaveState {
+  Metadata metadata = 1;
+}
+
+message Metadata {
+  uint32 version = 1;
+  uint32 rowCount = 2;
+  uint32 colCount = 3;
+  string uid = 4;
+  string name = 5;
+  uint64 timestamp = 6;
+  string gameMode = 7;
+}

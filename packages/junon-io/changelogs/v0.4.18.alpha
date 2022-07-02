@@ -1,0 +1,17 @@
+{
+  "version": "v0.4.18.alpha",
+  "date": "Jul 16, 2021",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added skins for prisoner/police/scientist craftable in forge",
+      "/hunger/stamina/oxygen commands",
+      "mob follow/release/mount triggers",
+      "generick timer start/tick/end trigger",
+      "Added omelette"
+    ]
+  }
+}
+

@@ -1,0 +1,16 @@
+{
+  "version": "v0.2.16.alpha",
+  "date": "Apr 28, 2020",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Added ability to favorite colonies",
+      "Disallow breaking of wall if no permission to enter room",
+      "Suit station if claimed by a player, cannot be retrieved by other player unless admin",
+      "Raid will now occur every 3 days instead of 1",
+      "Admin Rank + sell to trader permission is admin by default"
+    ]
+  }
+}

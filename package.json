@@ -2,7 +2,8 @@
   "name": "junon",
   "scripts": {
     "client": "npm run client --workspace packages/junon-io",
-    "server": "nodemon --inspect start_server.js"
+    "server": "nodemon --inspect start_server.js",
+    "db:setup": "npm run db:setup --workspace packages/junon-common"
   },
   "workspaces": ["packages/*"],
   "nodemonConfig": {

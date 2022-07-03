@@ -2,7 +2,9 @@
   "name": "junon-common",
   "version": "1.0.0",
   "description": "common tools for junon io",
-  "scripts": {},
+  "scripts": {
+    "db:setup": "sequelize db:create && sequelize db:migrate"
+  },
   "dependencies": {
     "@sentry/node": "^5.3.0",
     "base64id": "^1.0.0",

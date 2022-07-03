@@ -13,7 +13,7 @@ Installation
         cd ~/junon
         npm install
 
-4. Setup database using the command below. It is assumed that your mysql user is 'root' with empty password. To override this, define JUNON_DB_USER and JUNON_DB_PASS environment variable. For example
+4. Setup database using the command below. It is assumed that your mysql user is 'root' with empty password. To override this, define `JUNON_DB_USER` and `JUNON_DB_PASS` environment variable. For example
 
         npm run db:setup
 

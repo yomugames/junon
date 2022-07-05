@@ -373,7 +373,7 @@ class Server {
     if (["staging", "production"].indexOf(environment) !== -1) {
       let domain = this.ipToDomain(this.getRegion(), ip)
       return [domain,port].join(":")
-    } else if (environment === 'development') {
+    } else if (env === 'development') {
       return ["dev.junon.io",port].join(":")
     } else {
       return [ip,port].join(":")

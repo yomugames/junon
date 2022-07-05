@@ -2759,7 +2759,7 @@ class Game {
   }
 
   getEnvironment() {
-    return process.env["NODE_ENV"]
+    return process.env["NODE_ENV"] || 'development'
   }
 
   onPlayerCountChanged() {

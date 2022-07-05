@@ -179,9 +179,11 @@ class Server {
 
     if (this.onServerReadyListener) this.onServerReadyListener()
 
-    FirebaseAdminHelper.sendServerData(this.getFirebaseServerKey(), this.getServerData())
-    FirebaseAdminHelper.registerServerToNode(this.getNodeName(), this.getFirebaseServerKey())
-
+    if (!debugMode) {
+      FirebaseAdminHelper.sendServerData(this.getFirebaseServerKey(), this.getServerData())
+      FirebaseAdminHelper.registerServerToNode(this.getNodeName(), this.getFirebaseServerKey())
+    }
+    
     if (!debugMode) {
       await this.initLivenessProbeServer()
     }

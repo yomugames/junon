@@ -188,8 +188,12 @@ function copyProtobuf(){
 }
 
 function clean(cb) {
-   return gulp.src(paths.dist, {read: false})
-        .pipe(gulpClean())
+  if(!fs.existsSync(paths.dist)) {
+    fs.mkdirSync(paths.dist)
+  }   
+
+  return gulp.src(paths.dist, {read: false})
+             .pipe(gulpClean())
 }
 
 function developmentBrowserify() {

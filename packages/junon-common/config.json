@@ -2,8 +2,8 @@
   "saveFormatVersion": 35,
   "development": {
     "googleAnalyticsId": "",
-    "matchmakerUrl": "http://dev.junon.io:3000/",
-    "matchmakerWebsocketUrl": "ws://dev.junon.io:3000/",
+    "matchmakerUrl": "http://localhost:3000/",
+    "matchmakerWebsocketUrl": "ws://localhost:3000/",
     "matchmakerGameServerWebsocketUrl": "ws://localhost:2095/",
     "firebase": {
       "apiKey": "AIzaSyDj8y3h2TCaWdAJ_6bjskf-7V0-y2Z1I1U",

@@ -7,7 +7,8 @@
     "start": "node --max_old_space_size=2000 --expose-gc --inspect=127.0.0.1:0 server/server.js",
     "dev": "nodemon server/server.js",
     "inspect": "nodemon --inspect server/server.js",
-    "client": "gulp"
+    "client": "gulp",
+    "client:build": "gulp build"
   },
   "author": "",
   "license": "ISC",

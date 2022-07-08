@@ -296,6 +296,10 @@ function compileStatus() {
     .pipe(gulp.dest(paths.dist));
 }
 
+function compileIndexEnDefault() {
+  return compileIndex(null)
+}
+
 function compileIndexEn() {
   return compileIndex('en')
 }
@@ -397,6 +401,7 @@ gulp.task('build', series(
   vendor,
   productionBrowserify,
   compileStatus,
+  compileIndexEnDefault,
   compileIndexEn,
   compileIndexJa,
   compileIndexRu,

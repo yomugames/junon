@@ -1469,10 +1469,6 @@ class Main {
   getServerHTTPUrl(ip) {
     let protocol = this.isHttps() ? "https://" : "http://"
 
-    if (ip.match('dev.junon.io')) {
-      // ip = ip.replace('dev.junon.io', '192.168.68.124')  
-    }
-
     return protocol + ip
   }
 
@@ -1480,10 +1476,6 @@ class Main {
     let protocol = this.isHttps() ? "wss://" : "ws://"
 
     if (!ip) return null
-
-    if (ip.match('dev.junon.io')) {
-       // ip = ip.replace('dev.junon.io', '192.168.1.134')  
-    }
 
     return protocol + ip
   }

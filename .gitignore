@@ -5,3 +5,6 @@ packages/junon-io/client/dist/
 packages/junon-io/dist
 packages/junon-io/sourcemaps
 packages/junon-io/client/assets/screenshots
+packages/junon-io/Dockerfile
+packages/junon-io/deploy_server.sh
+packages/junon-io/deploy/

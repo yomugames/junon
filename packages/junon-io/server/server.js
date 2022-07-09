@@ -376,7 +376,7 @@ class Server {
       let domain = this.ipToDomain(this.getRegion(), ip)
       return [domain,port].join(":")
     } else if (env === 'development') {
-      return ["dev.junon.io",port].join(":")
+      return ["localhost",port].join(":")
     } else {
       return [ip,port].join(":")
     }

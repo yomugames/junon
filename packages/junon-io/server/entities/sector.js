@@ -224,7 +224,7 @@ class Sector {
 
     data.commandBlockTimers[timer.id] = timer
 
-    SocketUtil.broadcast(this.getSocketIds(), "CommandBlockTimerUpdated", data)
+    this.getSocketUtil().broadcast(this.getSocketIds(), "CommandBlockTimerUpdated", data)
   }
 
 

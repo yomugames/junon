@@ -133,7 +133,11 @@ class CommandBlockMenu extends BaseMenu {
   renderFullJson(fullJson) {
     document.querySelector(".triggers_container").innerHTML = ""
 
-    let data = JSON.parse(fullJson)
+    // removes invalid characters
+    // https://stackoverflow.com/a/20856346
+    const sanitatedJson = fullJson.replace(/[^\x00-\x7F]/g, "")
+
+    let data = JSON.parse(sanitatedJson)
     this.parseTriggers(data.triggers)
     this.setIsEnabled(data.isEnabled)
   }

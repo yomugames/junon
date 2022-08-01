@@ -135,7 +135,7 @@ class CommandBlockMenu extends BaseMenu {
 
     // removes invalid characters
     // https://stackoverflow.com/a/20856346
-    const sanitatedJson = fullJson.replace(/[^\x00-\x7F]/g, "")
+    const sanitatedJson = fullJson.replace(/[^\x00-\x7F§]/g, "")
 
     let data = JSON.parse(sanitatedJson)
     this.parseTriggers(data.triggers)

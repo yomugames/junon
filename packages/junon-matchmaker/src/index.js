@@ -83,6 +83,8 @@ class MatchmakerServer {
     this.exportsByUser = {}
     this.importsByUser = {}
 
+    this.apiRequestsByIp = {}
+
     this.currentImports = {}
 
     this.environments[env] = new Environment(this, env)
@@ -1288,10 +1290,37 @@ class MatchmakerServer {
     this.bindPort(app, "Game", this.GAME_WEBSOCKET_SERVER_PORT)
   }
 
+  rateLimit(name, socket, func) {
+    let maxRequestsPerTenSeconds = 5
+    let tenSeconds = 10 * 1000
+
+    let ip = getSocketRemoteAddress(socket)
+
+    this.apiRequestsByIp[name] = this.apiRequestsByIp[name] || {}
+    this.apiRequestsByIp[name][ip] = this.apiRequestsByIp[name][ip] || { count: 0, timestamp: Date.now() }
+
+    let durationSinceFirstCall = Date.now() - this.apiRequestsByIp[name][ip].timestamp
+    if (durationSinceFirstCall < tenSeconds && 
+      this.apiRequestsByIp[name][ip].count >= maxRequestsPerTenSeconds) {
+      this.apiRequestsByIp[name][ip].timestamp = Date.now() // wait another 10 sec
+      
+      return
+    } 
+
+    if (durationSinceFirstCall >= tenSeconds) {
+      // reset request count
+      this.apiRequestsByIp[name][ip] = { count: 0, timestamp: Date.now() }
+    }
+
+    this.apiRequestsByIp[name][ip].count += 1
+    func()
+  }
+
   handlePlayerMessage(socket, message) {
     try {
       let json = JSON.parse(message)
       let data = json.data
+
       switch (json.event) {
         // ping
         case "1":
@@ -1313,7 +1342,9 @@ class MatchmakerServer {
           this.onMatchFilter(data, socket)
           break
         case "RequestSectorList":
-          this.onRequestSectorList(data, socket)
+          this.rateLimit("onRequestSectorList", socket, () => {
+            this.onRequestSectorList(data, socket)
+          })
           break
         case "GetSector":
           this.onGetSector(data, socket)

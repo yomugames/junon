@@ -80,7 +80,7 @@
     "js-yaml": "^3.12.2",
     "merge-stream": "^1.0.1",
     "natives": "^1.1.6",
-    "nipplejs": "github:umeruma/nipplejs#features/fix-pointer-event",
+    "nipplejs": "github:simpleyuji/nipplejs#master",
     "nodemon": "^1.18.9",
     "perfect-scrollbar": "^1.4.0",
     "pixi.js": "^4.8.5",

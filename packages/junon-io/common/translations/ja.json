@@ -806,6 +806,6 @@
     "CultistSuit.Description":"カルト集団のリーダーの服です。",
     "Santa Hat":"サンタの帽子",
     "Name Tag":"名札",
-    "Missile.Description":"ミサイルタレット、ロケットランチャー用の弾です。"
-    
+    "Missile.Description":"ミサイルタレット、ロケットランチャー用の弾です。",
+    "Events.Alarm": "ライトを修正する。"
 }

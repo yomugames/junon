@@ -116,6 +116,7 @@ function watchFiles(cb) {
   let watchOptions = { ignoreInitial: false }
   watch('common/app.proto', watchOptions, copyProtobuf);
   watch('common/common.proto', watchOptions, copyProtobuf);
+  watch('common/constants.json', watchOptions, developmentBrowserify);
   watch('client/stylesheets/**/*.css', watchOptions, copyStylesheets);
   watch('client/src/**/*.js', watchOptions, developmentBrowserify)
   cb()

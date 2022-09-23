@@ -516,7 +516,7 @@ class BaseEntity {
       }
 
       if (typeof constantTable.height !== "undefined") {
-        this.sprite.width = constantTable.height
+        this.sprite.height = constantTable.height
       }
     }
   }

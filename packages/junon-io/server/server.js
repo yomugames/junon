@@ -64,7 +64,7 @@ debugMode = (env === 'development' || env === 'test') ? true : false
 if (debugMode) {
   let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
   let protocolDirectory = nodeModulesPath + "/junon-common/protocol"
-  let protocolContents        = require('child_process').execSync(`cat ${protocolDirectory}/enum.proto ${protocolDirectory}/base.proto ${protocolDirectory}/app.proto`).toString()
+  let protocolContents        = require('child_process').execSync(`cat '${protocolDirectory}/enum.proto' '${protocolDirectory}/base.proto' '${protocolDirectory}/app.proto'`).toString()
   global.protocolHash = require('crypto').createHash('md5').update(protocolContents).digest("hex").substring(0,8)
 }
 

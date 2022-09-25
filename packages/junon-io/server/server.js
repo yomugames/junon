@@ -268,11 +268,7 @@ class Server {
 
   fetchServerInfo() {
     this.REGION = process.env.REGION || "localhost"
-    if (debugMode) {
-      this.gameRevision = require('child_process').execSync('git rev-parse --short=7 HEAD').toString().trim()
-    } else {
-      this.gameRevision = require('fs').readFileSync(appRoot + '/revision.txt', 'utf8').trim()
-    }
+    this.gameRevision = require('child_process').execSync('git rev-parse --short=7 HEAD').toString().trim()
     this.gameVersion = require('fs').readFileSync(appRoot + '/VERSION.txt', 'utf8')
                          .replace(".alpha","").trim()
   }

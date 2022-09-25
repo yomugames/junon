@@ -11,7 +11,7 @@ const ExceptionReporter = {
         dsn: dsn,
         integrations: [dedupeIntegration]
       }
-      let settings = Object.assign({}, defaultOptions, options)
+      let settings = Object.assign({}, defaultOptions, {})
       Sentry.init(settings)
     }
 

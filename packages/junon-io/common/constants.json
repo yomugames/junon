@@ -3560,6 +3560,35 @@
       },
       "description": "Basic Melee weapon. Damage 7"
     },
+    "PlasmaBlade": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "sprite": {
+        "width": 120,
+        "height": 40,
+        "position": {
+          "x": 62,
+          "y": 0
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "cost": {
+        "gold": 1000
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 35,
+        "range": 75,
+        "meleeRange": 75
+      },
+      "requirements": {
+        "CopperBar": 20,
+        "Meteorite": 25
+      },
+      "description": "Strong blade made of plasma"
+    },
     "AssassinsKnife": {
       "parent": "Equipments.MeleeEquipment",
       "isWeapon": true,

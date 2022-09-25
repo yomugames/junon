@@ -250,6 +250,7 @@ enum BuildingType {
   Carrot = 254;
   Landmine = 255;
   BomberTurret = 256;
+  PlasmaBlade  = 257;
 }
 
 enum TerrainType {

@@ -87,7 +87,7 @@ class BaseFood extends BaseTransientEntity {
     let boundingBox = user.getNeighborBoundingBox(range)
     let players = user.sector.playerTree.search(boundingBox)
     players.forEach((player) => {
-      this.getSocketUtil().emit(player.getSocket(), "PlaySound", { id: Protocol.definition().SoundType.Eating })
+      player.getSocketUtil().emit(player.getSocket(), "PlaySound", { id: Protocol.definition().SoundType.Eating })
     })
   }
 

@@ -1401,7 +1401,7 @@ class Game {
 
     // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 
-    let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png']
+    let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png']
     tempAssets.forEach((asset) => {
       PIXI.Texture.addToCache(PIXI.Texture.fromImage('/assets/images/' + asset), asset)
     })

@@ -252,7 +252,7 @@ class Raid {
   }
 
   spawnBoss() {
-    if (this.boss === "SquidLord") {
+    if (this.boss) {
       let mobCount = 1
 
       let level = 0
@@ -269,7 +269,7 @@ class Raid {
       this.sector.spawnMob({
         x: col * Constants.tileSize,
         y: row * Constants.tileSize,
-        type: "SquidLord",
+        type: this.boss,
         level: level,
         count: mobCount,
         raid: this,

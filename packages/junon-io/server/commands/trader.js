@@ -25,7 +25,7 @@ class Trader extends BaseCommand {
     let itemName = args[1] || ""
     let klassName = this.sector.klassifySnakeCase(itemName)
     let klass 
-    let disallowedMobs = ["Guard", "Drone", "Chemist"]
+    let disallowedMobs = ["Guard", "Drone", "Chemist", "Raven"]
     let cost
 
     klass = Item.getKlassByName(klassName)

@@ -394,6 +394,7 @@ enum MobType {
   Prisoner = 32;
   SquidLord = 33;
   Firebat = 34;
+  Raven = 35;
 }
 
 enum EntityType {

@@ -40,6 +40,7 @@ Mobs.DummyPlayer = require("./dummy_player")
 
 // flying 
 Mobs.Drone = require("./drone")
+Mobs.Raven = require("./raven")
 
 Mobs.forType = (type) => {
   const klassName = Helper.getMobNameById(type)

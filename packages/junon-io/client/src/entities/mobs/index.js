@@ -23,6 +23,7 @@ Mobs.Prisoner = require("./prisoner")
 Mobs.SquidLord = require("./squid_lord")
 Mobs.Firebat = require("./firebat")
 
+Mobs.Raven = require("./raven")
 Mobs.Drone = require("./drone")
 Mobs.Cat = require("./cat")
 Mobs.Monkey = require("./monkey")

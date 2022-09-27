@@ -1639,8 +1639,8 @@
       "stats": {
         "speed": 4,
         "reload": 3000,
-        "health": 1200,
-        "damage": 35,
+        "health": 800,
+        "damage": 5,
         "range": 384,
         "los": 512
       },

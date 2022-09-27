@@ -27,15 +27,24 @@ class Raven extends HoverMob {
       return
     }
 
-    let sourcePoint = this.game.pointFromDistance(this.getX(), this.getY(), Constants.tileSize, this.getAbsoluteRadAngle())
+    let angleDiffInRad = 30 * Math.PI / 180
+    let firstSourcePoint = this.game.pointFromDistance(this.getX(), this.getY(), Constants.tileSize * 2, this.getAbsoluteRadAngle() - angleDiffInRad)
+    let secondSourcePoint = this.game.pointFromDistance(this.getX(), this.getY(), Constants.tileSize * 2, this.getAbsoluteRadAngle() + angleDiffInRad)
 
-    new Projectiles.Missile({
-      weapon:        this,
-      destinationEntity:  attackTarget,
-      source:      { x: sourcePoint[0],         y: sourcePoint[1] },
-      destination: this.getShootTarget(this),
-      ignoreObstacles: true
+    let points = [firstSourcePoint, secondSourcePoint]
+
+    points.forEach((sourcePoint) => {
+        new Projectiles.Missile({
+            weapon:        this,
+            destinationEntity:  attackTarget,
+            source:      { x: sourcePoint[0],         y: sourcePoint[1] },
+            destination: { x: attackTarget.getX(),    y: attackTarget.getY() },
+            ignoreObstacles: true,
+            shouldCreateExplosion: true,
+            shouldAttackBuildings: true
+        })
     })
+
   }
 
 

@@ -319,17 +319,19 @@ class NetworkManager {
 
   assignNetworks(hit, network) {
     this.floodFillManager.floodFill(hit.row, hit.col, {}, (visitedHit, neighbors) => {
-      this.assignNetwork(visitedHit, network, neighbors)
+      if (visitedHit.entity) {
+        this.assignNetwork(visitedHit, network, neighbors)
 
-      if (!this.game.sector.sectorLoader.isFinished) {
-        if (network.manager.getNetworkName() !== "room") {
-          visitedHit.entity.setNeighbors(neighbors)
-        } else if (visitedHit.entity.isWall()) {
-          if (!visitedHit.entity.neighbors) {
-            visitedHit.entity.setNeighbors(this.getWallNeighbors(neighbors))
-          }
-        } else if (visitedHit.entity.isCarpet())
-          visitedHit.entity.setNeighbors(this.getCarpetNeighbors(neighbors))
+        if (!this.game.sector.sectorLoader.isFinished) {
+          if (network.manager.getNetworkName() !== "room") {
+            visitedHit.entity.setNeighbors(neighbors)
+          } else if (visitedHit.entity.isWall()) {
+            if (!visitedHit.entity.neighbors) {
+              visitedHit.entity.setNeighbors(this.getWallNeighbors(neighbors))
+            }
+          } else if (visitedHit.entity.isCarpet())
+            visitedHit.entity.setNeighbors(this.getCarpetNeighbors(neighbors))
+        }
       }
     })
 

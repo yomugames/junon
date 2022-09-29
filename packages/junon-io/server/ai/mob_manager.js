@@ -17,7 +17,7 @@ class MobManager {
   }
 
   onHourChanged() {
-    // this.hourlySpawn()  
+    this.hourlySpawn()  
   }
 
   executeTurn() {

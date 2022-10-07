@@ -623,6 +623,14 @@ class EventHandler {
     return entity.getTypeName()
   }
 
+  getDay() {
+    return this.game.sector.getDayCount()
+  }
+
+  getHour() {
+    return this.game.sector.getHour()
+  }
+
   getMaxStamina(entityId) {
     let player = this.getPlayer(entityId)
     if (player) {
@@ -1017,7 +1025,9 @@ class EventHandler {
       "$modulo": true,
       "$isLoggedIn": true,
       "$getEquipId": true,
-      "$getBuildingType": true
+      "$getBuildingType": true,
+      "$getDay": true,
+      "$getHour": true
     }
   }
 

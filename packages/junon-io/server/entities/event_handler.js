@@ -616,6 +616,13 @@ class EventHandler {
     return 0
   }
 
+  getBuildingType(entityId) {
+    let entity = this.game.getEntity(entityId)
+    if (!entity) return ""
+
+    return entity.getTypeName()
+  }
+
   getMaxStamina(entityId) {
     let player = this.getPlayer(entityId)
     if (player) {
@@ -970,43 +977,7 @@ class EventHandler {
   }
 
   getFunctionList() {
-    return [
-      "$getGold",
-      "$getTeam",
-      "$getScore",
-      "$getEquip",
-      "$getRole",
-      "$getHealth",
-      "$getStamina",
-      "$getSpeed",
-      "$getOxygen",
-      "$getHunger",
-      "$getMaxHealth",
-      "$getMaxStamina",
-      "$getMaxOxygen",
-      "$getMaxHunger",
-      "$getOwner",
-      "$getRow",
-      "$getCol",
-      "$random",
-      "$formatTime",
-      "$getTeamMemberCount",
-      "$getRoleMemberCount",
-      "$getPlayerCount",
-      "$getRegionPlayerCount",
-      "$getRegion",
-      "$getEquipCount",
-      "getInventoryItemCount",
-      "$getArmorEquip",
-      "$add",
-      "$subtract",
-      "$multiply",
-      "$divide",
-      "$round",
-      "$modulo",
-      "$isLoggedIn",
-      "$getEquipId"
-    ]
+    return Object.keys(this.getFunctionTable())
   }
 
   getFunctionTable() {
@@ -1045,7 +1016,8 @@ class EventHandler {
       "$round": true,
       "$modulo": true,
       "$isLoggedIn": true,
-      "$getEquipId": true
+      "$getEquipId": true,
+      "$getBuildingType": true
     }
   }
 

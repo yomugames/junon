@@ -169,7 +169,11 @@ class MobManager {
 
   spawnBosses() {
     if (this.game.isSurvivalOrHardcore()) {
-      if (this.sector.getDayCount() > 0 && this.sector.getDayCount() % 15 === 0) {
+      if (this.sector.getDayCount() > 0 && this.sector.getDayCount() % 10 === 0) {
+        this.game.forEachTeam((team) => {
+          this.sector.game.eventManager.createRaid(team, { boss: "Raven" })
+        })
+      } else if (this.sector.getDayCount() > 0 && this.sector.getDayCount() % 15 === 0) {
         this.game.forEachTeam((team) => {
           this.sector.game.eventManager.createRaid(team, { boss: "SquidLord" })
         })

@@ -2145,6 +2145,10 @@ class BaseMob extends BaseEntity {
     return false
   }
 
+  getRotatedAngle() {
+    return this.angle
+  }
+
   canDestroyDoor(target) {
     if (target.isOpen) return false
 

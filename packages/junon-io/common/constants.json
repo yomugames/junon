@@ -1634,6 +1634,30 @@
         "damage": "+2"
       }
     },
+    "Raven": {
+      "parent": "Mobs.BaseMob",
+      "stats": {
+        "speed": 4,
+        "reload": 3000,
+        "health": 800,
+        "damage": 5,
+        "range": 384,
+        "los": 512
+      },
+      "isFlamable": false,
+      "immunity": ["poison"],
+      "categories": {"flying": true},
+      "shouldAttackIgnoreObstacle": true,
+      "isBuildingDestroyer": true,
+      "attackGroups": ["players", "buildings", "mobs"],
+      "sprite": {
+        "width": 148,
+        "height": 96
+      },
+      "cost": {
+        "gold": 3000
+      }
+    },
     "Reaver": {
       "parent": "Mobs.BaseMob",
       "stats": {

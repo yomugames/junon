@@ -44,6 +44,7 @@ class Stove extends BaseBuilding {
   getFoodRequirements() {
     let foodType = parseInt(this.content)
     let foodKlass = Foods.forType(foodType)
+    if (!foodKlass) return null
     return foodKlass.prototype.getRequirements()
   }
 

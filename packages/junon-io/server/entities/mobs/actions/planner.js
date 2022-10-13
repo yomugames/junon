@@ -259,6 +259,7 @@ class Planner {
     if (!this.targetStove.content) return false
 
     let requirements = this.targetStove.getFoodRequirements()
+    if (!requirements) return false
 
     if (this.hasIngredients(requirements)) {
       // go to stove

@@ -781,7 +781,11 @@ class Game {
 
     if (player.isRemoved) return
 
-    player.removeTeamMemberships()
+    // only remove if different team to avoid triggering unwanted team leave event
+    if (player.team?.name !== teamName) {
+      player.removeTeamMemberships()
+    }
+    
     team.addMemberWithRole(player)
 
     return true
@@ -948,7 +952,7 @@ class Game {
 
     let isNewGame = !options.isBootSector && !options.isMiniGame
     if (false && isNewGame) {
-       let compressed = require("fs").readFileSync("/Users/reg/gamedev/junon/junon-io/bigt.sav.gz")
+       let compressed = require("fs").readFileSync("/Users/reg/gamedev/junon/sector.sav.gz")
       // let compressed = require("fs").readFileSync("/Users/reg/gamedev/junon/junon-io/amongus_3.sav.gz")
       let buffer = await this.decompressGzip(compressed)
       if (!buffer) return

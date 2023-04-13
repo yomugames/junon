@@ -767,92 +767,92 @@
                         <tr>
                             <td class='function_name'>$getGold</td>
                             <td>$player</td>
-                            <td>The amount of gold player currently has</td>
+                            <td>The amount of gold player currently has. Ex. /chat @a $getGold($player) /g</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getTeam</td>
                             <td>$player</td>
-                            <td>The name of team player belongs to</td>
+                            <td>The name of team player belongs to. Ex. /chat $player %success% Your team is $getTeam($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getRole</td>
                             <td>$player</td>
-                            <td>The name of role that player belongs to</td>
+                            <td>The name of role that player belongs to. Ex. /chat $player %success% Your role is $getRole($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getScore</td>
                             <td>$player</td>
-                            <td>The score of player</td>
+                            <td>The score of player. Ex. /variable set score $getScore($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getEquip</td>
                             <td>$player</td>
-                            <td>The name of current equip player is holding</td>
+                            <td>The name of current equip player is holding. Ex. /clear $player $getEquip($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getEquipId</td>
                             <td>$player</td>
-                            <td>The id of current equip player is holding</td>
+                            <td>The id of current equip player is holding. Ex. /stat $getEquipId($player) damage:250</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getRow</td>
                             <td>$player</td>
-                            <td>The row position of player</td>
+                            <td>The row position of player. Ex. /tp @a[role=Admin] $getRow($player) 64</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getCol</td>
                             <td>$player</td>
-                            <td>The col position of player</td>
+                            <td>The col position of player. Ex. /tp @a[role=Admin] 64 $getCol($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getSpeed</td>
                             <td>$player</td>
-                            <td>The speed of player</td>
+                            <td>The speed of player. Ex. /score gain $player $getSpeed($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getHealth</td>
                             <td>$player</td>
-                            <td>The amount of health player currently has</td>
+                            <td>The amount of health player currently has. Ex. /chat @a $player now has $getHealth($player) health.</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getStamina</td>
                             <td>$player</td>
-                            <td>The amount of stamina player currently has</td>
+                            <td>The amount of stamina player currently has. Ex. /chat @a $player now has $getStamina($player) stamina.</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getOxygen</td>
                             <td>$player</td>
-                            <td>The amount of oxygen player currently has</td>
+                            <td>The amount of oxygen player currently has. Ex. /chat @a $player now has $getOxygen($player) oxygen.</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getHunger</td>
                             <td>$player</td>
-                            <td>The amount of hunger player currently has</td>
+                            <td>The amount of hunger player currently has. Ex. /chat @a $player now has $getHunger($player) hunger.</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getMaxHealth</td>
                             <td>$player</td>
-                            <td>The max amount of health player currently has</td>
+                            <td>The max amount of health player currently has. Ex. /chat @a $player now has maximum health of $getMaxHealth($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getMaxStamina</td>
                             <td>$player</td>
-                            <td>The max amount of stamina player currently has</td>
+                            <td>The max amount of stamina player currently has (usually 100). Ex. /chat @a $player now has maximum stamina of $getMaxStamina($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getMaxOxygen</td>
                             <td>$player</td>
-                            <td>The max amount of oxygen player currently has</td>
+                            <td>The max amount of oxygen player currently has (usually 100). Ex. /chat @a $player now has maximum oxygen of $getMaxOxygen($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getMaxHunger</td>
                             <td>$player</td>
-                            <td>The max amount of hunger player currently has</td>
+                            <td>The max amount of hunger player currently has (usually 100). Ex. /chat @a $player now has maximum hunger of $getMaxHunger($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getOwner</td>
                             <td>buildingId</td>
-                            <td>The id of owner</td>
+                            <td>The id of owner. Ex. /setowner @b[type=wall] $getOwner(2917)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$random</td>
@@ -887,47 +887,47 @@
                         <tr>
                             <td class='function_name'>$getRegion</td>
                             <td>playerName or entityId</td>
-                            <td>name of region for player or entity</td>
+                            <td>name of region for player or entity. Ex. /tp @a $getRegion($player)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getEquipCount</td>
                             <td>playerName</td>
-                            <td>count of equipped item</td>
+                            <td>count of equipped item. Ex. /sethealth $player $getEquipCount(kuroro)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getInventoryItemCount</td>
                             <td>playerName, itemName</td>
-                            <td>total count of item in inventory. ex. $getInventoryItemCount(kuroro,steak)</td>
+                            <td>total count of item in inventory. Ex. $getInventoryItemCount(kuroro,steak)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getArmorEquip</td>
                             <td>playerName</td>
-                            <td>name of equipped armor</td>
+                            <td>name of equipped armor. Ex. /setequipment armor $player $getArmorEquip(kuroro)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$add</td>
                             <td>value1, value2</td>
-                            <td>add two numbers</td>
+                            <td>add two numbers. Ex. /chat @a $add(2,5)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$subtract</td>
                             <td>value1, value2</td>
-                            <td>subtract two numbers</td>
+                            <td>subtract two numbers. Ex. /chat @a $subtract(2,5)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$multiply</td>
                             <td>value1, value2</td>
-                            <td>multiply two numbers</td>
+                            <td>multiply two numbers. Ex. /chat @a $multiply(2,5)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$divide</td>
                             <td>value1, value2</td>
-                            <td>divide two numbers</td>
+                            <td>divide two numbers. Ex. /chat @a $divide(2,4)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$round</td>
                             <td>value</td>
-                            <td>round a number</td>
+                            <td>round a number. Ex. /chat @a $round(2.5927)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$modulo</td>
@@ -942,17 +942,17 @@
                         <tr>
                             <td class='function_name'>$getBuildingType</td>
                             <td>$entityId</td>
-                            <td>the type name of a building or entity</td>
+                            <td>the type name of a building or entity. Ex. /chat @a The building type of entity number 2017 is $getBuildingType(2017)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getDay</td>
-                            <td></td>
-                            <td>day</td>
+                            <td>None</td>
+                            <td>Gives the daycount of your world back. Ex. /chat @a The daycount of this world is $getDay()</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getHour</td>
-                            <td></td>
-                            <td>hour</td>
+                            <td>None</td>
+                            <td>Gives the hourcount of your world back. Ex. /chat @a The hourcount of this world is $getHour()</td>
                         </tr>
                     </table>
                 </div>

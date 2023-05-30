@@ -951,7 +951,7 @@ class Game {
     }
 
     let isNewGame = !options.isBootSector && !options.isMiniGame
-    if (debugMode && isNewGame) {
+    if (false && isNewGame) {
        let compressed = require("fs").readFileSync("/Users/reg/gamedev/junon/sector.sav.gz")
       // let compressed = require("fs").readFileSync("/Users/reg/gamedev/junon/junon-io/amongus_3.sav.gz")
       let buffer = await this.decompressGzip(compressed)
@@ -2271,25 +2271,25 @@ class Game {
 
     let player
 
-    //  player = new Player(socket, data, sectorToJoin)
-    //  if (!this.creator && this.isCreatedByPlayer(player)) {
-    //    if (!this.creatorUid) {
-    //      this.setCreatorUid(player.getUid())
-    //    }
-    //    this.creator = player
-    //  }
+     player = new Player(socket, data, sectorToJoin)
+     if (!this.creator && this.isCreatedByPlayer(player)) {
+       if (!this.creatorUid) {
+         this.setCreatorUid(player.getUid())
+       }
+       this.creator = player
+     }
 
-     // hack to send player team to matchmaker
-     // as isSectorOwner will have correct value by now
-     // FIX: TBD
-    //  player.getTeam() && player.getTeam().onTeamChanged()
+    //  hack to send player team to matchmaker
+    //  as isSectorOwner will have correct value by now
+    //  FIX: TBD
+     player.getTeam() && player.getTeam().onTeamChanged()
 
-    if (debugMode) {
-        let playerData = Object.values(this.playerDataMap).find((pd) => { return pd.data.name === 'KanicoTheGreat' })
-        player = this.createPlayerFromPlayerData(socket, playerData)
-        this.setCreatorUid(player.getUid())
-        this.creator = player
-    }
+    // if (debugMode) {
+    //     let playerData = Object.values(this.playerDataMap).find((pd) => { return pd.data.name === 'KanicoTheGreat' })
+    //     player = this.createPlayerFromPlayerData(socket, playerData)
+    //     this.setCreatorUid(player.getUid())
+    //     this.creator = player
+    // }
 
     await this.broadcastPlayerJoin(player)
     this.announceEvents(player)

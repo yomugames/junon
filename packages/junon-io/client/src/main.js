@@ -1059,7 +1059,7 @@ class Main {
 
   onPlayBtnClick() {
     if (this.hasZeroGames()) {
-      this.createNewColony()
+      this.onNewColonyLaunchBtnClick()
       return
     }
 

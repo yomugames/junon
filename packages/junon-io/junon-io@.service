@@ -1,0 +1,16 @@
+[Unit]
+Description=junon io
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=/root/env_variables
+ExecStart=/usr/local/bin/npm run start --workspace packages/junon-io --prefix /root/junon
+Restart=always
+RestartSec=3s
+MemoryAccounting=true
+MemoryHigh=2048M
+MemoryMax=2048M
+
+[Install]
+WantedBy=multi-user.target

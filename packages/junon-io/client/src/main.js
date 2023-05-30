@@ -1058,6 +1058,11 @@ class Main {
   }
 
   onPlayBtnClick() {
+    if (this.hasZeroGames()) {
+      this.createNewColony()
+      return
+    }
+
     if (this.isJoinInProgress) return
     this.lockJoin()
 
@@ -1755,12 +1760,16 @@ class Main {
       this.game.confirmMenu.open({
         message: i18n.t('AskTutorialMessage'),
         proceedCallback: this.onTutorialMenuBtnClick.bind(this),
-        cancelCallback: this.joinDominationMiniGame.bind(this)
+        cancelCallback: this.onPlayBtnClick.bind(this)
       })
       return
     } else {
-      this.joinDominationMiniGame()
+      this.onPlayBtnClick()
     }
+  }
+
+  hasZeroGames() {
+    return Object.keys(this.gameExplorer.sectorEntries).length === 0
   }
 
   joinDominationMiniGame() {

@@ -7069,7 +7069,7 @@ html[lang='ja'] .quest_label {
 }
 
 .minigames_tab {
-    /*display: none;*/
+    display: none;
 }
 
 .minigame_entry {

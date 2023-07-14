@@ -65,6 +65,7 @@ Commands.oxygen = require("./oxygen")
 Commands.wait = require("./wait")
 Commands.hour = require("./hour")
 Commands.day = require("./day")
+Commands.getsubstring = require('./getsubstring')
 
 Commands.accept_rules = require("./accept_rules")
 

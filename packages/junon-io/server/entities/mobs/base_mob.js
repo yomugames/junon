@@ -767,7 +767,7 @@ class BaseMob extends BaseEntity {
   }
 
   drainSample() {
-    let damage = Math.floor(this.getMaxHealth() / 3)
+    let damage = Math.floor(this.getMaxHealth() / 10) + 3
     this.setHealth(this.health - damage)
     return this.constructor.name
   }

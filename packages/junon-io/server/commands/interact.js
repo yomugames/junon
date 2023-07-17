@@ -10,7 +10,8 @@ class Interact extends BaseCommand {
       "/interact [entity_id] generate [type]",
       "/interact [entity_id] processingrate [1-5]",
       "/interact [entity_id] unown",
-      "/interact [entity_id] shoot"
+      "/interact [entity_id] shoot",
+      "/interact [entity_id] time [>=0]"
     ]
   }
 
@@ -35,6 +36,17 @@ class Interact extends BaseCommand {
           const angle = parseInt(args[2])
           if (!isNaN(angle)) {
             entity.setAngle(angle)
+          }
+        }
+
+        if (operation === "time") {
+          if (entity.hasCategory("timer_bomb")) {
+            const output = parseInt(args[2])
+            if (output < 0 && !isNaN(output)) {
+              entity.duration = output
+            } else {
+              player.showChatError("Invalid time " + output)
+            }
           }
         }
 

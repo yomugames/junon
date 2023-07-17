@@ -4887,7 +4887,7 @@
       "cost": {
         "gold": 300
       },
-      "categories": {},
+      "categories": {"timer_bomb":true},
       "requirements": {
         "IronBar": 30,
         "CircuitBoard": 5,

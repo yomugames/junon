@@ -3,7 +3,7 @@ const BaseCommand = require("./base_command")
 class GetNthWord extends BaseCommand {
     getUsage() {
         return [
-            "Set a variable named $word",
+            "Gets nth word of sentence and sets it to $word variable",
             "/getnthword [index] [message]",
             "Ex: /getnthword 2 a random message - creates a $word variable, and assigns the word 'random' to it."
         ]

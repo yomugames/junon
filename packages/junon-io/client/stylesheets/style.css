@@ -8897,6 +8897,7 @@ body.imposter_mode .minigame_poster {
 
 .io_game_promo {
     margin-top: 20px;
+    display: none;
 }
 
 .io_game_promo img {

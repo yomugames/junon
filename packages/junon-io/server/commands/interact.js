@@ -11,7 +11,7 @@ class Interact extends BaseCommand {
       "/interact [entity_id] processingrate [1-5]",
       "/interact [entity_id] unown",
       "/interact [entity_id] shoot",
-      "/interact [entity_id] time [>=0]"
+      "/interact [entity_id] time [>=-1]"
     ]
   }
 
@@ -42,7 +42,7 @@ class Interact extends BaseCommand {
         if (operation === "time") {
           if (entity.hasCategory("timer_bomb")) {
             const output = parseInt(args[2])
-            if (output < 0 && !isNaN(output)) {
+            if (output < -1 && !isNaN(output)) {
               entity.duration = output
             } else {
               player.showChatError("Invalid time " + output)

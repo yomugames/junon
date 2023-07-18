@@ -3,9 +3,9 @@ const BaseCommand = require("./base_command")
 class GetNthWord extends BaseCommand {
     getUsage() {
         return [
-            "Returns a variable named $word",
+            "Set a variable named $word",
             "/getnthword [index] [message]",
-            "Ex: /getnthword 2 a random message, creates a $word variable, and assigns random to it."
+            "Ex: /getnthword 2 a random message - creates a $word variable, and assigns the word 'random' to it."
         ]
     }
     allowOwnerOnly() {

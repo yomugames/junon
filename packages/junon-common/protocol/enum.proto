@@ -251,6 +251,7 @@ enum BuildingType {
   Landmine = 255;
   BomberTurret = 256;
   PlasmaBlade  = 257;
+  Starberries  = 258;
 }
 
 enum TerrainType {

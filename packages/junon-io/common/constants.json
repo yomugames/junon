@@ -2961,11 +2961,11 @@
       "width": 21,
       "height": 14,
       "cost": {
-        "gold": 250
+        "gold": 500
       },
       "stats": {
         "food": 40
-        "health": 20
+        "health": 30
       },
       "sprite": {
         "position": {

@@ -2964,8 +2964,8 @@
         "gold": 250
       },
       "stats": {
-        "food": 25
-        "health": 25
+        "food": 40
+        "health": 20
       },
       "sprite": {
         "position": {

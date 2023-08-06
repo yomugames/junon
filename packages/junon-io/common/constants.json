@@ -2933,7 +2933,7 @@
         "Bread": 2
       },
       "upgrade": {},
-      "description": "A simple, but tasty soup dish. Don't burn your tounge!"
+      "description": "A simple, but tasty soup dish. Don't burn your tongue!"
     },
     "Omelette": {
       "width": 24,
@@ -2956,6 +2956,26 @@
       },
       "upgrade": {},
       "description": "Breakfast favorite."
+    },
+    "Starberries": {
+      "width": 21,
+      "height": 14,
+      "cost": {
+        "gold": 500
+      },
+      "stats": {
+        "food": 40
+        "health": 30
+      },
+      "sprite": {
+        "position": {
+          "x": 64,
+          "y": 0
+        },
+        "rotation": 90
+      },
+      "upgrade": {},
+      "description": "Strange berries from alien bushes."
     },
     "Antidote": {
       "width": 24,

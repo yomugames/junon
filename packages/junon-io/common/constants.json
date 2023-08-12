@@ -928,13 +928,13 @@
       "height": 96,
       "useOriginalSize": true,
       "shouldFadeOut": true,
-      "immunity": ["miasma"],
-      "categories": {"mountable":true,"flying":true},
-      "drop": "AlienMeat",
+      "immunity": ["miasma","poison","fear"],
+      "categories": {"mountable":true},
+      "drop": "IronOre",
       "isTamable": true,
-      "hasBlood": true,
+      "hasBlood": false,
       "cost": {
-        "gold": 1500
+        "gold": 20000
       },
       "attackGroups": ["players"],
       "dizzySprite": {
@@ -949,14 +949,10 @@
       },
       "stats": {
         "reload": 3000,
-        "health": 50,
-        "damage": 15,
+        "health": 3000,
+        "damage": 1,
         "range": 96,
         "los": 640
-      },
-      "upgrade": {
-        "health": "+5",
-        "damage": "+5"
       }
     },
     "Spider": {

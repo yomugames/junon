@@ -28,6 +28,7 @@ Mobs.Golem = require("./golem")
 Mobs.Mantis = require("./mantis")
 Mobs.SquidLord = require("./squid_lord")
 Mobs.Firebat = require("./firebat")
+Mobs.Car = require("./car")
 
 // robots
 Mobs.CleanBot = require("./robots/clean_bot")

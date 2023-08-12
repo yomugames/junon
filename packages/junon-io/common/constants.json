@@ -922,6 +922,43 @@
         "damage": "+5"
       }
     },
+    "Car": {
+      "parent": "Mobs.BaseMob",
+      "width": 96,
+      "height": 96,
+      "useOriginalSize": true,
+      "shouldFadeOut": true,
+      "immunity": ["miasma"],
+      "categories": {"mountable":true,"flying":true},
+      "drop": "AlienMeat",
+      "isTamable": true,
+      "hasBlood": true,
+      "cost": {
+        "gold": 1500
+      },
+      "attackGroups": ["players"],
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -20
+        },
+        "width": 28,
+        "height": 12,
+        "rotation": 0,
+        "tint": "#444444"
+      },
+      "stats": {
+        "reload": 3000,
+        "health": 50,
+        "damage": 15,
+        "range": 96,
+        "los": 640
+      },
+      "upgrade": {
+        "health": "+5",
+        "damage": "+5"
+      }
+    },
     "Spider": {
       "parent": "Mobs.BaseMob",
       "hasBlood": true,

@@ -322,6 +322,8 @@
     "Assault Rifle": "Штурмовая винтовка",
     "Bio Raptor": "Биораптор",
     "Bio Raptor Corpse": "Тело биораптора",
+    "Car": "машина",
+    "Car Corpse":"труп автомобиля",
     "SteelCrate.Description": "Хранилище для предметов",
     "SolarPanel.Description": "Производит энергию, используя Солнечную энергию. Can only be placed on Lattice",
     "Messenger.DemandPayment": "Империя требует денежную плату, в качестве знака лояльности!",

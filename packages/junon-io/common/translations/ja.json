@@ -316,6 +316,8 @@
     "Assault Rifle": "アサルトライフル",
     "Bio Raptor": "バイオラプター",
     "Bio Raptor Corpse": "バイオラプターの死体",
+    "Car":"車",
+    "Car Corpse": "車の死体",
     "SteelCrate.Description": "アイテムを収納できます。",
     "SolarPanel.Description": "太陽エネルギーを用いて発電します。Can only be placed on Lattice",
     "Messenger.DemandPayment": "我らが神聖なる帝国の名において 忠誠の証としての税金の納入を命ずる!",

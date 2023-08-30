@@ -511,7 +511,7 @@ class Sector {
   }
 
   initDefaultSellables() {
-    let itemKlasses = [Ores.Sand, Ores.Wood, Buildings.CoffeeSeed, Buildings.WheatSeed, Buildings.PotatoSeed, Buildings.SunflowerSeed, Buildings.BlueSeed, Buildings.PoppySeed, Foods.Starberries, Mobs.Chicken, Mobs.Monkey, Mobs.Cat, Mobs.CleanBot, Equipments.CombatArmor, Equipments.SantaHat, Equipments.NameTag]
+    let itemKlasses = [Ores.Sand, Ores.Wood, Buildings.CoffeeSeed, Buildings.WheatSeed, Buildings.PotatoSeed, Buildings.SunflowerSeed, Buildings.BlueSeed, Buildings.PoppySeed, Foods.Starberries, Mobs.Chicken, Mobs.Monkey, Mobs.Cat, Mobs.CleanBot, Mobs.Car, Equipments.CombatArmor, Equipments.SantaHat, Equipments.NameTag]
     itemKlasses.forEach((klass) => {
       let group = klass.prototype.isMob() ? "mob" : "item"
       this.sellables[klass.prototype.getTypeName()] = { group: group, type: klass.prototype.getType(), cost: klass.getCost() }

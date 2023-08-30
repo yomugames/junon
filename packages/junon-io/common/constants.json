@@ -922,6 +922,39 @@
         "damage": "+5"
       }
     },
+    "Car": {
+      "parent": "Mobs.BaseMob",
+      "width": 96,
+      "height": 96,
+      "useOriginalSize": true,
+      "shouldFadeOut": true,
+      "immunity": ["miasma","poison","fear"],
+      "categories": {"mountable":true},
+      "drop": "IronOre",
+      "isTamable": true,
+      "hasBlood": false,
+      "cost": {
+        "gold": 20000
+      },
+      "attackGroups": ["players"],
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -20
+        },
+        "width": 28,
+        "height": 12,
+        "rotation": 0,
+        "tint": "#444444"
+      },
+      "stats": {
+        "reload": 3000,
+        "health": 3000,
+        "damage": 1,
+        "range": 96,
+        "los": 640
+      }
+    },
     "Spider": {
       "parent": "Mobs.BaseMob",
       "hasBlood": true,

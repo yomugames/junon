@@ -396,6 +396,7 @@ enum MobType {
   SquidLord = 33;
   Firebat = 34;
   Raven = 35;
+  Car = 36;
 }
 
 enum EntityType {

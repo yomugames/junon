@@ -1,0 +1,14 @@
+{
+  "version": "v0.5.4.alpha",
+  "date": "Aug 30, 2023",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Starberries added by Wahlee1",
+      "getnthword command added by chickenmeeple and bigT",
+      "Car added by chickenmeeple"
+    ]
+  }
+}

@@ -3458,7 +3458,7 @@
       "isUnbreakable": true,
       "isCostIndependent": true,
       "cost": {
-        "gold": 1000
+        "gold": 100
       },
       "stats": {
         "damage": 25,
@@ -5120,7 +5120,7 @@
         "health": 150,
         "count": 125,
         "powerProduction": 10,
-        "powerCapacity": 1000,
+        "powerCapacity": 100,
         "clientResource": "power"
       },
       "upgrade": {

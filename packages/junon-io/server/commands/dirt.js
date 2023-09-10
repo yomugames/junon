@@ -29,6 +29,7 @@ class DirtCommand extends BaseCommand {
                 entities[entity].removeDirt()
             } else if (subcommand == "decrease") {
                 entities[entity].reduceDirt()
+            }
         }
         
 

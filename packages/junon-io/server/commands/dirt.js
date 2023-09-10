@@ -28,8 +28,7 @@ class DirtCommand extends BaseCommand {
             } else if (subcommand == "clear") {
                 entities[entity].removeDirt()
             } else if (subcommand == "decrease") {
-                entities[entity].reduceDirt() //blood addBlood()
-            }
+                entities[entity].reduceDirt()
         }
         
 

@@ -69,7 +69,7 @@ class Game {
   }
 
   removeMutedPlayer(name) {
-    delete this.mutedPlayers[name] 
+    delete this.mutedPlayers[name]
   }
 
   initVariables(options = {}) {
@@ -268,7 +268,7 @@ class Game {
 
   getRoleByName(name) {
     let result
-    
+
     for (let id in this.roles) {
       let role = this.roles[id]
       if (role.name === name) {
@@ -477,7 +477,7 @@ class Game {
   isLeaderAndOwner(entity, team, player) {
     if (!team) return false
     if (!entity.owner) return false
-      
+
     let teamId = team.id
     let ownerId = entity.owner.id
 
@@ -607,7 +607,7 @@ class Game {
 
   getHighlightedEntity() {
     if (!this.sector) return null
-    return this.sector.selection.selectedEntity || 
+    return this.sector.selection.selectedEntity ||
            this.sector.persistentSelection.selectedEntity
   }
 
@@ -629,7 +629,7 @@ class Game {
     } else {
       document.querySelector("#mobile_action_btn").innerText = ""
     }
-    
+
   }
 
   hideActionTooltip() {
@@ -872,7 +872,7 @@ class Game {
         this.removeCurrentSound(name)
       }
     })
-    
+
     this.sounds[name] = sound
   }
 
@@ -1148,7 +1148,7 @@ class Game {
   handleGameEvent(event) {
     let eventsMenu = document.querySelector("#events_menu")
 
-    let eventItem 
+    let eventItem
 
     if (!event.skipDisplay) {
       eventItem = document.createElement("div")
@@ -1563,7 +1563,7 @@ class Game {
     for (let id in data.commandBlockTimers) {
       let timer = data.commandBlockTimers[id]
       if (timer.clientMustDelete) {
-        delete this.commandBlockTimers[timer.id] 
+        delete this.commandBlockTimers[timer.id]
       } else {
         this.commandBlockTimers[timer.id] = timer
       }
@@ -1587,7 +1587,7 @@ class Game {
     if (data.fullJson) {
       this.renderFullCommandBlock(data.fullJson)
       return
-    } 
+    }
 
     this.commandBlockMenu.update(data)
   }
@@ -1606,7 +1606,7 @@ class Game {
 
   onCustomStats(data) {
     if (!this.sector) return
-      
+
     if (data.group === 'mobs') {
       this.sector.setMobCustomStats(data.type, data.stats)
     } else if (data.group === 'buildings') {
@@ -2557,7 +2557,7 @@ class Game {
 
     document.querySelector(".search_colony_list").style.display = 'none'
     document.querySelector(".main_colony_list").style.display = 'block'
-    
+
     this.visitColonyMenu.toggle()
   }
 
@@ -3737,7 +3737,7 @@ class Game {
     if (this.sector.getOriginalUid() === "Ap9OYBkw3dQvJ") {
       return "anotherplanet"
     } else if (this.sector.getOriginalUid() === "vbj91eofmFCiu") {
-      return "td"  
+      return "td"
     } else {
       return "peaceful"
     }
@@ -4260,10 +4260,6 @@ class Game {
     let shouldRefreshAd = !this.lastDeathAdDisplay ||
                           (this.lastDeathAdDisplay && ((Date.now() - this.lastDeathAdDisplay) > threeMinutes))
     if (shouldRefreshAd) {
-      aiptag.cmd.display.push(function() {
-        aipDisplayTag.display('junon-io_728x90');
-      })
-
       this.lastDeathAdDisplay = Date.now()
     }
   }
@@ -5350,7 +5346,7 @@ class Game {
       return this.lastMoveAngle === moveAngle && this.lastIdle === idle
     } else {
       if (this.lastPressedKey !== pressedKey) return false
-      return this.lastControlKeys === controlKeys 
+      return this.lastControlKeys === controlKeys
     }
   }
 

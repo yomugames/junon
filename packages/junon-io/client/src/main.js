@@ -144,12 +144,12 @@ class Main {
       }
     }
 
-    let i18n = new Polyglot({ 
-      phrases: phrases, 
+    let i18n = new Polyglot({
+      phrases: phrases,
       allowMissing: true
     })
     window.i18n = i18n
-  }  
+  }
 
   getVersion() {
     let el = document.querySelector(".game_version")
@@ -211,7 +211,7 @@ class Main {
     if (this.inviteToken) {
       this.renderGameInvite()
       return
-    } 
+    }
 
     let miniGame = this.getUrlParam().get("minigame")
     if (miniGame) {
@@ -394,14 +394,6 @@ class Main {
     let shouldRefreshAd = !this.lastHomepageAdDisplay ||
                           (this.lastHomepageAdDisplay && ((Date.now() - this.lastHomepageAdDisplay) > threeMinutes))
     if (shouldRefreshAd) {
-      aiptag.cmd.display.push(() => { 
-        aipDisplayTag.display('junon-io_300x250'); 
-      })
-
-      aiptag.cmd.display.push(() => { 
-        aipDisplayTag.display('junon-io_300x250_2'); 
-      })
-
       this.lastHomepageAdDisplay = Date.now()
     }
   }
@@ -418,27 +410,27 @@ class Main {
     document.querySelector("#preroll_container").style.marginLeft = -(playerWidth/2) + "px"
     document.querySelector("#preroll_container").style.marginTop  = -(playerHeight/2) + "px"
 
-    aiptag.cmd.player.push(() => {
-      window.adplayer = new aipPlayer({
-        AD_WIDTH: playerWidth,
-        AD_HEIGHT: playerHeight,
-        AD_FULLSCREEN: false,
-        AD_CENTERPLAYER: false,
-        LOADING_TEXT: 'loading advertisement',
-        PREROLL_ELEM: () => { 
-          return document.getElementById('preroll') 
-        },
-        AIP_COMPLETE: () => {
-          document.querySelector("#preroll_container").style.display = 'none'
-          if (this.videoAdCompleteCallback) {
-            this.videoAdCompleteCallback()
-          }
-        },
-        AIP_REMOVE: () => {
-          document.querySelector("#preroll_container").style.display = 'none'
-        }
-      });
-    });
+    //aiptag.cmd.player.push(() => {
+      //window.adplayer = new aipPlayer({
+        //AD_WIDTH: playerWidth,
+        //AD_HEIGHT: playerHeight,
+        //AD_FULLSCREEN: false,
+        //AD_CENTERPLAYER: false,
+        //LOADING_TEXT: 'loading advertisement',
+        //PREROLL_ELEM: () => {
+          //return document.getElementById('preroll')
+        //},
+        //AIP_COMPLETE: () => {
+          //document.querySelector("#preroll_container").style.display = 'none'
+          //if (this.videoAdCompleteCallback) {
+            //this.videoAdCompleteCallback()
+          //}
+        //},
+        //AIP_REMOVE: () => {
+          //document.querySelector("#preroll_container").style.display = 'none'
+        //}
+      //});
+    //});
   }
 
   recordColonyVisit() {
@@ -484,17 +476,13 @@ class Main {
 
   displayVideoAd() {
     if (typeof adplayer !== 'undefined') {
-      aiptag.cmd.player.push(() => { 
-        document.querySelector("#preroll_container").style.display = 'block'
-        adplayer.startPreRoll()
-      });
     } else {
       //Adlib didnt load this could be due to an adblocker, timeout etc.
       if (this.videoAdCompleteCallback) {
         this.videoAdCompleteCallback()
       }
     }
-  }  
+  }
 
   initRegionTabContent() {
     if (debugMode) {
@@ -520,7 +508,7 @@ class Main {
         "<div class='game_browser_container'>" +
             "<div class='new_colony_launch_btn main_menu_btn'>" +
                 "<span>" +  i18n.t('New Colony') + "</span>" +
-                "<div class='play_spinner lds-ring'><div></div><div></div><div></div><div></div></div>" + 
+                "<div class='play_spinner lds-ring'><div></div><div></div><div></div><div></div></div>" +
             "</div>" +
             "<div class='search_colony_list colony_list' cellspacing='0' cellpadding='0'>" +
             "</div>" +
@@ -535,7 +523,7 @@ class Main {
 
   mobileDetect() {
     this.isMobile = isMobile.any
-    
+
     if (this.isMobile) {
       document.querySelector("body").classList.add("mobile")
     }
@@ -623,7 +611,7 @@ class Main {
 
   renderGameInvite() {
     if (!this.inviteToken) return
-    
+
     this.gameExplorer.fetchSectorData(this.inviteToken, (sector) => {
       if (sector) {
         let teamEntry = new TeamEntry(this.gameExplorer, sector)
@@ -658,7 +646,7 @@ class Main {
       container.querySelector(".game_invite_container .team_days_alive").innerText = teamEntry.getDayCount()
       container.querySelector(".game_invite_container .game_invite_day_count").style.display = 'block'
     }
-    
+
     container.querySelector(".game_invite_container .team_member_count").innerText = teamEntry.getMemberCount() + " / 10"
 
     container.style.display = 'block'
@@ -670,7 +658,7 @@ class Main {
 
   onGameInitialized() {
     this.isGameInitialized = true
-    this.postInitSetup()  
+    this.postInitSetup()
   }
 
   onRegionAssigned() {
@@ -679,7 +667,7 @@ class Main {
 
   getRegionName() {
     if (!this.region) return ""
-      
+
     let regionData = this.regions.find((regionData) => {
       return regionData.id === this.region
     })
@@ -725,7 +713,7 @@ class Main {
 
     this.initSetupFinished = true
 
-    if (!this.teamInviteEntryFound && 
+    if (!this.teamInviteEntryFound &&
         !this.getUrlParam().get("nav") &&
         !this.getUrlParam().get("game") &&
         !this.getUrlParam().get("minigame")) {
@@ -735,7 +723,7 @@ class Main {
   }
 
   isImposterMode() {
-    return this.getUrlParam().get("game") && 
+    return this.getUrlParam().get("game") &&
            (this.getUrlParam().get("game") === 'FindtheImposter-Ap9OYBkw3dQvJ' ||
             this.getUrlParam().get("game") === 'FindtheImposter-eWC1CfZymRExY' )
   }
@@ -746,7 +734,7 @@ class Main {
 
   requestGame(url, options = {}) {
     if (!url) return
-      
+
     this.connectGame(url, () => {
       this.game.requestGame(options)
     })
@@ -833,7 +821,7 @@ class Main {
     document.querySelector("#connecting_message").style.display = 'none'
     document.querySelector(".loading_modal").style.display = 'none'
     console.log(data.message)
-    
+
     setTimeout(() => {
       this.enableJoin()
       let message = data.message || "Servers are currently full"
@@ -919,7 +907,7 @@ class Main {
           if (!region) {
             region = this.regions[0].id // choose a default one
           }
-          
+
           this.setRegion(region)
           this.onRegionAssigned()
           cb()
@@ -1092,7 +1080,7 @@ class Main {
   onLogoutBtnClick() {
     this.user = null
     this.uid = null
-    
+
     FirebaseClientHelper.signOut(() => {
       this.showAuthContainer()
       this.hideUsernameContainer()
@@ -1237,11 +1225,11 @@ class Main {
 
     let idToken = await this.getFirebaseIdToken()
     let matchmakerUrl = Config[env].matchmakerUrl
-    let data = { 
-      idToken: idToken, 
-      uid: uid, 
-      username: username, 
-      email: this.user.email 
+    let data = {
+      idToken: idToken,
+      uid: uid,
+      username: username,
+      email: this.user.email
     }
 
     ClientHelper.httpPost(matchmakerUrl + "create_user", data, {
@@ -1365,7 +1353,7 @@ class Main {
 
   getPendingReceivedFriendRequestsCount() {
     let count = 0
-    
+
     for (let uid in this.receivedFriendRequests) {
       let request = this.receivedFriendRequests[uid]
       if (request.status !== 'ignored') {
@@ -1665,14 +1653,14 @@ class Main {
   showLoadGameSettings(teamEntry) {
     this.hideHomeMenu()
     this.showBackMainBtn()
-    document.querySelector(".load_game_settings_container").style.display = 'block'  
+    document.querySelector(".load_game_settings_container").style.display = 'block'
     document.querySelector('.visibility_select').value = teamEntry.isPrivate ? 'private' : 'public'
 
     document.querySelector('.load_game_save_name').innerText = teamEntry.getName()
   }
 
   hideLoadGameSettings() {
-    document.querySelector(".load_game_settings_container").style.display = 'none'  
+    document.querySelector(".load_game_settings_container").style.display = 'none'
   }
 
   showHomeMenu() {
@@ -1685,7 +1673,7 @@ class Main {
     document.querySelector(".other_game_ad_square").style.display = 'block'
 
     this.gameExplorer.show()
-    
+
     if (this.settingsMenu) {
       this.settingsMenu.hide()
       this.miniGameDetailsMenu.hide()
@@ -1747,7 +1735,7 @@ class Main {
     this.lockJoin()
     this.clearHomeErrorMessage()
 
-    Cookies.set('tutorial_done', true)  
+    Cookies.set('tutorial_done', true)
 
     document.querySelector(".new_colony_menu_btn span").innerText = i18n.t("Starting")
     document.querySelector(".new_colony_menu_btn .play_spinner").style.display = 'inline-block'
@@ -1790,7 +1778,7 @@ class Main {
     this.lockJoin()
     this.clearHomeErrorMessage()
 
-    Cookies.set('tutorial_done', true)  
+    Cookies.set('tutorial_done', true)
 
     document.querySelector(".tutorial_menu_btn span").innerText = i18n.t("Starting")
     document.querySelector(".tutorial_menu_btn .play_spinner").style.display = 'inline-block'
@@ -1878,11 +1866,11 @@ class Main {
 
     if (this.getUrlParam().get("row")) {
       data["rowCount"] = this.getUrlParam().get("row")
-    } 
+    }
 
     if (this.getUrlParam().get("col")) {
       data["colCount"] = this.getUrlParam().get("col")
-    } 
+    }
 
     this.sendToMatchmaker({ event: "NewColony", data: data })
   }
@@ -1948,7 +1936,7 @@ class Main {
     this.showBackMainBtn()
     this.pvpExplorer.show()
   }
-  
+
   onLoadGameMenuBtnClick(e) {
     this.hideMenus()
 
@@ -1969,7 +1957,7 @@ class Main {
 
   onExitGameMenuBtnClick(e) {
     SocketUtil.emit("LeaveGame", {})
-    
+
     if (this.gameConnection) {
       this.gameConnection.close()
     }
@@ -1989,7 +1977,7 @@ class Main {
     // this.game.gameConnection.close()
     window.history.replaceState(null, null, "?")
 
-    this.game.displayHomePage()     
+    this.game.displayHomePage()
     if (this.impy) {
       this.hideMenus()
       let miniGameId = debugMode ? "eWC1CfZymRExY" : "Ap9OYBkw3dQvJ"
@@ -1999,11 +1987,11 @@ class Main {
   }
 
   onGoogleLoginBtnClick() {
-    FirebaseClientHelper.signIn("google")    
+    FirebaseClientHelper.signIn("google")
   }
 
   onFacebookLoginBtnClick() {
-    FirebaseClientHelper.signIn("facebook")    
+    FirebaseClientHelper.signIn("facebook")
   }
 
   initAuthentication() {
@@ -2012,7 +2000,7 @@ class Main {
 
     let hasLocalStorage = this.checkLocalStorageSupport()
     // when iframed in incognito, localStorage is not available if (cookies are blocked)
-    // firebase would throw error, and cant even play game. 
+    // firebase would throw error, and cant even play game.
     // dont init firebase, show warning that cookies must be enable to login (for google sign in to work using their sdk)
     if (hasLocalStorage) {
       FirebaseClientHelper.initFirebase(this.onFirebaseAuth.bind(this))
@@ -2119,7 +2107,7 @@ class Main {
   async onUserAuthenticated() {
     let mods = ["kuroro", "BigTforLife", "Pkovacic", "Potato"]
     let isMod = mods.indexOf(main.userData.username) !== -1
-    
+
     if (isMod) {
       document.querySelector(".open_ban_list_btn").style.display = 'block'
     }

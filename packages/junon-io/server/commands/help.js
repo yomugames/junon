@@ -71,6 +71,7 @@ class Help extends BaseCommand {
         player.showChatSuccess("/oxygen    - manage oxygen")
         player.showChatSuccess("/wait      - delay next command by seconds in command block")
         player.showChatSuccess("/getnthword - gets nth word of sentence and sets it to $word variable")
+        player.showChatSuccess("/getnthletter - gets nth letter of sentence and sets it to $letter variable")
         player.showChatSuccess("/dirt       - adds or removes dirt")
         player.showChatSuccess("/blood      - adds or removes blood")
       }

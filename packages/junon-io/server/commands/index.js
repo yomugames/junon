@@ -66,6 +66,8 @@ Commands.wait = require("./wait")
 Commands.hour = require("./hour")
 Commands.day = require("./day")
 Commands.getnthword = require('./getnthword')
+Commands.dirt = require('./dirt')
+Commands.blood = require('./blood')
 
 Commands.accept_rules = require("./accept_rules")
 

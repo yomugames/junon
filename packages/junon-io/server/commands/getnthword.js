@@ -15,6 +15,8 @@ class GetNthWord extends BaseCommand {
         let index = args[0];
         if(isNaN(index)) {
             caller.showChatError(`index must be a number`)
+            // In commandblocks, you can't tell if $word is the last word of the message, so making it undefined should fix this
+            this.game.executeCommand(this.sector,`/variable set word undefined`)
             return
         }
         let text = args.slice(1).join(" ")

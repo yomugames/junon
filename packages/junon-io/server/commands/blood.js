@@ -1,7 +1,7 @@
 const BaseCommand = require("./base_command")
 
 class Blood extends BaseCommand {
-    getUseage() {
+    getUsage() {
         return [
             "/blood add [entity_id]",
             "/blood decrease [entity_id]"

@@ -19,6 +19,15 @@ class Scene extends BaseCommand {
       let sceneName = args[1]
       if (!this.game.hasScene(sceneName)) {
         player.showChatError("no such scene")
+        player.showChatError("- - - - - - - -")
+        player.showChatError("Possible Scenes:")
+        player.showChatError("VotingSkipped")
+        player.showChatError("EjectImpostor")
+        player.showChatError("EmergencyMeeting")
+        player.showChatError("StationExplode")
+        player.showChatError("StarmancerTDMobSpawn")
+        player.showChatError("StarmancerTDProtectCore")
+        player.showChatError("BurnImpostor")
         return
       }
 

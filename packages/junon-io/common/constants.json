@@ -3010,6 +3010,26 @@
       "upgrade": {},
       "description": "Strange berries from alien bushes."
     },
+    "Star Nut": {
+      "width": 21,
+      "height": 14,
+      "cost": {
+        "gold": 250
+      },
+      "stats": {
+        "food": 10,
+        "health": 15
+      },
+      "sprite": {
+        "position": {
+          "x": 64,
+          "y": 0
+        },
+        "rotation": 90
+      },
+      "upgrade": {},
+      "description": "Strange brown nut ish is..."
+    },
     "Antidote": {
       "width": 24,
       "height": 24,

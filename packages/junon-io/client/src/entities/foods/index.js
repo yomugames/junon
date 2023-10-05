@@ -25,6 +25,7 @@ Foods.Cooked.PotatoSoup = require("./potato_soup")
 Foods.Cooked.SlimeBroth = require("./slime_broth")
 Foods.Cooked.MisoSoup = require("./miso_soup")
 Foods.Cooked.Starberries = require("./starberries")
+Foods.Cooked.Starnut = require("./starnut")
 
 Foods.Drugs = {}
 Foods.Drugs.FirstAidKit = require("./first_aid_kit")

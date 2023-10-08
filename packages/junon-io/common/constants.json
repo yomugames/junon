@@ -3028,7 +3028,11 @@
         "rotation": 90
       },
       "upgrade": {},
+<<<<<<< HEAD
+      "description": "Strange brown nut. Can it be grown?"
+=======
       "description": "A strange brown nut. Maybe it can be planted?"
+>>>>>>> eb5b85890bc211afc59db074178a429bda0c67c2
     },
     "Antidote": {
       "width": 24,

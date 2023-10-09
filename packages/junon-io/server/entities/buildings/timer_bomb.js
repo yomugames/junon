@@ -8,6 +8,7 @@ class TimerBomb extends BaseBuilding {
     super.onConstructionFinished()
 
     this.seconds = 0
+    this.duration = 10
     this.container.addProcessor(this)
   }
 
@@ -26,8 +27,7 @@ class TimerBomb extends BaseBuilding {
 
     this.setBuildingContent(this.seconds.toString())
 
-    let duration = 10
-    if (this.seconds === duration) {
+    if (this.seconds >= this.duration) {
       this.trigger()
       this.remove()
     }

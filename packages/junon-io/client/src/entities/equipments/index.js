@@ -6,6 +6,7 @@ const Constants = require("./../../../../common/constants.json")
 const Equipments = {}
 Equipments.LeadPipe = require("./hand/lead_pipe")
 Equipments.PlasmaBlade = require("./hand/plasma_blade")
+Equipments.PointyStick = require("./hand/pointy_stick")
 Equipments.Mop = require("./hand/mop")
 Equipments.Pistol = require("./hand/pistol")
 Equipments.Shotgun = require("./hand/shotgun")

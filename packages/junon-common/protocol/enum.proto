@@ -253,6 +253,7 @@ enum BuildingType {
   PlasmaBlade  = 257;
   Starberries  = 258;
   Starnut    = 259;
+  PointyStick = 260;
 }
 
 enum TerrainType {

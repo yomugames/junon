@@ -3686,6 +3686,24 @@
       },
       "description": "Strong blade made of plasma"
     },
+    "PointyStick": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 250
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 14,
+        "range": 55,
+        "meleeRange": 55
+      },
+      "requirements": {
+        "Wood": 5
+      },
+      "description": "A weak but pointy stick"
+    },
     "AssassinsKnife": {
       "parent": "Equipments.MeleeEquipment",
       "isWeapon": true,

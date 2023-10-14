@@ -76,7 +76,7 @@ class Help extends BaseCommand {
         player.showChatSuccess("/blood      - adds or removes blood")
         player.showChatSuccess("/scene      - play specific scenes")
         player.showChatSuccess("/needs      - add mob needs")
-        player.showChatSuccess("/limit      - set building limit")
+        player.showChatSuccess("/path      - set mob walk paths")
         player.showChatSuccess("/setowner      - set the owner of a building")
         player.showChatSuccess("/mute      - mute a specified player")
         player.showChatSuccess("/unmute      - unmute a specified player")

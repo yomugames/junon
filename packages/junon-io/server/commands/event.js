@@ -22,6 +22,8 @@ class Event extends BaseCommand {
 
   perform(player, args) {
     let options = { player: player }
+    let text
+
 
     const eventName = args[0]
     if (args[1] && args[2]) {
@@ -60,7 +62,7 @@ class Event extends BaseCommand {
         break
       default:
         if (eventName) {
-          player.showChatError("no such event: " + eventName + " . Valid events are " + this.getValidEvents().join(", "))
+          this.game.eventManager.emitEvent(player, text)
         }
     }
   }

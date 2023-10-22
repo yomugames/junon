@@ -244,6 +244,10 @@ class ChatMenu extends BaseMenu {
       chatContent.dataset.error = true
     }  else if (messageObj.status === "success") {
       chatContent.dataset.success = true
+    } else if(messageObj.status === "hexcolor") {
+      chatContent.style.color ="#"+ messageObj.color
+    } else if(messageObj.status === "color") {
+      chatContent.style.color = messageObj.color
     }
 
     chatMessage.appendChild(chatUsername)
@@ -303,12 +307,34 @@ class ChatMenu extends BaseMenu {
 
     if (message.match(errorRegex)) {
       return { status: "error", message: message.replace(errorRegex, "") }
+
     } else if (message.match(successRegex)) {
       return { status: "success", message: message.replace(successRegex, "") }
-    } else {
-      return { status: "normal", message: message }
+
+    } else if (message.startsWith("%#")) { //regular expressions are consusing lol
+        let colorEndIndex = message.indexOf("%", 2);
+
+        if (colorEndIndex === -1) return
+            
+        let colorCode = message.slice(2, colorEndIndex);
+        let restOfMessage = message.slice(colorEndIndex + 1);
+        return { status: "hexcolor", message: restOfMessage, color: colorCode };
+    } else if (message.startsWith("%")) {
+      const colorEndIndex = message.indexOf("%", 2)
+      if(colorEndIndex === -1) return
+
+      const allowedColors = ["blue", "red", "green", "yellow", "brown", "purple", "pink", "gray", "orange", "black", "white",]
+
+      const color = message.slice(1, colorEndIndex)
+      if(allowedColors.indexOf(color) === -1) return { status: "normal", message: message };
+
+      let restOfMessage = message.slice(colorEndIndex + 1);
+
+      return { status: "color", message: restOfMessage, color:color}
     }
+    return { status: "normal", message: message };
   }
+
 
   close() {
     if (this.isVoteMode) return

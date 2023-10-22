@@ -22,7 +22,6 @@ class Event extends BaseCommand {
 
   perform(player, args) {
     let options = { player: player }
-    let text
 
 
     const eventName = args[0]
@@ -62,7 +61,7 @@ class Event extends BaseCommand {
         break
       default:
         if (eventName) {
-          this.game.eventManager.emitEvent(player, text)
+          this.game.eventManager.emitEvent(player, eventName)
         }
     }
   }

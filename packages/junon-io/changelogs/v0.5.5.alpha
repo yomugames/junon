@@ -1,0 +1,15 @@
+{
+  "version": "v0.5.5.alpha",
+  "date": "October 1, 2023",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "/dirt and /blood Commands Added by chickemeeple",
+      "/fill building command added by chickemeeple",
+      "/fill command updated by chickemeeple"
+      "/getnthletter command added by BigTforLife"
+    ]
+  }
+}

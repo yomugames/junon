@@ -74,6 +74,13 @@ class Help extends BaseCommand {
         player.showChatSuccess("/getnthletter - gets nth letter of sentence and sets it to $letter variable")
         player.showChatSuccess("/dirt       - adds or removes dirt")
         player.showChatSuccess("/blood      - adds or removes blood")
+        player.showChatSuccess("/scene      - play specific scenes")
+        player.showChatSuccess("/needs      - add mob needs")
+        player.showChatSuccess("/setowner      - set the owner of a building")
+        player.showChatSuccess("/mute      - mute a specified player")
+        player.showChatSuccess("/unmute      - unmute a specified player")
+        player.showChatSuccess("/playsound      - play specific sounds")
+        player.showChatSuccess("/path      - create and manage paths")
       }
     }
     player.showChatSuccess("\n")

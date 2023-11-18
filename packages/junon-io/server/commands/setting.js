@@ -41,7 +41,7 @@ class Setting extends BaseCommand {
       return
     }
 
-    if (!this.sector.settings[key]) {
+    if (!this.sector.settings.hasOwnProperty(key)) {
       player.showChatError("invalid key. Valid keys are: " + Object.keys(this.sector.settings).join(", "))
       return
     }

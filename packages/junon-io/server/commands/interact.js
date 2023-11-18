@@ -10,7 +10,8 @@ class Interact extends BaseCommand {
       "/interact [entity_id] generate [type]",
       "/interact [entity_id] processingrate [1-5]",
       "/interact [entity_id] unown",
-      "/interact [entity_id] shoot"
+      "/interact [entity_id] shoot",
+      "/interact [entity_id] content"
     ]
   }
 

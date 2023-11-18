@@ -1,0 +1,6660 @@
+{
+  "Control": {
+    "up": 1,
+    "down": 2,
+    "left": 4,
+    "right": 8,
+    "space": 16
+  },
+  "globalSpeedMultiplier": 2,
+  "maxStackCount": 99,
+  "holdItemIndex": 9999,
+  "chunkRowCount": 16,
+  "chunkColCount": 16,
+  "fovViewDistance": 384,
+  "maxStorageCount": 48,
+  "maxColonyScreenshots": 2,
+  "interactDistance": 128,
+  "quickInventoryBaseIndex": 0,
+  "regularInventoryBaseIndex": 8,
+  "inventoryStorageId": 1,
+  "autoscreenshotPosition": 99,
+  "equipmentStorageId": 2,
+  "worldStorageId": 0,
+  "defaultVolume": 0.2,
+  "defaultBackgroundVolume": 0.1,
+  "gameWidth": 9600,
+  "gameHeight": 9600,
+  "cameraWidth": 544,
+  "cameraHeight": 512,
+  "floorHeight": 128,
+  "secondsPerHour": 25,
+  "physicsTimeStep": 10,
+  "decayThresholdInSeconds": 600,
+  "restartCountdown": 10000,
+  "maxAsteroidRadius": 32,
+  "minAsteroidRadius": 32,
+  "maxPlanetRadius": 150,
+  "minPlanetRadius": 50,
+  "maxStarRadius": 3,
+  "minStarRadius": 1,
+  "maxRingRadius": 2200,
+  "minRingRadius": 1500,
+  "mobSpawnRadiusTileCount": 20,
+  "mobSafeSpawnRadiusTileCountDay": 15,
+  "mobSafeSpawnRadiusTileCountNight": 10,
+  "mobDespawnRadiusTileCount": 25,
+  "maxMobActivity": 60,
+  "mobSpawnLimitDay": 3,
+  "mobSpawnLimitNight": 5,
+  "oxygenProductionConsumptionRate": 3,
+  "Triggers": {
+    "PlayerJoined": {
+      "description": "Event triggered when a player joins a game. ",
+      "variables": {
+        "player": "username of player who joined",
+        "playerRole": "role of player who joined"
+      }
+    },
+    "PlayerLeft": {
+      "description": "Event triggered when a player leaves a game. ",
+      "variables": {
+        "player": "username of player who left",
+        "playerRole": "role of player who left"
+      }
+    },
+    "PlayerMessage": {
+      "description": "Event triggered when a player sends a chat message",
+      "variables": {
+        "player": "username of player",
+        "message": "message sent by player"
+      }
+    },
+    "PlayerAttacked": {
+      "description": "Event triggered when a player gets damaged",
+      "variables": {
+        "player": "username of player got attacked",
+        "playerRole": "role of player got attacked",
+        "attackingPlayer": "username of player who attacked the unit",
+        "attackingPlayerRole": "role of player who attacked the unit",
+        "attackingMob": "id of mob who attacked the unit",
+        "damage": "amount of damage"
+      }
+    },
+    "PlayerDestroyed": {
+      "description": "Event triggered when a player dies. ",
+      "variables": {
+        "player": "username of player who died",
+        "playerRole": "role of player who died",
+        "killingPlayer": "username of player who killed the unit",
+        "killingPlayerRole": "role of player who killed the unit",
+        "killingMob": "id of mob who killed the unit"
+      }
+    },
+    "PlayerMove": {
+      "description": "Event triggered when player changes position",
+      "variables": {
+        "player": "username of player",
+        "row": "row position of player",
+        "col": "row position of player"
+      }
+    },
+    "PlayerRespawn": {
+      "description": "Event triggered when player respawns",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player"
+      }
+    },
+    "PlayerKeyboard": {
+      "description": "Event triggered when player presses a key",
+      "variables": {
+        "playerId": "id of player",
+        "player": "username of player",
+        "key": "key pressed"
+      }
+    },
+    "MobAttacked": {
+      "description": "Event triggered when a mob gets damaged",
+      "variables": {
+        "entityId": "id of mob who got attacked",
+        "entityType": "type of mob got attacked",
+        "attackingPlayer": "username of player who attacked the unit",
+        "attackingPlayerRole": "role of player who attacked the unit",
+        "attackingMob": "id of mob who attacked the unit",
+        "damage": "amount of damage"
+      }
+    },
+    "MobDestroyed": {
+      "description": "Event triggered when a mob dies. ",
+      "variables": {
+        "entityId": "id of mob who died",
+        "entityType": "type of mob who died",
+        "killingPlayer": "username of player who killed the unit",
+        "killingPlayerRole": "role of player who killed the unit",
+        "killingMob": "id of mob who killed the unit"
+      }
+    },
+    "MobFeed": {
+      "description": "Event triggered when a mob is fed. ",
+      "variables": {
+        "entityId": "id of mob",
+        "entityType": "type of mob",
+        "playerId": "id of player who fed the mob",
+        "player": "name of player who fed the mob",
+        "itemType": "name of item used to feed"
+      }
+    },
+    "MobTamed": {
+      "description": "Event triggered when a mob is tamed. ",
+      "variables": {
+        "entityId": "id of mob",
+        "entityType": "type of mob",
+        "playerId": "id of player who tamed the mob",
+        "player": "name of player who tamed the mob"
+      }
+    },
+    "MobFollow": {
+      "description": "Event triggered when a mob starts following player. ",
+      "variables": {
+        "entityId": "id of mob",
+        "entityType": "type of mob",
+        "playerId": "id of player that mob follows",
+        "player": "name of player that mob follows"
+      }
+    },
+    "MobRelease": {
+      "description": "Event triggered when a mob stops following player. ",
+      "variables": {
+        "entityId": "id of mob",
+        "entityType": "type of mob",
+        "playerId": "id of player that mob follows",
+        "player": "name of player that mob follows"
+      }
+    },
+    "MobMount": {
+      "description": "Event triggered when a player mounts mob. ",
+      "variables": {
+        "entityId": "id of mob",
+        "entityType": "type of mob",
+        "playerId": "id of player",
+        "player": "name of players"
+      }
+    },
+    "MobUnmount": {
+      "description": "Event triggered when a player unmounts mob. ",
+      "variables": {
+        "entityId": "id of mob",
+        "entityType": "type of mob",
+        "playerId": "id of player",
+        "player": "name of players"
+      }
+    },
+    "BuildingAttacked": {
+      "description": "Event triggered when a building gets damaged",
+      "variables": {
+        "entityId": "id of building that got attacked",
+        "entityType": "type of building that got attacked",
+        "attackingPlayer": "username of player who attacked the building",
+        "attackingPlayerRole": "role of player who attacked the building",
+        "attackingMob": "id of mob who attacked the building",
+        "damage": "amount of damage"
+      }
+    },
+    "BuildingPlaced": {
+      "description": "Event triggered when a building gets placed",
+      "variables": {
+        "entityId": "id of building ",
+        "entityType": "type of building ",
+        "player": "username of player",
+        "playerId": "id of player"
+      }
+    },
+    "BuildingDeconstructed": {
+      "description": "Event triggered when a building gets deconstructed",
+      "variables": {
+        "entityId": "id of building ",
+        "entityType": "type of building ",
+        "player": "username of player",
+        "playerId": "id of player"
+      }
+    },
+    "AsteroidMined": {
+      "description": "Event triggered when asteroid mined",
+      "variables": {
+        "type": "name of resource gained",
+        "player": "name of player who mined resource",
+        "remaining": "amount of resource remaining"
+      }
+    },
+    "ItemCrafted": {
+      "description": "Event triggered when an item is crafted by a player",
+      "variables": {
+        "type": "name of the item crafted",
+        "player": "name of the player who crafted item"
+      }
+    },
+    "TeamMemberAdded": {
+      "description": "Event triggered when membed added to team",
+      "variables": {
+        "player": "username of player who joined team",
+        "team": "name of team",
+        "count": "number of members in team"
+      }
+    },
+    "TeamMemberRemoved": {
+      "description": "Event triggered when membed removed from team",
+      "variables": {
+        "player": "username of player who was removed",
+        "team": "name of team",
+        "count": "number of members in team"
+      }
+    },
+    "RegionEnter": {
+      "description": "Event triggered when entity enters a region ",
+      "variables": {
+        "region": "name of region",
+        "player": "username of player who entered",
+        "playerRole": "role of player who entered",
+        "entityId": "id of entity who entered",
+        "entityType": "type of mob who entered"
+      }
+    },
+    "RegionLeave": {
+      "description": "Event triggered when entity leaves a region ",
+      "variables": {
+        "region": "name of region",
+        "player": "username of player who left",
+        "playerRole": "role of player who left",
+        "entityId": "id of entity who left",
+        "entityType": "type of mob who entered"
+      }
+    },
+    "ColonyLike": {
+      "description": "Event triggered when player likes colony ",
+      "variables": {
+        "player": "username of player"
+      }
+    },
+    "ColonyUnlike": {
+      "description": "Event triggered when player unlikes colony ",
+      "variables": {
+        "player": "username of player"
+      }
+    },
+    "WorldLoaded": {
+      "description": "Event triggered when world is first loaded. Useful for setting up commands such as sidebar etc.",
+      "variables": {
+      }
+    },
+    "InteractBuilding": {
+      "description": "Event triggered when player interacts with building",
+      "variables": {
+         "entityId": "id of building", 
+         "entityType": "type of building", 
+         "playerId": "id of player",
+         "player": "username of player who interacted"
+      }
+    },
+    "HealthChanged": {
+      "description": "Event triggered when entity health changed",
+      "variables": {
+         "entityId": "id of entity", 
+         "entityType": "type of entity", 
+         "playerId": "id of player",
+         "player": "username of player",
+         "previous": "previous value",
+         "current": "current value",
+         "delta": "amount changed"
+      }
+    },
+    "OxygenChanged": {
+      "description": "Event triggered when player oxygen changed",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "previous": "previous value",
+         "current": "current value",
+         "delta": "amount changed"
+      }
+    },
+    "HungerChanged": {
+      "description": "Event triggered when player hunger changed",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "previous": "previous value",
+         "current": "current value",
+         "delta": "amount changed"
+      }
+    },
+    "StaminaChanged": {
+      "description": "Event triggered when player stamina changed",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "previous": "previous value",
+         "current": "current value",
+         "delta": "amount changed"
+      }
+    },
+    "ScoreChanged": {
+      "description": "Event triggered when player score changed",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "previous": "previous value",
+         "current": "current value",
+         "delta": "amount changed"
+      }
+    },
+    "ItemBuy": {
+      "description": "Event triggered when player buys items",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "itemType": "name of item purchased",
+         "count": "amount of items"
+      }
+    },
+    "ItemSell": {
+      "description": "Event triggered when player sells items",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "itemType": "name of item sold",
+         "count": "amount of items"
+      }
+    },
+    "ItemUsed": {
+      "description": "Event triggered when player uses item",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "itemType": "name of item"
+      }
+    },
+    "ItemConsumed": {
+      "description": "Event triggered when player consumes item",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "itemType": "name of item"
+      }
+    },
+    "ItemDropped": {
+      "description": "Event triggered when player drops item",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "itemType": "name of item",
+         "count": "count of item"
+      }
+    },
+    "ItemPickup": {
+      "description": "Event triggered when player picks up item",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "itemType": "name of item",
+         "count": "count of item"
+      }
+    },
+    "CropHarvested": {
+      "description": "Event triggered when a crop gets harvested",
+      "variables": {
+        "entityId": "id of crop",
+        "entityType": "type of crop",
+        "yieldType": "type of yield dropped",
+        "player": "username of player who harvested crop"
+      }
+    },
+    "CropPlanted": {
+      "description": "Event triggered when a crop gets planted",
+      "variables": {
+        "entityId": "id of crop",
+        "entityType": "type of crop",
+        "player": "username of player who planted crop"
+      }
+    },
+    "CorpseButchered": {
+      "description": "Event triggered when corpse butchered",
+      "variables": {
+         "entityId": "id of user who cooked food",
+         "player": "username of player",
+         "corpseType": "type of corpse"
+      }
+    },
+    "CorpseDragged": {
+      "description": "Event triggered when corpse dragged",
+      "variables": {
+         "entityId": "id of user who dragged",
+         "player": "username of player",
+         "corpseType": "type of corpse",
+         "corpseId": "id of corpse"
+      }
+    },
+    "CorpseReleased": {
+      "description": "Event triggered when corpse released",
+      "variables": {
+         "entityId": "id of user who dragged",
+         "player": "username of player",
+         "corpseType": "type of corpse",
+         "corpseId": "id of corpse"
+      }
+    },
+    "FoodCooked": {
+      "description": "Event triggered when food cooked",
+      "variables": {
+         "entityId": "id of user who cooked food",
+         "player": "username of player",
+         "foodType": "type of food"
+      }
+    },
+    "RoleChanged": {
+      "description": "Event triggered when role changed",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "previous": "previous role",
+         "current": "current role"
+      }
+    },
+    "GoldChanged": {
+      "description": "Event triggered when gold changed",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "previous": "previous gold",
+         "current": "current gold",
+         "delta": "amount changed"
+      }
+    },
+    "ArmorEquipChanged": {
+      "description": "Event triggered when armor equip changed",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "previous": "previous armor",
+         "current": "current armor"
+      }
+    },
+    "PlatformCleaned": {
+      "description": "Event triggered when platform cleaned",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "entityId": "id of platform",
+         "row": "row of platform",
+         "col": "col of platform"
+      }
+    },
+    "StoragePut": {
+      "description": "Event triggered when player puts item into storage",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "itemType": "name of item",
+         "count": "count of item",
+         "storageId": "id of storage",
+         "storageType": "type of storage"
+      }
+    },
+    "StorageGet": {
+      "description": "Event triggered when player gets item from storage",
+      "variables": {
+         "playerId": "id of player",
+         "player": "username of player",
+         "itemType": "name of item",
+         "count": "count of item",
+         "storageId": "id of storage",
+         "storageType": "type of storage"
+      }
+    },
+    "Timer:start": {
+      "description": "Event triggered when timer starts",
+      "variables": {
+        "name": "name of timer"
+      }
+    },
+    "Timer:tick": {
+      "description": "Event triggered when timer is ticking",
+      "variables": {
+        "name": "name of timer",
+        "seconds": "number of seconds elapsed",
+        "remaining": "number of seconds remaining before timer ends"
+      }
+    },
+    "Timer:end": {
+      "description": "Event triggered when timer ends",
+      "variables": {
+        "name": "name of timer"
+      }
+    },
+    "start": {
+      "description": "Event triggered when timer starts",
+      "variables": {
+      }
+    },
+    "tick": {
+      "description": "Event triggered when timer is ticking",
+      "variables": {
+        "seconds": "number of seconds elapsed",
+        "remaining": "number of seconds remaining before timer ends"
+      }
+    },
+    "end": {
+      "description": "Event triggered when timer ends",
+      "variables": {
+      }
+    }
+  },
+  "Actions": {
+    "commands": {
+      "description": "Execute command. Can use variable names provided by the event. Variable names must start with dollar sign $ . Certain commands also accept <a href='/selectors.html' target='_blank'>target_selectors</a> which starts with @ symbol. See example below",
+      "examples": [
+        "/give $player potato 5",
+        "/tp @a 20 20",
+        "/caption @a[role=crew] title Role: Crew"
+      ]
+    },
+    "ifthenelse": {
+      "description": "Add a condition for another action to execute. Can use variable names provided by the event. Variable names must start with dollar sign $",
+      "examples": [
+        "if $player != insert_owner_name, then /give $player potato 5"
+      ]
+    },
+    "timer": {
+      "description": "Timer that emits start/tick/end events which can be used as triggers",
+      "examples": [
+        "name: RounStartTimer, duration: 10 (in seconds)"
+      ]
+    }
+  },
+  "Effects": {
+    "Fire": {
+      "name": "fire",
+      "sprite": "flame_2.png"
+    },
+    "Blood": {
+      "name": "blood",
+      "sprite": "blood_1.png"
+    },
+    "Web": {
+      "name": "web",
+      "sprite": "web.png"
+    },
+    "Residue": {
+      "name": "residue",
+      "sprite": "residue.png"
+    },
+    "Dirt": {
+      "name": "dirt",
+      "sprite": "residue.png"
+    },
+    "Miasma": {
+      "name": "miasma",
+      "sprite": "white_gas.png"
+    },
+    "Break": {
+      "name": "break",
+      "sprite": "break.png"
+    },
+    "Poison": {
+      "name": "poison",
+      "sprite": "acid_spit.png"
+    },
+    "Smoke": {
+      "name": "smoke",
+      "sprite": ""
+    },
+    "Spin": {
+      "name": "spin",
+      "sprite": ""
+    },
+    "Invisible": {
+      "name": "invisible",
+      "sprite": ""
+    },
+    "Haste": {
+      "name": "haste",
+      "sprite": ""
+    }
+  },
+  "Tutorial": {
+    "main": {
+      "0": "Grab Items from EscapePod (Right-Click)" ,
+      "1": "Mine 10 Iron Ores from Asteroid" ,
+      "2": "Craft Furnace (Press C to open craft menu)" ,
+      "3": "Smelt 15 Iron Bars",
+      "4": "Craft OxygenGenerator" ,
+      "5": "Collect Water with Bottle",
+      "6": "Refill Oxygen Generator with Water Bottle",
+      "7": "Interact OxygenGenerator to refill suit oxygen",
+      "8": "Gather 5 plant fibers",
+      "9": "Craft 2 cloth using furnace",
+      "10": "Craft Bed and sleep to restore stamina",
+      "11": "Craft TradingTable",
+      "12": "Craft ChemistryStation",
+      "13": "Collect Blood using bottle until full",
+      "14": "Craft BloodPack",
+      "15": "Craft SlaversTable"
+    },
+    "corpse": {
+      "0": "Craft ButcherTable",
+      "1": "Drag a Corpse (Press E)",
+      "2": "Harvest Corpse Meat using ButcherTable"
+    } 
+  },
+  "CategoryClassifiers": {
+    "power_producer": "powerProduction",
+    "power_storage": "powerCapacity",
+    "power_consumer": "powerConsumption",
+    "oxygen_producer": "oxygenProduction",
+    "oxygen_storage": "oxygenCapacity",
+    "liquid_producer": "liquidProduction",
+    "liquid_storage": "liquidCapacity",
+    "liquid_consumer": "liquidConsumption",
+    "fuel_producer": "fuelProduction",
+    "fuel_storage": "fuelCapacity",
+    "fuel_consumer": "fuelConsumption"
+  },
+  "Events": {
+    "Raid": "raid",
+    "TaxCollection": "tax_collection",
+    "SpiderInfestation": "spider_infestation",
+    "TraderArrived": "trader_arrived",
+    "SlaveTraderArrived": "slave_trade_arrived",
+    "MeteorShower": "meteor_shower"
+  },
+  "FloorTextures": {
+    "solid_texture":       { "index": 1 },
+    "cornered_texture":    { "index": 2 },
+    "plated_texture":      { "index": 3 },
+    "striped_texture":     { "index": 4 },
+    "layered_bar_texture": { "index": 5 },
+    "grilled_texture":     { "index": 6 }
+  },
+  "SuitColors": {
+    "gray":   { "index": 1 , "value": "#999999" },
+    "red":   { "index": 2 , "value": "#c81010" },
+    "blue":   { "index": 3 , "value": "#245e9b" },
+    "green":   { "index": 4 , "value": "#186638" },
+    "yellow":   { "index": 5 , "value": "#f3b61d" },
+    "orange":   { "index": 6 , "value": "#eb4c1a" },
+    "purple":   { "index": 7 , "value": "#6e3797" },
+    "black":   { "index": 8 , "value": "#222222" }
+  },
+  "FloorColors": {
+    "grey_1":   { "index": 1 , "value": "#6c6c6c" },
+    "grey_2":   { "index": 2 , "value": "#2e3940" },
+    "grey_3":   { "index": 3 , "value": "#76756a" },
+    "grey_4":   { "index": 4 , "value": "#a7adbb" },
+    "blue_1":   { "index": 5 , "value": "#495377" },
+    "blue_2":   { "index": 6 , "value": "#3a5b75" },
+    "blue_3":   { "index": 7 , "value": "#306be4" },
+    "blue_4":   { "index": 8 , "value": "#78ccee" },
+    "blue_5":   { "index": 9 , "value": "#dbefee" },
+    "orange_1": { "index": 10, "value": "#ec7333" },
+    "red_1":    { "index": 11, "value": "#754e4e" },
+    "red_2":    { "index": 12, "value": "#632828" },
+    "red_3":    { "index": 13, "value": "#c80016" },
+    "green_1":  { "index": 14, "value": "#bbf5e1" },
+    "green_2":  { "index": 15, "value": "#818371" },
+    "green_3":  { "index": 16, "value": "#416747" },
+    "green_4":  { "index": 17, "value": "#627435" },
+    "green_5":  { "index": 18, "value": "#6a8867" },
+    "yellow_1": { "index": 19, "value": "#e0c78f" },
+    "yellow_2": { "index": 20, "value": "#edd46f" },
+    "yellow_3": { "index": 21, "value": "#856420" },
+    "yellow_4": { "index": 22, "value": "#e7c727" },
+    "yellow_5": { "index": 23, "value": "#c57f17" },
+    "brown_1":  { "index": 24, "value": "#5b3119" },
+    "brown_2":  { "index": 25, "value": "#493c21" },
+    "white_1":  { "index": 26, "value": "#c5c5c5" },
+    "purple_1": { "index": 27, "value": "#564a54" },
+    "white_2":  { "index": 28, "value": "#ffffff" },
+    "gray_5":   { "index": 29, "value": "#2a2a2a" }
+  },
+  "Deeds": {
+    "taxes_not_paid": {
+      "effect": -20,
+      "description": "Taxes not paid"
+    },
+    "cannibalism": {
+      "effect": -10,
+      "description": "Ate empire soldiers"
+    },
+    "extreme_cannibalism": {
+      "effect": -10,
+      "description": "Cannibalized large amount of empire soldiers"
+    },
+    "no_beacon": {
+      "effect": -5,
+      "description": "No Beacon constructed"
+    }
+  },
+  "Mothership": {
+    "maxWidth": 640,
+    "maxHeight": 640,
+    "cost": {
+      "gold": 5000
+    },
+    "stats": {
+      "tileCount": 50
+    },
+    "upgrade": {}
+  },
+  "Faith": {
+    "Hostile": 0,
+    "Obedient": 50,
+    "Guardian": 80
+  },
+  "Shield": {
+    "width": 32,
+    "height": 32,
+    "cost": 5000,
+    "stats": {
+      "health": 250
+    },
+    "upgrade": {
+      "health": "+250"
+    }
+  },
+  "Pickup": {
+    "width": 32,
+    "height": 32
+  },
+  "Corpse": {
+    "width": 32,
+    "height": 32,
+    "categories": {"corpse": true},
+    "isFlamable": true,
+    "isInteractable": true
+  },
+  "Player": {
+    "width": 24,
+    "height": 24,
+    "oxygen": 15,
+    "speed": 8,
+    "isFlamable": true,
+    "syringeDescription": "Increase health by 5",
+    "inventoryCount": 32,
+    "happiness": 100,
+    "stamina": 100,
+    "hunger": 100,
+    "thirst": 100,
+    "stats": {
+      "damage": 1,
+      "reload": 500,
+      "range": 64,
+      "oxygenConsumption": 1
+    }
+  },
+  "Mobs": {
+    "BaseMob": {
+      "width": 32,
+      "height": 32,
+      "obstacleCollisionWidth": 20,
+      "obstacleCollisionHeight": 20,
+      "isFlamable": true,
+      "stats": {
+        "oxygen": 100,
+        "speed": 3,
+        "reload": 3000
+      }
+    },
+    "SkyMob": {
+      "parent": "Mobs.BaseMob",
+      "categories": {"sky_creature": true}
+    },
+    "Ghost": {
+      "parent": "Mobs.BaseMob",
+      "attackGroups": [],
+      "categories": {"ghost": true},
+      "immunity": ["miasma"],
+      "stats": {
+        "speed": 20,
+        "reload": 3000,
+        "health": 5,
+        "damage": 5,
+        "range": 50,
+        "los": 160
+      },
+      "upgrade": {
+        "health": "+5",
+        "damage": "+5"
+      }
+    },
+    "Slime": {
+      "parent": "Mobs.BaseMob",
+      "drop": "Gel",
+      "isNonHostile": true,
+      "isTamable": true,
+      "attackGroups": ["mobs"],
+      "cost": {
+        "gold": 600
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "width": 20,
+        "height": 8,
+        "rotation": 0
+      },
+      "stats": {
+        "speed": 2,
+        "reload": 2000,
+        "health": 10,
+        "damage": 5,
+        "range": 32,
+        "los": 160
+      }
+    },
+    "Brood": {
+      "parent": "Mobs.BaseMob",
+      "drop": "AlienMeat",
+      "useOriginalSize": true,
+      "hasBlood": true,
+      "isTamable": true,
+      "cost": {
+        "gold": 800
+      },
+      "attackGroups": ["players", "mobs"],
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "width": 20,
+        "height": 8,
+        "rotation": 0
+      },
+      "stats": {
+        "speed": 2,
+        "reload": 1000,
+        "health": 10,
+        "damage": 2,
+        "range": 32,
+        "los": 160
+      },
+      "upgrade": {
+        "health": "+5",
+        "damage": "+5"
+      }
+    },
+    "BioRaptor": {
+      "parent": "Mobs.SkyMob",
+      "width": 96,
+      "height": 96,
+      "useOriginalSize": true,
+      "shouldFadeOut": true,
+      "immunity": ["miasma"],
+      "categories": {"mountable":true,"flying":true},
+      "drop": "AlienMeat",
+      "isTamable": true,
+      "hasBlood": true,
+      "cost": {
+        "gold": 1500
+      },
+      "attackGroups": ["players"],
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -20
+        },
+        "width": 28,
+        "height": 12,
+        "rotation": 0,
+        "tint": "#444444"
+      },
+      "stats": {
+        "reload": 3000,
+        "health": 50,
+        "damage": 15,
+        "range": 96,
+        "los": 640
+      },
+      "upgrade": {
+        "health": "+5",
+        "damage": "+5"
+      }
+    },
+    "Car": {
+      "parent": "Mobs.BaseMob",
+      "width": 96,
+      "height": 96,
+      "useOriginalSize": true,
+      "shouldFadeOut": true,
+      "immunity": ["miasma","poison","fear"],
+      "categories": {"mountable":true},
+      "drop": "IronOre",
+      "isTamable": true,
+      "hasBlood": false,
+      "cost": {
+        "gold": 20000
+      },
+      "attackGroups": ["players"],
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -20
+        },
+        "width": 28,
+        "height": 12,
+        "rotation": 0,
+        "tint": "#444444"
+      },
+      "stats": {
+        "reload": 3000,
+        "health": 3000,
+        "damage": 1,
+        "range": 96,
+        "los": 640
+      }
+    },
+    "Spider": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "isTamable": true,
+      "cost": {
+        "gold": 2000
+      },
+      "isBuildingDestroyer": true,
+      "attackGroups": ["players", "buildings", "mobs"],
+      "drop": ["Web"],
+      "resistance": ["fire"],
+      "sprite": {
+        "width": 96,
+        "height": 64
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -8
+        },
+        "width": 13,
+        "height": 6,
+        "rotation": 0
+      },
+      "stats": {
+        "reload": 1500,
+        "health": 120,
+        "damage": 10,
+        "range": 50,
+        "los": 160
+      },
+      "upgrade": {
+        "health": "+5",
+        "damage": "+5"
+      }
+    },
+    "PoisonSpider": {
+      "parent": "Mobs.BaseMob",
+      "drop": "Poison",
+      "syringeDescription": "Poisons target for 30 seconds",
+      "isTamable": true,
+      "cost": {
+        "gold": 2500
+      },
+      "sprite": {
+        "width": 96,
+        "height": 64
+      },
+      "stats": {
+        "health": 150,
+        "damage": 5,
+        "range": 320,
+        "los": 480
+      },
+      "upgrade": {
+        "health": "+5",
+        "damage": "+5"
+      }
+    },
+    "Pirate": {
+      "parent": "Mobs.BaseMob",
+      "drop": "HumanMeat",
+      "isHuman": true,
+      "canFly": true,
+      "cost": {
+        "gold": 500
+      },
+      "attackGroups": ["players", "buildings", "mobs"],
+      "sprite": {
+        "width": 40,
+        "height": 40
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 22,
+          "y": 20
+        },
+        "width": 20,
+        "height": 8,
+        "rotation": 90
+      },
+      "stats": {
+        "health": 30,
+        "damage": 10,
+        "range": 32,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "Human": {
+      "parent": "Mobs.BaseMob",
+      "drop": "HumanMeat",
+      "isHuman": true,
+      "cost": {
+        "gold": 500
+      },
+      "attackGroups": [],
+      "sprite": {
+        "width": 40,
+        "height": 40
+      },
+      "dizzySprite": {
+        "tint": "#000000",
+        "position": {
+          "x": 22,
+          "y": 20
+        },
+        "width": 20,
+        "height": 8,
+        "rotation": 90
+      },
+      "stats": {
+        "health": 100,
+        "damage": 10,
+        "range": 32,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "Guard": {
+      "parent": "Mobs.Pirate",
+      "hasBlood": true
+    },
+    "Trooper": {
+      "parent": "Mobs.Guard",
+      "sprite": {
+        "width": 50,
+        "height": 72
+      },
+      "stats": {
+        "health": 150,
+        "damage": 12,
+        "range": 256,
+        "los": 256
+      }
+    },
+    "Chemist": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "drop": ["Grenade", "PoisonGrenade"],
+      "resistance": ["fire"],
+      "immunity": ["poison"],
+      "canTargetTraps": true,
+      "canFly": true,
+      "cost": {
+        "gold": 2500
+      },
+      "attackGroups": ["players", "buildings", "mobs"],
+      "sprite": {
+        "width": 50,
+        "height": 45
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 30,
+          "y": 25
+        },
+        "width": 25,
+        "height": 10,
+        "rotation": 90
+      },
+      "stats": {
+        "health": 90,
+        "damage": 1,
+        "range": 256,
+        "los": 256,
+        "reload": 8000
+      }
+    },
+    "Firebat": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "drop": ["Flamethrower"],
+      "resistance": ["fire"],
+      "immunity": ["poison"],
+      "canTargetTraps": true,
+      "canFly": true,
+      "cost": {
+        "gold": 2500
+      },
+      "attackGroups": ["crops", "buildings", "players", "mobs"],
+      "sprite": {
+        "width": 90,
+        "height": 60
+      },
+      "canTargetCrops": true,
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "width": 40,
+        "height": 15,
+        "rotation": 90
+      },
+      "stats": {
+        "health": 150,
+        "damage": 1,
+        "range": 256,
+        "los": 256,
+        "reload": 8000
+      }
+    },
+    "DummyPlayer": {
+      "parent": "Mobs.BaseMob",
+      "cost": {
+        "gold": 1000
+      },
+      "categories": {"dummy_player": true},
+      "attackGroups": [],
+      "sprite": {
+        "width": 40,
+        "height": 40
+      },
+      "stats": {
+        "health": 100,
+        "damage": 1,
+        "range": 32,
+        "los": 256
+      },
+      "upgrade": {
+        "damage": "+2"
+      }
+    },
+    "Chicken": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "isTamable": true,
+      "drop": "Egg",
+      "cost": {
+        "gold": 1000
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 15,
+          "y": 14
+        },
+        "width": 20,
+        "height": 8,
+        "rotation": 0,
+        "tint": "#000000"
+      },
+      "stats": {
+        "health": 35,
+        "damage": 1,
+        "range": 32,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "Monkey": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "isTamable": true,
+      "drop": "AnimalMeat",
+      "cost": {
+        "gold": 1000
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -20
+        },
+        "width": 30,
+        "height": 15,
+        "rotation": 0
+      },
+      "sprite": {
+        "width": 40,
+        "height": 40
+      },
+      "stats": {
+        "health": 75,
+        "damage": 10,
+        "range": 32,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "Trader": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "hasMenu": true,
+      "categories": {"trader": true},
+      "isNPC": true,
+      "sprite": {
+        "width": 40,
+        "height": 40
+      },
+      "stats": {
+        "reload": 4000,
+        "health": 100,
+        "damage": 10,
+        "range": 32,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "SlaveTrader": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "categories": {"trader": true},
+      "hasMenu": true,
+      "isNPC": true,
+      "stats": {
+        "reload": 4000,
+        "health": 40,
+        "damage": 10,
+        "range": 32,
+        "los": 256
+      },
+      "sprite": {
+        "width": 42,
+        "height": 50
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "Slave": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "hasMenu": true,
+      "categories": {"worker": true},
+      "isNPC": true,
+      "isNonHostile": true,
+      "shouldShowBehavior": true,
+      "shouldShowNeeds": true,
+      "cost": {
+        "gold": 10000
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 27,
+          "y": 20
+        },
+        "width": 28,
+        "height": 12,
+        "rotation": 90,
+        "tint": "#222222"
+      },
+      "stats": {
+        "reload": 4000,
+        "health": 100,
+        "damage": 1,
+        "range": 32,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "NuuSlave": {
+      "parent": "Mobs.Slave",
+      "cost": {
+        "gold": 10000
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 27,
+          "y": 20
+        },
+        "width": 28,
+        "height": 12,
+        "rotation": 90,
+        "tint": "#222222"
+      }
+    },
+    "PixiSlave": {
+      "parent": "Mobs.Slave",
+      "cost": {
+        "gold": 10000
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 27,
+          "y": 20
+        },
+        "width": 28,
+        "height": 12,
+        "rotation": 90,
+        "tint": "#222222"
+      }
+    },
+    "GaramSlave": {
+      "parent": "Mobs.Slave",
+      "cost": {
+        "gold": 10000
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 27,
+          "y": 20
+        },
+        "width": 28,
+        "height": 12,
+        "rotation": 90,
+        "tint": "#222222"
+      }
+    },
+    "Messenger": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "hasMenu": true,
+      "isNPC": true,
+      "cost": {
+        "gold": 1000
+      },
+      "stats": {
+        "reload": 4000,
+        "health": 50,
+        "damage": 1,
+        "range": 32,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "FirstBot": {
+      "parent": "Mobs.BaseMob",
+      "stats": {
+        "reload": 4000,
+        "health": 20,
+        "damage": 10,
+        "range": 32,
+        "los": 256
+      },
+      "categories": {"bot": true},
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "CleanBot": {
+      "parent": "Mobs.BaseMob",
+      "cost": {
+        "gold": 5000
+      },
+      "categories": {"bot": true},
+      "stats": {
+        "speed": 2,
+        "reload": 1000,
+        "health": 100,
+        "damage": 10,
+        "range": 32,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "GuardBot": {
+      "parent": "Mobs.BaseMob",
+      "cost": {
+        "gold": 3000
+      },
+      "stats": {
+        "reload": 4000,
+        "health": 20,
+        "damage": 10,
+        "range": 32,
+        "los": 256
+      },
+      "categories": {"bot": true},
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "Mutant": {
+      "parent": "Mobs.BaseMob",
+      "stats": {
+        "speed": 5,
+        "reload": 2000,
+        "health": 150,
+        "damage": 15,
+        "range": 64,
+        "los": 256
+      },
+      "resistance": ["fire", "poison"],
+      "attackGroups": ["players", "buildings", "mobs"],
+      "sprite": {
+        "width": 100,
+        "height": 80
+      },
+      "cost": {
+        "gold": 2000
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 3,
+          "y": -2
+        },
+        "width": 30,
+        "height": 12,
+        "rotation": 40
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "Cat": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "isNonHostile": true,
+      "isTamable": true,
+      "drop": "AnimalMeat",
+      "cost": {
+        "gold": 3000
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -14
+        },
+        "width": 25,
+        "height": 12,
+        "rotation": 0,
+        "tint": "#000000"
+      },
+      "stats": {
+        "reload": 3000,
+        "health": 50,
+        "damage": 5,
+        "range": 48,
+        "los": 160
+      },
+      "sprite": {
+        "width": 40,
+        "height": 50
+      },
+      "upgrade": {
+        "health": "+5",
+        "damage": "+5"
+      }
+    },
+    "Golem": {
+      "parent": "Mobs.BaseMob",
+      "isTamable": true,
+      "width": 192,
+      "height": 192,
+      "drop": "SulfurOre",
+      "isNonHostile": true,
+      "cost": {
+        "gold": 3000
+      },
+      "immunity": ["poison", "fear", "miasma"],
+      "attackGroups": ["players", "buildings", "mobs"],
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -14
+        },
+        "width": 25,
+        "height": 12,
+        "rotation": 0,
+        "tint": "#000000"
+      },
+      "stats": {
+        "reload": 4000,
+        "health": 300,
+        "damage": 30,
+        "range": 96,
+        "los": 160
+      },
+      "sprite": {
+        "width": 200,
+        "height": 145
+      }
+    },
+    "Prisoner": {
+      "parent": "Mobs.BaseMob",
+      "isTamable": true,
+      "width": 64,
+      "height": 64,
+      "drop": "HumanMeat",
+      "isNonHostile": true,
+      "cost": {
+        "gold": 3000
+      },
+      "attackGroups": ["players", "buildings", "mobs"],
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": 7
+        },
+        "width": 25,
+        "height": 12,
+        "rotation": 0,
+        "tint": "#000000"
+      },
+      "stats": {
+        "health": 100,
+        "damage": 5,
+        "range": 64,
+        "los": 128
+      },
+      "sprite": {
+        "width": 58,
+        "height": 58
+      }
+    },
+    "Mantis": {
+      "parent": "Mobs.BaseMob",
+      "isNonHostile": true,
+      "isTamable": true,
+      "drop": "Stimpack",
+      "cost": {
+        "gold": 3000
+      },
+      "attackGroups": ["players", "buildings", "mobs"],
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -8
+        },
+        "width": 20,
+        "height": 10,
+        "rotation": 0,
+        "tint": "#ffffff"
+      },
+      "stats": {
+        "reload": 2000,
+        "health": 150,
+        "damage": 15,
+        "range": 48,
+        "los": 160
+      },
+      "sprite": {
+        "width": 80,
+        "height": 80
+      }
+    },
+    "SquidLord": {
+      "parent": "Mobs.BaseMob",
+      "width": 256,
+      "height": 256,
+      "drop": "SquidLordHeart",
+      "stats": {
+        "speed": 4,
+        "reload": 3000,
+        "health": 2000,
+        "damage": 10,
+        "range": 256,
+        "los": 384
+      },
+      "isFlamable": false,
+      "categories": {"flying": true},
+      "shouldAttackIgnoreObstacle": true,
+      "isBuildingDestroyer": true,
+      "attackGroups": ["players", "buildings", "mobs"],
+      "sprite": {
+        "width": 256,
+        "height": 236
+      },
+      "cost": {
+        "gold": 30000
+      },
+      "upgrade": {
+        "health": "+3",
+        "damage": "+2"
+      }
+    },
+    "Drone": {
+      "parent": "Mobs.BaseMob",
+      "stats": {
+        "speed": 4,
+        "reload": 3000,
+        "health": 200,
+        "damage": 10,
+        "range": 256,
+        "los": 384
+      },
+      "isFlamable": false,
+      "immunity": ["poison"],
+      "categories": {"flying": true},
+      "shouldAttackIgnoreObstacle": true,
+      "isBuildingDestroyer": true,
+      "attackGroups": ["players", "buildings", "mobs"],
+      "sprite": {
+        "width": 52,
+        "height": 40
+      },
+      "cost": {
+        "gold": 3000
+      },
+      "upgrade": {
+        "health": "+3",
+        "damage": "+2"
+      }
+    },
+    "Raven": {
+      "parent": "Mobs.BaseMob",
+      "stats": {
+        "speed": 4,
+        "reload": 3000,
+        "health": 800,
+        "damage": 5,
+        "range": 384,
+        "los": 512
+      },
+      "isFlamable": false,
+      "immunity": ["poison"],
+      "categories": {"flying": true},
+      "shouldAttackIgnoreObstacle": true,
+      "isBuildingDestroyer": true,
+      "attackGroups": ["players", "buildings", "mobs"],
+      "sprite": {
+        "width": 148,
+        "height": 96
+      },
+      "cost": {
+        "gold": 3000
+      }
+    },
+    "Reaver": {
+      "parent": "Mobs.BaseMob",
+      "stats": {
+        "speed": 4,
+        "reload": 4000,
+        "health": 15,
+        "damage": 1,
+        "range": 100,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      },
+      "cost": {
+        "gold": 4000
+      }
+    },
+    "Transporter": {
+      "parent": "Mobs.BaseMob",
+      "stats": {
+        "reload": 4000,
+        "health": 15,
+        "damage": 1,
+        "range": 100,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+2"
+      }
+    },
+    "Catapult": {
+      "parent": "Mobs.BaseMob",
+      "width": 128,
+      "height": 128,
+      "cost": {
+        "gold": 5000
+      },
+      "stats": {
+        "speed": 5,
+        "reload": 5000,
+        "health": 30,
+        "damage": 7,
+        "range": 150,
+        "los": 256
+      },
+      "upgrade": {
+        "health": "+10",
+        "damage": "+3"
+      }
+    }
+  },
+  "Crops": {
+    "BaseSeed": {
+      "width": 32,
+      "height": 32,
+      "abstract": true,
+      "isInteractable": true,
+      "dontShowHealth": true,
+      "categories": {"distribution":true,"not_structure_conduit":true,"crop":true,"seed":true},
+      "sprite": {
+        "width": 24,
+        "height": 24
+      },
+      "stats": {
+        "liquidCapacity": 10,
+        "health": 100
+      }
+    },
+    "FiberSeed": {
+      "parent": "Crops.BaseSeed",
+      "cost": {
+        "gold": 25
+      },
+      "yield": "PlantFiber",
+      "description": "Plant on soil to grow fiber"
+    },
+    "PotatoSeed": {
+      "parent": "Crops.BaseSeed",
+      "cost": {
+        "gold": 25
+      },
+      "yield": "Potato",
+      "description": "Plant on soil to grow potato"
+    },
+    "CoffeeSeed": {
+      "parent": "Crops.BaseSeed",
+      "cost": {
+        "gold": 100
+      },
+      "stats": {
+        "health": 100
+      },
+      "yield": "CoffeeBean",
+      "description": "Plant on soil to grow coffee"
+    },
+    "SunflowerSeed": {
+      "parent": "Crops.BaseSeed",
+      "sprite": {
+        "path": "sunflower_seed",
+        "maturepath": "sunflower"
+      },
+      "yield": "Sunflower",
+      "cost": {
+        "gold": 200
+      },
+      "stats": {
+        "health": 100
+      },
+      "description": "Plant on soil to grow Sunflower"
+    },
+    "BlueSeed": {
+      "parent": "Crops.BaseSeed",
+      "sprite": {
+        "path": "blue_seed",
+        "maturepath": "blue_lotus"
+      },
+      "yield": "BlueLotus",
+      "cost": {
+        "gold": 200
+      },
+      "stats": {
+        "health": 100
+      },
+      "description": "Plant on soil to grow Blue Lotus"
+    },
+    "PoppySeed": {
+      "parent": "Crops.BaseSeed",
+      "sprite": {
+        "path": "poppy_seed",
+        "maturepath": "poppy"
+      },
+      "yield": "Poppy",
+      "cost": {
+        "gold": 200
+      },
+      "stats": {
+        "health": 100
+      },
+      "description": "Plant on soil to grow Poppy"
+    },
+    "WheatSeed": {
+      "parent": "Crops.BaseSeed",
+      "cost": {
+        "gold": 100
+      },
+      "yield": "Wheat",
+      "stats": {
+        "health": 150
+      },
+      "description": "Plant on soil to grow wheat"
+    }
+  },
+  "Projectiles": {
+    "BasicLaser": {
+      "width": 5,
+      "height": 5,
+      "speed": 60,
+      "damage": 12,
+      "sprite": {
+        "width": 32,
+        "height": 4,
+        "tint": "#ffff07"
+      },
+      "categories": {"distance_dependent_width": true}
+    },
+    "MiningBeam": {
+      "width": 32,
+      "height": 32,
+      "speed": 0
+    },
+    "VoidRayLight": {
+      "width": 32,
+      "height": 32,
+      "speed": 0
+    },
+    "LightLaser": {
+      "width": 5,
+      "height": 5,
+      "speed": 70,
+      "sprite": {
+        "width": 32,
+        "height": 3,
+        "tint": "#f33136"
+      },
+      "categories": {"distance_dependent_width": true}
+    },
+    "CannonBall": {
+      "width": 32,
+      "height": 32,
+      "speed": 10
+    },
+    "Bubble": {
+      "width": 32,
+      "height": 32,
+      "speed": 12
+    },
+    "BlasterLaser": {
+      "width": 24,
+      "height": 8,
+      "speed": 15
+    },
+    "CarbonGas": {
+      "width": 64,
+      "height": 64,
+      "minWidth": 32,
+      "maxWidth": 40,
+      "maxRadialExpansion": 30,
+      "speed": 0
+    },
+    "DisinfectingGas": {
+      "width": 64,
+      "height": 64,
+      "minWidth": 32,
+      "maxWidth": 64,
+      "maxRadialExpansion": 32,
+      "speed": 0
+    },
+    "PoisonGas": {
+      "width": 64,
+      "height": 64,
+      "minWidth": 42,
+      "maxWidth": 50,
+      "maxRadialExpansion": 90,
+      "speed": 0
+    },
+    "AcidSpit": {
+      "width": 24,
+      "height": 24,
+      "speed": 8
+    },
+    "Grenade": {
+      "canDamageWalls": true,
+      "width": 16,
+      "height": 16,
+      "speed": 8
+    },
+    "MolotovCocktail": {
+      "canDamageWalls": false,
+      "width": 24,
+      "height": 28,
+      "speed": 12
+    },
+    "Meteor": {
+      "width": 64,
+      "height": 64,
+      "speed": 30
+    },
+    "PoisonGrenade": {
+      "width": 16,
+      "height": 16,
+      "speed": 8
+    },
+    "TeslaLaser": {
+      "width": 10,
+      "height": 10,
+      "damage": 40
+    },
+    "Explosion": {
+      "canDamageWalls": true,
+      "width": 192,
+      "height": 192,
+      "damage": 25,
+      "speed": 1
+    },
+    "Flame": {
+      "width": 32,
+      "height": 32,
+      "minWidth": 32,
+      "maxWidth": 64,
+      "maxRadialExpansion": 16,
+      "damage": 10,
+      "speed": 0,
+      "categories": {"elemental":true,"fire":true}
+    },
+    "IonBeam": {
+      "width": 512,
+      "height": 32,
+      "speed": 5
+    },
+    "Spike": {
+      "width": 32,
+      "height": 32
+    },
+    "Bullet": {
+      "width": 8,
+      "height": 8,
+      "sprite": {
+        "width": 32,
+        "height": 5,
+        "tint": "#ffff07"
+      },
+      "damage": 10,
+      "speed": 70,
+      "categories": {"distance_dependent_width": true}
+    },
+    "ShotgunBullet": {
+      "width": 8,
+      "height": 8,
+      "sprite": {
+        "width": 32,
+        "height": 5,
+        "tint": "#777777"
+      },
+      "damage": 12,
+      "speed": 50,
+      "categories": {"distance_dependent_width": true}
+    },
+    "RifleBullet": {
+      "width": 8,
+      "height": 8,
+      "sprite": {
+        "width": 32,
+        "height": 5,
+        "tint": "#666666"
+      },
+      "speed": 70,
+      "damage": 7,
+      "categories": {"distance_dependent_width": true}
+    },
+    "PlasmaBullet": {
+      "width": 32,
+      "height": 32,
+      "sprite": {
+        "width": 64,
+        "height": 16,
+        "tint": "#cc4ad7"
+      },
+      "isPiercing": true,
+      "speed": 120,
+      "damage": 40,
+      "categories": {"distance_dependent_width": true}
+    },
+    "Missile": {
+      "width": 32,
+      "height": 32,
+      "speed": 25,
+      "damage": 20
+    }
+  },
+  "Bars": {
+    "CircuitBoard": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 30
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "requirements": {
+        "CopperBar": 2
+      },
+      "upgrade": {},
+      "description": "CircuitBoard"
+    },
+    "CopperBar": {
+      "width": 25,
+      "height": 16,
+      "cost": {
+        "gold": 15
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "requirements": {
+        "CopperOre": 1
+      },
+      "upgrade": {},
+      "description": "Copper bar"
+    },
+    "SteelBar": {
+      "width": 25,
+      "height": 16,
+      "cost": {
+        "gold": 15
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "requirements": {
+        "IronOre": 1
+      },
+      "upgrade": {},
+      "description": "Steel bar"
+    },
+    "IronBar": {
+      "width": 25,
+      "height": 16,
+      "cost": {
+        "gold": 15
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "requirements": {
+        "IronOre": 1
+      },
+      "upgrade": {},
+      "description": "Iron bar"
+    },
+    "Glass": {
+      "width": 25,
+      "height": 16,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "requirements": {
+        "Sand": 1
+      },
+      "upgrade": {},
+      "description": "Glass"
+    }
+  },
+  "Ores": {
+    "PlantFiber": {
+      "width": 26,
+      "height": 22,
+      "categories": {"crop": true},
+      "isIngredient": true,
+      "cost": {
+        "gold": 5
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Ingredient for crafting medicine"
+    },
+    "Explosives": {
+      "width": 32,
+      "height": 32,
+      "categories": {},
+      "requirements": {
+        "SulfurOre": 1
+      },
+      "sprite": {
+        "path": "sunflower"
+      },
+      "isFlower": true,
+      "cost": {
+        "gold": 250
+      },
+      "stats": {
+      },
+      "upgrade": {},
+      "description": "Ingredient for making grenades and missiles"
+    },
+    "Sunflower": {
+      "width": 32,
+      "height": 32,
+      "categories": {"crop": true},
+      "sprite": {
+        "path": "sunflower"
+      },
+      "isFlower": true,
+      "cost": {
+        "gold": 250
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Flower that is placable on pot"
+    },
+    "BlueLotus": {
+      "width": 32,
+      "height": 32,
+      "categories": {"crop": true},
+      "cost": {
+        "gold": 250
+      },
+      "isFlower": true,
+      "sprite": {
+        "path": "blue_lotus"
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Flower that is placable on pot"
+    },
+    "Poppy": {
+      "width": 32,
+      "height": 32,
+      "categories": {"crop": true},
+      "cost": {
+        "gold": 250
+      },
+      "isFlower": true,
+      "sprite": {
+        "path": "poppy"
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Flower that is placable on pot"
+    },
+    "CoffeeBean": {
+      "width": 20,
+      "height": 20,
+      "categories": {"crop": true},
+      "cost": {
+        "gold": 200
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Ingredient for making coffee"
+    },
+    "Cloth": {
+      "width": 26,
+      "height": 22,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "requirements": {
+        "PlantFiber": 2
+      },
+      "upgrade": {},
+      "description": "Ingredient for crafting furnitures and armors"
+    },
+    "Web": {
+      "width": 26,
+      "height": 22,
+      "cost": {
+        "gold": 50
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Sticky. Useful for catching prey"
+    },
+    "Wood": {
+      "width": 26,
+      "height": 22,
+      "cost": {
+        "gold": 25
+      },
+      "stats": {
+        "health": 100
+      },
+      "upgrade": {},
+      "description": "Ingredient for crafting furnitures"
+    },
+    "Poison": {
+      "width": 26,
+      "height": 22,
+      "cost": {
+        "gold": 50
+      },
+      "stats": {
+        "health": 100
+      },
+      "upgrade": {},
+      "description": "Ingredient for crafting poisonous items or cure"
+    },
+    "SquidLordHeart": {
+      "width": 26,
+      "height": 22,
+      "cost": {
+        "gold": 1000
+      },
+      "stats": {
+        "health": 100
+      },
+      "upgrade": {},
+      "description": "Ingredient for crafting rare items"
+    },
+    "Sand": {
+      "width": 26,
+      "height": 22,
+      "cost": {
+        "gold": 15
+      },
+      "stats": {
+        "health": 100
+      },
+      "upgrade": {},
+      "description": "Ingredient for crafting certain equipments"
+    },
+    "NitroPowder": {
+      "width": 26,
+      "height": 22,
+      "cost": {
+        "gold": 20
+      },
+      "requirements": {
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Ingredient for crafting explosives"
+    },
+    "Gold": {
+      "width": 20,
+      "height": 25,
+      "cost": {
+        "gold": 1
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Currency for buying/selling goods and services"
+    },
+    "IceOre": {
+      "width": 20,
+      "height": 25,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Ice ore"
+    },
+    "IronOre": {
+      "width": 20,
+      "height": 25,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Iron ore"
+    },
+    "SteelOre": {
+      "width": 20,
+      "height": 25,
+      "cost": {
+        "gold": 15
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Steel ore"
+    },
+    "SulfurOre": {
+      "width": 20,
+      "height": 25,
+      "cost": {
+        "gold": 15
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Sulfur ore"
+    },
+    "Meteorite": {
+      "width": 20,
+      "height": 25,
+      "cost": {
+        "gold": 100
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Meteorite"
+    },
+    "CopperOre": {
+      "width": 20,
+      "height": 25,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "upgrade": {},
+      "description": "Copper ore"
+    }
+  },
+  "Ammos": {
+    "BulletAmmo": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5,
+        "range": 250
+      },
+      "requirements": {
+        "IronOre": 3
+      },
+      "upgrade": {},
+      "description": "Ammunition for Pistol/Turrets"
+    },
+    "PlasmaCell": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 8
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5,
+        "range": 250
+      },
+      "requirements": {
+        "SulfurOre": 1
+      },
+      "upgrade": {},
+      "description": "Ammunition for Plasma Gun"
+    },
+    "RifleAmmo": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 8
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5,
+        "range": 250
+      },
+      "requirements": {
+        "IronOre": 2
+      },
+      "upgrade": {},
+      "description": "Ammunition for AssaultRifle"
+    },
+    "ShotgunShell": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5,
+        "range": 250
+      },
+      "requirements": {
+        "IronOre": 10
+      },
+      "upgrade": {},
+      "description": "Ammunition for Shotgun"
+    },
+    "Missile": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+      },
+      "requirements": {
+        "CopperOre": 10,
+        "Explosives": 1
+      },
+      "upgrade": {},
+      "description": "Ammunition for Missile Turret"
+    }
+  },
+  "Drinks": {
+    "Beer": {
+      "width": 24,
+      "height": 24,
+      "sprite": {
+        "path": "beer"
+      },
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "stamina": 30
+      },
+      "requirements": {
+        "Wheat": 1,
+        "Bottle": 1
+      },
+      "description": "Restores 30 stamina. Dont Drink too much"
+    },
+    "Vodka": {
+      "width": 24,
+      "height": 24,
+      "sprite": {
+        "path": "vodka"
+      },
+      "cost": {
+        "gold": 600
+      },
+      "stats": {
+        "stamina": 40
+      },
+      "requirements": {
+        "Potato": 2,
+        "Bottle": 1
+      },
+      "description": "Restores 40 stamina. Make Russia great again!"
+    },
+    "EnergyDrink": {
+      "width": 24,
+      "height": 24,
+      "sprite": {
+        "path": "energy_drink"
+      },
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "stamina": 20
+      },
+      "requirements": {
+        "CoffeeBean": 5,
+        "Bottle": 1
+      },
+      "description": "Adds Haste effect."
+    },
+    "AlienJuice": {
+      "width": 24,
+      "height": 24,
+      "sprite": {
+        "path": "alien_juice"
+      },
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "stamina": 20
+      },
+      "requirements": {
+        "SquidLordHeart": 1,
+        "Bottle": 1
+      },
+      "description": "Adds Invisibility effect."
+    },
+    "Cola": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 80
+      },
+      "sprite": {
+        "path": "cola",
+        "position": {
+          "x": 48,
+          "y": 20
+        },
+        "rotation": 35
+      },
+      "stats": {
+        "stamina": 10,
+        "thirst": 20
+      },
+      "requirements": {
+        "PlantFiber": 3,
+        "Bottle": 1
+      },
+      "description": "Restores 10 stamina"
+    },
+    "Coffee": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 300
+      },
+      "sprite": {
+        "path": "coffee",
+        "position": {
+          "x": 48,
+          "y": 20
+        },
+        "rotation": 35
+      },
+      "stats": {
+        "stamina": 50,
+        "thirst": 20
+      },
+      "requirements": {
+        "CoffeeBean": 1,
+        "Bottle": 1
+      },
+      "description": "Restores 50 stamina"
+    }
+  },
+  "Foods": {
+    "Gelatin": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 15
+      },
+      "stats": {
+        "food": 25
+      },
+      "requirements": {
+        "Gel": 1
+      },
+      "upgrade": {},
+      "description": "Good source of protein. Yummy"
+    },
+    "Gel": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "food": 5
+      },
+      "isIngredient": true,
+      "upgrade": {},
+      "description": "Can be cooked to make gelatin."
+    },
+    "AlienMeat": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 5
+      },
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "rotation": 0
+      },
+      "stats": {
+        "food": 15
+      },
+      "upgrade": {},
+      "description": "Raw Alien Meat. Cook to eat."
+    },
+    "HumanMeat": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 20
+      },
+      "isIngredient": true,
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "rotation": 0
+      },
+      "stats": {
+        "food": 25
+      },
+      "upgrade": {},
+      "description": "Raw Human Meat. Do not eat."
+    },
+    "AnimalMeat": {
+      "width": 24,
+      "height": 24,
+      "isIngredient": true,
+      "cost": {
+        "gold": 15
+      },
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "rotation": 0
+      },
+      "stats": {
+        "food": 25
+      },
+      "upgrade": {},
+      "description": "Raw Animal Meat. Tasty if cooked."
+    },
+    "HotDog": {
+      "width": 24,
+      "height": 24,
+      "sprite": {
+        "position": {
+          "x": 60,
+          "y": 15
+        }
+      },
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "food": 25
+      },
+      "requirements": {
+        "AnimalMeat": 1,
+        "Wheat": 1
+      },
+      "upgrade": {},
+      "description": "Cooked Animal Meat. Classic American Food."
+    },
+    "Bread": {
+      "width": 24,
+      "height": 24,
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "rotation": 0
+      },
+      "cost": {
+        "gold": 250
+      },
+      "stats": {
+        "food": 25
+      },
+      "requirements": {
+        "Wheat": 1
+      },
+      "upgrade": {},
+      "description": "Yummy breakfast food"
+    },
+    "VeganPizza": {
+      "width": 40,
+      "height": 40,
+      "sprite": {
+        "position": {
+          "x": 95,
+          "y": -5
+        }
+      },
+      "cost": {
+        "gold": 500
+      },
+      "stats": {
+        "food": 50
+      },
+      "requirements": {
+        "PlantFiber": 5,
+        "Wheat": 2
+      },
+      "upgrade": {},
+      "description": "Pizza for vegans."
+    },
+    "SlimyMeatPizza": {
+      "width": 40,
+      "height": 40,
+      "cost": {
+        "gold": 500
+      },
+      "sprite": {
+        "position": {
+          "x": 95,
+          "y": -5
+        }
+      },
+      "stats": {
+        "food": 100
+      },
+      "requirements": {
+        "Gel": 2,
+        "Wheat": 2
+      },
+      "upgrade": {},
+      "description": "Exotic Pizza made from slime and animal meat."
+    },
+    "LectersDinner": {
+      "width": 40,
+      "height": 40,
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "food": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 70,
+          "y": 0
+        }
+      },
+      "requirements": {
+        "HumanMeat": 1
+      },
+      "upgrade": {},
+      "description": "Cooked Human meat"
+    },
+    "Potato": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 150
+      },
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "rotation": 0
+      },
+      "stats": {
+        "food": 40
+      },
+      "upgrade": {},
+      "description": "Staple food for Survival."
+    },
+    "Wheat": {
+      "width": 24,
+      "height": 24,
+      "categories": {"crop": true},
+      "isIngredient": true,
+      "cost": {
+        "gold": 200
+      },
+      "sprite": {
+        "position": {
+          "x": 70,
+          "y": 0
+        }
+      },
+      "isEdible": false,
+      "stats": {
+        "food": 10
+      },
+      "upgrade": {},
+      "description": "Raw wheat. For making bread"
+    },
+    "Egg": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 50
+      },
+      "isIngredient": true,
+      "stats": {
+        "food": 10
+      },
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "rotation": 0
+      },
+      "upgrade": {},
+      "description": "Good protein source"
+    },
+    "Fries": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 100
+      },
+      "isIngredient": true,
+      "stats": {
+        "food": 70
+      },
+      "sprite": {
+        "position": {
+          "x": 65,
+          "y": 5
+        },
+        "rotation": 90
+      },
+      "requirements": {
+        "Potato": 3
+      },
+      "upgrade": {},
+      "description": "Yummy potato fries"
+    },
+    "Steak": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 200
+      },
+      "stats": {
+        "food": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "rotation": 0
+      },
+      "requirements": {
+        "AlienMeat": 1
+      },
+      "upgrade": {},
+      "description": "Cooked meat. Dont care where it came from. "
+    },
+    "PotatoSoup": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 200
+      },
+      "sprite": {
+        "anchor": 0.5
+      },
+      "stats": {
+        "food": 75
+      },
+      "requirements": {
+        "Bowl": 1,
+        "Potato": 2,
+        "Bread": 1
+      },
+      "upgrade": {},
+      "description": "Healthy and luxury breakfast dish"
+    },
+    "SlimeBroth": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 200
+      },
+      "sprite": {
+        "anchor": 0.5
+      },
+      "stats": {
+        "food": 40
+      },
+      "requirements": {
+        "Bowl": 1,
+        "Gel": 3
+      },
+      "upgrade": {},
+      "description": "An unembellished, but edible soup. Who knew your pet could satisfy your hunger?"
+    },
+    "MisoSoup": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 200
+      },
+      "sprite": {
+        "anchor": 0.5
+      },
+      "stats": {
+        "food": 50
+      },
+      "requirements": {
+        "Bowl": 1,
+        "Bread": 2
+      },
+      "upgrade": {},
+      "description": "A simple, but tasty soup dish. Don't burn your tongue!"
+    },
+    "Omelette": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 200
+      },
+      "stats": {
+        "food": 25
+      },
+      "sprite": {
+        "position": {
+          "x": 64,
+          "y": 0
+        },
+        "rotation": 90
+      },
+      "requirements": {
+        "Egg": 1
+      },
+      "upgrade": {},
+      "description": "Breakfast favorite."
+    },
+    "Starberries": {
+      "width": 21,
+      "height": 14,
+      "cost": {
+        "gold": 500
+      },
+      "stats": {
+        "food": 40,
+        "health": 30
+      },
+      "sprite": {
+        "position": {
+          "x": 64,
+          "y": 0
+        },
+        "rotation": 90
+      },
+      "upgrade": {},
+      "description": "Strange berries from alien bushes."
+    },
+    "Antidote": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 15
+      },
+      "isEdible": false,
+      "categories": {"drug": true},
+      "sprite": {
+        "position": {
+          "x": 50,
+          "y": 20
+        },
+        "rotation": 35
+      },
+      "stats": {
+        "food": 0,
+        "health": 100,
+        "reload": 3000
+      },
+      "requirements": {
+        "Poison": 1,
+        "Bottle": 1
+      },
+      "upgrade": {},
+      "description": "Cures poison"
+    },
+    "BloodPack": {
+      "width": 24,
+      "height": 24,
+      "isEdible": false,
+      "categories": {"drug": true},
+      "cost": {
+        "gold": 80
+      },
+      "sprite": {
+        "position": {
+          "x": 40,
+          "y": 0
+        },
+        "rotation": 0
+      },
+      "stats": {
+        "food": 0,
+        "health": 50
+      },
+      "requirements": {
+        "BloodBottle": 1
+      },
+      "upgrade": {},
+      "description": "Heals 50 health points"
+    },
+    "Stimpack": {
+      "width": 24,
+      "height": 24,
+      "categories": {"drug": true},
+      "isEdible": false,
+      "cost": {
+        "gold": 600
+      },
+      "sprite": {
+        "position": {
+          "x": 50,
+          "y": 55
+        },
+        "rotation": 210
+      },
+      "stats": {
+        "food": 0
+      },
+      "requirements": {
+        "IronBar": 20,
+        "BloodPack": 1,
+        "PlantFiber": 5
+      },
+      "upgrade": {},
+      "description": "Doubles Attack Speed for 15 seconds. Reduces health by 25"
+    },
+    "FirstAidKit": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 50
+      },
+      "isEdible": false,
+      "categories": {"drug": true},
+      "stats": {
+        "food": 0,
+        "health": 50
+      },
+      "requirements": {
+        "PlantFiber": 5
+      },
+      "upgrade": {},
+      "description": "Heals 50 health points instantly"
+    }
+  },
+  "Equipments": {
+    "BaseEquipment": {
+      "abstract": true,
+      "width": 24,
+      "height": 24,
+      "useOriginalSize": true,
+      "stats": {
+        "health": 100,
+        "speed": 5
+      }
+    },
+    "MeleeEquipment": {
+      "parent": "Equipments.BaseEquipment",
+      "categories": {"melee_weapon": true},
+      "useOriginalSize": true,
+      "abstract": true,
+      "stats": {
+        "range": 32
+      }
+    },
+    "Syringe": {
+      "parent": "Equipments.BaseEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 30
+      },
+      "stats": {
+        "range": 250,
+        "liquidCapacity": 100
+      },
+      "description": "[Deprecated]"
+    },
+    "Lighter": {
+      "parent": "Equipments.MeleeEquipment",
+      "isAnimatable": true,
+      "isWeapon": true,
+      "cost": {
+        "gold": 100
+      },
+      "shouldNotRemoveOnBreak": true,
+      "stats": {
+        "health": 50,
+        "range": 64,
+        "usageCapacity": 10,
+        "fuelConsumption": 40,
+        "meleeRange": 48
+      },
+      "requirements": {
+        "Glass": 2,
+        "CopperBar": 5
+      },
+      "description": "Lit things on fire. Refill with FuelTank"
+    },
+    "NameTag": {
+      "parent": "Equipments.MeleeEquipment",
+      "isStackable": true,
+      "cost": {
+        "gold": 15000
+      },
+      "sprite": {
+        "position": {
+          "x": 48,
+          "y": 16
+        },
+        "rotation": 0
+      },
+      "isUnbreakable": true,
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+      },
+      "description": "Change name of pet or slave"
+    },
+    "Bottle": {
+      "parent": "Equipments.MeleeEquipment",
+      "cost": {
+        "gold": 15
+      },
+      "shouldShowUsage": true,
+      "isUnbreakable": true,
+      "shouldNotRemoveOnBreak": true,
+      "isAnimatable": true,
+      "stats": {
+        "range": 64,
+        "liquidCapacity": 100,
+        "oxygenProduction": 50
+      },
+      "requirements": {
+        "Glass": 2
+      },
+      "description": "Stores liquid"
+    },
+    "BloodBottle": {
+      "parent": "Equipments.Bottle",
+      "description": "Contains Blood"
+    },
+    "Bowl": {
+      "parent": "Equipments.MeleeEquipment",
+      "width": 32,
+      "height": 32,
+      "isStackable": true,
+      "shouldShowUsage": false,
+      "isUnbreakable": true,
+      "cost": {
+        "gold": 100
+      },
+      "sprite": {
+        "path": "bowl_by_px",
+        "position": {
+          "x": 50,
+          "y": 20
+        },
+        "anchor": 0.5
+      },
+      "stats": {
+      },
+      "requirements": {
+        "Wood": 10
+      },
+      "description": "Can be used to craft Soups"
+    },
+    "WaterBottle": {
+      "parent": "Equipments.Bottle",
+      "description": "Used to fill up OxygenGenerator or watering plants"
+    },
+    "SurvivalTool": {
+      "parent": "Equipments.MeleeEquipment",
+      "isAnimatable": true,
+      "isUnbreakable": true,
+      "isWeapon": true,
+      "categories": {"melee_damage": true},
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "damage": 2,
+        "range": 250,
+        "meleeRange": 48
+      },
+      "requirements": {
+        "IronBar": 25,
+        "CircuitBoard": 5
+      },
+      "description": "Used for mining, and salvaging objects. Damage 2"
+    },
+    "Drill": {
+      "parent": "Equipments.MeleeEquipment",
+      "isAnimatable": true,
+      "isWeapon": true,
+      "cost": {
+        "gold": 600
+      },
+      "stats": {
+        "damage": 5,
+        "range": 250,
+        "meleeRange": 48
+      },
+      "requirements": {
+        "IronBar": 20,
+        "CopperBar": 20,
+        "Wire": 5
+      },
+      "description": "Mines Asteroids faster. Damage 5"
+    },
+    "Pistol": {
+      "parent": "Equipments.BaseEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 250
+      },
+      "stats": {
+        "range": 960,
+        "damage": 10,
+        "health": 300,
+        "reload": 500
+      },
+      "requirements": {
+        "IronBar": 10,
+        "CopperBar": 10
+      },
+      "description": "Range weapon. Damage 10"
+    },
+    "Shotgun": {
+      "parent": "Equipments.BaseEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 550
+      },
+      "stats": {
+        "range": 256,
+        "damage": 12,
+        "health": 300,
+        "reload": 1500
+      },
+      "requirements": {
+        "IronBar": 20,
+        "CopperBar": 20
+      },
+      "description": "Spread shot weapon. Each Deals Damage 12"
+    },
+    "PlasmaGun": {
+      "parent": "Equipments.BaseEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 2000
+      },
+      "stats": {
+        "range": 1280,
+        "damage": 65,
+        "health": 300,
+        "reload": 1200
+      },
+      "requirements": {
+        "CopperBar": 20,
+        "Meteorite": 20
+      },
+      "description": "Concentrated Energy Shot weapon"
+    },
+    "AssaultRifle": {
+      "parent": "Equipments.BaseEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 900
+      },
+      "stats": {
+        "range": 960,
+        "damage": 7,
+        "health": 300,
+        "reload": 1000
+      },
+      "requirements": {
+        "IronBar": 30,
+        "CopperBar": 30
+      },
+      "description": "Burst Weapon that shoots fast projectiles"
+    },
+    "Scar17": {
+      "parent": "Equipments.BaseEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 700
+      },
+      "stats": {
+        "range": 960,
+        "damage": 9,
+        "health": 300,
+        "reload": 1200
+      },
+      "requirements": {
+        "IronBar": 70,
+        "CopperBar": 70
+      },
+      "description": "Burst Weapon that shoots fast projectiles"
+    },
+    "RocketLauncher": {
+      "parent": "Equipments.BaseEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 900
+      },
+      "stats": {
+        "range": 960,
+        "damage": 25,
+        "health": 300,
+        "reload": 1000
+      },
+      "requirements": {
+        "SulfurOre": 2,
+        "CircuitBoard": 20
+      },
+      "description": "Shoots missiles towards target enemy"
+    },
+    "FlameThrower": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 450
+      },
+      "isFireArm": true,
+      "shouldNotRemoveOnBreak": true,
+      "stats": {
+        "damage": 2,
+        "usageCapacity": 20,
+        "fuelConsumption": 80,
+        "range": 200
+      },
+      "requirements": {
+        "CopperBar": 30
+      },
+      "description": "Shoots flames"
+    },
+    "SquidStaff": {
+      "parent": "Equipments.BaseEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 5000
+      },
+      "sprite": {
+        "position": {
+          "x": 70,
+          "y": -60
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "stats": {
+        "range": 800,
+        "damage": 10,
+        "health": 300,
+        "reload": 800
+      },
+      "requirements": {
+        "SquidLordHeart": 1,
+        "Meteorite": 20
+      },
+      "description": "Shoots 5 beams of charged energy"
+    },
+    "MolotovCocktail": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "isThrowable": true,
+      "isUnbreakable": true,
+      "cost": {
+        "gold": 80
+      },
+      "stats": {
+        "damage": 5,
+        "range": 256
+      },
+      "requirements": {
+        "Beer": 1,
+        "Cloth": 1
+      },
+      "description": "Throw it to an area to create flames"
+    },
+    "Grenade": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "isThrowable": true,
+      "isStackable": true,
+      "isUnbreakable": true,
+      "isCostIndependent": true,
+      "cost": {
+        "gold": 1000
+      },
+      "stats": {
+        "damage": 25,
+        "range": 256,
+        "reload": 1000
+      },
+      "requirements": {
+        "Explosives": 1,
+        "IronBar": 5
+      },
+      "description": "Throwable item that creates explosive damage"
+    },
+    "PoisonGrenade": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "isThrowable": true,
+      "isStackable": true,
+      "isUnbreakable": true,
+      "isCostIndependent": true,
+      "cost": {
+        "gold": 750
+      },
+      "stats": {
+        "damage": 25,
+        "range": 256,
+        "reload": 1000
+      },
+      "requirements": {
+        "Explosives": 1,
+        "Poison": 1
+      },
+      "description": "Throwable item that emits poison to an area"
+    },
+    "FireExtinguisher": {
+      "parent": "Equipments.BaseEquipment",
+      "cost": {
+        "gold": 200
+      },
+      "stats": {
+        "range": 64,
+        "damage": 2
+      },
+      "requirements": {
+        "IronBar": 25
+      },
+      "description": "Puts out fire."
+    },
+    "Disinfectant": {
+      "parent": "Equipments.BaseEquipment",
+      "cost": {
+        "gold": 200
+      },
+      "stats": {
+        "range": 32,
+        "damage": 2
+      },
+      "sprite": {
+        "position": {
+          "x": 70,
+          "y": 20
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "requirements": {
+        "PlantFiber": 10,
+        "Bottle": 1
+      },
+      "description": "Cleans area. Removes miasma."
+    },
+    "Radio": {
+      "parent": "Equipments.BaseEquipment",
+      "isUnbreakable": true,
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "range": 32,
+        "damage": 2
+      },
+      "sprite": {
+        "position": {
+          "x": 70,
+          "y": 20
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "requirements": {
+        "CircuitBoard": 20,
+        "IronBar": 10
+      },
+      "description": "Comm Device. Report suspicious activities."
+    },
+    "PocketTrader": {
+      "parent": "Equipments.BaseEquipment",
+      "isUnbreakable": true,
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "range": 32,
+        "damage": 2
+      },
+      "sprite": {
+        "position": {
+          "x": 30,
+          "y": 0
+        },
+        "anchor": 0,
+        "rotation": 0
+      },
+      "requirements": {
+        "CircuitBoard": 20,
+        "Meteorite": 10
+      },
+      "description": "Buy/Sell items"
+    },
+    "Wrench": {
+      "parent": "Equipments.BaseEquipment",
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "range": 32,
+        "damage": 2,
+        "meleeRange": 48
+      },
+      "sprite": {
+        "position": {
+          "x": 50,
+          "y": 15
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "isAnimatable": true,
+      "requirements": {
+        "IronBar": 25
+      },
+      "description": "Repairs Structures"
+    },
+    "Mop": {
+      "parent": "Equipments.MeleeEquipment",
+      "cost": {
+        "gold": 50
+      },
+      "isAnimatable": true,
+      "stats": {
+        "damage": 1,
+        "health": 30,
+        "range": 40,
+        "meleeRange": 48
+      },
+      "requirements": {
+        "IronOre": 10
+      },
+      "upgrade": {},
+      "description": "Floor cleaning equipment"
+    },
+    "LeadPipe": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 100
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 7,
+        "range": 55,
+        "meleeRange": 55
+      },
+      "requirements": {
+        "IronOre": 10
+      },
+      "description": "Basic Melee weapon. Damage 7"
+    },
+    "PlasmaBlade": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "sprite": {
+        "width": 120,
+        "height": 40,
+        "position": {
+          "x": 62,
+          "y": 0
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "cost": {
+        "gold": 1000
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 35,
+        "range": 75,
+        "meleeRange": 75
+      },
+      "requirements": {
+        "CopperBar": 20,
+        "Meteorite": 25
+      },
+      "description": "Strong blade made of plasma"
+    },
+    "AssassinsKnife": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 1000
+      },
+      "shouldShowCooldown": true,
+      "sprite": {
+        "position": {
+          "x": 30,
+          "y": 0
+        },
+        "anchor": 0,
+        "rotation": 0
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "canDamageEveryone": true,
+      "stats": {
+        "damage": 1,
+        "attackRadius": 128,
+        "reload": 20000
+      },
+      "requirements": {
+      },
+      "description": "Looks like a radio but is actually an Assassins Knife"
+    },
+    "Katana": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 500
+      },
+      "categories": {"melee_damage": true},
+      "sprite": {
+        "position": {
+          "x": 50,
+          "y": 5
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "concurrentTargetCount": 3,
+      "isAnimatable": true,
+      "stats": {
+        "damage": 10,
+        "range": 48,
+        "attackRadius": 48,
+        "meleeRange": 48
+      },
+      "requirements": {
+        "IronOre": 50,
+        "Wood": 20
+      },
+      "description": "Can slice through 3 enemies at a time. Damage 10."
+    },
+    "BlueEnergySword": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 2000
+      },
+      "categories": {"melee_damage": true},
+      "sprite": {
+        "position": {
+          "x": 45,
+          "y": 5
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "concurrentTargetCount": 3,
+      "isAnimatable": true,
+      "stats": {
+        "damage": 25,
+        "range": 48,
+        "attackRadius": 48,
+        "meleeRange": 48
+      },
+      "requirements": {
+        "Meteorite": 10,
+        "CopperBar": 10
+      },
+      "description": "A energy based sword forged from meteorite. Damage 25"
+    },
+    "GreenEnergySword": {
+      "parent": "Equipments.BlueEnergySword"
+    },
+    "RedEnergySword": {
+      "parent": "Equipments.BlueEnergySword"
+    },
+    "StunBaton": {
+      "parent": "Equipments.MeleeEquipment",
+      "isAnimatable": true,
+      "isWeapon": true,
+      "cost": {
+        "gold": 150
+      },
+      "sprite": {
+        "path": "stun_baton",
+        "position": {
+          "x": 42,
+          "y": 0
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "categories": {"wall_breaker":true,"melee_damage":true},
+      "stats": {
+        "damage": 6,
+        "health": 200,
+        "range": 48,
+        "meleeRange": 48
+      },
+      "requirements": {
+        "IronBar": 10,
+        "CircuitBoard": 2
+      },
+      "description": "Melee Weapon that can stun enemy. Damage 6"
+    },
+    "SantaHat": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 50,
+      "height": 50,
+      "cost": {
+        "gold": 10000
+      },
+      "isCostIndependent": true,
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "Cloth": 20
+      },
+      "description": "Hat that santa wears"
+    },
+    "SpaceSuit": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 64,
+      "height": 64,
+      "lightColor": "#ffffff",
+      "isLightPersistent": true,
+      "brightness": 0.8,
+      "cost": {
+        "gold": 200
+      },
+      "stats": {
+        "range": 64,
+        "oxygen": 300
+      },
+      "requirements": {
+        "Glass": 5,
+        "Cloth": 20,
+        "IronBar": 20
+      },
+      "description": "Wear this in space to avoid suffocating"
+    },
+    "CombatArmor": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 64,
+      "height": 64,
+      "lightColor": "#ffffff",
+      "isLightPersistent": true,
+      "isCostIndependent": true,
+      "brightness": 0.8,
+      "cost": {
+        "gold": 8000
+      },
+      "stats": {
+        "range": 64,
+        "oxygen": 150,
+        "defense": 4
+      },
+      "requirements": {
+        "Meteorite": 40,
+        "SpaceSuit": 1
+      },
+      "description": "Good for melee combat. Reduces damage by 4."
+    },
+    "PrisonerSuit": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 64,
+      "height": 64,
+      "lightColor": "#ffffff",
+      "isLightPersistent": true,
+      "brightness": 0.8,
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "PlantFiber": 30
+      },
+      "description": "Prisoner clothing"
+    },
+    "PoliceSuit": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 64,
+      "height": 64,
+      "lightColor": "#ffffff",
+      "isLightPersistent": true,
+      "brightness": 0.8,
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "PlantFiber": 50
+      },
+      "description": "Police clothing"
+    },
+    "LabCoat": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 64,
+      "height": 64,
+      "lightColor": "#ffffff",
+      "isLightPersistent": true,
+      "brightness": 0.8,
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "PlantFiber": 50
+      },
+      "description": "Scientist clothing"
+    },
+    "CultistSuit": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 80,
+      "height": 75,
+      "lightColor": "#ffffff",
+      "isLightPersistent": true,
+      "brightness": 0.8,
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "PlantFiber": 50
+      },
+      "description": "Cult Leader clothing"
+    },
+    "HazmatSuit": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 64,
+      "height": 64,
+      "lightColor": "#ffffff",
+      "isLightPersistent": true,
+      "isCostIndependent": true,
+      "brightness": 0.8,
+      "cost": {
+        "gold": 25000
+      },
+      "stats": {
+        "range": 64,
+        "oxygen": 150
+      },
+      "requirements": {
+        "Meteorite": 50,
+        "PlantFiber": 20,
+        "SpaceSuit": 1
+      },
+      "description": "Protect against environmental hazards (miasma, poison)"
+    }
+  },
+  "Transports": {
+    "RailTram": {
+      "width": 96,
+      "height": 96,
+      "cost": {
+        "gold": 1000
+      },
+      "categories": {"rail":true,"rail_tram":true},
+      "isPassable": true,
+      "requirements": {
+        "IronBar": 50,
+        "Wire": 10,
+        "CircuitBoard": 5
+      },
+      "stats": {
+        "health": 500,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Fast rail transportation. Must be placed at end of Rail Track"
+    }
+  },
+  "Floors": {
+    "BaseFloor": {
+      "categories": {"platform": true},
+      "abstract": true,
+      "width": 32,
+      "height": 32
+    },
+    "Lattice": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 15
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 50,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Lightweight support. Can only be placed outside asteroid area"
+    },
+    "Floor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 20
+      },
+      "categories": {"custom_colors": true},
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 125
+      },
+      "description": "Customizable floor. Double-click to change color and texture"
+    },
+    "SteelFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 20
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 50,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Allow players to move around and place additional buildings"
+    },
+    "WoodFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "requirements": {
+        "Wood": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "wooden floor"
+    },
+    "BlueFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "sprite": {
+        "path": "blue_floor"
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "blue floor"
+    },
+    "GreenFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "green floor"
+    },
+    "PurpleFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "purple floor"
+    },
+    "YellowFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "sprite": {
+        "path": "yellow_floor"
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "yellow floor"
+    },
+    "BronzeFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "sprite": {
+        "path": "bronze_floor"
+      },
+      "requirements": {
+        "CopperBar": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "Bronze floor"
+    },
+    "GrayFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "sprite": {
+        "path": "gray_floor"
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "gray floor"
+    },
+    "GrassFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 40
+      },
+      "sprite": {
+        "path": "grass_floor"
+      },
+      "requirements": {
+        "IronBar": 1,
+        "PlantFiber": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "grass floor"
+    },
+    "PinkFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "sprite": {
+        "path": "pink_floor"
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "pink floor"
+    },
+    "CarpetFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "requirements": {
+        "Cloth": 2
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "red carpet"
+    },
+    "PlatedFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "plated floor"
+    },
+    "StripePlatedFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "stripe plated floor"
+    },
+    "Soil": {
+      "width": 32,
+      "height": 32,
+      "categories": {"soil":true,"platform":true},
+      "cost": {
+        "gold": 30
+      },
+      "requirements": {
+        "Sand": 2
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "Used for growing crops"
+    },
+    "TiledFloor": {
+      "parent": "Floors.BaseFloor",
+      "cost": {
+        "gold": 30
+      },
+      "requirements": {
+        "IronBar": 2
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "tiled floor"
+    }
+  },
+  "Walls": {
+    "BaseWall": {
+      "width": 32,
+      "height": 32,
+      "abstract": true,
+      "isLightBlocker": true,
+      "isAirtight": true,
+      "isUpgradable": true,
+      "minimapColor": "#444444",
+      "categories": {"wall":true, "melee_resistant":true, "custom_colors": true},
+      "cost": {
+        "gold": 15
+      },
+      "requirements": {
+        "IronBar": 1
+      },
+      "stats": {
+        "health": 300,
+        "pvpHealth": 600,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      }
+    },
+    "Wall": {
+      "parent": "Walls.BaseWall",
+      "sprite": {
+        "path": "wall",
+        "basepath": "wall_0",
+        "color": "#2a2a2a"
+      },
+      "description": "Airtight structure for sealing a room"
+    },
+    "BlueWall": {
+      "parent": "Walls.BaseWall",
+      "description": "blue wall",
+      "sprite": {
+        "path": "blue_wall",
+        "basepath": "wall_0",
+        "color": "#3a3e55"
+      }
+    },
+    "GreenWall": {
+      "parent": "Walls.BaseWall",
+      "description": "green wall",
+      "sprite": {
+        "path": "green_wall",
+        "basepath": "wall_0",
+        "color": "#25352d"
+      }
+    },
+    "IvoryWall": {
+      "parent": "Walls.BaseWall",
+      "description": "white wall",
+      "sprite": {
+        "path": "white_wall",
+        "basepath": "wall_0",
+        "color": "#8c8a7d"
+      }
+    }
+  },
+  "Buildings": {
+    "HangarCornerBlock": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5,
+        "count": 2
+      },
+      "upgrade": {
+        "health": "+150",
+        "count": "+1"
+      },
+      "maxCount": 1
+    },
+    "HangarController": {
+      "width": 32,
+      "height": 64,
+      "cost": {
+        "gold": 300
+      },
+      "isInteractable": true,
+      "energy": 50,
+      "stats": {
+        "health": 100,
+        "speed": 5,
+        "count": 2
+      },
+      "upgrade": {
+        "health": "+150",
+        "count": "+1"
+      },
+      "maxCount": 1
+    },
+    "ShipyardConstructor": {
+      "width": 32,
+      "height": 32,
+      "hasMenu": true,
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5,
+        "count": 2
+      },
+      "upgrade": {
+        "health": "+150",
+        "count": "+1"
+      },
+      "maxCount": 1
+    },
+    "Thruster": {
+      "width": 32,
+      "height": 32,
+      "isAirtight": true,
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5,
+        "count": 2
+      },
+      "upgrade": {
+        "health": "+150",
+        "count": "+1"
+      },
+      "maxCount": 1,
+      "description": "Provided ship mobility"
+    },
+    "Reactor": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 500
+      },
+      "stats": {
+        "health": 500,
+        "powerProduction": 100,
+        "count": 3
+      },
+      "upgrade": {
+        "health": "+100",
+        "energy": "+50",
+        "count": "+1"
+      },
+      "maxCount": 1,
+      "description": "Generates Energy for Weapons"
+    },
+    "MineralStorage": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 250
+      },
+      "stats": {
+        "health": 250,
+        "minerals": 5000,
+        "count": 2
+      },
+      "upgrade": {
+        "health": "+100",
+        "minerals": "+5000"
+      },
+      "maxCount": 1
+    },
+    "MineralMiner": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 500
+      },
+      "stats": {
+        "damage": 20,
+        "health": 200,
+        "production": 500,
+        "reload": 2500,
+        "range": 700,
+        "count": 1
+      },
+      "upgrade": {
+        "damage": "+2",
+        "health": "+100",
+        "count": "+1"
+      },
+      "maxCount": 1,
+      "description": "Increases Minerals overtime"
+    },
+    "ShieldGenerator": {
+      "width": 64,
+      "height": 64,
+      "energy": 100,
+      "cost": {
+        "gold": 500
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+250",
+        "count": "+1"
+      },
+      "maxCount": 1,
+      "description": "Generates a force field around the entire ship. [Requires Energy]"
+    },
+    "WallLamp": {
+      "width": 32,
+      "height": 32,
+      "isInteractable": true,
+      "categories": {"not_structure_conduit":true,"switch":true,"lamp":true},
+      "hasEditableContent": true,
+      "showInteractTooltip": true,
+      "isPassable": true,
+      "isLightSource": true,
+      "lightColor": "#ffffff",
+      "lightRadius": 15,
+      "useOriginalSize": true,
+      "cost": {
+        "gold": 50
+      },
+      "requirements": {
+        "Glass": 1,
+        "CopperBar": 2
+      },
+      "stats": {
+        "health": 50,
+        "count": 1,
+        "powerConsumption": 50
+      },
+      "upgrade": {
+        "health": "+250",
+        "count": "+1"
+      },
+      "maxCount": 1,
+      "description": "Lights up surrounding."
+    },
+    "Lamp": {
+      "width": 32,
+      "height": 32,
+      "isInteractable": true,
+      "categories": {"not_structure_conduit":true,"switch":true,"lamp":true},
+      "hasEditableContent": true,
+      "showInteractTooltip": true,
+      "isPassable": true,
+      "isLightSource": true,
+      "lightColor": "#ffffff",
+      "lightRadius": 15,
+      "useOriginalSize": true,
+      "cost": {
+        "gold": 50
+      },
+      "requirements": {
+        "Glass": 1,
+        "CopperBar": 2
+      },
+      "stats": {
+        "health": 50,
+        "count": 1,
+        "powerConsumption": 50
+      },
+      "upgrade": {
+        "health": "+250",
+        "count": "+1"
+      },
+      "maxCount": 1,
+      "description": "Lights up surrounding."
+    },
+    "PowerSwitch": {
+      "width": 64,
+      "height": 64,
+      "isInteractable": true,
+      "categories": {"switch":true,"power_conduit":true},
+      "showInteractTooltip": true,
+      "isLightSource": true,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "rotation": 90
+      },
+      "requirements": {
+        "CircuitBoard": 10,
+        "CopperBar": 20
+      },
+      "stats": {
+        "health": 200,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+250"
+      },
+      "description": "Controls multiple power sources. Can turn them off/on"
+    },
+    "WaterPump": {
+      "width": 64,
+      "height": 96,
+      "isInteractable": true,
+      "cost": {
+        "gold": 500
+      },
+      "requirements": {
+        "IronBar": 30,
+        "LiquidPipe": 5
+      },
+      "stats": {
+        "health": 250,
+        "count": 1,
+        "liquidProduction": 10
+      },
+      "upgrade": {
+        "health": "+250",
+        "count": "+1"
+      },
+      "maxCount": 1,
+      "description": "Generates water. Must be placed beside water source and connected via pipes"
+    },
+    "BaseStarter": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 2500
+      },
+      "stats": {
+        "health": 200,
+        "range": 2000,
+        "reload": 1
+      },
+      "upgrade": {
+        "health": "+250",
+        "range": "+5"
+      },
+      "maxCount": 1,
+      "description": "Allows player to create a new base."
+    },
+    "Core": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 250
+      },
+      "hasFillBar": true,
+      "isInteractable": true,
+      "stats": {
+        "health": 1000,
+        "range": 2000,
+        "reload": 1,
+        "powerProduction": 10,
+        "powerCapacity": 500,
+        "clientResource": "power"
+      },
+      "upgrade": {
+        "health": "+250",
+        "range": "+5"
+      },
+      "maxCount": 1,
+      "description": "Power Source. 500 W"
+    },
+    "Beaker": {
+      "width": 32,
+      "height": 32,
+      "requirements": {
+        "Glass": 5
+      },
+      "cost": {
+        "gold": 75
+      },
+      "stats": {
+        "health": 100,
+        "count": 100,
+        "liquidCapacity": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "stores injectable samples"
+    },
+    "Cage": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 50
+      },
+      "requirements": {
+        "IronBar": 4
+      },
+      "stats": {
+        "health": 100,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "Used to secure tamed animals/aliens"
+    },
+    "Fence": {
+      "width": 128,
+      "height": 32,
+      "requirements": {
+        "CopperBar": 15,
+        "CircuitBoard": 5
+      },
+      "stats": {
+        "health": 100
+      },
+      "description": "Door that restricts pets/bots/slaves but allows players"
+    },
+    "SecurityCamera": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 100
+      },
+      "isPassable": true,
+      "hasMenu": true,
+      "hasEditableContent": true,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "maxContentLength": 50,
+      "requirements": {
+        "IronBar": 10,
+        "CircuitBoard": 10
+      },
+      "stats": {
+        "health": 100,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "monitors an area."
+    },
+    "SecurityMonitor": {
+      "width": 64,
+      "height": 128,
+      "cost": {
+        "gold": 100
+      },
+      "hasMenu": true,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "requirements": {
+        "CopperBar": 20,
+        "CircuitBoard": 20
+      },
+      "stats": {
+        "health": 300,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "view security camera screens"
+    },
+    "Chair": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 100
+      },
+      "useOriginalSize": true,
+      "isPassable": true,
+      "requirements": {
+        "IronBar": 10
+      },
+      "stats": {
+        "health": 75,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "decorative chair"
+    },
+    "RedPresent": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 100
+      },
+      "isPassable": true,
+      "requirements": {
+        "Cloth": 10
+      },
+      "stats": {
+        "health": 75,
+        "count": 100
+      },
+      "description": "Red present"
+    },
+    "BluePresent": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 100
+      },
+      "isPassable": true,
+      "requirements": {
+        "Cloth": 10
+      },
+      "stats": {
+        "health": 75,
+        "count": 100
+      },
+      "description": "Blue present"
+    },
+    "GreenPresent": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 100
+      },
+      "isPassable": true,
+      "requirements": {
+        "Cloth": 10
+      },
+      "stats": {
+        "health": 75,
+        "count": 100
+      },
+      "description": "Green present"
+    },
+    "WoodChair": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 100
+      },
+      "useOriginalSize": true,
+      "isPassable": true,
+      "requirements": {
+        "Wood": 5
+      },
+      "stats": {
+        "health": 75,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "wood chair"
+    },
+    "Shower": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 75
+      },
+      "isPassable": true,
+      "isInteractable": true,
+      "isOnCeiling": true,
+      "useOriginalSize": true,
+      "requirements": {
+        "IronBar": 5
+      },
+      "stats": {
+        "health": 75,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "For cleaning your body"
+    },
+    "SuitStation": {
+      "width": 64,
+      "height": 64,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 1,
+      "cost": {
+        "gold": 550
+      },
+      "requirements": {
+        "IronBar": 30,
+        "CopperBar": 5,
+        "CircuitBoard": 5
+      },
+      "stats": {
+        "health": 100,
+        "count": 100,
+        "oxygenConsumption": 1
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "stores armor/suits"
+    },
+    "Sign": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 200
+      },
+      "isPassable": true,
+      "categories": {"sign": true},
+      "hasMenu": true,
+      "hasEditableContent": true,
+      "isInteractable": true,
+      "maxContentLength": 300,
+      "requirements": {
+        "Wood": 4
+      },
+      "stats": {
+        "health": 50
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "Display Editable Text to Players"
+    },
+    "EmergencyButton": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 300
+      },
+      "categories": {},
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "requirements": {
+        "IronBar": 30,
+        "CircuitBoard": 10
+      },
+      "stats": {
+        "health": 100,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "Calls an Emergency"
+    },
+    "TimerBomb": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 300
+      },
+      "categories": {},
+      "requirements": {
+        "IronBar": 30,
+        "CircuitBoard": 5,
+        "Explosives": 2
+      },
+      "stats": {
+        "health": 50,
+        "damage": 50
+      },
+      "upgrade": {
+      },
+      "description": "Will detonate after 10 seconds of planting"
+    },
+    "Tree": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 200
+      },
+      "requirements": {
+        "Wood": 10
+      },
+      "stats": {
+        "health": 100
+      },
+      "description": "tree"
+    },
+    "ChristmasTree": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 300
+      },
+      "requirements": {
+        "Wood": 20,
+        "PlantFiber": 20
+      },
+      "stats": {
+        "health": 100
+      },
+      "description": "Christmas tree"
+    },
+    "Table": {
+      "width": 32,
+      "height": 64,
+      "cost": {
+        "gold": 300
+      },
+      "categories": {"dining_table": true},
+      "requirements": {
+        "IronBar": 30
+      },
+      "stats": {
+        "health": 100,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "decorative table"
+    },
+    "WoodTable": {
+      "width": 32,
+      "height": 128,
+      "cost": {
+        "gold": 300
+      },
+      "categories": {"dining_table":true,"large_dining_table":true},
+      "requirements": {
+        "Wood": 20
+      },
+      "stats": {
+        "health": 100,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "wood table"
+    },
+    "LargeTable": {
+      "width": 64,
+      "height": 128,
+      "cost": {
+        "gold": 600
+      },
+      "categories": {"dining_table":true,"large_dining_table":true},
+      "requirements": {
+        "IronBar": 70
+      },
+      "stats": {
+        "health": 100,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "large decorative table"
+    },
+    "TradingTable": {
+      "parent": "Buildings.Table",
+      "requirements": {
+        "IronBar": 30,
+        "CopperBar": 20,
+        "PlantFiber": 10
+      },
+      "description": "Build to attract Traders to arrive."
+    },
+    "SlaversTable": {
+      "parent": "Buildings.Table",
+      "requirements": {
+        "IronBar": 30,
+        "BloodPack": 1
+      },
+      "description": "Build to attract Slave Traders to arrive."
+    },
+    "ButcherTable": {
+      "categories": {"producer":true,"drag_target_storage":true,"butcher_table":true},
+      "width": 32,
+      "height": 96,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "cost": {
+        "gold": 300
+      },
+      "stats": {
+        "health": 100
+      },
+      "requirements": {
+        "IronBar": 35
+      },
+      "description": "Allows you to butcher dead bodies for meat and other resources"
+    },
+    "SealedDoor": {
+      "width": 128,
+      "height": 32,
+      "requirements": {
+        "IronBar": 20,
+        "CircuitBoard": 8
+      },
+      "cost": {
+        "gold": 400
+      },
+      "stats": {
+        "health": 300,
+        "count": 125
+      },
+      "isUpgradable": true,
+      "isInteractable": true,
+      "minimapColor": "#3bceaa",
+      "showInteractTooltip": true,
+      "isAirtight": true,
+      "categories": {"door":true,"melee_resistant":true,"editable_permissions":true},
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Door that restricts access to certain personnels only"
+    },
+    "SolarPanel": {
+      "width": 64,
+      "height": 32,
+      "cost": {
+        "gold": 200
+      },
+      "isInteractable": true,
+      "hasFillBar": true,
+      "requirements": {
+        "IronBar": 10,
+        "Glass": 10,
+        "Wire": 5
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "powerProduction": 10,
+        "powerCapacity": 1000,
+        "clientResource": "power"
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Generates Power using sun energy. Can only be placed on Lattice"
+    },
+    "OxygenTank": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 350
+      },
+      "isInteractable": true,
+      "hasFillBar": true,
+      "requirements": {
+        "IronBar": 20,
+        "GasPipe": 5
+      },
+      "stats": {
+        "health": 200,
+        "count": 125,
+        "oxygenCapacity": 200,
+        "clientResource": "oxygen"
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Stores oxygen. Must be connected via gas pipes"
+    },
+    "OxygenGenerator": {
+      "width": 64,
+      "height": 128,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "interactButtonMessage": "use",
+      "hasFillBar": true,
+      "cost": {
+        "gold": 250
+      },
+      "requirements": {
+        "IronBar": 15
+      },
+      "primaryResource": "oxygen",
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "oxygenProduction": 5,
+        "oxygenCapacity": 100,
+        "liquidConsumption": 1,
+        "liquidCapacity": 25,
+        "clientResource": "oxygen"
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Converts Water to Oxygen"
+    },
+    "CryoTube": {
+      "width": 96,
+      "height": 96,
+      "cost": {
+        "gold": 350
+      },
+      "categories": {"entity_storage":true,"editable_permissions":true},
+      "isInteractable": true,
+      "skipRemoveOwner": true,
+      "storageCount": 1,
+      "isLightSource": true,
+      "isLightPersistent": true,
+      "lightColor": "#578357",
+      "lightRadius": 3,
+      "requirements": {
+        "IronBar": 20,
+        "LiquidPipe": 5
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "liquidCapacity": 200
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Stores living organisms for healing."
+    },
+    "LiquidTank": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 250
+      },
+      "categories": {"liquid_tank": true},
+      "isInteractable": true,
+      "isBottleFillable": true,
+      "requirements": {
+        "IronBar": 20,
+        "LiquidPipe": 5
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "liquidCapacity": 200,
+        "clientResource": "liquid"
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Stores liquid."
+    },
+    "SmallOxygenTank": {
+      "width": 32,
+      "height": 32,
+      "hasFillBar": true,
+      "isInteractable": true,
+      "cost": {
+        "gold": 150
+      },
+      "requirements": {
+        "IronBar": 10,
+        "GasPipe": 2
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "oxygenCapacity": 100,
+        "clientResource": "oxygen"
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Stores small amount of oxygen. Connect via gas pipes"
+    },
+    "AirAlarm": {
+      "width": 32,
+      "height": 32,
+      "isLightSource": true,
+      "lightColor": "#ff0000",
+      "lightRadius": 30,
+      "categories": {"air_detector": true},
+      "cost": {
+        "gold": 100
+      },
+      "requirements": {
+        "CopperBar": 5,
+        "Wire": 2
+      },
+      "stats": {
+        "health": 100,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Sets alarm when room has no oxygen"
+    },
+    "Ventilator": {
+      "width": 32,
+      "height": 32,
+      "isLightBlocker": true,
+      "isAirtight": true,
+      "categories": {"vent":true,"structure_conduit":true,"oxygen_conduit":true},
+      "cost": {
+        "gold": 150
+      },
+      "requirements": {
+        "IronBar": 15
+      },
+      "stats": {
+        "health": 150,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Airtight oxygen distributor. Must be connected via gas pipes"
+    },
+    "Atm": {
+      "width": 64,
+      "height": 64,
+      "isLightSource": true,
+      "lightColor": "#18bffa",
+      "lightRadius": 3,
+      "hasMenu": true,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "categories": {"atm": true},
+      "sprite": {
+        "rotation": 90
+      },
+      "cost": {
+        "gold": 300
+      },
+      "requirements": {
+        "CopperBar": 20,
+        "CircuitBoard": 5,
+        "Wire": 5
+      },
+      "stats": {
+        "health": 300
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Withdraw and Deposit Gold to your account"
+    },
+    "Fridge": {
+      "width": 32,
+      "height": 32,
+      "energy": 50,
+      "description": "",
+      "cost": {
+        "gold": 150
+      },
+      "hasMenu": true,
+      "isInteractable": true,
+      "storageCount": 10,
+      "requirements": {
+        "IronBar": 10,
+        "Wire": 2
+      },
+      "stats": {
+        "health": 150,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      }
+    },
+    "BaseProcessor": {
+      "storageCount": 2
+    },
+    "MiningDrill": {
+      "parent": "Buildings.BaseProcessor",
+      "width": 96,
+      "height": 96,
+      "hasMenu": true,
+      "menuDescription": "Generates ores over time",
+      "energy": 100,
+      "cost": {
+        "gold": 500
+      },
+      "categories": {"producer":true,"mining_drill":true,"editable_permissions":true},
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "requirements": {
+        "IronBar": 50,
+        "CircuitBoard": 10
+      },
+      "stats": {
+        "health": 250,
+        "count": 125,
+        "processingRate": 5,
+        "powerConsumption": 300
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Mines Ores underground automatically"
+    },
+    "EscapePod": {
+      "width": 32,
+      "height": 64,
+      "showInteractTooltip": true,
+      "storageCount": 5,
+      "categories": {"escape_pod":true,"food_storage":true,"storage":true},
+      "cost": {
+        "gold": 150
+      },
+      "hasMenu": true,
+      "isAirtight": true,
+      "isInteractable": true,
+      "requirements": {
+        "IronBar": 10
+      },
+      "stats": {
+        "health": 150,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Broken escape pod"
+    },
+    "SteelCrate": {
+      "width": 32,
+      "height": 64,
+      "cost": {
+        "gold": 50
+      },
+      "hasMenu": true,
+      "menuDescription": "",
+      "categories": {"food_storage":true,"storage":true,"editable_permissions":true},
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 16,
+      "requirements": {
+        "IronBar": 10
+      },
+      "stats": {
+        "health": 150,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "stores items"
+    },
+    "FoodVendingMachine": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 500
+      },
+      "sprite": {
+        "rotation": 90
+      },
+      "categories": {"seller":true,"vending_machine":true},
+      "hasMenu": true,
+      "menuDescription": "",
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 8,
+      "requirements": {
+        "IronBar": 30,
+        "Wire": 5,
+        "CircuitBoard": 10
+      },
+      "stats": {
+        "health": 250
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Store and sell food"
+    },
+    "DrinksVendingMachine": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 500
+      },
+      "sprite": {
+        "rotation": 90
+      },
+      "categories": {"seller":true,"vending_machine":true},
+      "hasMenu": true,
+      "menuDescription": "",
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 8,
+      "requirements": {
+        "IronBar": 30,
+        "Wire": 5,
+        "CircuitBoard": 10
+      },
+      "stats": {
+        "health": 250
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Store and sell drinks"
+    },
+    "Conveyor": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 50
+      },
+      "stats": {
+        "health": 50,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      }
+    },
+    "FuelPipe": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 30
+      },
+      "categories": {"fuel_conduit":true,"distribution":true,"pipe":true},
+      "requirements": {
+        "IronBar": 2
+      },
+      "stats": {
+        "health": 50,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "transports fuel between components"
+    },
+    "LiquidPipe": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 30
+      },
+      "categories": {"liquid_conduit":true,"distribution":true,"pipe":true},
+      "requirements": {
+        "IronBar": 2
+      },
+      "stats": {
+        "health": 50,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "transports liquid between components"
+    },
+    "GasPipe": {
+      "width": 32,
+      "height": 32,
+      "categories": {"oxygen_conduit":true,"distribution":true,"pipe":true},
+      "cost": {
+        "gold": 30
+      },
+      "requirements": {
+        "IronBar": 2
+      },
+      "stats": {
+        "health": 50,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "transports oxygen between components"
+    },
+    "Wire": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "categories": {"power_conduit":true,"distribution":true,"wire":true},
+      "requirements": {
+        "CopperOre": 1
+      },
+      "stats": {
+        "health": 50,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "transports power to objects"
+    },
+    "Hangar": {
+      "width": 480,
+      "height": 640,
+      "cost": {
+        "gold": 50
+      },
+      "stats": {
+        "health": 50,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      }
+    },
+    "Airlock": {
+      "width": 128,
+      "height": 32,
+      "cost": {
+        "gold": 200
+      },
+      "isInteractable": true,
+      "minimapColor": "#3bceaa",
+      "showInteractTooltip": true,
+      "isAirtight": true,
+      "isUpgradable": true,
+      "categories": {"door":true,"partially_passable":true,"melee_resistant":true},
+      "requirements": {
+        "IronBar": 10,
+        "CircuitBoard": 4
+      },
+      "stats": {
+        "health": 300,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Airtight door that seals oxygen inside the area"
+    },
+    "ManualAirlock": {
+      "width": 64,
+      "height": 32,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "isUpgradable": true,
+      "isAirtight": true,
+      "categories": {"door":true,"melee_resistant":true},
+      "minimapColor": "#3bceaa",
+      "requirements": {
+        "IronBar": 5
+      },
+      "cost": {
+        "gold": 50
+      },
+      "stats": {
+        "health": 200,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Airtight door. No power required to operate"
+    },
+    "SmallAirlock": {
+      "width": 64,
+      "height": 32,
+      "cost": {
+        "gold": 50
+      },
+      "stats": {
+        "health": 100,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      }
+    },
+    "ResearchTable": {
+      "width": 32,
+      "height": 96,
+      "cost": {
+        "gold": 50
+      },
+      "stats": {
+        "health": 150,
+        "count": 125
+      },
+      "requirements": {
+        "IronBar": 20,
+        "CircuitBoard": 4
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      }
+    },
+    "Forge": {
+      "width": 64,
+      "height": 128,
+      "cost": {
+        "gold": 500
+      },
+      "hasMenu": true,
+      "categories": {"producer": true},
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 1,
+      "isCraftingStorage": true,
+      "stats": {
+        "health": 250,
+        "powerConsumption": 200
+      },
+      "requirements": {
+        "Wire": 5,
+        "IronBar": 20,
+        "CircuitBoard": 10
+      },
+      "description": "Craft Weapons and Armors"
+    },
+    "AmmoPrinter": {
+      "width": 64,
+      "height": 128,
+      "cost": {
+        "gold": 500
+      },
+      "hasMenu": true,
+      "categories": {"producer": true},
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 1,
+      "isCraftingStorage": true,
+      "stats": {
+        "health": 250,
+        "count": 125,
+        "powerConsumption": 200
+      },
+      "requirements": {
+        "Wire": 5,
+        "IronBar": 20,
+        "CircuitBoard": 10
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Producers ammunition for weapons"
+    },
+    "Brewery": {
+      "width": 64,
+      "height": 96,
+      "cost": {
+        "gold": 300
+      },
+      "categories": {"producer": true},
+      "hasMenu": true,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 1,
+      "isCraftingStorage": true,
+      "requirements": {
+        "IronBar": 10,
+        "CopperBar": 10
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "powerConsumption": 100
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Make drinks and quench thirst"
+    },
+    "Stove": {
+      "width": 32,
+      "height": 64,
+      "energy": 50,
+      "cost": {
+        "gold": 250
+      },
+      "categories": {"producer":true,"stove":true},
+      "hasMenu": true,
+      "hasEditableContent": true,
+      "isInteractable": true,
+      "shouldLimitInteractToMenuOnly": true,
+      "showInteractTooltip": true,
+      "storageCount": 1,
+      "isCraftingStorage": true,
+      "requirements": {
+        "IronBar": 10,
+        "CopperBar": 10
+      },
+      "stats": {
+        "health": 100,
+        "count": 125,
+        "powerConsumption": 200
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "cook your food here"
+    },
+    "ChemistryStation": {
+      "width": 64,
+      "height": 96,
+      "hasMenu": true,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 1,
+      "categories": {"producer": true},
+      "isCraftingStorage": true,
+      "cost": {
+        "gold": 350
+      },
+      "requirements": {
+        "Bottle": 2,
+        "IronBar": 20
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "powerConsumption": 200
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Craft drugs and explosives"
+    },
+    "Workshop": {
+      "width": 64,
+      "height": 64,
+      "hasMenu": true,
+      "isInteractable": true,
+      "storageCount": 1,
+      "isCraftingStorage": true,
+      "cost": {
+        "gold": 450
+      },
+      "requirements": {
+        "CopperBar": 10,
+        "IronBar": 20,
+        "Wire": 5
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "powerConsumption": 200
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "craft equipments"
+    },
+    "Refinery": {
+      "parent": "Buildings.BaseProcessor",
+      "width": 64,
+      "height": 128,
+      "hasMenu": true,
+      "categories": {"producer": true},
+      "isInteractable": true,
+      "menuDescription": "[Deprecated] No longer functional",
+      "requirements": {
+        "IronBar": 30,
+        "CircuitBoard": 10,
+        "Wire": 5
+      },
+      "cost": {
+        "gold": 500
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "processingRate": 10
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "[Deprecated] No longer functional"
+    },
+    "OilRefinery": {
+      "width": 96,
+      "height": 96,
+      "isInteractable": true,
+      "interactButtonMessage": "use",
+      "requirements": {
+        "IronBar": 30,
+        "FuelPipe": 5
+      },
+      "cost": {
+        "gold": 500
+      },
+      "stats": {
+        "health": 100,
+        "count": 125,
+        "fuelProduction": 5
+      },
+      "description": "Extracts oil underground and generates chemfuel"
+    },
+    "FuelTank": {
+      "width": 64,
+      "height": 96,
+      "cost": {
+        "gold": 300
+      },
+      "isInteractable": true,
+      "interactButtonMessage": "use",
+      "hasFillBar": true,
+      "requirements": {
+        "IronBar": 20,
+        "FuelPipe": 2
+      },
+      "stats": {
+        "health": 100,
+        "count": 125,
+        "fuelCapacity": 200,
+        "clientResource": "fuel"
+      },
+      "description": "Stores Fuel"
+    },
+    "DeepDrill": {
+      "parent": "Buildings.BaseProcessor",
+      "width": 96,
+      "height": 96,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "hasFillBar": true,
+      "hasMenu": true,
+      "categories": ["editable_permissions", "mining_drill"],
+      "menuDescription": "Generates ores over time",
+      "requirements": {
+        "IronBar": 200,
+        "CopperBar": 200,
+        "FuelPipe": 25
+      },
+      "cost": {
+        "gold": 2000
+      },
+      "stats": {
+        "health": 300,
+        "fuelConsumption": 25,
+        "fuelCapacity": 100,
+        "powerConsumption": 200,
+        "clientResource": "fuel",
+        "processingRate": 5
+      },
+      "description": "Extracts rare resources from oil underground. Needs fuel and power."
+    },
+    "PowerGenerator": {
+      "width": 64,
+      "height": 96,
+      "cost": {
+        "gold": 250
+      },
+      "primaryResource": "power",
+      "isInteractable": true,
+      "hasFillBar": true,
+      "requirements": {
+        "IronBar": 20,
+        "FuelPipe": 2
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "fuelConsumption": 3,
+        "fuelCapacity": 3,
+        "powerProduction": 10,
+        "powerCapacity": 500,
+        "clientResource": "power"
+      },
+      "description": "Generates Power using chemfuel"
+    },
+    "Furnace": {
+      "width": 32,
+      "height": 64,
+      "hasMenu": true,
+      "showInteractTooltip": true,
+      "categories": {"producer": true},
+      "isInteractable": true,
+      "storageCount": 1,
+      "isCraftingStorage": true,
+      "description": "Smelts ores into other items",
+      "menuDescription": "Place ore in left slot to smelt",
+      "requirements": {
+        "IronOre": 10
+      },
+      "cost": {
+        "gold": 150
+      },
+      "stats": {
+        "health": 100,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      }
+    },
+    "RailTrack": {
+      "width": 32,
+      "height": 32,
+      "categories": {"rail":true,"rail_track":true,"instant_build":true},
+      "isPassable": true,
+      "isFlamable": false,
+      "minimapColor": "#483d8b",
+      "cost": {
+        "gold": 50
+      },
+      "requirements": {
+        "IronBar": 5
+      },
+      "stats": {
+        "health": 250,
+        "count": 125
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Platform for Rail Tram to travel on"
+    },
+    "RailStop": {
+      "width": 96,
+      "height": 128,
+      "cost": {
+        "gold": 1000
+      },
+      "minimapColor": "#483d8b",
+      "isInteractable": true,
+      "hasEditableContent": true,
+      "hasMenu": true,
+      "categories": {"rail":true,"rail_stop":true,"partially_passable":true},
+      "requirements": {
+        "IronBar": 20,
+        "CircuitBoard": 20, 
+        "Glass": 5
+      },
+      "stats": {
+        "health": 500,
+        "count": 125,
+        "powerConsumption": 100
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Acts as Start/Stop point for Rail Trams. Must be placed at end of Rail Track"
+    },
+    "Terminal": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 250
+      },
+      "sprite": {
+        "rotation": 90
+      },
+      "hasMenu": true,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "requirements": {
+        "IronBar": 25,
+        "CircuitBoard": 10,
+        "Wire": 10
+      },
+      "stats": {
+        "health": 100,
+        "count": 1,
+        "powerConsumption": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+1"
+      },
+      "description": "Decorative Computer Terminal"
+    },
+    "Television": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 500
+      },
+      "requirements": {
+        "IronBar": 30,
+        "CircuitBoard": 10
+      },
+      "stats": {
+        "health": 100,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+1"
+      },
+      "description": "Decorative Television"
+    },
+    "Pot": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 50
+      },
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 1,
+      "requirements": {
+        "Wood": 2
+      },
+      "stats": {
+        "health": 100,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+1"
+      },
+      "description": "Decorative container for plants/flowers"
+    },
+    "Bridge": {
+      "width": 32,
+      "height": 64,
+      "isInteractable": true,
+      "cost": {
+        "gold": 1000
+      },
+      "stats": {
+        "health": 100,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+1"
+      },
+      "description": "Allows player to pilot ship"
+    },
+    "Beacon": {
+      "width": 64,
+      "height": 64,
+      "categories": {"walkable":true,"spawnpoint":true},
+      "hasEditableContent": true,
+      "isPassable": true,
+      "isFlamable": false,
+      "cost": {
+        "gold": 200
+      },
+      "requirements": {
+        "IronBar": 20,
+        "CircuitBoard": 10,
+        "Glass": 5
+      },
+      "stats": {
+        "health": 200,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "Acts as spawn point for visitors"
+    },
+    "UndergroundVent": {
+      "width": 64,
+      "height": 64,
+      "categories": {"walkable":true,"editable_permissions":true},
+      "isPassable": true,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "isFlamable": false,
+      "cost": {
+        "gold": 200
+      },
+      "requirements": {
+        "IronBar": 20
+      },
+      "stats": {
+        "health": 150,
+        "count": 1
+      },
+      "description": "Underground Vent"
+    },
+    "FarmController": {
+      "width": 32,
+      "height": 32,
+      "categories": {"farm_controller": true},
+      "cost": {
+        "gold": 200
+      },
+      "hasMenu": true,
+      "isInteractable": true,
+      "hasEditableContent": true,
+      "isLightSource": true,
+      "lightColor": "#00ffff",
+      "isLightPersistent": true,
+      "lightRadius": 2,
+      "requirements": {
+        "Wood": 20,
+        "CircuitBoard": 10
+      },
+      "stats": {
+        "health": 200,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "Place beside soil. Informs workers which crops to grow"
+    },
+    "SpikeTrap": {
+      "width": 32,
+      "height": 32,
+      "categories": {"trap":true,"spike_trap":true},
+      "isPassable": true,
+      "isFlamable": false,
+      "cost": {
+        "gold": 400
+      },
+      "requirements": {
+        "IronBar": 20,
+        "CircuitBoard": 2
+      },
+      "stats": {
+        "health": 200,
+        "pvpHealth": 50,
+        "damage": 10,
+        "count": 1,
+        "reload": 5000
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "spike trap"
+    },
+    "WebTrap": {
+      "width": 32,
+      "height": 32,
+      "categories": {"trap": true},
+      "isPassable": true,
+      "isFlamable": false,
+      "cost": {
+        "gold": 400
+      },
+      "requirements": {
+        "IronBar": 10,
+        "Web": 2, 
+        "CircuitBoard": 2
+      },
+      "stats": {
+        "health": 50,
+        "damage": 10,
+        "count": 1,
+        "reload": 20000
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "Trap that immobilizes enemies for 5 seconds"
+    },
+    "Bed": {
+      "width": 64,
+      "height": 32,
+      "cost": {
+        "gold": 150
+      },
+      "isPassable": true,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "requirements": {
+        "IronBar": 10,
+        "Cloth": 2
+      },
+      "stats": {
+        "health": 250,
+        "count": 1
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+1"
+      },
+      "description": "Restores player stamina. Also a respawn point"
+    },
+    "FlamethrowerTurret": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 500
+      },
+      "shouldAttackIgnoreObstacle": true,
+      "hasFillBar": true,
+      "categories": {"turret":true,"editable_targets":true},
+      "stats": {
+        "reload": 2000,
+        "damage": 10,
+        "range": 288,
+        "health": 200,
+        "fuelConsumption": 25,
+        "fuelCapacity": 100,
+        "powerConsumption": 100,
+        "clientResource": "fuel"
+      },
+      "requirements": {
+        "IronBar": 20,
+        "CopperBar": 40
+      },
+      "upgrade": {
+        "damage": "+3",
+        "health": "+50",
+        "count": "+1"
+      },
+      "description": "Shoots flames at targets. Requires fuel and power."
+    },
+    "MiniTurret": {
+      "width": 64,
+      "height": 64,
+      "energy": 25,
+      "storageCount": 1,
+      "cost": {
+        "gold": 500
+      },
+      "shouldAttackIgnoreObstacle": true,
+      "categories": {"turret":true,"editable_targets":true,"ammo_turret":true},
+      "hasMenu": true,
+      "menuDescription": "Place Ammunition",
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "stats": {
+        "reload": 3000,
+        "damage": 12,
+        "range": 320,
+        "health": 300,
+        "count": 2,
+        "powerConsumption": 100
+      },
+      "requirements": {
+        "IronBar": 50,
+        "CopperBar": 20
+      },
+      "upgrade": {
+        "damage": "+3",
+        "health": "+50",
+        "count": "+1"
+      },
+      "description": "Sentry Turret. Needs Power and Ammunition. Damage 15"
+    },
+    "Turret": {
+      "width": 64,
+      "height": 64,
+      "energy": 25,
+      "cost": {
+        "gold": 500
+      },
+      "stats": {
+        "reload": 2000,
+        "damage": 50,
+        "range": 800,
+        "health": 150,
+        "count": 2
+      },
+      "upgrade": {
+        "damage": "+3",
+        "health": "+50",
+        "count": "+1"
+      },
+      "description": "Short Ranged Lasers. [Requires Energy]"
+    },
+    "VoidRay": {
+      "width": 64,
+      "height": 64,
+      "energy": 75,
+      "cost": {
+        "gold": 1000
+      },
+      "stats": {
+        "reload": 1000,
+        "damage": 10,
+        "range": 400,
+        "health": 150,
+        "count": 2
+      },
+      "upgrade": {
+        "damage": "+5",
+        "health": "+50",
+        "count": "+1"
+      },
+      "description": "Shoots a continuous beam of focused energy. [Requires Energy]"
+    },
+    "TeslaCoil": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 3000
+      },
+      "shouldAttackIgnoreObstacle": true,
+      "categories": {"turret":true,"editable_targets":true},
+      "stats": {
+        "reload": 3000,
+        "damage": 50,
+        "health": 350,
+        "range": 320,
+        "powerConsumption": 750
+      },
+      "requirements": {
+        "IronBar": 50,
+        "Meteorite": 20,
+        "CircuitBoard": 20
+      },
+      "upgrade": {
+        "damage": "+5",
+        "health": "+50",
+        "count": "+1"
+      },
+      "description": "Strikes Lightning Bolt to up to 4 targets"
+    },
+    "BomberTurret": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 3000
+      },
+      "storageCount": 1,
+      "shouldAttackIgnoreObstacle": true,
+      "categories": {"turret":true,"editable_targets":true,"ammo_turret":true},
+      "hasMenu": true,
+      "menuDescription": "Place Ammunition",
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "stats": {
+        "reload": 2000,
+        "damage": 75,
+        "health": 300,
+        "range": 320,
+        "powerConsumption": 200
+      },
+      "requirements": {
+        "IronBar": 50,
+        "SulfurOre": 30,
+        "CircuitBoard": 15
+      },
+      "upgrade": {
+        "damage": "+5",
+        "health": "+50",
+        "count": "+1"
+      },
+      "description": "Blast your enemies with this powerful and capable turret."
+    },
+    "MissileTurret": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 500
+      },
+      "storageCount": 1,
+      "shouldAttackIgnoreObstacle": true,
+      "categories": {"turret":true,"editable_targets":true,"ammo_turret":true},
+      "hasMenu": true,
+      "menuDescription": "Place Ammunition",
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "stats": {
+        "reload": 2000,
+        "damage": 20,
+        "health": 400,
+        "range": 480,
+        "powerConsumption": 250
+      },
+      "requirements": {
+        "IronBar": 50,
+        "SulfurOre": 10,
+        "CircuitBoard": 20
+      },
+      "upgrade": {
+        "damage": "+5",
+        "health": "+50",
+        "count": "+1"
+      },
+      "description": "Launches homing missile towards locked target."
+    },
+    "Cannon": {
+      "width": 64,
+      "height": 64,
+      "energy": 50,
+      "cost": {
+        "gold": 750
+      },
+      "stats": {
+        "reload": 2000,
+        "damage": 75,
+        "range": 800,
+        "health": 250,
+        "count": 2
+      },
+      "upgrade": {
+        "damage": "+5",
+        "health": "+100",
+        "count": "+1"
+      },
+      "description": "Long Range Cannon. Moderate Damage. [Requires Energy]"
+    },
+    "IonCannon": {
+      "width": 64,
+      "height": 64,
+      "energy": 50,
+      "cost": {
+        "gold": 500
+      },
+      "stats": {
+        "reload": 500,
+        "damage": 50,
+        "range": 400,
+        "health": 200,
+        "count": 1
+      },
+      "upgrade": {
+        "damage": "+10",
+        "health": "+100",
+        "count": "+1"
+      },
+      "description": "Static but powerful ranged cannon that damages anything on its path"
+    },
+    "Fighter": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 1000
+      },
+      "stats": {
+        "reload": 2000,
+        "speed": 10,
+        "damage": 10,
+        "range": 300,
+        "health": 50,
+        "count": 2
+      },
+      "upgrade": {
+        "damage": "+5",
+        "health": "+50",
+        "count": "+1"
+      },
+      "description": "Basic Fighter Drone"
+    }
+  },
+  "Terrains": {
+    "BaseTerrain": {
+      "width": 32,
+      "height": 32,
+      "categories": {"terrain": true}
+    },
+    "Rock": {
+      "parent": "Terrains.BaseTerrain",
+      "minimapColor": "#201003",
+      "description": "Rock"
+    },
+    "LavaRock": {
+      "parent": "Terrains.BaseTerrain"
+    },
+    "Water": {
+      "parent": "Terrains.BaseTerrain",
+      "description": "Water",
+      "isBottleFillable": true,
+      "isInteractable": true,
+      "bottleDescription": "Use to refill oxygen tanks",
+      "speedMultiplier": 0.7,
+      "showLiquidTrail": true,
+      "liquidTrailColor": "#75d3e6",
+      "minimapColor": "#1269b9"
+    },
+    "Oil": {
+      "parent": "Terrains.BaseTerrain",
+      "description": "Oil",
+      "categories": {"oil": true},
+      "speedMultiplier": 0.5,
+      "isInteractable": true,
+      "showLiquidTrail": true,
+      "liquidTrailColor": "#333333",
+      "minimapColor": "#000000"
+    },
+    "Ice": {
+      "parent": "Terrains.BaseTerrain"
+    },
+    "Sky": {
+      "parent": "Terrains.BaseTerrain",
+      "description": "Sky"
+    },
+    "Lava": {
+      "parent": "Terrains.BaseTerrain",
+      "minimapColor": "#ff0000",
+      "description": "Lava",
+      "categories": {"lava": true}
+    },
+    "Vine": {
+      "parent": "Terrains.BaseTerrain",
+      "health": 10
+    },
+    "Asteroid": {
+      "parent": "Terrains.BaseTerrain",
+      "description": "Asteroid",
+      "isLightBlocker": true,
+      "categories": {"wall":true,"astreoid":true},
+      "health": 25,
+      "isAirtight": true,
+      "minimapColor": "#2b1e14"
+    },
+    "IceAsteroid": {
+      "parent": "Terrains.Asteroid",
+      "health": 100
+    },
+    "IronAsteroid": {
+      "parent": "Terrains.Asteroid",
+      "label": "Iron Ore",
+      "health": 100,
+      "minimapColor": "#2b1e14"
+    },
+    "MeteoriteAsteroid": {
+      "parent": "Terrains.Asteroid",
+      "description": "Meteorite Asteroid",
+      "label": "Meteorite",
+      "health": 20,
+      "minimapColor": "#2b1e14"
+    },
+    "SteelAsteroid": {
+      "parent": "Terrains.Asteroid",
+      "label": "Steel Ore",
+      "health": 100
+    },
+    "CopperAsteroid": {
+      "parent": "Terrains.Asteroid",
+      "description": "Copper Asteroid",
+      "label": "Copper Ore",
+      "health": 100,
+      "minimapColor": "#2b1e14"
+    }
+  },
+  "Resource": {
+    "width": 32,
+    "height": 32
+  },
+  "Tiles": {
+    "Ground": 1,
+    "Tree": 2
+  },
+  "tileSize": 32,
+  "collisionGroup": {
+    "Player": 1,
+    "Ground": 2,
+    "Projectile": 4,
+    "Building": 8,
+    "Resource": 16,
+    "Mob": 32,
+    "Unit": 64,
+    "Pickup": 128,
+    "Ship": 256
+  }
+}

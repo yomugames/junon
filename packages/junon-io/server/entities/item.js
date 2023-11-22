@@ -193,6 +193,11 @@ class Item extends BaseTransientEntity {
     return klassType === "ore"
   }
 
+  isAlloy() {
+    const klassType = this.getKlassType(this.type)
+    return klassType === "alloy"
+  }
+
   isFlower() {
     let klass = this.getKlass(this.type)
     return klass && klass.prototype.getConstants().isFlower

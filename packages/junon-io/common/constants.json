@@ -228,7 +228,7 @@
       }
     },
     "ItemCrafted": {
-      "description": "Event triggered when asteroid mined",
+      "description": "Event triggered when item crafted",
       "variables": {
         "type": "name of item crafted",
         "player": "name of player who crafted item"
@@ -673,7 +673,12 @@
     "plated_texture":      { "index": 3 },
     "striped_texture":     { "index": 4 },
     "layered_bar_texture": { "index": 5 },
-    "grilled_texture":     { "index": 6 }
+    "grilled_texture":     { "index": 6 },
+    "bricks_texture":      { "index": 7 },
+    "checker_texture":     { "index": 8 },
+    "xchecker_texture":    { "index": 9 },
+    "x_texture":           { "index": 10 },
+    "noise_texture":       { "index": 11 }
   },
   "SuitColors": {
     "gray":   { "index": 1 , "value": "#999999" },
@@ -714,7 +719,15 @@
     "white_1":  { "index": 26, "value": "#c5c5c5" },
     "purple_1": { "index": 27, "value": "#564a54" },
     "white_2":  { "index": 28, "value": "#ffffff" },
-    "gray_5":   { "index": 29, "value": "#2a2a2a" }
+    "gray_5":   { "index": 29, "value": "#2a2a2a" },
+    "cyan_1":   { "index": 30, "value": "#10b3a1" },
+    "cyan_2":   { "index": 31, "value": "#00ffff" },
+    "cyan_3":   { "index": 32, "value": "#55cbbe" },
+    "cyan_4":   { "index": 33, "value": "#007971" },
+    "pink_1":   { "index": 34, "value": "#d784de" },
+    "pink_2":   { "index": 35, "value": "#ff51b1" },
+    "pink_3":   { "index": 36, "value": "#ef6990" },
+    "pink_4":   { "index": 37, "value": "#ff54c9" }
   },
   "Deeds": {
     "taxes_not_paid": {

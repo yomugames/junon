@@ -627,7 +627,7 @@ class EventHandler {
     let player = this.getPlayer(entityId)
     if (!player) return 0
 
-    return player.effectere(typeName)
+    return player.hasEffect(typeName)
   }
 
     return 0

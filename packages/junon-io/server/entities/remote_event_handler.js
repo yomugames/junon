@@ -4,6 +4,7 @@ const Protocol = require('../../common/util/protocol')
 const FirebaseAdminHelper = require("../util/firebase_admin_helper")
 const BadWordsFilter = require("../util/bad_words_filter")
 const SectorBanModel = require("junon-common/db/sector_ban")
+const xss = require("xss")
 
 class RemoteEventHandler {
 
@@ -24,6 +25,8 @@ class RemoteEventHandler {
     if (eventsNotRequiringPlayer.indexOf(eventName) !== -1) {
       this[handlerName](player, data, socket)
     } else if (player) {
+      const xssfree = xss(JSON.stringify(data))
+      data = JSON.parse(xssfree)
       this[handlerName](player, data, socket)
     }
 

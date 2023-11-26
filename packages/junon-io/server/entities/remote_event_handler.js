@@ -21,13 +21,15 @@ class RemoteEventHandler {
 
     let player = this.getPlayerForSocket(socket)
 
+    const json = JSON.stringify(data.toJSON())
+    const xssfree = xss(json)
+    const cleanedData = JSON.parse(xssfree)
+
     let eventsNotRequiringPlayer = ["WindowResized", "RequestGame", "ResumeGame", "Ping"]
     if (eventsNotRequiringPlayer.indexOf(eventName) !== -1) {
-      this[handlerName](player, data, socket)
+      this[handlerName](player, cleanedData, socket)
     } else if (player) {
-      const xssfree = xss(JSON.stringify(data))
-      data = JSON.parse(xssfree)
-      this[handlerName](player, data, socket)
+      this[handlerName](player, cleanedData, socket)
     }
 
   }

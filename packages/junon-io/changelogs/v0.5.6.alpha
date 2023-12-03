@@ -1,0 +1,13 @@
+{
+  "version": "v0.5.6.alpha",
+  "date": "Nov 25, 2023",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix xss bug and /settings bug by chickemeeple"
+    ],
+    "features": [
+      "More floor colors/textures by Wahlee1"
+    ]
+  }
+}

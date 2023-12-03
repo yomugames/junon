@@ -18,6 +18,7 @@ const Protocol = {
       protobuf = window.Protobuf
     } else {
       protobuf = require("protobufjs")
+      protobuf.util.toJSONOptions ={ longs: String,  enums: Number,  bytes: String,  json: true  }
     }
 
     let root = new protobuf.Root()

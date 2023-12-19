@@ -28,16 +28,6 @@ class RemoteEventHandler {
 
   }
 
-    
-          
-            
-    
-
-          
-          Expand Down
-    
-    
-  
   onPing(player, data, socket) {
     this.getSocketUtil().emit(socket, "Pong", {})
   }

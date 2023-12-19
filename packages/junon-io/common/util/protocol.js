@@ -20,16 +20,6 @@ const Protocol = {
 
     let root = new protobuf.Root()
 
-    
-          
-            
-    
-
-          
-          Expand Down
-    
-    
-  
     root.resolvePath = function(origin, target) {
       let protoMatch = origin.match(/(.*)\/.*\.proto/)
       let directory = protoMatch ? protoMatch[1] : ""

@@ -881,6 +881,12 @@ class MatchmakerServer {
             return
           }
         }
+        if(sectorData && sectorData.name && sectorData.name.length > 255) {
+          this.socketUtil.emit(socket, responseEventName, {
+            error: "You can't have a very long world name, otherwise you'd completely crash junon =D"
+          })
+          return
+        }
         let sectorModel = await SectorModel.createOne(sectorData)
         sectorId = sectorModel.uid
       }

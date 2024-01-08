@@ -177,20 +177,6 @@ class TradeOrder {
     let typeName = this.getPurchaseTypeName()
     if (typeName === "Gold") return
 
-    let itemValid;
-    for(item of this.sector.sellables) {
-      if(item.constructor.name == typeName) itemValid = true
-    }
-    if(!itemValid) {
-      for(mob of this.sector.mobs) {
-        if(mob.constructor.name == itemType) itemValid = true
-      }
-    }
-
-
-
-    if(!itemValid) return
-
     if (!this.hasSellPrivilege(this.customer)) {
       this.customer.showError("You dont have permission to sell", { isWarning: true })
       return

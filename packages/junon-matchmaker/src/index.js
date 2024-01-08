@@ -336,8 +336,8 @@ class MatchmakerServer {
 
     let modIds = [
       "5t1H4HSXgGRzCw0isgiwxBf2cXn2", 
-      "c1ZwNiSozAWrVSPOD6dspydyYOR2", 
-      "jEleFj7LAVhfv8FwLEKejEj6ESx2"
+      "jEleFj7LAVhfv8FwLEKejEj6ESx2",
+      "UBdPAUeJBfZfUycLhl3508aAgVH2"
     ]
 
     if (modIds.indexOf(uid) !== -1) {

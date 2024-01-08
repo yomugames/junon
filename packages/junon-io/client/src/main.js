@@ -2105,7 +2105,7 @@ class Main {
   }
 
   async onUserAuthenticated() {
-    let mods = ["kuroro", "BigTforLife", "Pkovacic", "Potato"]
+    let mods = ["kuroro", "BigTforLife", "superaaron"]
     let isMod = mods.indexOf(main.userData.username) !== -1
 
     if (isMod) {

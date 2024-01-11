@@ -1846,6 +1846,21 @@
       },
       "description": "Plant on soil to grow Poppy"
     },
+    "PumpkinSeed": {
+      "parent": "Crops.BaseSeed",
+      "cost": {
+        "gold": 500
+      },
+      "sprite": {
+        "width": 33,
+        "height": 33
+      },
+      "stats": {
+        "health": 90
+      },
+      "yield": "Pumpkin",
+      "description": "Plant on soil to grow pumpkin"
+    },
     "WheatSeed": {
       "parent": "Crops.BaseSeed",
       "cost": {
@@ -1856,6 +1871,21 @@
         "health": 150
       },
       "description": "Plant on soil to grow wheat"
+    },
+    "RiceSeed": {
+      "parent": "Crops.BaseSeed",
+      "cost": {
+        "gold": 150
+      },
+      "yield": "Rice",
+      "stats": {
+        "health": 150
+      },
+      "sprite": {
+        "width": 28,
+        "height": 28
+      },
+      "description": "Plant on soil to grow rice"
     }
   },
   "Projectiles": {
@@ -2536,6 +2566,26 @@
       },
       "description": "Restores 40 stamina. Make Russia great again!"
     },
+    "Nihonshu": {
+      "width": 24,
+      "height": 24,
+      "sprite": {
+        "width": 30,
+        "height": 36,
+        "path": "nihonshu"
+      },
+      "cost": {
+        "gold": 250
+      },
+      "stats": {
+        "stamina": 40
+      },
+      "requirements": {
+        "Rice": 1,
+        "Bottle": 1
+      },
+      "description": "Japanese rice wine. Favorite beverage of Kamikaze."
+    },
     "EnergyDrink": {
       "width": 24,
       "height": 24,
@@ -2621,7 +2671,7 @@
       "description": "Restores 50 stamina"
     }
   },
-  "Foods": {
+      "Foods": {
     "Gelatin": {
       "width": 24,
       "height": 24,
@@ -2858,6 +2908,27 @@
       "upgrade": {},
       "description": "Raw wheat. For making bread"
     },
+    "Rice": {
+      "width": 24,
+      "height": 24,
+      "categories": {"crop": true},
+      "isIngredient": true,
+      "cost": {
+        "gold": 200
+      },
+      "sprite": {
+        "position": {
+          "x": 70,
+          "y": 0
+        }
+      },
+      "isEdible": false,
+      "stats": {
+        "food": 10
+      },
+      "upgrade": {},
+      "description": "A bag of rice."
+    },
     "Egg": {
       "width": 24,
       "height": 24,
@@ -2922,6 +2993,25 @@
       },
       "upgrade": {},
       "description": "Cooked meat. Dont care where it came from. "
+    },
+    "Pumpkin": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 300
+      },
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "rotation": 0
+      },
+      "stats": {
+        "food": 50
+      },
+      "upgrade": {},
+      "description": "Orange pumpkin."
     },
     "PotatoSoup": {
       "width": 32,
@@ -3003,6 +3093,30 @@
       "upgrade": {},
       "description": "Breakfast favorite."
     },
+    "Nigiri": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 400
+      },
+      "stats": {
+        "food": 50,
+        "health":75
+      },
+      "sprite": {
+        "position": {
+          "x": 55 ,
+          "y": 0
+        },
+        "rotation": 70
+      },
+      "requirements": {
+        "Fish": 1,
+        "Rice": 1
+      },
+      "upgrade": {},
+      "description": "Type of japanese sushi dish made with japanese rice and slice of fish on top. Perfect small and healthy meal."
+    },
     "Starberries": {
       "width": 21,
       "height": 14,
@@ -3022,6 +3136,22 @@
       },
       "upgrade": {},
       "description": "Strange berries from alien bushes."
+    },
+    "Fish": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 200
+      },
+      "sprite": {
+        "anchor": 0.5
+      },
+      "stats": {
+        "food": 40,
+        "health": 30
+      },
+      "upgrade": {},
+      "description": "A yummy fish, used in lots of dishes. I wonder where that trader got it from?"
     },
     "Antidote": {
       "width": 24,
@@ -3715,8 +3845,8 @@
       "categories": {"melee_damage": true},
       "sprite": {
         "position": {
-          "x": 50,
-          "y": 5
+          "x": 53,
+          "y": -8
         },
         "anchor": 0,
         "rotation": 90
@@ -3724,16 +3854,16 @@
       "concurrentTargetCount": 3,
       "isAnimatable": true,
       "stats": {
-        "damage": 10,
-        "range": 48,
-        "attackRadius": 48,
-        "meleeRange": 48
+        "damage": 15,
+        "range": 64,
+        "attackRadius": 64,
+        "meleeRange": 64
       },
       "requirements": {
         "IronOre": 50,
         "Wood": 20
       },
-      "description": "Can slice through 3 enemies at a time. Damage 10."
+      "description": "Can slice through 3 enemies at a time. Damage 15."
     },
     "BlueEnergySword": {
       "parent": "Equipments.MeleeEquipment",

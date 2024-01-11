@@ -252,6 +252,13 @@ enum BuildingType {
   BomberTurret = 256;
   PlasmaBlade  = 257;
   Starberries  = 258;
+  Nihonshu  = 259;
+  PumpkinSeed  = 260;
+  Pumpkin  = 261;
+  Rice  = 262;
+  RiceSeed  = 263;
+  Fish =  264;
+  Nigiri =  265;
 }
 
 enum TerrainType {

@@ -259,6 +259,8 @@ enum BuildingType {
   RiceSeed  = 263;
   Fish =  264;
   Nigiri =  265;
+  PumpkinPie =  266;
+  ImperialSpecialForcesArmor = 267;
 }
 
 enum TerrainType {

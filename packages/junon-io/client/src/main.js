@@ -2105,8 +2105,9 @@ class Main {
   }
 
   isModerator() {
+    if (!this.userData) return false
     let mods = ["kuroro", "BigTforLife", "superaaron"]
-    return mods.indexOf(main.userData.username) !== -1
+    return mods.indexOf(this.userData.username) !== -1
   }
 
   async onUserAuthenticated() {

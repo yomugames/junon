@@ -33,6 +33,10 @@ class TeamEntry {
     this.el.innerHTML += "<img class='screenshot' src='" + this.getThumbnailPath() + "' />"
     this.el.innerHTML += "<div class='info_name'></div>"
     
+    if (team.online && this.main.isModerator()) {
+      this.el.innerHTML += "<div class='ban_world_btn'>Ban</div>"
+    }
+
     if (this.isMine) {
       this.el.innerHTML += "<img class='team_delete_btn' src='/assets/images/trash_icon.png' />"
       this.el.innerHTML += "<img class='export_world_btn' src='/assets/images/download_icon.png' />"

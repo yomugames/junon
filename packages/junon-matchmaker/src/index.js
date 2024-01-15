@@ -330,8 +330,8 @@ class MatchmakerServer {
     return ["sectors", namespace, sectorUid, "sector.sav"].join("/")
   }
 
-  async isMod(idToken) {
-    let uid = await this.getUidFromRequest(idToken, uid)
+  async isMod(idToken, targetUid) {
+    let uid = await this.getUidFromRequest(idToken, targetUid)
     if (!uid) return false
 
     let modIds = [
@@ -579,6 +579,18 @@ class MatchmakerServer {
             return
           }
 
+          if (body.sectorUid) {
+            // ban sector and owner
+            const gameServerSocket = this.gameServerSockets[body.host]
+
+            this.socketUtil.emit(gameServerSocket, "BanWorldAndOwner", {
+              creatorUid: body.creatorUid,
+              sectorUid: body.sectorUid
+            })
+            return
+          }
+
+          // ban user
           let userToBan = await User.findOne({ 
             where: { username: body.username }
           })
@@ -620,6 +632,7 @@ class MatchmakerServer {
 
           let ipBan = await IpBan.create(data)
           res.end(JSON.stringify({ success: body.username + " banned" }))
+          this.kickPlayerFromAllServers({ ip: targetIp, username: username })
         } catch(e) {
           ExceptionReporter.captureException(e)
           let data = { error: "Ban error" }
@@ -627,7 +640,6 @@ class MatchmakerServer {
         }
       })
     })
-
 
     app.post('/create_user', async (res, req) => {
       res.writeHeader('Access-Control-Allow-Origin','*')
@@ -751,6 +763,17 @@ class MatchmakerServer {
     })
 
     this.bindPort(app, "Matchmaker", this.APP_SERVER_PORT)
+  }
+
+  async kickPlayerFromAllServers(ip, username) {
+    for (let host in this.gameServerSockets) {
+      let gameServerSocket = this.gameServerSockets[host]
+
+      this.socketUtil.emit(gameServerSocket, "KickPlayer", {
+        ip: ip,
+        username: username,
+      })
+    }
   }
 
   async removePlayerFromPreviousCreatedGame(environment, ip, data) {

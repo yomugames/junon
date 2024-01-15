@@ -910,6 +910,7 @@ class Game {
   canBeSaved() {
     if (this.isTutorial) return false
     if (this.isMiniGame()) return false
+    if (this.isRemoved) return false
 
     return true
   }
@@ -1416,6 +1417,19 @@ class Game {
     return Date.now() - this.readyTime
   }
 
+  async deleteForever() {
+    await WorldSerializer.deleteSector(this.getSectorUid())
+    let sectorModel = await SectorModel.findOne({
+      where: { uid: this.getSectorUid() }
+    })
+
+    if (sectorModel) {
+      await sectorModel.destroy()
+    }
+
+    this.remove()
+  }
+
   async prepareRemove() {
     if (this.isPreparingRemoval) return
     this.isPreparingRemoval = true
@@ -1428,16 +1442,7 @@ class Game {
     if (this.isCreatedByAnonynmous()) {
       let creator = [this.creatorUid, this.getCreatorIp()].join("-")
       LOG.info(`Sector ${this.sectorUid} ${this.sector.name} is anonymously created by ${creator}. Removing save file`)
-      await WorldSerializer.deleteSector(this.getSectorUid())
-      let sectorModel = await SectorModel.findOne({
-        where: { uid: this.getSectorUid() }
-      })
-
-      if (sectorModel) {
-        await sectorModel.destroy()
-      }
-
-      this.remove()
+      await this.deleteForever()
       return
     }
 

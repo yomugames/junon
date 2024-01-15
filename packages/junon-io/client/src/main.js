@@ -2104,9 +2104,13 @@ class Main {
     this.receivedFriendRequests[data.uid] = data
   }
 
-  async onUserAuthenticated() {
+  isModerator() {
     let mods = ["kuroro", "BigTforLife", "superaaron"]
-    let isMod = mods.indexOf(main.userData.username) !== -1
+    return mods.indexOf(main.userData.username) !== -1
+  }
+
+  async onUserAuthenticated() {
+    let isMod = this.isModerator()
 
     if (isMod) {
       document.querySelector(".open_ban_list_btn").style.display = 'block'

@@ -872,7 +872,7 @@ class MatchmakerServer {
       let uid
 
       // check if ip blacklisted
-      let isBanned = await this.performBanCheck(data, socket, responseEventName, requestId)
+      let isBanned = await this.checkIsBanned(data, socket, responseEventName, requestId)
       if (isBanned) return
 
       let gameServerSocket = this.gameServerSockets[server.host]
@@ -1017,33 +1017,30 @@ class MatchmakerServer {
     return remaining
   }
 
-  formatBanMsg(ipBan) {
+  formatBanMsg(ban) {
     let msg = "Banned"
 
-    let remaining = this.remainingDays(ipBan)
+    let remaining = this.remainingDays(ban)
     if (remaining) {
       msg += ` for ${remaining} days.`
     } else {
       msg += "."
     }
 
-    if (ipBan.reason) {
-      msg += ` Reason: ${ipBan.reason}`
+    if (ban.reason) {
+      msg += ` Reason: ${ban.reason}`
     }
 
     return msg
   }
 
-  async performBanCheck(data, socket, responseEventName, requestId) {
-    let banSets = await this.getBanSets()
-    let ipBan = banSets.ipBanSet[socket.remoteAddress]
-    let username = data.username && data.username.toLowerCase()
-    let userBan = banSets.userBanSet[username]
-    let ban = ipBan || userBan
+  async checkIsBanned(data, socket, responseEventName, requestId) {
+    let username = data.username && data.username.toLowerCase() || ''
+    const ip = socket.remoteAddress
+
+    let ban = await IpBan.findOne({ where: { ip: ip, username: username } })
 
     if (ban) {
-      if (data.idToken && !userBan) return false
-
       if (this.isBanExpired(ban)) {
         this.removeBan({ ip: [ban.ip] })
         return false
@@ -1080,7 +1077,7 @@ class MatchmakerServer {
       if (!data.language) data.language = "en"
 
       // check if ip blacklisted
-      let isBanned = await this.performBanCheck(data, socket, responseEventName, requestId)
+      let isBanned = await this.checkIsBanned(data, socket, responseEventName, requestId)
       if (isBanned) return
 
       let environment = this.getEnvironment()
@@ -1188,7 +1185,7 @@ class MatchmakerServer {
       }
 
       // check if ip blacklisted
-      let isBanned = await this.performBanCheck(data, socket, responseEventName, requestId)
+      let isBanned = await this.checkIsBanned(data, socket, responseEventName, requestId)
       if (isBanned) return
 
       let environment = this.getEnvironment()

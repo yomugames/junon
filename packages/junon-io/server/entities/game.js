@@ -39,6 +39,7 @@ const Scene = require("./scene")
 const Commands = require("../commands/index")
 const Sidebar = require("./sidebar")
 const xss = require("xss")
+const IpBan = require("junon-common/db/ip_ban")
 
 class Game {
   constructor(server, sectorData = {}) {
@@ -2148,8 +2149,7 @@ class Game {
   async performJoinGame(socket, data) {
     // check if ip blacklisted
     let ipAddress = Helper.getSocketRemoteAddress(socket)
-    let banSets = await this.server.getBanSets()
-    let ipBan   = banSets.ipBanSet[ipAddress]
+    let ipBan = await IpBan.findOne({ where: { ip: ipAddress } })
     if (ipBan && !data.idToken) {
       if (this.server.isBanExpired(ipBan)) {
         this.server.removeBan({ ip: [ipBan.ip] })
@@ -2185,7 +2185,7 @@ class Game {
 
       data.username = userModel.username
 
-      let userBan = banSets.userBanSet[data.username.toLowerCase()]
+      let userBan = await IpBan.findOne({ where: { username: data.username.toLowerCase() } })
       if (userBan) {
         if (this.server.isBanExpired(userBan)) {
           this.server.removeBan({ ip: [userBan.ip] })

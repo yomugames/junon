@@ -1341,24 +1341,6 @@ class Server {
     IpBan.destroy({ where: condition })
   }
 
-  async getBanSets() {
-    if (!this.lastIpBanCacheTime ||
-         Date.now() - this.lastIpBanCacheTime > (60 * 1000)) {
-      let ipBanList = await IpBan.findAll({ attributes: ['ip', 'username', 'reason', 'dayCount', 'createdAt'] })
-      this.lastIpBanCacheTime = Date.now()
-      this.ipBanSet   = {}
-      this.userBanSet = {}
-      for (var i = 0; i < ipBanList.length; i++) {
-        this.ipBanSet[ipBanList[i].ip] = ipBanList[i]
-        if (ipBanList[i].username) {
-          this.userBanSet[ipBanList[i].username.toLowerCase()] = ipBanList[i]
-        }
-      }
-    }
-
-    return { ipBanSet: this.ipBanSet, userBanSet: this.userBanSet  }
-  }
-
   processQueue(queue, gameIds) {
     try {
       this.lastQueueIndex[queue.name] = this.lastQueueIndex[queue.name] || 0

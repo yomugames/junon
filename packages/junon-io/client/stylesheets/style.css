@@ -8906,11 +8906,16 @@ body.imposter_mode .minigame_poster {
 }
 
 .team_entry_row .ban_world_btn {
+    display: none;
     float: right;
-    background-color: darkred;
+    background-color: gray;
     color: white;
     margin: 5px;
     padding: 3px 6px;
+}
+
+body.moderator .team_entry_row .ban_world_btn {
+    display: inline-block;
 }
 
 .team_entry_row .ban_world_btn:hover {

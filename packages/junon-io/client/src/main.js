@@ -2082,6 +2082,10 @@ class Main {
         let favorites   = this.userData.favorites
         this.gameExplorer.addMyColonies(saveEntries)
         this.gameExplorer.addFavoriteColonies(favorites)
+
+        if (this.isModerator()) {
+          document.body.classList.add("moderator")
+        }
       }
 
       this.onUserAuthenticated()

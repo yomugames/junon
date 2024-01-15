@@ -172,6 +172,8 @@ Buildings.Crops.CoffeeSeed = require("./crops/coffee_seed")
 // Buildings.Crops.NitroSeed = require("./crops/nitro_seed")
 // Buildings.Crops.CottonSeed = require("./crops/cotton_seed")
 Buildings.Crops.FiberSeed = require("./crops/fiber_seed")
+Buildings.Crops.PumpkinSeed = require("./crops/pumpkin_seed.js")
+Buildings.Crops.RiceSeed = require("./crops/rice_seed")
 
 // dynamically create klasses
 for (let name in Constants.Crops) {

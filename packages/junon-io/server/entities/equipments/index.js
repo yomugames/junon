@@ -46,6 +46,7 @@ Equipments.PrisonerSuit = require("./armor/prisoner_suit")
 Equipments.PoliceSuit = require("./armor/police_suit")
 Equipments.LabCoat = require("./armor/lab_coat")
 Equipments.CultistSuit = require("./armor/cultist_suit")
+Equipments.ImperialSpecialForcesArmor = require("./armor/imperial_special_forces_armor")
 
 
 Equipments.forType = (type) => {

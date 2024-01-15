@@ -9,6 +9,7 @@ Drinks.Beer = require("./beer")
 Drinks.Vodka = require("./vodka")
 Drinks.EnergyDrink = require("./energy_drink")
 Drinks.AlienJuice = require("./alien_juice")
+Drinks.Nihonshu = require("./nihonshu")
 
 Drinks.forType = (type) => {
   const klassName = Helper.getTypeNameById(type)

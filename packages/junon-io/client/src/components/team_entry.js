@@ -33,7 +33,7 @@ class TeamEntry {
     this.el.innerHTML += "<img class='screenshot' src='" + this.getThumbnailPath() + "' />"
     this.el.innerHTML += "<div class='info_name'></div>"
     
-    if (team.online && this.main.isModerator()) {
+    if (team.online) {
       this.el.innerHTML += "<div class='ban_world_btn'>Ban</div>"
     }
 

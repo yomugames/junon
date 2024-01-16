@@ -47,13 +47,14 @@ Equipments.PrisonerSuit = require("./armor/prisoner_suit")
 Equipments.PoliceSuit = require("./armor/police_suit")
 Equipments.LabCoat = require("./armor/lab_coat")
 Equipments.CultistSuit = require("./armor/cultist_suit")
+Equipments.ImperialSpecialForcesArmor = require("./armor/imperial_special_forces_armor")
 
 Equipments.forType = (type) => {
   const klassName = Helper.getTypeNameById(type)
   return Equipments[klassName]
 }
 
-const craftExcludeList = ["Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "Katana", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit"]
+const craftExcludeList = ["Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "Katana", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit", "ImperialSpecialForcesArmor"]
 
 Equipments.getList = () => {
   return Object.values(Equipments).filter((klass) => {

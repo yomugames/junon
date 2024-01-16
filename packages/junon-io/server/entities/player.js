@@ -3651,7 +3651,7 @@ class Player extends BaseEntity {
     let effectDuration = this.game.timestamp - this.getEffectCreatedAt("rage")
     let effectDurationInSeconds = Math.floor(effectDuration / Constants.physicsTimeStep)
 
-    if (effectDurationInSeconds >= 15) {
+    if (effectDurationInSeconds >= 60) {
       this.removeRage()
     }
   }
@@ -5340,12 +5340,10 @@ class Player extends BaseEntity {
         }
       }
 
-      // if (!this.sector.isMiniGame()) {
-      //   if (!this.isLoggedIn()) {
-      //     this.showChatError("must login to chat")
-      //     return
-      //   }
-      // }
+      if (!this.isLoggedIn()) {
+        this.showChatError("must login to chat")
+        return
+      }
 
       message = this.replaceBadWords(message)
 

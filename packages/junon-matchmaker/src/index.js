@@ -330,14 +330,14 @@ class MatchmakerServer {
     return ["sectors", namespace, sectorUid, "sector.sav"].join("/")
   }
 
-  async isMod(idToken) {
-    let uid = await this.getUidFromRequest(idToken, uid)
+  async isMod(idToken, targetUid) {
+    let uid = await this.getUidFromRequest(idToken, targetUid)
     if (!uid) return false
 
     let modIds = [
       "5t1H4HSXgGRzCw0isgiwxBf2cXn2", 
-      "c1ZwNiSozAWrVSPOD6dspydyYOR2", 
-      "jEleFj7LAVhfv8FwLEKejEj6ESx2"
+      "jEleFj7LAVhfv8FwLEKejEj6ESx2",
+      "UBdPAUeJBfZfUycLhl3508aAgVH2"
     ]
 
     if (modIds.indexOf(uid) !== -1) {
@@ -579,6 +579,18 @@ class MatchmakerServer {
             return
           }
 
+          if (body.sectorUid) {
+            // ban sector and owner
+            const gameServerSocket = this.gameServerSockets[body.host]
+
+            this.socketUtil.emit(gameServerSocket, "BanWorldAndOwner", {
+              creatorUid: body.creatorUid,
+              sectorUid: body.sectorUid
+            })
+            return
+          }
+
+          // ban user
           let userToBan = await User.findOne({ 
             where: { username: body.username }
           })
@@ -620,6 +632,7 @@ class MatchmakerServer {
 
           let ipBan = await IpBan.create(data)
           res.end(JSON.stringify({ success: body.username + " banned" }))
+          this.kickPlayerFromAllServers({ ip: targetIp, username: username })
         } catch(e) {
           ExceptionReporter.captureException(e)
           let data = { error: "Ban error" }
@@ -627,7 +640,6 @@ class MatchmakerServer {
         }
       })
     })
-
 
     app.post('/create_user', async (res, req) => {
       res.writeHeader('Access-Control-Allow-Origin','*')
@@ -753,6 +765,17 @@ class MatchmakerServer {
     this.bindPort(app, "Matchmaker", this.APP_SERVER_PORT)
   }
 
+  async kickPlayerFromAllServers(ip, username) {
+    for (let host in this.gameServerSockets) {
+      let gameServerSocket = this.gameServerSockets[host]
+
+      this.socketUtil.emit(gameServerSocket, "KickPlayer", {
+        ip: ip,
+        username: username,
+      })
+    }
+  }
+
   async removePlayerFromPreviousCreatedGame(environment, ip, data) {
     let uid = await this.getUidFromRequest(data.idToken, data.uid)
     let sectorData = environment.getActivePlayerCreatedGame(ip, uid)
@@ -849,7 +872,7 @@ class MatchmakerServer {
       let uid
 
       // check if ip blacklisted
-      let isBanned = await this.performBanCheck(data, socket, responseEventName, requestId)
+      let isBanned = await this.checkIsBanned(data, socket, responseEventName, requestId)
       if (isBanned) return
 
       let gameServerSocket = this.gameServerSockets[server.host]
@@ -994,33 +1017,30 @@ class MatchmakerServer {
     return remaining
   }
 
-  formatBanMsg(ipBan) {
+  formatBanMsg(ban) {
     let msg = "Banned"
 
-    let remaining = this.remainingDays(ipBan)
+    let remaining = this.remainingDays(ban)
     if (remaining) {
       msg += ` for ${remaining} days.`
     } else {
       msg += "."
     }
 
-    if (ipBan.reason) {
-      msg += ` Reason: ${ipBan.reason}`
+    if (ban.reason) {
+      msg += ` Reason: ${ban.reason}`
     }
 
     return msg
   }
 
-  async performBanCheck(data, socket, responseEventName, requestId) {
-    let banSets = await this.getBanSets()
-    let ipBan = banSets.ipBanSet[socket.remoteAddress]
-    let username = data.username && data.username.toLowerCase()
-    let userBan = banSets.userBanSet[username]
-    let ban = ipBan || userBan
+  async checkIsBanned(data, socket, responseEventName, requestId) {
+    let username = data.username && data.username.toLowerCase() || ''
+    const ip = socket.remoteAddress
+
+    let ban = await IpBan.findOne({ where: { ip: ip, username: username } })
 
     if (ban) {
-      if (data.idToken && !userBan) return false
-
       if (this.isBanExpired(ban)) {
         this.removeBan({ ip: [ban.ip] })
         return false
@@ -1057,7 +1077,7 @@ class MatchmakerServer {
       if (!data.language) data.language = "en"
 
       // check if ip blacklisted
-      let isBanned = await this.performBanCheck(data, socket, responseEventName, requestId)
+      let isBanned = await this.checkIsBanned(data, socket, responseEventName, requestId)
       if (isBanned) return
 
       let environment = this.getEnvironment()
@@ -1165,7 +1185,7 @@ class MatchmakerServer {
       }
 
       // check if ip blacklisted
-      let isBanned = await this.performBanCheck(data, socket, responseEventName, requestId)
+      let isBanned = await this.checkIsBanned(data, socket, responseEventName, requestId)
       if (isBanned) return
 
       let environment = this.getEnvironment()

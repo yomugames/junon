@@ -39,6 +39,7 @@ const Scene = require("./scene")
 const Commands = require("../commands/index")
 const Sidebar = require("./sidebar")
 const xss = require("xss")
+const IpBan = require("junon-common/db/ip_ban")
 
 class Game {
   constructor(server, sectorData = {}) {
@@ -910,6 +911,7 @@ class Game {
   canBeSaved() {
     if (this.isTutorial) return false
     if (this.isMiniGame()) return false
+    if (this.isRemoved) return false
 
     return true
   }
@@ -1416,6 +1418,19 @@ class Game {
     return Date.now() - this.readyTime
   }
 
+  async deleteForever() {
+    await WorldSerializer.deleteSector(this.getSectorUid())
+    let sectorModel = await SectorModel.findOne({
+      where: { uid: this.getSectorUid() }
+    })
+
+    if (sectorModel) {
+      await sectorModel.destroy()
+    }
+
+    this.remove()
+  }
+
   async prepareRemove() {
     if (this.isPreparingRemoval) return
     this.isPreparingRemoval = true
@@ -1428,16 +1443,7 @@ class Game {
     if (this.isCreatedByAnonynmous()) {
       let creator = [this.creatorUid, this.getCreatorIp()].join("-")
       LOG.info(`Sector ${this.sectorUid} ${this.sector.name} is anonymously created by ${creator}. Removing save file`)
-      await WorldSerializer.deleteSector(this.getSectorUid())
-      let sectorModel = await SectorModel.findOne({
-        where: { uid: this.getSectorUid() }
-      })
-
-      if (sectorModel) {
-        await sectorModel.destroy()
-      }
-
-      this.remove()
+      await this.deleteForever()
       return
     }
 
@@ -2147,8 +2153,7 @@ class Game {
   async performJoinGame(socket, data) {
     // check if ip blacklisted
     let ipAddress = Helper.getSocketRemoteAddress(socket)
-    let banSets = await this.server.getBanSets()
-    let ipBan   = banSets.ipBanSet[ipAddress]
+    let ipBan = await IpBan.findOne({ where: { ip: ipAddress } })
     if (ipBan && !data.idToken) {
       if (this.server.isBanExpired(ipBan)) {
         this.server.removeBan({ ip: [ipBan.ip] })
@@ -2184,7 +2189,7 @@ class Game {
 
       data.username = userModel.username
 
-      let userBan = banSets.userBanSet[data.username.toLowerCase()]
+      let userBan = await IpBan.findOne({ where: { username: data.username.toLowerCase() } })
       if (userBan) {
         if (this.server.isBanExpired(userBan)) {
           this.server.removeBan({ ip: [userBan.ip] })

@@ -10,7 +10,7 @@ Drinks.Drinkable.Beer = require("./beer")
 Drinks.Drinkable.Vodka = require("./vodka")
 Drinks.Drinkable.EnergyDrink = require("./energy_drink")
 Drinks.Drinkable.AlienJuice = require("./alien_juice")
-
+Drinks.Drinkable.Nihonshu = require("./nihonshu")
 
 Drinks.forType = (type) => {
   let klass

@@ -1871,6 +1871,17 @@
       },
       "categories": {"distance_dependent_width": true}
     },
+    "BlueLaser": {
+      "width": 5,
+      "height": 5,
+      "speed": 15,
+      "damage": 75,
+      "sprite": {
+        "width": 32,
+        "height": 4
+      }
+
+    },
     "MiningBeam": {
       "width": 32,
       "height": 32,
@@ -3284,6 +3295,35 @@
         "Wire": 5
       },
       "description": "Mines Asteroids faster. Damage 5"
+    },
+    "Deconstructor": {
+      "parent": "Equipments.BaseEquipment",
+      "canDamageWalls": true,
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 2050
+      },
+      "stats": {
+        "range": 1500,
+        "damage": 100,
+        "health": 20,
+        "reload": 2000
+      },
+      "requirements": {
+        "IronBar": 95,
+        "CopperBar": 215,
+        "Wire": 10,
+        "CircuitBoard": 20,
+        "SolarPanel": 1
+      },
+      "sprite": {
+        "position": {
+          "x": 67,
+          "y": 20
+        }
+      },
+      "description": "An energy powered gun which easily destroys buildings"
     },
     "Pistol": {
       "parent": "Equipments.BaseEquipment",

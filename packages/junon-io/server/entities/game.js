@@ -1593,6 +1593,10 @@ class Game {
     for (let id in this.sector.transports) {
       cb(this.sector.transports[id].body)
     }
+
+    for(let id in this.sector.buildings) {
+      cb(this.sector.buildings[id].body)
+    }
   }
 
   calculateDistance(entity, otherEntity) {

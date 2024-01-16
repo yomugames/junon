@@ -252,6 +252,7 @@ enum BuildingType {
   BomberTurret = 256;
   PlasmaBlade  = 257;
   Starberries  = 258;
+  Deconstructor = 259;
 }
 
 enum TerrainType {
@@ -299,6 +300,7 @@ enum ProjectileType {
   MolotovCocktail = 23;
   PlasmaBullet = 24;
   Bubble = 25;
+  BlueLaser = 26;
 }
 
 enum MobStatus {

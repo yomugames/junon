@@ -190,10 +190,7 @@ class TradeOrder {
         this.customer.showError("Invalid sell item")
         return
       }
-<<<<<<< HEAD
-=======
     
->>>>>>> 4fd3669da0cba6b701138d1d7804f220a596f2cf
       entity.remove()
     } else {
       if (this.sector.isCustomSell) {

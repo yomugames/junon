@@ -252,9 +252,6 @@ enum BuildingType {
   BomberTurret = 256;
   PlasmaBlade  = 257;
   Starberries  = 258;
-<<<<<<< HEAD
-  Deconstructor = 259;
-=======
   Nihonshu  = 259;
   PumpkinSeed  = 260;
   Pumpkin  = 261;
@@ -264,7 +261,7 @@ enum BuildingType {
   Nigiri =  265;
   PumpkinPie =  266;
   ImperialSpecialForcesArmor = 267;
->>>>>>> 4fd3669da0cba6b701138d1d7804f220a596f2cf
+  Deconstructor = 268;
 }
 
 enum TerrainType {

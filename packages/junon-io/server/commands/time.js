@@ -18,6 +18,11 @@ class Time extends BaseCommand {
   }
 
   perform(player, args) {
+    if (!debugMode) {
+      this.showChatError("Command no longer available")
+      return
+    }
+
     if (!args[0]) {
       this.showChatError("/time [hour]")
       return

@@ -8904,3 +8904,20 @@ body.imposter_mode .minigame_poster {
     border: solid 1px #555;
     margin-bottom: 15px;
 }
+
+.team_entry_row .ban_world_btn {
+    display: none;
+    float: right;
+    background-color: gray;
+    color: white;
+    margin: 5px;
+    padding: 3px 6px;
+}
+
+body.moderator .team_entry_row .ban_world_btn {
+    display: inline-block;
+}
+
+.team_entry_row .ban_world_btn:hover {
+    background-color: #c44242;
+}

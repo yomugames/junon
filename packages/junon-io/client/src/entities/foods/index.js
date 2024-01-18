@@ -9,6 +9,7 @@ Foods.Raw.AlienMeat = require("./alien_meat")
 Foods.Raw.HumanMeat = require("./human_meat")
 Foods.Raw.AnimalMeat = require("./animal_meat")
 Foods.Raw.Wheat = require("./wheat")
+Foods.Raw.Rice = require("./rice")
 
 Foods.Cooked = {}
 Foods.Cooked.Potato = require("./potato")
@@ -25,6 +26,10 @@ Foods.Cooked.PotatoSoup = require("./potato_soup")
 Foods.Cooked.SlimeBroth = require("./slime_broth")
 Foods.Cooked.MisoSoup = require("./miso_soup")
 Foods.Cooked.Starberries = require("./starberries")
+Foods.Cooked.Pumpkin = require("./pumpkin")
+Foods.Cooked.Fish = require("./fish")
+Foods.Cooked.Nigiri = require("./nigiri")
+Foods.Cooked.PumpkinPie = require("./pumpkin_pie")
 Foods.Cooked.Starnut = require("./starnut")
 
 Foods.Drugs = {}

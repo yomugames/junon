@@ -229,7 +229,7 @@ class BaseEntity {
 
     let el = "<div class='entity_stats_entry ownership_stat_entry'>" +
                     "<div class='stats_type'>" + i18n.t("Owner") + ":</div>" +
-                    "<div class='stats_value'>" + ownerName + "</div>" +
+                    "<div class='stats_value'>" + ownerName.replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</div>" +
                 "</div>"
     return el
   }

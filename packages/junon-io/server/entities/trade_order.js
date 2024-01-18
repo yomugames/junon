@@ -186,6 +186,11 @@ class TradeOrder {
       let entity = this.game.getEntity(this.entityId)
       if (!entity) return
 
+      if(!entity.isMob() && !entity.isItem()) {
+        this.customer.showError("Invalid sell item")
+        return
+      }
+    
       entity.remove()
     } else {
       if (this.sector.isCustomSell) {

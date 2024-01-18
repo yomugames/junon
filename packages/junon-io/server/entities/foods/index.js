@@ -26,6 +26,11 @@ Foods.PotatoSoup = require("./potato_soup")
 Foods.SlimeBroth = require("./slime_broth")
 Foods.Starberries = require("./starberries")
 Foods.Starnut = require("./starnut")
+Foods.Pumpkin = require("./pumpkin")
+Foods.Rice = require("./rice")
+Foods.Fish = require("./fish")
+Foods.Nigiri = require("./nigiri")
+Foods.PumpkinPie = require("./pumpkin_pie")
 
 Foods.forType = (type) => {
   const klassName = Helper.getTypeNameById(type)

@@ -18,6 +18,38 @@ class BanManager {
     document.querySelector("#ban_manager_container .cancel_btn").addEventListener("click", this.onCancelClick.bind(this))
   }
 
+  async banWorld(host, sectorUid, creatorUid) {
+    let url = Config[env].matchmakerUrl + "create_ban" 
+    let idToken = await this.main.getFirebaseIdToken()
+
+    const data = {
+      idToken: idToken,
+      host: host,
+      sectorUid: sectorUid,
+      creatorUid: creatorUid,
+    }
+
+    ClientHelper.httpPost(url, data, {
+      success: (result) => {
+        try {
+          let data = JSON.parse(result)
+          if (data.error) {
+            alert("Ban world failed: " + data.error) 
+            return
+          }
+          if (data.success) {
+            alert("Ban successful") 
+          }
+        } catch(e) {
+          alert("Ban world failed" ) 
+        }
+      },
+      error: () => {
+        alert("Ban world failed" ) 
+      }
+    })
+  }
+
   async onGlobalBanBtnClick(e) {
     let username = document.querySelector(".ban_user_form .ban_username input").value
     let dayCount = document.querySelector(".ban_user_form .ban_duration input").value

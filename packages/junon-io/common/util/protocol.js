@@ -11,9 +11,7 @@ const Protocol = {
   },
   init(filePath, cb){
     let protobuf 
-
     let isClient = typeof window !== 'undefined'
-
     if (typeof window !== 'undefined' && window.Protobuf) {
       protobuf = window.Protobuf
     } else {
@@ -21,6 +19,7 @@ const Protocol = {
     }
 
     let root = new protobuf.Root()
+
     root.resolvePath = function(origin, target) {
       let protoMatch = origin.match(/(.*)\/.*\.proto/)
       let directory = protoMatch ? protoMatch[1] : ""
@@ -38,12 +37,10 @@ const Protocol = {
         cb(err)
         return
       }
-
       if (!root.nested) {
         cb("error_fetching_proto_file")
         return
       }
-
       this.protocol = root.nested.app
       cb(null, this.protocol)
     })
@@ -52,5 +49,4 @@ const Protocol = {
     return this.protocol
   }
 }
-
 module.exports = Protocol

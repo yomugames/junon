@@ -2082,6 +2082,10 @@ class Main {
         let favorites   = this.userData.favorites
         this.gameExplorer.addMyColonies(saveEntries)
         this.gameExplorer.addFavoriteColonies(favorites)
+
+        if (this.isModerator()) {
+          document.body.classList.add("moderator")
+        }
       }
 
       this.onUserAuthenticated()
@@ -2104,9 +2108,14 @@ class Main {
     this.receivedFriendRequests[data.uid] = data
   }
 
+  isModerator() {
+    if (!this.userData) return false
+    let mods = ["kuroro", "BigTforLife", "superaaron"]
+    return mods.indexOf(this.userData.username) !== -1
+  }
+
   async onUserAuthenticated() {
-    let mods = ["kuroro", "BigTforLife", "Pkovacic", "Potato"]
-    let isMod = mods.indexOf(main.userData.username) !== -1
+    let isMod = this.isModerator()
 
     if (isMod) {
       document.querySelector(".open_ban_list_btn").style.display = 'block'

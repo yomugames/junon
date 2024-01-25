@@ -261,6 +261,8 @@ enum BuildingType {
   Nigiri =  265;
   PumpkinPie =  266;
   ImperialSpecialForcesArmor = 267;
+  Starnut    = 268;
+  PointyStick = 269;
 }
 
 enum TerrainType {

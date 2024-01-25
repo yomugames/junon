@@ -30,6 +30,7 @@ Foods.Cooked.Pumpkin = require("./pumpkin")
 Foods.Cooked.Fish = require("./fish")
 Foods.Cooked.Nigiri = require("./nigiri")
 Foods.Cooked.PumpkinPie = require("./pumpkin_pie")
+Foods.Cooked.Starnut = require("./starnut")
 
 Foods.Drugs = {}
 Foods.Drugs.FirstAidKit = require("./first_aid_kit")

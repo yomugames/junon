@@ -3158,6 +3158,26 @@
       "upgrade": {},
       "description": "Strange berries from alien bushes."
     },
+    "Star Nut": {
+      "width": 21,
+      "height": 14,
+      "cost": {
+        "gold": 250
+      },
+      "stats": {
+        "food": 10,
+        "health": 15
+      },
+      "sprite": {
+        "position": {
+          "x": 64,
+          "y": 0
+        },
+        "rotation": 90
+      },
+      "upgrade": {},
+      "description": "A strange brown nut. Can it be planted?"
+    },
     "Fish": {
       "width": 32,
       "height": 32,
@@ -3829,6 +3849,24 @@
         "Meteorite": 25
       },
       "description": "Strong blade made of plasma"
+    },
+    "PointyStick": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 250
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 14,
+        "range": 55,
+        "meleeRange": 55
+      },
+      "requirements": {
+        "Wood": 5
+      },
+      "description": "A weak but pointy stick"
     },
     "AssassinsKnife": {
       "parent": "Equipments.MeleeEquipment",

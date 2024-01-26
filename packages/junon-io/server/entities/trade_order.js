@@ -65,6 +65,7 @@ class TradeOrder {
         return inventoryItemCount >= purchaseCost
       }
     }
+    let entity = this.game.getEntity(this.entityId)
 
     return this.customer.gold >= this.getTotalPurchaseCost()
   }

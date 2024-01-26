@@ -262,6 +262,7 @@ enum BuildingType {
   PumpkinPie =  266;
   ImperialSpecialForcesArmor = 267;
   Deconstructor = 268;
+  KeypadDoor = 269;
 }
 
 enum TerrainType {

@@ -3333,7 +3333,7 @@
         "Glass": 2,
         "CopperBar": 5
       },
-      "description": "Lit things on fire. Refill with FuelTank"
+      "description": "Light things on fire. Refill with FuelTank"
     },
     "NameTag": {
       "parent": "Equipments.MeleeEquipment",
@@ -5330,6 +5330,33 @@
         "count": "+25"
       },
       "description": "Door that restricts access to certain personnels only"
+    },
+    "KeypadDoor": {
+      "hasMenu": true,
+      "width": 128,
+      "height": 32,
+      "requirements": {
+        "IronBar": 35,
+        "CircuitBoard": 30,
+        "Wire": 15
+      },
+      "cost": {
+        "gold": 800
+      },
+      "stats": {
+        "health": 300,
+        "count": 125
+      },
+      "isInteractable": true,
+      "minimapColor": "#3bceaa",
+      "showInteractTooltip": true,
+      "isAirtight": true,
+      "categories": {"door":true,"melee_resistant":true},
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Only opens if you have the code"
     },
     "SolarPanel": {
       "width": 64,

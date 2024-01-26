@@ -394,6 +394,13 @@ class Main {
     let shouldRefreshAd = !this.lastHomepageAdDisplay ||
                           (this.lastHomepageAdDisplay && ((Date.now() - this.lastHomepageAdDisplay) > threeMinutes))
     if (shouldRefreshAd) {
+      aiptag.cmd.display.push(() => {
+        aipDisplayTag.display('junon-io_300x250');
+      })
+
+      aiptag.cmd.display.push(() => {
+        aipDisplayTag.display('junon-io_300x250_2');
+      })
       this.lastHomepageAdDisplay = Date.now()
     }
   }
@@ -410,27 +417,27 @@ class Main {
     document.querySelector("#preroll_container").style.marginLeft = -(playerWidth/2) + "px"
     document.querySelector("#preroll_container").style.marginTop  = -(playerHeight/2) + "px"
 
-    //aiptag.cmd.player.push(() => {
-      //window.adplayer = new aipPlayer({
-        //AD_WIDTH: playerWidth,
-        //AD_HEIGHT: playerHeight,
-        //AD_FULLSCREEN: false,
-        //AD_CENTERPLAYER: false,
-        //LOADING_TEXT: 'loading advertisement',
-        //PREROLL_ELEM: () => {
-          //return document.getElementById('preroll')
-        //},
-        //AIP_COMPLETE: () => {
-          //document.querySelector("#preroll_container").style.display = 'none'
-          //if (this.videoAdCompleteCallback) {
-            //this.videoAdCompleteCallback()
-          //}
-        //},
-        //AIP_REMOVE: () => {
-          //document.querySelector("#preroll_container").style.display = 'none'
-        //}
-      //});
-    //});
+    aiptag.cmd.player.push(() => {
+      window.adplayer = new aipPlayer({
+        AD_WIDTH: playerWidth,
+        AD_HEIGHT: playerHeight,
+        AD_FULLSCREEN: false,
+        AD_CENTERPLAYER: false,
+        LOADING_TEXT: 'loading advertisement',
+        PREROLL_ELEM: () => {
+          return document.getElementById('preroll')
+        },
+        AIP_COMPLETE: () => {
+          document.querySelector("#preroll_container").style.display = 'none'
+          if (this.videoAdCompleteCallback) {
+            this.videoAdCompleteCallback()
+          }
+        },
+        AIP_REMOVE: () => {
+          document.querySelector("#preroll_container").style.display = 'none'
+        }
+      });
+    });
   }
 
   recordColonyVisit() {
@@ -476,6 +483,10 @@ class Main {
 
   displayVideoAd() {
     if (typeof adplayer !== 'undefined') {
+      aiptag.cmd.player.push(() => {
+        document.querySelector("#preroll_container").style.display = 'block'
+        adplayer.startPreRoll()
+      })
     } else {
       //Adlib didnt load this could be due to an adblocker, timeout etc.
       if (this.videoAdCompleteCallback) {

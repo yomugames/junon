@@ -48,7 +48,6 @@ message Entities {
 }
 
 message KeyCode {
-  uint32 id = 1;
   string keyCode = 2;
 }
 

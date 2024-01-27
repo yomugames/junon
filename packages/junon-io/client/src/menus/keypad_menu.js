@@ -3,22 +3,22 @@ const BaseMenu = require("./base_menu");
 class KeypadMenu extends BaseMenu {
     onMenuConstructed() {
         document.querySelector("#keypad_clear_button").addEventListener('click', () => {
-            document.querySelector("#keypad_code_value").innerHTML = ''
+            document.querySelector("#keypad_code_value").innerText = ''
         })
 
         document.querySelector("#keypad_submit_button").addEventListener("click", () => {
             if(!this.doorId) return
             let el = document.querySelector("#keypad_submit_button")
             let valueEl = document.querySelector("#keypad_code_value")
-            switch (el.innerHTML) {
+            switch (el.innerText) {
                 case 'set code':
-                    if(valueEl.innerHTML != '') {
-                        this.game.getSocketUtil().emit("KeypadAction", {id: this.doorId, action: "setCode", keyCode: valueEl.innerHTML})
+                    if(valueEl.innerText != '') {
+                        this.game.getSocketUtil().emit("KeypadAction", {id: this.doorId, action: "setCode", keyCode: valueEl.innerText})
                     }
                     break
                 case 'check code':
-                    if(valueEl.innerHTML != '') {
-                        this.game.getSocketUtil().emit("KeypadAction", {id: this.doorId, action: "checkCode", keyCode: valueEl.innerHTML})
+                    if(valueEl.innerText != '') {
+                        this.game.getSocketUtil().emit("KeypadAction", {id: this.doorId, action: "checkCode", keyCode: valueEl.innerText})
                     }
                     break;
                 default:
@@ -31,8 +31,8 @@ class KeypadMenu extends BaseMenu {
             element.addEventListener('click', () => {
                 let valueEl = document.querySelector('#keypad_code_value')
 
-                if(valueEl.innerHTML.length < 10) {
-                    valueEl.innerHTML += element.innerHTML
+                if(valueEl.innerText.length < 10) {
+                    valueEl.innerText += element.innerText
                 }
             })
         }
@@ -40,7 +40,7 @@ class KeypadMenu extends BaseMenu {
     
     open(doorId=0) {
         this.el.style.display = 'block'
-        document.querySelector("#keypad_code_value").innerHTML = ''
+        document.querySelector("#keypad_code_value").innerText = ''
         document.querySelector("#keypad_err_msg").style.visibility = 'hidden'
 
         this.doorId = doorId

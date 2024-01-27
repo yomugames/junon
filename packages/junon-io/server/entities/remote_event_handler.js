@@ -545,6 +545,32 @@ class RemoteEventHandler {
       }
     }
   }
+  onGetDoorStatus(player, data, socket) {
+    let entity = player.game.getEntity(data.id)
+
+    if(!entity) return
+    if(!entity.type === 269) return
+
+    this.getSocketUtil().emit(socket, "DoorStatus", {status: entity.getStatus(player)})
+    
+  }
+  onKeypadAction(player, data, socket) {
+    let entity = player.game.getEntity(data.id)
+
+    if(!entity) return
+    if(!entity.type == 269) return
+
+    switch(data.action) {
+      case "setCode":
+        entity.setKeypadCode(player, data)
+        break
+      case "checkCode":
+        entity.checkKeypadCode(player, data)
+        break
+      default:
+        break
+    }
+  }
   onClientChat(player, data, socket) {
     player.chat(data)
   }

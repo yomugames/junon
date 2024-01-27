@@ -162,6 +162,26 @@ class EventHandler {
     return equipment.getTypeName()
   }
 
+  getPlatformByCoords(row, col) {
+    let platform = this.sector.platformMap.get(row, col)
+    if(!platform) return ''
+    let id = platform.id
+
+    if(id) return id
+
+    return ''
+  }
+
+  getStructureByCoords(row, col) {
+    let structure = this.sector.structureMap.get(row, col)
+    if(!structure) return ''
+    let id = structure.id
+
+    if(id) return id
+
+    return ''
+  }
+
   getOxygen(playerId) {
     let player = this.getPlayer(playerId)
     if (!player) return 0
@@ -211,6 +231,14 @@ class EventHandler {
     if (!player) return 0
 
     return player.getInventoryItemCount(typeName)
+  }
+
+  getContent(entityId) {
+    let entity = this.game.getEntity(entityId)
+    let content = entity.content
+    if(!entity || !content) return ''
+
+    return content    
   }
 
   getRegion(entityId) {
@@ -1027,7 +1055,10 @@ class EventHandler {
       "$getEquipId": true,
       "$getBuildingType": true,
       "$getDay": true,
-      "$getHour": true
+      "$getHour": true,
+      "$getContent": true,
+      "$getPlatformByCoords": true,
+      "$getStructureByCoords": true
     }
   }
 

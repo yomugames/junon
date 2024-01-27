@@ -26,6 +26,7 @@ Buildings.SpikeTrap = require("./spike_trap")
 Buildings.WebTrap = require("./web_trap")
 
 Buildings.SealedDoor = require("./sealed_door")
+Buildings.KeypadDoor = require("./keypad_door")
 Buildings.Airlock = require("./airlock")
 Buildings.ManualAirlock = require("./manual_airlock")
 Buildings.SolarPanel = require("./solar_panel")

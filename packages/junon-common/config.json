@@ -1,5 +1,5 @@
 {
-  "saveFormatVersion": 35,
+  "saveFormatVersion": 36,
   "development": {
     "googleAnalyticsId": "",
     "matchmakerUrl": "http://localhost:3000/",

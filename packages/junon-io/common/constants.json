@@ -1901,6 +1901,17 @@
       },
       "categories": {"distance_dependent_width": true}
     },
+    "BlueLaser": {
+      "width": 5,
+      "height": 5,
+      "speed": 15,
+      "damage": 75,
+      "sprite": {
+        "width": 32,
+        "height": 4
+      }
+
+    },
     "MiningBeam": {
       "width": 32,
       "height": 32,
@@ -3322,7 +3333,7 @@
         "Glass": 2,
         "CopperBar": 5
       },
-      "description": "Lit things on fire. Refill with FuelTank"
+      "description": "Light things on fire. Refill with FuelTank"
     },
     "NameTag": {
       "parent": "Equipments.MeleeEquipment",
@@ -3435,6 +3446,35 @@
         "Wire": 5
       },
       "description": "Mines Asteroids faster. Damage 5"
+    },
+    "Deconstructor": {
+      "parent": "Equipments.BaseEquipment",
+      "canDamageWalls": true,
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 2050
+      },
+      "stats": {
+        "range": 1500,
+        "damage": 100,
+        "health": 20,
+        "reload": 2000
+      },
+      "requirements": {
+        "IronBar": 95,
+        "CopperBar": 215,
+        "Wire": 10,
+        "CircuitBoard": 20,
+        "SolarPanel": 1
+      },
+      "sprite": {
+        "position": {
+          "x": 67,
+          "y": 20
+        }
+      },
+      "description": "An energy powered gun which easily destroys buildings"
     },
     "Pistol": {
       "parent": "Equipments.BaseEquipment",
@@ -5290,6 +5330,33 @@
         "count": "+25"
       },
       "description": "Door that restricts access to certain personnels only"
+    },
+    "KeypadDoor": {
+      "hasMenu": true,
+      "width": 128,
+      "height": 32,
+      "requirements": {
+        "IronBar": 35,
+        "CircuitBoard": 30,
+        "Wire": 15
+      },
+      "cost": {
+        "gold": 800
+      },
+      "stats": {
+        "health": 300,
+        "count": 125
+      },
+      "isInteractable": true,
+      "minimapColor": "#3bceaa",
+      "showInteractTooltip": true,
+      "isAirtight": true,
+      "categories": {"door":true,"melee_resistant":true},
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Only opens if you have the code"
     },
     "SolarPanel": {
       "width": 64,

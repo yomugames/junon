@@ -1848,7 +1848,7 @@ class Player extends BaseEntity {
 
     const item = new Item(this, data.type, { count: count })
     let requirements = item.getRequirements()
-    if (this.game.isSurvivalOrHardcore() && Object.keys(requirements).length === 0) {
+    if (Object.keys(requirements).length === 0) {
       // item without requirements cant be crafted
       return
     }

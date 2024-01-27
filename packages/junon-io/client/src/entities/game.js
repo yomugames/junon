@@ -198,6 +198,7 @@ class Game {
   initMenus() {
     this.openMenus = []
 
+    this.keypadMenu    = new Menus.KeypadMenu(this, document.querySelector("#keypad_menu"))
     this.entityMenu    = new Menus.EntityMenu(this, document.querySelector("#entity_menu"))
     this.blueprintMenu = new Menus.BlueprintMenu(this, document.querySelector("#blueprint_menu"))
     this.craftMenu     = new Menus.CraftMenu(this, document.querySelector("#craft_menu"))
@@ -736,7 +737,7 @@ class Game {
             "assault_rifle", "explosion", "missile",
             "harvest_plant", "melee_damage",
             "water_step", "flame", "gas_release", "burning", "eating", "saber_one", "saber_two", "alert", "tesla",
-            "cannon", "plasma_gun", "bubble"]
+            "cannon", "plasma_gun", "bubble", "deep_laser"]
   }
 
   initSoundManager() {
@@ -1401,7 +1402,7 @@ class Game {
 
     // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 
-    let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png','pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png']
+    let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png','pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png', 'deconstructor.png', 'blue_laser.png', 'keypad_door.png', 'keypad_door_lower.png', 'keypad_door_upper.png']
     tempAssets.forEach((asset) => {
       PIXI.Texture.addToCache(PIXI.Texture.fromImage('/assets/images/' + asset), asset)
     })
@@ -1557,6 +1558,30 @@ class Game {
     SocketUtil.on("CommandEventLog", this.onCommandEventLog.bind(this))
     SocketUtil.on("CommandEventLogList", this.onCommandEventLogList.bind(this))
     SocketUtil.on("CommandBlockTimerUpdated", this.onCommandBlockTimerUpdated.bind(this))
+    SocketUtil.on("DoorStatus", this.onDoorStatus.bind(this))
+    SocketUtil.on("KeypadSuccessful", this.onKeypadSuccessful.bind(this))
+    SocketUtil.on("KeypadUnsuccessful", this.onKeypadUnsuccessful.bind(this))
+  }
+
+  onKeypadUnsuccessful() {
+    document.querySelector("#keypad_err_msg").style.visibility = 'visible'
+    document.querySelector("#keypad_code_value").innerHTML = ''
+
+    setTimeout(() => {
+      document.querySelector("#keypad_err_msg").style.visibility = 'hidden'
+    }, 3000)
+  }
+
+  onKeypadSuccessful() {
+    game.keypadMenu.close()
+  }
+
+  onDoorStatus(status) {
+    if(status && status.status) {
+      document.querySelector("#keypad_submit_button").innerHTML = status.status
+    } else {
+      document.querySelector("#keypad_submit_button").innerHTML = status
+    }
   }
 
   onCommandBlockTimerUpdated(data) {

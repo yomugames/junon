@@ -261,6 +261,8 @@ enum BuildingType {
   Nigiri =  265;
   PumpkinPie =  266;
   ImperialSpecialForcesArmor = 267;
+  Deconstructor = 268;
+  KeypadDoor = 269;
 }
 
 enum TerrainType {
@@ -308,6 +310,7 @@ enum ProjectileType {
   MolotovCocktail = 23;
   PlasmaBullet = 24;
   Bubble = 25;
+  BlueLaser = 26;
 }
 
 enum MobStatus {

@@ -517,7 +517,7 @@ class Server {
   }
 
   async getUidFromRequest(idToken, uid) {
-    if (debugMode) return uid
+    if (debugMode || !idToken) return uid
     return await FirebaseAdminHelper.verifyIdToken(idToken)
   }
 
@@ -731,14 +731,24 @@ class Server {
     return targetPlayer
   }
 
-  async getPlayersByIpOrIdToken(ipAddress, idToken, userUid) {
+  async getPlayersBy(options = {}) {
+    const ipAddress = options.ipAddress
+    const idToken = options.idToken
+    const userUid = options.userUid
+    const username = options.username
+
     let players = []
-    let uid = await this.getUidFromRequest(idToken, userUid)
+    let uid = ""
+
+    if (idToken || userUid) {
+      uid = await this.getUidFromRequest(idToken, userUid)
+    }
 
     this.forEachGame((game) => {
       game.forEachPlayer((player) => {
         if (player.getRemoteAddress() === ipAddress ||
-            player.getUid() === uid) {
+            player.getUid() === uid ||
+            player.getName() === username) {
           players.push(player)
         }
       })
@@ -836,13 +846,61 @@ class Server {
     if (data.playerTag) {
       this.removePlayerLegacy(data)
     } else {
-      let playersToRemove = await this.getPlayersByIpOrIdToken(data.ipAddress, data.idToken, data.uid)
+      let playersToRemove = await this.getPlayersBy({
+        ipAddress: data.ipAddress, 
+        idToken: data.idToken, 
+        userUid: data.uid
+      })
       playersToRemove.forEach((player) => {
         let duration = player.getSessionDuration()
         LOG.info(player.name + " removePlayerFromMatchmaker. session duration: " + Helper.stringifyTimeShort(duration))
         player.remove()
       })
     }
+  }
+
+  async onBanWorldAndOwner(data) {
+    let players = await this.getPlayersBy({ userUid: data.creatorUid })
+    let player = players[0]
+
+    let username
+    let targetIp
+
+    if (!player) {
+      // search on DB
+      let user = await User.findOne({
+        where: { uid: data.creatorUid }
+      })
+
+      if (!user) return
+
+      username = user.username
+      targetIp = user.ip
+    } else {
+      username = player.getName()
+      targetIp = player.getRemoteAddress()
+    }
+
+    let existingBan = await IpBan.findOne({
+      where: { ip: targetIp, username: username }
+    })
+
+    if (!existingBan) {
+      await IpBan.create({
+        ip: targetIp,
+        username: username,
+        dayCount: 60,
+        reason: "Ban World"
+      })
+    }
+
+    player.game.deleteForever()
+  }
+
+  async onKickPlayer(data) {
+    let players = await this.getPlayersBy({ ipAddress: data.ip, username: data.username })
+    let player = players[0]
+    player.kick()
   }
 
   removePlayerLegacy(data) {
@@ -970,6 +1028,12 @@ class Server {
           break
         case "CanPlayerJoinResponse":
           this.onCanPlayerJoinResponse(data)
+          break
+        case "BanWorldAndOwner":
+          this.onBanWorldAndOwner(data)
+          break
+        case "KickPlayer":
+          this.onKickPlayer(data)
           break
         default:
       }
@@ -1288,24 +1352,6 @@ class Server {
 
   removeBan(condition) {
     IpBan.destroy({ where: condition })
-  }
-
-  async getBanSets() {
-    if (!this.lastIpBanCacheTime ||
-         Date.now() - this.lastIpBanCacheTime > (60 * 1000)) {
-      let ipBanList = await IpBan.findAll({ attributes: ['ip', 'username', 'reason', 'dayCount', 'createdAt'] })
-      this.lastIpBanCacheTime = Date.now()
-      this.ipBanSet   = {}
-      this.userBanSet = {}
-      for (var i = 0; i < ipBanList.length; i++) {
-        this.ipBanSet[ipBanList[i].ip] = ipBanList[i]
-        if (ipBanList[i].username) {
-          this.userBanSet[ipBanList[i].username.toLowerCase()] = ipBanList[i]
-        }
-      }
-    }
-
-    return { ipBanSet: this.ipBanSet, userBanSet: this.userBanSet  }
   }
 
   processQueue(queue, gameIds) {

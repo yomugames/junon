@@ -1,0 +1,18 @@
+{
+  "version": "v0.5.7.alpha",
+  "date": "Jan 15, 2024",
+  "title": "",
+  "content": {
+    "bugs": [
+      "allow world ban for mods"
+    ],
+    "features": [
+      "Credits to Deovu for added feature/items",
+      "Added nigiri, rice, fish, nihonshu, pumpkin and pumpkin pie",
+      "Added rice plant, rice seed, pumpkin plant and pumpkin seed",
+      "Credits: art for nigiri, rice and fish by KanicoTheGreat",
+      "Credits: art for imperial special forces armor, rice plant, pumpkin, pumpkin plant and pumpkin seed by Wahlee",
+      "Credits: art for nihonshu and katana reskin by KAMIKAZE"
+    ]
+  }
+}

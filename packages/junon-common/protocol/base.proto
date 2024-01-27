@@ -161,7 +161,32 @@ message MessageWrapper {
     CommandEventLog CommandEventLog = 168;
     CommandBlockTimerUpdated CommandBlockTimerUpdated = 169;
     CommandEventLogList CommandEventLogList = 170;
+    KeypadAction KeypadAction = 171;
+    GetDoorStatus GetDoorStatus = 172;
+    DoorStatus DoorStatus = 173;
+    KeypadSuccessful KeypadSuccessful = 174;
+    KeypadUnsuccessful KeypadUnsuccessful = 175;
   }
+}
+
+message KeypadUnsuccessful {
+}
+
+message KeypadSuccessful {
+}
+
+message GetDoorStatus {
+  uint32 id = 1;
+}
+
+message DoorStatus {
+  string status = 1;
+}
+
+message KeypadAction {
+  uint32 id = 1;
+  string action = 2;
+  string keyCode = 3;
 }
 
 message CommandEventLogList {

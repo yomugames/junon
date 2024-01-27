@@ -21,7 +21,7 @@ html {
 
 /* https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_custom_scrollbar2 */
 ::-webkit-scrollbar {
-  width: 8px;
+    width: 8px;
 }
 
 /* Track */
@@ -33,52 +33,58 @@ html {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 10px;
-  border: solid 1px #111;
-  width: 15px;
+    background: #555;
+    border-radius: 10px;
+    border: solid 1px #111;
+    width: 15px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #888;
+    background: #888;
 
 }
 
 /* https://loading.io/css/ */
 .lds-ring {
-  display: inline-block;
-  position: relative;
-  width: 20px;
-  height: 20px;
+    display: inline-block;
+    position: relative;
+    width: 20px;
+    height: 20px;
 }
+
 .lds-ring div {
-  box-sizing: border-box;
-  display: block;
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border: 4px solid #fff;
-  border-radius: 50%;
-  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #fff transparent transparent transparent;
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #fff transparent transparent transparent;
 }
+
 .lds-ring div:nth-child(1) {
-  animation-delay: -0.45s;
+    animation-delay: -0.45s;
 }
+
 .lds-ring div:nth-child(2) {
-  animation-delay: -0.3s;
+    animation-delay: -0.3s;
 }
+
 .lds-ring div:nth-child(3) {
-  animation-delay: -0.15s;
+    animation-delay: -0.15s;
 }
+
 @keyframes lds-ring {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 button {
@@ -106,7 +112,7 @@ button {
     width: 140px;
     background-color: black;
     padding: 5px 10px;
-    font-family: 'cc'; 
+    font-family: 'cc';
 }
 
 
@@ -366,23 +372,25 @@ html[lang='ru'] #welcome_menu .blurb {
     src: url(./../assets/images/cc.ttf);
 }
 
-*:focus {outline:none}
+*:focus {
+    outline: none
+}
 
 canvas {
     touch-action: none;
-  /*display: none !important;*/
+    /*display: none !important;*/
 }
 
 body.mobile div,
 body.mobile span,
 body.mobile label,
 .noselect {
-  -webkit-touch-callout: none;
+    -webkit-touch-callout: none;
     -webkit-user-select: none;
-     -khtml-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 body {
@@ -408,13 +416,13 @@ body,
 }
 
 body {
-  /* Sending body at the bottom of the stack */
-  z-index: 1;
+    /* Sending body at the bottom of the stack */
+    z-index: 1;
 }
 
 .wrapper {
-  /* Making the wrapper stack above the body */
-  z-index: 2;
+    /* Making the wrapper stack above the body */
+    z-index: 2;
     background-color: #0b1825;
 }
 
@@ -446,12 +454,12 @@ body {
 }
 
 .arrow-right {
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
 
-  border-left:10px solid blue;
+    border-left: 10px solid blue;
 }
 
 #name_input_container {
@@ -462,8 +470,7 @@ body {
     margin-bottom: 20px;
 }
 
-#game_list_action_container {
-}
+#game_list_action_container {}
 
 #connecting_message {
     position: absolute;
@@ -506,7 +513,7 @@ body {
     cursor: initial;
     top: 50%;
     position: absolute;
-    transform: translate3d( -50%, -50%, 0 );
+    transform: translate3d(-50%, -50%, 0);
     left: 50%;
 
     margin: 0px;
@@ -704,7 +711,7 @@ body {
 
 .upgrade_item.acquired {
     /*display: none;*/
-/*            border: solid 1px gray;
+    /*            border: solid 1px gray;
     background-color: gray;
     color: white;
 */
@@ -796,8 +803,8 @@ body {
     width: 600px;
     height: 30px;
     z-index: 3;
-    margin-left:-300px;
-    left:50%;
+    margin-left: -300px;
+    left: 50%;
     text-align: center;
     color: #ccc;
     font-family: monospace;
@@ -810,7 +817,7 @@ body {
     background-color: #888;
     color: white;
     border-radius: 5px;
-    padding: 5px 10px ;
+    padding: 5px 10px;
     text-decoration: none;
 }
 
@@ -834,7 +841,8 @@ body {
     color: gray;
 }
 
-#title_description, #question {
+#title_description,
+#question {
     font-size: 20px;
     color: lightgoldenrodyellow;
     margin-top: 0px;
@@ -922,7 +930,8 @@ body {
     margin: 10px;
 }
 
-#how_to_play, #changelog {
+#how_to_play,
+#changelog {
     background-color: black;
     opacity: 0.5;
     color: #aaa;
@@ -955,11 +964,11 @@ body {
 }
 
 #player_experience_bar_fill {
-    position:absolute;
+    position: absolute;
     background-color: steelblue;
-    top:0;
-    bottom:0;
-    left:0;
+    top: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
 }
 
@@ -980,11 +989,11 @@ body {
 }
 
 #player_stamina_bar_fill {
-    position:absolute;
+    position: absolute;
     background-color: #c6ea5d;
-    top:0;
-    bottom:0;
-    left:0;
+    top: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
 }
 
@@ -1058,22 +1067,31 @@ body {
     font-size: 13px;
 }
 
-::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-    color:    #777;
+::-webkit-input-placeholder {
+    /* WebKit, Blink, Edge */
+    color: #777;
 }
-:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-   color:    #777;
-   opacity:  1;
+
+:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
+    color: #777;
+    opacity: 1;
 }
-::-moz-placeholder { /* Mozilla Firefox 19+ */
-   color:    #777;
-   opacity:  1;
+
+::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
+    color: #777;
+    opacity: 1;
 }
-:-ms-input-placeholder { /* Internet Explorer 10-11 */
-   color:    #777;
+
+:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: #777;
 }
-::-ms-input-placeholder { /* Microsoft Edge */
-   color:    #777;
+
+::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: #777;
 }
 
 .resources {
@@ -1324,7 +1342,10 @@ body {
     z-index: 12;
 }
 
-.stats_type, .stats_before, .stats_after, .stats_value {
+.stats_type,
+.stats_before,
+.stats_after,
+.stats_value {
     display: inline-block;
 }
 
@@ -1381,7 +1402,8 @@ html[lang='ja'] .stats_type {
     background-color: #006e68;
 }
 
-#upgrade_btn, #sell_btn {
+#upgrade_btn,
+#sell_btn {
     border: solid 1px #222;
     padding: 10px;
     height: 60px;
@@ -1394,7 +1416,7 @@ html[lang='ja'] .stats_type {
 }
 
 #sell_btn.disabled {
-    pointer-events:none;
+    pointer-events: none;
 }
 
 .action_label {
@@ -1488,9 +1510,7 @@ html[lang='ja'] .stats_type {
     opacity: 0.5 !important;
 }
 
-#upgrade_btn:hover {
-
-}
+#upgrade_btn:hover {}
 
 #entity_health {
     text-align: center;
@@ -1546,11 +1566,12 @@ html[lang='ja'] .stats_type {
 }
 
 #hangar_background {
-/*    position: absolute;
+    /*    position: absolute;
     width: 100%;
     height: 100%;
     background-color: gold;
-*/}
+*/
+}
 
 .base_menu#bottom_black {
     bottom: 0px;
@@ -1605,9 +1626,7 @@ html[lang='ja'] .stats_type {
     color: white;
 }
 
-#error_title {
-
-}
+#error_title {}
 
 #error_menu_content.success {
     color: green;
@@ -1694,7 +1713,7 @@ body.mobile #gamepad_joystick {
 }
 
 img[src=""] {
-   display: none !important;
+    display: none !important;
 }
 
 #player_quick_inventory {
@@ -1795,7 +1814,7 @@ img[src=""] {
     bottom: -8px;
     right: -3px;
     font-size: 13px;
-    font-family:   monospace;
+    font-family: monospace;
 }
 
 #mobile_primary_action_btn:after {
@@ -1820,11 +1839,11 @@ img[src=""] {
 }
 
 .bar_fill {
-    position:absolute;
+    position: absolute;
     background-color: darkgray;
-    top:0;
-    bottom:0;
-    left:0;
+    top: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
     opacity: 0.9;
 }
@@ -1896,7 +1915,7 @@ img[src=""] {
     display: inline-block;
     padding: 10px;
     border-radius: 5px;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 #chat_container {
@@ -1978,8 +1997,7 @@ img[src=""] {
     display: inline-block;
 }
 
-#chat_toggle_btn {
-}
+#chat_toggle_btn {}
 
 #zoom_in_btn,
 #zoom_out_btn {
@@ -2211,7 +2229,7 @@ img[src=""] {
     display: none;
     position: absolute;
     bottom: 240px;
-    left:   25px;
+    left: 25px;
     width: 40px;
     height: 40px;
     opacity: 0.5;
@@ -2283,15 +2301,18 @@ html[lang='ja'] #death_screen_content_message {
 
 /* https://stackoverflow.com/a/14816807 */
 .center {
-    position:absolute; /*it can be fixed too*/
-    left:0; right:0;
-    top:0; bottom:0;
-    margin:auto;
+    position: absolute;
+    /*it can be fixed too*/
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
 
     /*this to solve "the content will not be cut when the window is smaller than the content": */
-    max-width:100%;
-    max-height:100%;
-    overflow:auto;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: auto;
 }
 
 #party_container {
@@ -2465,7 +2486,7 @@ html[lang='ja'] #death_screen_content_message {
     margin-top: 0px;
 }
 
-.visitor_list ,
+.visitor_list,
 .offline_member_list,
 .member_list {
     display: inline-block;
@@ -2947,7 +2968,8 @@ html[lang='ru'] #blueprint_menu {
     padding: 5px;
 }
 
-.entity_stats, .entity_action {
+.entity_stats,
+.entity_action {
     font-size: 14px;
     margin-left: auto;
     margin-right: auto;
@@ -3064,6 +3086,35 @@ html[lang='ru'] #blueprint_menu {
     margin: 10px;
 }
 
+#keypad_code_value {
+    background-color: black;
+    border: solid 1px #333;
+    color: white;
+    text-align: center;
+    width: 200px;
+    height: 26px;
+    vertical-align: middle;
+    font-size: 20px;
+}
+.keypad_button {
+    color:#fff;
+    background-color: #333;
+    font-size: px;
+    border: 1px solid;
+    padding: 15px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 3px;
+}
+.keypad_button:hover {
+    color: #000;
+    background-color: #555;
+
+}
+.keypad_input_holder {
+    display:inline-block
+}
+
 #product_main_container .inventory_header {
     margin-top: 25px;
     font-size: 14px;
@@ -3111,8 +3162,8 @@ html[lang='ru'] .blueprint_name {
     width: 95%;
     padding: 5px;
     background-color: #222;
-    display : flex;
-    align-items : center;
+    display: flex;
+    align-items: center;
 }
 
 .template_row:hover,
@@ -3162,7 +3213,7 @@ html[lang='ru'] .blueprint_name {
     object-fit: contain;
     display: inline-block;
     margin-right: 10px;
-/*    background-color: #111;
+    /*    background-color: #111;
     border: solid 1px #3b3b3b;
 */
 }
@@ -3306,8 +3357,8 @@ html[lang='ru'] .blueprint_name {
 
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .room_oxygen_stat {
@@ -3723,7 +3774,8 @@ html[lang='ru'] .colony_info_entry label {
 
 .team_private_status.private.read_only {
     background: none;
-    color: #f74f4f;;
+    color: #f74f4f;
+    ;
 }
 
 .team_private_status[data-disabled='true'] {
@@ -4053,7 +4105,7 @@ body.mobile .ui_select {
     color: #ccc;
     display: inline-block;
     border: solid 2px black;
-    background-color: rgba(20,20,20,0.95);
+    background-color: rgba(20, 20, 20, 0.95);
     padding: 5px 10px;
     font-size: 20px;
     font-family: 'cc';
@@ -4113,8 +4165,7 @@ body.mobile .ui_select {
 }
 
 .sector_list thead tr,
-.colony_list thead tr {
-}
+.colony_list thead tr {}
 
 .sector_entry_row td,
 .team_entry_row td {
@@ -4151,7 +4202,7 @@ body.mobile .ui_select {
     padding: 20px;
     min-height: 150px;
     max-height: 380px;
-    background-color: rgb(20,20,20);
+    background-color: rgb(20, 20, 20);
     border: solid 2px black;
     color: gray;
 }
@@ -4335,7 +4386,7 @@ html[lang='ja'] #total_online_count {
     position: relative;
     height: 380px;
     max-width: 450px;
-    background-color: rgb(20,20,20);
+    background-color: rgb(20, 20, 20);
     color: gray;
     border: solid 2px black;
     margin: auto;
@@ -4551,9 +4602,10 @@ html[lang='ru'] .main_menu_btn {
     padding: 5px 10px;
     background-color: #222;
     cursor: pointer;
-/*    font-family: 'cc';
+    /*    font-family: 'cc';
     font-size: 22px;
-*/    font-family: PixelForce;
+*/
+    font-family: PixelForce;
     font-size: 16px;
 }
 
@@ -4640,7 +4692,7 @@ html[lang='ru'] .main_menu_btn {
     position: relative;
     height: 300px;
     max-width: 450px;
-    background-color: rgb(20,20,20);
+    background-color: rgb(20, 20, 20);
     color: gray;
     border: solid 2px black;
     margin: auto;
@@ -5165,8 +5217,7 @@ html[lang='ja'] .mobile_authentication_container .btn {
     width: 250px;
 }
 
-.colony_roles_container input[type='radio'] {
-}
+.colony_roles_container input[type='radio'] {}
 
 .colony_roles_container .members_header {
     margin: 0px;
@@ -5926,9 +5977,7 @@ html[lang='ja'] .ownership_stat_entry .stats_value {
     margin-left: 5px;
 }
 
-.colony_list.list_mode .team_entry_row.mine .export_world_btn {
-
-}
+.colony_list.list_mode .team_entry_row.mine .export_world_btn {}
 
 .team_entry_row.mine .team_delete_btn:hover {
     background-color: #222;
@@ -6285,17 +6334,11 @@ html[lang='ja'] .leaderboard_tab {
 }
 */
 
-#preview_capture_menu {
+#preview_capture_menu {}
 
-}
+.preview_capture_overlay {}
 
-.preview_capture_overlay {
-
-}
-
-.preview_capture_box {
-
-}
+.preview_capture_box {}
 
 #game_sticky_announcement {
     position: absolute;
@@ -6440,9 +6483,7 @@ html[lang='ja'] .leaderboard_tab {
     padding-left: 20px;
 }
 
-#change_name_menu {
-
-}
+#change_name_menu {}
 
 #change_name_menu .set_name_btn {
     float: none;
@@ -6733,6 +6774,7 @@ html[lang='ja'] .game_mode_description {
     text-align: left;
     margin-left: 10px;
 }
+
 #color_picker_menu .picker_tab.selected {
     background-color: #444;
 }
@@ -6751,13 +6793,9 @@ html[lang='ja'] .game_mode_description {
     width: 100%;
 }
 
-.picker_color_stat {
+.picker_color_stat {}
 
-}
-
-.picker_texture_stat {
-
-}
+.picker_texture_stat {}
 
 .picker_color_value,
 .picker_texture_value {
@@ -6838,6 +6876,7 @@ html[lang='ja'] .report_player_explanation {
 .report_player_rules_link {
     color: #b5864c;
 }
+
 .report_player_success_message {
     color: green;
     height: 100px;
@@ -7000,56 +7039,56 @@ html[lang='ja'] .quest_label {
 
 /* Hide the browser's default checkbox */
 .custom_checkbox_container input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
 }
 
 .custom_checkbox_container .checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 16px;
-  width: 16px;
-  background: none;
-  border: solid 2px green;
-  display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 16px;
+    width: 16px;
+    background: none;
+    border: solid 2px green;
+    display: none;
 }
 
-.custom_checkbox_container:hover input ~ .checkmark {
-  background: none;
+.custom_checkbox_container:hover input~.checkmark {
+    background: none;
 }
 
 /* When the checkbox is checked, add a background */
-.custom_checkbox_container input:checked ~ .checkmark {
-  background-color: #276327;
+.custom_checkbox_container input:checked~.checkmark {
+    background-color: #276327;
 }
 
 /* Create the checkmark/indicator (hidden when not checked) */
 .custom_checkbox_container .checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
+    content: "";
+    position: absolute;
+    display: none;
 }
 
 /* Show the checkmark when checked */
-.custom_checkbox_container input:checked ~ .checkmark:after {
-  display: block;
+.custom_checkbox_container input:checked~.checkmark:after {
+    display: block;
 }
 
 /* Style the checkmark/indicator */
 .custom_checkbox_container .checkmark:after {
-  left: 6px;
-  top: 2px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 3px 3px 0;
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
 }
 
 .quest_row {
@@ -7065,8 +7104,7 @@ html[lang='ja'] .quest_label {
     top: 60px;
 }
 
-#minigames_tab_content {
-}
+#minigames_tab_content {}
 
 .minigames_tab {
     display: none;
@@ -7117,7 +7155,9 @@ html[lang='ja'] .quest_label {
     font-size: 18px;
 }
 
-.exit_minigame_btn, .play_again_btn, .spectate_btn {
+.exit_minigame_btn,
+.play_again_btn,
+.spectate_btn {
     cursor: pointer;
 }
 
@@ -7216,8 +7256,7 @@ html[lang='ja'] .quest_label {
     display: none;
 }
 
-#visit_colony_hud_btn {
-}
+#visit_colony_hud_btn {}
 
 .game_mode_thumb img {
     width: 14vw;
@@ -7350,7 +7389,7 @@ html[lang='ja'] .game_mode_name {
 .minigame_details_container {
     display: none;
     max-width: 450px;
-    background-color: rgb(20,20,20);
+    background-color: rgb(20, 20, 20);
     color: gray;
     border: solid 2px black;
     margin: auto;
@@ -7363,7 +7402,7 @@ html[lang='ja'] .game_mode_name {
     margin: 10px;
 }
 
-.join_minigame_btn, 
+.join_minigame_btn,
 .host_minigame_btn {
     float: none;
     font-family: 'cc';
@@ -7485,8 +7524,7 @@ body.minigame #map_menu_frame {
     font-family: 'cc';
 }
 
-.invite_link_copy_btn {
-}
+.invite_link_copy_btn {}
 
 #security_camera_menu {
     display: none;
@@ -7579,9 +7617,9 @@ body.minigame #map_menu_frame {
 }
 
 #ban_manager_container {
-/*    width: 600px;
+    /*    width: 600px;
     left: calc(50vw - (600px / 2));
-*/    
+*/
     top: 10px;
     left: 10px;
     width: calc(100% - 70px);
@@ -7612,9 +7650,7 @@ body.minigame #map_menu_frame {
     display: inline-block;
 }
 
-.ban_user_form input {
-
-}
+.ban_user_form input {}
 
 .ban_status_message {
     font-family: 'cc';
@@ -7771,9 +7807,7 @@ body.imposter_mode .minigame_poster {
     display: inline-block;
 }
 
-.terminal_chat_container {
-
-}
+.terminal_chat_container {}
 
 .terminal_chat_content {
     height: 200px;
@@ -7888,9 +7922,9 @@ body.imposter_mode .minigame_poster {
 }
 
 .language_icon {
-   vertical-align: middle;
-   opacity: 0.5;
-   width: 20px; 
+    vertical-align: middle;
+    opacity: 0.5;
+    width: 20px;
 }
 
 .middle_container {
@@ -8021,8 +8055,7 @@ body.imposter_mode .minigame_poster {
     cursor: pointer;
 }
 
-.event_entry .event_help_btn:hover {
-}
+.event_entry .event_help_btn:hover {}
 
 .event_entry .event_value {
     color: #00b9ff;
@@ -8161,7 +8194,7 @@ body.imposter_mode .minigame_poster {
 .commands_event_log {
     font-family: 'Monaco';
     font-size: 14px;
-    text-align: left;    
+    text-align: left;
     border: solid 1px #444;
     padding: 10px;
 }
@@ -8452,14 +8485,14 @@ body.imposter_mode .minigame_poster {
     width: 70px;
 }
 
-#command_block_menu .comparison .row_content {
-}
+#command_block_menu .comparison .row_content {}
 
 #command_block_menu .comparison select {
     background-color: #333;
     color: white;
     width: 50px;
 }
+
 #command_block_menu .comparison .operator {
     margin-bottom: 3px;
 }
@@ -8468,7 +8501,7 @@ body.imposter_mode .minigame_poster {
     width: 80px;
 }
 
-.timer_duration  {
+.timer_duration {
     margin-bottom: 3px;
 }
 
@@ -8534,12 +8567,9 @@ body.imposter_mode .minigame_poster {
     margin: 0px;
 }
 
-.function_table {
+.function_table {}
 
-}
-
-.function_table tr {
-}
+.function_table tr {}
 
 .function_table td {
     border: solid 1px #333;
@@ -8726,9 +8756,7 @@ body.imposter_mode .minigame_poster {
     border-radius: 5px;
 }
 
-.search_players_content {
-
-}
+.search_players_content {}
 
 .player_search_input {
     background-color: black;
@@ -8903,4 +8931,21 @@ body.imposter_mode .minigame_poster {
     width: 100%;
     border: solid 1px #555;
     margin-bottom: 15px;
+}
+
+.team_entry_row .ban_world_btn {
+    display: none;
+    float: right;
+    background-color: gray;
+    color: white;
+    margin: 5px;
+    padding: 3px 6px;
+}
+
+body.moderator .team_entry_row .ban_world_btn {
+    display: inline-block;
+}
+
+.team_entry_row .ban_world_btn:hover {
+    background-color: #c44242;
 }

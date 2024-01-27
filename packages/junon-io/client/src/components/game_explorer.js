@@ -621,6 +621,12 @@ class GameExplorer {
         return  
       }
 
+      if (event.target.closest(".ban_world_btn")) {
+        let teamEntry = this.teamEntries[teamEntryRow.dataset.key]
+        this.banWorld(teamEntry.data.host, teamEntry.data.sectorId, teamEntry.data.creatorUid)
+        return  
+      }
+
       if (event.target.closest(".export_world_btn")) {
         this.exportWorld(teamEntryRow)
         return  
@@ -642,6 +648,10 @@ class GameExplorer {
         this.visitTeamEntry(teamEntryRow)
       }
     }
+  }
+
+  async banWorld(host, sectorUid, creatorUid) {
+    this.main.banManager.banWorld(host, sectorUid, creatorUid)
   }
 
   async exportWorld(teamEntryRow) {

@@ -37,6 +37,7 @@ Equipments.Radio = require("./hand/radio")
 Equipments.AssassinsKnife = require("./hand/assassins_knife")
 Equipments.PocketTrader = require("./hand/pocket_trader")
 Equipments.Bowl = require("./hand/bowl")
+Equipments.Deconstructor = require('./hand/deconstructor')
 
 Equipments.SpaceSuit = require("./armor/space_suit")
 Equipments.CombatArmor = require("./armor/combat_armor")
@@ -46,13 +47,14 @@ Equipments.PrisonerSuit = require("./armor/prisoner_suit")
 Equipments.PoliceSuit = require("./armor/police_suit")
 Equipments.LabCoat = require("./armor/lab_coat")
 Equipments.CultistSuit = require("./armor/cultist_suit")
+Equipments.ImperialSpecialForcesArmor = require("./armor/imperial_special_forces_armor")
 
 Equipments.forType = (type) => {
   const klassName = Helper.getTypeNameById(type)
   return Equipments[klassName]
 }
 
-const craftExcludeList = ["Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "Katana", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit"]
+const craftExcludeList = ["Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "Katana", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit", "ImperialSpecialForcesArmor"]
 
 Equipments.getList = () => {
   return Object.values(Equipments).filter((klass) => {

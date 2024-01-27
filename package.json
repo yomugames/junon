@@ -6,8 +6,13 @@
     "client:build": "npm run client:build --workspace packages/junon-io",
     "db:setup": "npm run db:setup --workspace packages/junon-common"
   },
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "nodemonConfig": {
     "ext": "js, json, proto"
+  },
+  "dependencies": {
+    "sharp": "^0.33.1"
   }
 }

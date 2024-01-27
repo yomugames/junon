@@ -155,6 +155,7 @@ class Sector {
     this.initButtons(entities)
     this.initCommandBlock(entities)
     this.initBuildLimits(entities)
+    this.initKeyCodes(entities)
 
     this.initObjectives()
 
@@ -192,6 +193,14 @@ class Sector {
 
   setBuildLimit(klassName, limit) {
     this.buildLimits[klassName] = limit
+  }
+
+  initKeyCodes(entities) {
+    this.keyCodes = {}
+
+    if(!entities || !entities.keyCodes) return
+
+    this.keyCodes = entities.keyCodes
   }
 
   getBuildLimit(klassName) {
@@ -511,7 +520,7 @@ class Sector {
   }
 
   initDefaultSellables() {
-    let itemKlasses = [Ores.Sand, Ores.Wood, Buildings.CoffeeSeed, Buildings.WheatSeed, Buildings.PotatoSeed, Buildings.SunflowerSeed, Buildings.BlueSeed, Buildings.PoppySeed, Foods.Starberries, Mobs.Chicken, Mobs.Monkey, Mobs.Cat, Mobs.CleanBot, Mobs.Car, Equipments.CombatArmor, Equipments.SantaHat, Equipments.NameTag]
+    let itemKlasses = [Ores.Sand, Ores.Wood, Buildings.CoffeeSeed, Buildings.WheatSeed, Buildings.PotatoSeed, Buildings.SunflowerSeed, Buildings.BlueSeed, Buildings.PoppySeed,Buildings.PumpkinSeed,Buildings.RiceSeed, Foods.Starberries, Foods.Fish, Mobs.Chicken, Mobs.Monkey, Mobs.Cat, Mobs.CleanBot, Mobs.Car, Equipments.CombatArmor, Equipments.SantaHat, Equipments.NameTag]
     itemKlasses.forEach((klass) => {
       let group = klass.prototype.isMob() ? "mob" : "item"
       this.sellables[klass.prototype.getTypeName()] = { group: group, type: klass.prototype.getType(), cost: klass.getCost() }

@@ -28,6 +28,7 @@ Projectiles.TeslaLaser = require("./tesla_laser")
 Projectiles.MolotovCocktail = require("./molotov_cocktail")
 Projectiles.PlasmaBullet = require("./plasma_bullet")
 Projectiles.Bubble = require("./bubble")
+Projectiles.BlueLaser = require('./blue_laser')
 
 Projectiles.forType = (type) => {
   const klassName = Helper.getProjectileNameById(type)

@@ -455,6 +455,11 @@ class InputController {
       event.preventDefault()
     }
 
+    if(keyCode == 191) {
+      //Firefox opens find box when / pressed
+      event.preventDefault()
+    }
+
     if (keyCode === 9) { // tab
       event.preventDefault()
     } else if (keyCode === 13) { // enter

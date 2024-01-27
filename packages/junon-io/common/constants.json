@@ -228,7 +228,7 @@
       }
     },
     "ItemCrafted": {
-      "description": "Event triggered when asteroid mined",
+      "description": "Event triggered when item crafted",
       "variables": {
         "type": "name of item crafted",
         "player": "name of player who crafted item"
@@ -673,7 +673,12 @@
     "plated_texture":      { "index": 3 },
     "striped_texture":     { "index": 4 },
     "layered_bar_texture": { "index": 5 },
-    "grilled_texture":     { "index": 6 }
+    "grilled_texture":     { "index": 6 },
+    "bricks_texture":      { "index": 7 },
+    "checker_texture":     { "index": 8 },
+    "xchecker_texture":    { "index": 9 },
+    "x_texture":           { "index": 10 },
+    "noise_texture":       { "index": 11 }
   },
   "SuitColors": {
     "gray":   { "index": 1 , "value": "#999999" },
@@ -714,7 +719,15 @@
     "white_1":  { "index": 26, "value": "#c5c5c5" },
     "purple_1": { "index": 27, "value": "#564a54" },
     "white_2":  { "index": 28, "value": "#ffffff" },
-    "gray_5":   { "index": 29, "value": "#2a2a2a" }
+    "gray_5":   { "index": 29, "value": "#2a2a2a" },
+    "cyan_1":   { "index": 30, "value": "#10b3a1" },
+    "cyan_2":   { "index": 31, "value": "#00ffff" },
+    "cyan_3":   { "index": 32, "value": "#55cbbe" },
+    "cyan_4":   { "index": 33, "value": "#007971" },
+    "pink_1":   { "index": 34, "value": "#d784de" },
+    "pink_2":   { "index": 35, "value": "#ff51b1" },
+    "pink_3":   { "index": 36, "value": "#ef6990" },
+    "pink_4":   { "index": 37, "value": "#ff54c9" }
   },
   "Deeds": {
     "taxes_not_paid": {
@@ -1833,6 +1846,21 @@
       },
       "description": "Plant on soil to grow Poppy"
     },
+    "PumpkinSeed": {
+      "parent": "Crops.BaseSeed",
+      "cost": {
+        "gold": 500
+      },
+      "sprite": {
+        "width": 33,
+        "height": 33
+      },
+      "stats": {
+        "health": 90
+      },
+      "yield": "Pumpkin",
+      "description": "Plant on soil to grow pumpkin"
+    },
     "WheatSeed": {
       "parent": "Crops.BaseSeed",
       "cost": {
@@ -1843,6 +1871,21 @@
         "health": 150
       },
       "description": "Plant on soil to grow wheat"
+    },
+    "RiceSeed": {
+      "parent": "Crops.BaseSeed",
+      "cost": {
+        "gold": 150
+      },
+      "yield": "Rice",
+      "stats": {
+        "health": 150
+      },
+      "sprite": {
+        "width": 28,
+        "height": 28
+      },
+      "description": "Plant on soil to grow rice"
     }
   },
   "Projectiles": {
@@ -1857,6 +1900,17 @@
         "tint": "#ffff07"
       },
       "categories": {"distance_dependent_width": true}
+    },
+    "BlueLaser": {
+      "width": 5,
+      "height": 5,
+      "speed": 15,
+      "damage": 75,
+      "sprite": {
+        "width": 32,
+        "height": 4
+      }
+
     },
     "MiningBeam": {
       "width": 32,
@@ -2523,6 +2577,26 @@
       },
       "description": "Restores 40 stamina. Make Russia great again!"
     },
+    "Nihonshu": {
+      "width": 24,
+      "height": 24,
+      "sprite": {
+        "width": 30,
+        "height": 36,
+        "path": "nihonshu"
+      },
+      "cost": {
+        "gold": 250
+      },
+      "stats": {
+        "stamina": 40
+      },
+      "requirements": {
+        "Rice": 1,
+        "Bottle": 1
+      },
+      "description": "Japanese rice wine."
+    },
     "EnergyDrink": {
       "width": 24,
       "height": 24,
@@ -2608,7 +2682,7 @@
       "description": "Restores 50 stamina"
     }
   },
-  "Foods": {
+      "Foods": {
     "Gelatin": {
       "width": 24,
       "height": 24,
@@ -2845,6 +2919,27 @@
       "upgrade": {},
       "description": "Raw wheat. For making bread"
     },
+    "Rice": {
+      "width": 24,
+      "height": 24,
+      "categories": {"crop": true},
+      "isIngredient": true,
+      "cost": {
+        "gold": 200
+      },
+      "sprite": {
+        "position": {
+          "x": 70,
+          "y": 0
+        }
+      },
+      "isEdible": false,
+      "stats": {
+        "food": 10
+      },
+      "upgrade": {},
+      "description": "A bag of rice."
+    },
     "Egg": {
       "width": 24,
       "height": 24,
@@ -2909,6 +3004,25 @@
       },
       "upgrade": {},
       "description": "Cooked meat. Dont care where it came from. "
+    },
+    "Pumpkin": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 80
+      },
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "rotation": 0
+      },
+      "stats": {
+        "food": 30
+      },
+      "upgrade": {},
+      "description": "Orange pumpkin."
     },
     "PotatoSoup": {
       "width": 32,
@@ -2990,6 +3104,51 @@
       "upgrade": {},
       "description": "Breakfast favorite."
     },
+    "Nigiri": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 400
+      },
+      "stats": {
+        "food": 50,
+        "health": 25
+      },
+      "sprite": {
+        "position": {
+          "x": 55 ,
+          "y": 0
+        },
+        "rotation": 70
+      },
+      "requirements": {
+        "Fish": 1,
+        "Rice": 1
+      },
+      "upgrade": {},
+      "description": "Type of japanese sushi dish made with japanese rice and slice of fish on top. Perfect small and healthy meal."
+    },
+    "PumpkinPie": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 250
+      },
+      "sprite": {
+        "anchor": 0.5
+      },
+      "stats": {
+        "food": 80,
+        "health": 20
+      },
+      "requirements": {
+        "Pumpkin": 2,
+        "Egg": 2,
+        "Wheat": 2
+      },
+      "upgrade": {},
+      "description": "Tasty dessert pie with a spiced, pumpkin-based custard filling."
+    },
     "Starberries": {
       "width": 21,
       "height": 14,
@@ -3009,6 +3168,22 @@
       },
       "upgrade": {},
       "description": "Strange berries from alien bushes."
+    },
+    "Fish": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 200
+      },
+      "sprite": {
+        "anchor": 0.5
+      },
+      "stats": {
+        "food": 40,
+        "health": 30
+      },
+      "upgrade": {},
+      "description": "A yummy fish, used in lots of dishes. I wonder where that trader got it from?"
     },
     "Antidote": {
       "width": 24,
@@ -3158,7 +3333,7 @@
         "Glass": 2,
         "CopperBar": 5
       },
-      "description": "Lit things on fire. Refill with FuelTank"
+      "description": "Light things on fire. Refill with FuelTank"
     },
     "NameTag": {
       "parent": "Equipments.MeleeEquipment",
@@ -3272,6 +3447,35 @@
       },
       "description": "Mines Asteroids faster. Damage 5"
     },
+    "Deconstructor": {
+      "parent": "Equipments.BaseEquipment",
+      "canDamageWalls": true,
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 2050
+      },
+      "stats": {
+        "range": 1500,
+        "damage": 100,
+        "health": 20,
+        "reload": 2000
+      },
+      "requirements": {
+        "IronBar": 95,
+        "CopperBar": 215,
+        "Wire": 10,
+        "CircuitBoard": 20,
+        "SolarPanel": 1
+      },
+      "sprite": {
+        "position": {
+          "x": 67,
+          "y": 20
+        }
+      },
+      "description": "An energy powered gun which easily destroys buildings"
+    },
     "Pistol": {
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
@@ -3319,7 +3523,7 @@
       },
       "stats": {
         "range": 1280,
-        "damage": 65,
+        "damage": 52,
         "health": 300,
         "reload": 1200
       },
@@ -3702,8 +3906,8 @@
       "categories": {"melee_damage": true},
       "sprite": {
         "position": {
-          "x": 50,
-          "y": 5
+          "x": 53,
+          "y": -8
         },
         "anchor": 0,
         "rotation": 90
@@ -3711,16 +3915,16 @@
       "concurrentTargetCount": 3,
       "isAnimatable": true,
       "stats": {
-        "damage": 10,
-        "range": 48,
-        "attackRadius": 48,
-        "meleeRange": 48
+        "damage": 15,
+        "range": 64,
+        "attackRadius": 64,
+        "meleeRange": 64
       },
       "requirements": {
         "IronOre": 50,
         "Wood": 20
       },
-      "description": "Can slice through 3 enemies at a time. Damage 10."
+      "description": "Can slice through 3 enemies at a time. Damage 15."
     },
     "BlueEnergySword": {
       "parent": "Equipments.MeleeEquipment",
@@ -3844,6 +4048,30 @@
         "SpaceSuit": 1
       },
       "description": "Good for melee combat. Reduces damage by 4."
+    },
+    "ImperialSpecialForcesArmor": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 64,
+      "height": 64,
+      "lightColor": "#ffffff",
+      "isLightPersistent": true,
+      "isCostIndependent": true,
+      "brightness": 0.8,
+      "cost": {
+        "gold": 50000
+      },
+      "stats": {
+        "range": 64,
+        "oxygen": 100,
+        "defense": 10
+      },
+      "requirements": {
+        "Meteorite": 180,
+        "SulfurOre": 20,
+        "CombatArmor": 1,
+        "CircuitBoard": 40
+      },
+      "description": "Advanced armor used by Imperial Special Forces. That reduces damage by 10 and is immune to negative effects."
     },
     "PrisonerSuit": {
       "parent": "Equipments.BaseEquipment",
@@ -5102,6 +5330,33 @@
         "count": "+25"
       },
       "description": "Door that restricts access to certain personnels only"
+    },
+    "KeypadDoor": {
+      "hasMenu": true,
+      "width": 128,
+      "height": 32,
+      "requirements": {
+        "IronBar": 35,
+        "CircuitBoard": 30,
+        "Wire": 15
+      },
+      "cost": {
+        "gold": 800
+      },
+      "stats": {
+        "health": 300,
+        "count": 125
+      },
+      "isInteractable": true,
+      "minimapColor": "#3bceaa",
+      "showInteractTooltip": true,
+      "isAirtight": true,
+      "categories": {"door":true,"melee_resistant":true},
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Only opens if you have the code"
     },
     "SolarPanel": {
       "width": 64,

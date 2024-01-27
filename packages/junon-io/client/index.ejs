@@ -50,6 +50,18 @@
     <script src="/<%= assetPath('vendor.js') %>"></script>
     <script src="/<%= assetPath('app.js') %>"   ></script>
 
+    <!-- AdinPlay Ads -->
+    <script>
+        var aiptag = aiptag || {};
+        aiptag.cmd = aiptag.cmd || [];
+        aiptag.cmd.display = aiptag.cmd.display || [];
+        aiptag.cmd.player = aiptag.cmd.player || [];
+
+        aiptag.gdprShowConsentTool = true;
+        aiptag.gdprConsentToolPosition = "bottom";
+    </script>
+    <script async src="//api.adinplay.com/libs/aiptag/pub/KKK/junon.io/tag.min.js"></script>
+
 </body>
 <div id="fb-root"></div>
 </html>

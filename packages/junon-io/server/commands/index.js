@@ -69,6 +69,8 @@ Commands.getnthword = require('./getnthword')
 Commands.getnthletter = require('./getnthletter')
 Commands.dirt = require('./dirt')
 Commands.blood = require('./blood')
+Commands.setstatus = require('./set_status')
+Commands.menu = require('./menu')
 
 Commands.accept_rules = require("./accept_rules")
 

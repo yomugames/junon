@@ -23,7 +23,7 @@ class BlueLaser extends CollidableProjectile {
         if (this.owner && this.owner.isPlayer() && !this.owner.canDamage(entity)) {
           return false
         }
-    
+        if(entity.isPlayer()) return false
         if (this.isFriendlyUnit(entity)) return false
         if (entity.isOwnedBy(this.owner)) return false
         if (entity.hasCategory("ghost")) return false

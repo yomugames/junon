@@ -263,6 +263,7 @@ enum BuildingType {
   ImperialSpecialForcesArmor = 267;
   Deconstructor = 268;
   KeypadDoor = 269;
+  UnbreakableWall = 270;
 }
 
 enum TerrainType {

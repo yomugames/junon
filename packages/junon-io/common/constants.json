@@ -4576,6 +4576,19 @@
     }
   },
   "Buildings": {
+    "UnbreakableWall": {
+      "isAirtight": true,
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 70
+      },
+      "stats": {
+        "health": 750,
+        "speed": 1,
+        "count": 1
+      }
+    },
     "HangarCornerBlock": {
       "width": 32,
       "height": 32,

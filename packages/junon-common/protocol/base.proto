@@ -166,7 +166,18 @@ message MessageWrapper {
     DoorStatus DoorStatus = 173;
     KeypadSuccessful KeypadSuccessful = 174;
     KeypadUnsuccessful KeypadUnsuccessful = 175;
+    OpenMenu OpenMenu = 176;
+    CloseMenu CloseMenu = 177;
   }
+}
+
+
+message OpenMenu {
+  string menuName = 1;
+}
+
+message CloseMenu {
+  string menuName = 1;
 }
 
 message KeypadUnsuccessful {

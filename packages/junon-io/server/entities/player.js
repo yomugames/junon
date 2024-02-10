@@ -4020,7 +4020,6 @@ class Player extends BaseEntity {
       let ownerOnly = ["UnbreakableWall"]
       if(ownerOnly.indexOf(buildingKlass.prototype.getTypeName()) != -1) {
         if(!this.isSectorOwner()) {
-          console.log(this.isSectorOwner())
           this.showError("Only owner can place", {isWarning: true})
           return null
         }

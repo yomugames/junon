@@ -4577,6 +4577,7 @@
   },
   "Buildings": {
     "UnbreakableWall": {
+      "isAbstract": true,
       "isAirtight": true,
       "width": 32,
       "height": 32,
@@ -4587,7 +4588,9 @@
         "health": 750,
         "speed": 1,
         "count": 1
-      }
+      },
+      "description": "A sturdy, airtight wall, that only the owner of a world/sector can place or break."
+      
     },
     "HangarCornerBlock": {
       "width": 32,

@@ -1,10 +1,8 @@
-
-
 Junon.io
 =======
 Junon.io is a co-op multiplayer survival game where your goal is to build your own space-station, grow your colony, and defend it against hostile threats.
 
-Installation
+Installation (linux)
 --------
 1. Install Node.js 16.15.0 (ideally using [nvm](https://github.com/nvm-sh/nvm) )
 2. Install MySQL
@@ -13,7 +11,7 @@ Installation
         cd ~/junon
         npm install
 
-4. Setup database using the command below. It is assumed that your mysql user is 'root' with empty password. To override this, define `JUNON_DB_USER` and `JUNON_DB_PASS` environment variable. For example
+4. Setup database using the command below. It is assumed that your mysql user is 'root' with empty password. To override this, define `JUNON_DB_USER` and `JUNON_DB_PASS` in a .env file, or in the /packages/junon-common/db/config.js file.
 
         npm run db:setup
 
@@ -38,4 +36,4 @@ Debugging
 Contributing
 ---------
 
-  See [contribution guidelines](https://github.com/yomugames/junon/wiki)
+  See https://www.youtube.com/channel/UCMuok-F6ElORq7aKyyFDgqw for tutorials related to running/contributing

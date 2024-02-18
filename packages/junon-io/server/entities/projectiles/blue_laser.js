@@ -23,9 +23,14 @@ class BlueLaser extends CollidableProjectile {
         if (this.owner && this.owner.isPlayer() && !this.owner.canDamage(entity)) {
           return false
         }
+
+        if(this.owner && this.owner.isPlayer() && !this.owner.getRole().isAllowedTo("Deconstruct")) {
+            return false
+        }
+
         if(entity.isPlayer()) return false
-        if (this.isFriendlyUnit(entity)) return false
-        if (entity.isOwnedBy(this.owner)) return false
+        if (this.isFriendlyUnit(entity)) return
+        //if (entity.isOwnedBy(this.owner)) return false
         if (entity.hasCategory("ghost")) return false
         if(entity.isMob()) return false
     
@@ -35,7 +40,7 @@ class BlueLaser extends CollidableProjectile {
         const isDistribution = entity.isDistribution()
     
         if (isSelfHit || isDistribution || !entity.setHealth) return false
-        if (entity.hasCategory("trap")) return true
+        if (entity.hasCategory("trap")) return false //web traps will instantly kill a sapper, dont want them to be destroyed. web traps are hard to get anyways
         if (entity.hasCategory("platform") && this.shouldHitFloor) return true
         if (!entity.isCollidable(this)) return false
         if (entity.isBuilding() && entity.getConstants().isPassable) return false

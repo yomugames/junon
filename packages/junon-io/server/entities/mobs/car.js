@@ -25,10 +25,7 @@ class Car extends BaseMob {
 
 
   moveEntity(targetEntityToMove, deltaTime) {
-    if (this.passenger) {
-    } else {
-      super.moveEntity(targetEntityToMove, deltaTime)
-    }
+    //do nothing, cars don't move
   }
 
   canDamage(target) {

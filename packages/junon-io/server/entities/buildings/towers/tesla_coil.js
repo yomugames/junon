@@ -56,9 +56,12 @@ class TeslaCoil extends BaseTower {
         source:      { x: this.getX(),     y: this.getY() },
         destination: { x: attackTarget.getX(), y: attackTarget.getY() }
       })
-
-      attackTarget.damage(this.getDamage(), projectile)
-      alreadyDamagedEntities[target.getId()] = true
+      if(attackTarget.getType() == Protocol.definition().MobType.Sapper) {
+        attackTarget.setHealth(attackTarget.health + 5)
+      } else {
+        attackTarget.damage(this.getDamage(), projectile)
+        alreadyDamagedEntities[target.getId()] = true
+      }
     }
 
     for (var i = 0; i <= chainCount; i++) {
@@ -72,6 +75,10 @@ class TeslaCoil extends BaseTower {
 
         target = nextTarget
         alreadyDamagedEntities[nextTarget.getId()] = true
+        if(nextTarget.getType() == Protocol.definition().MobType.Sapper) {
+          nextTarget.setHealth(nextTarget.health + 5)
+          return
+        }
         nextTarget.damage(this.getDamage(), projectile)
       }
     }

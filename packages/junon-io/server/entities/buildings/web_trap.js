@@ -32,6 +32,10 @@ class WebTrap extends BaseFloor {
   immobilizeTargets(entities) {
     entities.forEach((entity) => {
       entity.addWeb()
+
+      if(entity.getType() == Protocol.definition().MobType.Sapper) {
+        entity.remove() //sappers die to webs
+      }
     })
   }
 

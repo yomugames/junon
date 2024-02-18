@@ -4295,6 +4295,9 @@ class Game {
     let shouldRefreshAd = !this.lastDeathAdDisplay ||
                           (this.lastDeathAdDisplay && ((Date.now() - this.lastDeathAdDisplay) > threeMinutes))
     if (shouldRefreshAd) {
+      aiptag.cmd.display.push(function() {
+        aipDisplayTag.display('junon-io_728x90');
+      })
       this.lastDeathAdDisplay = Date.now()
     }
   }

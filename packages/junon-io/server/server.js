@@ -863,10 +863,23 @@ class Server {
     let players = await this.getPlayersBy({ userUid: data.creatorUid })
     let player = players[0]
 
-    if (!player) return
+    let username
+    let targetIp
 
-    const username = player.getName()
-    const targetIp = player.getRemoteAddress()
+    if (!player) {
+      // search on DB
+      let user = await User.findOne({
+        where: { uid: data.creatorUid }
+      })
+
+      if (!user) return
+
+      username = user.username
+      targetIp = user.ip
+    } else {
+      username = player.getName()
+      targetIp = player.getRemoteAddress()
+    }
 
     let existingBan = await IpBan.findOne({
       where: { ip: targetIp, username: username }

@@ -20,8 +20,8 @@ class KeypadMenu extends BaseMenu {
                 case 'check code':
                     if(valueEl.value != '') {
                         this.game.getSocketUtil().emit("KeypadAction", {id: this.doorId, action: "checkCode", keyCode: valueEl.value})
-                    break
-                }
+                    }
+                    break;
                 default:
                     break;
             }

@@ -196,13 +196,11 @@ class Sector {
   }
 
   initKeyCodes(entities) {
-    this.keyCodes = []
+    this.keyCodes = {}
 
     if(!entities || !entities.keyCodes) return
 
-    for (let code in entities.keyCodes) {
-      this.keyCodes.push(entities.keyCodes[code])
-    }
+    this.keyCodes = entities.keyCodes
   }
 
   getBuildLimit(klassName) {

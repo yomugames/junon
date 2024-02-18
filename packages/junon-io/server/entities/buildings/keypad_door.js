@@ -52,9 +52,14 @@ class KeypadDoor extends Airlock {
         return !this.isOpen
     }
 
+    remove() {
+        delete this.sector.keyCodes[this.id]
+        super.remove()
+    }
+
     setKeypadCode(player, data) {
         if(player.isAdmin() || player.isSectorOwner()) {
-            if(player.sector.keyCodes.find(code => code.id === data.id)) return
+            if(this.sector.keyCodes[data.id]) return
             if(typeof data.keyCode != 'string') return
             if(data.keyCode.length > 10) return
 
@@ -64,7 +69,7 @@ class KeypadDoor extends Airlock {
             this.getSocketUtil().emit(player.getSocket(), "KeypadSuccessful", {})
             this.getSocketUtil().emit(player.getSocket(), "DoorStatus", {status: 'check code'})
 
-            this.sector.keyCodes.push({id: data.id, keyCode: data.keyCode})
+            this.sector.keyCodes[data.id] = { keyCode: data.keyCode }
         } else {
             player.showError("Must be admin", {isWarning: true})
         }
@@ -74,7 +79,7 @@ class KeypadDoor extends Airlock {
         if(!data || !data.keyCode) return
 
 
-        let keyCode = player.sector.keyCodes.find(code => code.id === data.id)
+        let keyCode = this.sector.keyCodes[data.id]
 
         if(!keyCode) {
             player.showError("Code not set")
@@ -98,7 +103,7 @@ class KeypadDoor extends Airlock {
     }
 
     getStatus(player) {
-        if(player.sector.keyCodes.find(code => code.id === this.id)) {
+        if(this.sector.keyCodes[this.id]) {
             return "check code"
         }
         else {

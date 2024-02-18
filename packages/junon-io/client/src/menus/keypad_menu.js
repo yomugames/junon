@@ -10,17 +10,18 @@ class KeypadMenu extends BaseMenu {
             if(!this.doorId) return
             let el = document.querySelector("#keypad_submit_button")
             let valueEl = document.querySelector("#keypad_code_value")
-            switch (el.innerHTML) {
+            switch (el.innerText) {
                 case 'set code':
                     if(valueEl.value != '') {
                         this.game.getSocketUtil().emit("KeypadAction", {id: this.doorId, action: "setCode", keyCode: valueEl.value})
                     }
                     break
+                    
                 case 'check code':
                     if(valueEl.value != '') {
                         this.game.getSocketUtil().emit("KeypadAction", {id: this.doorId, action: "checkCode", keyCode: valueEl.value})
-                    }
-                    break;
+                    break
+                }
                 default:
                     break;
             }
@@ -38,7 +39,7 @@ class KeypadMenu extends BaseMenu {
                 let valueEl = document.querySelector('#keypad_code_value')
 
                 if(valueEl.value.length < 10) {
-                    valueEl.value += element.innerHTML
+                    valueEl.value += element.innerText
                 }
             })
         }

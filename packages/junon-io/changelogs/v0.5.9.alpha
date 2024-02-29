@@ -12,7 +12,7 @@
       "keypad door ui update",
       "dynamite",
       "/menu command, for opening menus",
-      "sapper mob"
+      "sapper mob",
       "/setstatus command for changing a sector's visibility"
     ]
   }

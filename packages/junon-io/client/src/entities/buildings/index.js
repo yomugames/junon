@@ -98,6 +98,7 @@ Buildings.Furnitures.ChristmasTree = require("./christmas_tree")
 Buildings.Furnitures.RedPresent = require("./red_present")
 Buildings.Furnitures.BluePresent = require("./blue_present")
 Buildings.Furnitures.GreenPresent = require("./green_present")
+Buildings.Furnitures.UnbreakableWall = require("./unbreakable_wall")
 
 // platforms
 Buildings.Floors.Lattice = require("./platforms/lattice")

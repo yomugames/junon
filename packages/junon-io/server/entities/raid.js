@@ -242,6 +242,7 @@ class Raid {
       this.spawnChemist()
       this.spawnDrone()
       this.spawnTrooper()
+      this.spawnSapper()
     }
 
     if (this.team) {
@@ -399,6 +400,21 @@ class Raid {
     return Math.floor(Math.random() * 3) + 2
   }
 
+  getDesiredMobCountSapper() {
+    if(this.sector.getDayCount() < 25) return 0
+
+    if(this.game.isHardcore()) {
+      let count = (this.sector.getDayCount() - 18)
+      return Math.min(10, count)
+    }
+
+    if(this.team.getNumDaysAlive < 28) {
+      return 1
+    }
+
+    return Math.floor(Math.random() * 3) + 2
+  }
+
   spawnDrone() {
     let mobCount = this.getDesiredMobCountDrone()
     if (mobCount === 0) return
@@ -443,6 +459,28 @@ class Raid {
       type: "Trooper",
       level: level,
       count: mobCount,
+      raid: this,
+      ignoreLimits: true
+    })
+  }
+
+  spawnSapper() {
+    let mobCount = this.getDesiredMobCountSapper()
+    if(mobCount === 0) return
+
+    let level = 0
+
+    if(this.game.isHardcore()) {
+      level = Math.floor((this.team.getNumDaysAlive() - 30) / 3)
+      level = Math.max(0, level)
+      level = Math.min(30, level)
+    }
+
+    this.sector.spawnMob({
+      x: this.spawnGround.getX(),
+      y: this.spawnGround.getY(),
+      type: "Sapper",
+      level: level,
       raid: this,
       ignoreLimits: true
     })

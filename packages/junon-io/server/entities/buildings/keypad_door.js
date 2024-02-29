@@ -93,6 +93,10 @@ class KeypadDoor extends Airlock {
             else this.open()
 
             this.getSocketUtil().emit(player.getSocket(), "KeypadSuccessful", {})
+
+            setTimeout(() => {
+                this.close()
+            }, 3000)
         } else {
             this.getSocketUtil().emit(player.getSocket(), "KeypadUnsuccessful", {})
         }

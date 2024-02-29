@@ -1110,6 +1110,19 @@
         "los": 256
       }
     },
+    "Sapper": {
+      "parent": "Mobs.Guard",
+      "sprite": {
+        "width": 60,
+        "height": 181
+      },
+      "stats": {
+        "health": 350,
+        "damage": 80,
+        "range": 400,
+        "los": 256
+      }
+    },
     "Chemist": {
       "parent": "Mobs.BaseMob",
       "hasBlood": true,
@@ -1983,6 +1996,12 @@
       "height": 16,
       "speed": 8
     },
+    "Dynamite": {
+      "canDamageWalls": true,
+      "width": 16,
+      "height": 16,
+      "speed": 8
+    },
     "MolotovCocktail": {
       "canDamageWalls": false,
       "width": 24,
@@ -2009,6 +2028,13 @@
       "width": 192,
       "height": 192,
       "damage": 25,
+      "speed": 1
+    },
+    "MiningExplosion": {
+      "canDamageWalls": true,
+      "width": 192,
+      "height": 192,
+      "damage": 10,
       "speed": 1
     },
     "Flame": {
@@ -3465,8 +3491,7 @@
         "IronBar": 95,
         "CopperBar": 215,
         "Wire": 10,
-        "CircuitBoard": 20,
-        "SolarPanel": 1
+        "CircuitBoard": 20
       },
       "sprite": {
         "position": {
@@ -3695,6 +3720,27 @@
         "Poison": 1
       },
       "description": "Throwable item that emits poison to an area"
+    },
+    "Dynamite": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "isThrowable": true,
+      "isUnbreakable": true,
+      "isStackable": true,
+      "isCostIndependent": true,
+      "cost": {
+        "gold": 1500
+      },
+      "stats": {
+        "damage": 10,
+        "range": 256,
+        "reload": 900
+      },
+      "requirements": {
+        "Explosives": 30,
+        "IronOre": 5
+      },
+      "description": "Creates an explosion that easily destroys asteroids that can't be salvaged."
     },
     "FireExtinguisher": {
       "parent": "Equipments.BaseEquipment",
@@ -4576,6 +4622,22 @@
     }
   },
   "Buildings": {
+    "UnbreakableWall": {
+      "isAbstract": true,
+      "isAirtight": true,
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 70
+      },
+      "stats": {
+        "health": 750,
+        "speed": 1,
+        "count": 1
+      },
+      "description": "A sturdy, airtight wall, that only the owner of a world/sector can place or break."
+      
+    },
     "HangarCornerBlock": {
       "width": 32,
       "height": 32,

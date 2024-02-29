@@ -4017,9 +4017,15 @@ class Player extends BaseEntity {
 
     if (this.getRole()) {
       let canBuild = this.getRole().isAllowedTo("Build") || byPassRoleBuildPermission
+      let ownerOnly = ["UnbreakableWall"]
+      if(ownerOnly.indexOf(buildingKlass.prototype.getTypeName()) != -1) {
+        if(!this.isSectorOwner()) {
+          this.showError("Only owner can place", {isWarning: true})
+          return null
+        }
+      }
       if (buildingKlass.prototype.isCrop()) {
-        if (canBuild &&
-            !this.getRole().isAllowedTo("PlantSeeds")) {
+        if (canBuild && !this.getRole().isAllowedTo("PlantSeeds")) {
         this.showError("Permission Denied")
         return null
         }
@@ -5326,8 +5332,8 @@ class Player extends BaseEntity {
         this.showChatError("You are muted")
         return
       }
-
-      message = this.sanitize(message)
+      //xss won't work in the client, no need for double xss prevention
+      //message = this.sanitize(message)
 
       let maxChatLength = 100
       message = message.substring(0, maxChatLength)

@@ -1,0 +1,21 @@
+{
+  "version": "v0.5.9.alpha",
+  "date": "Feb 28, 2024",
+  "title": "",
+  "content": {
+    "bugs": [
+      "deconstructor bug fix",
+      "car bug fix"
+    ],
+    "features": [
+      "unbreakable wall",
+      "keypad door ui update",
+      "dynamite",
+      "/menu command, for opening menus",
+      "sapper mob"
+      "/setstatus command for changing a sector's visibility"
+    ]
+  }
+}
+
+

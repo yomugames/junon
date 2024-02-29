@@ -4,15 +4,16 @@
   "title": "",
   "content": {
     "bugs": [
-      "deconstructor bug fix",
-      "car bug fix"
+      "Deconstructor bug fix",
+      "Car bug fix"
     ],
     "features": [
-      "unbreakable wall",
-      "keypad door ui update",
-      "dynamite",
+      "Updates made by chickemeeple",
+      "Unbreakable wall",
+      "Keypad door ui update",
+      "Dynamite",
       "/menu command, for opening menus",
-      "sapper mob",
+      "Sapper mob",
       "/setstatus command for changing a sector's visibility"
     ]
   }

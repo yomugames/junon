@@ -8910,7 +8910,8 @@ body.imposter_mode .minigame_poster {
 }
 
 .default_play_btn {
-    width: 80px;
+    width: 120px;
+    background-color: #803a3a !important;
 }
 
 .also_play {

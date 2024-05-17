@@ -53,7 +53,7 @@ class TeamEntry {
     let screenshot = this.getScreenshot()
     let thumbnailPath
     if (!screenshot) {
-      thumbnailPath = "/assets/images/background/placeholder_thumbnail.png"
+      thumbnailPath = "/assets/images/background/default_junon_thumb.png"
     } else {
       thumbnailPath = this.main.getScreenshotThumbnailPath(screenshot)
     }

@@ -311,7 +311,7 @@ class Main {
 
           this.updateItchChangelogUrl()
           this.updateItchPrivacyUrl()
-          this.displayHomePageAd()
+          // this.displayHomePageAd()
           this.initVideoAd()
 
           this.isClientUpToDate((isUpToDate) => {

@@ -5346,10 +5346,10 @@ class Player extends BaseEntity {
         }
       }
 
-      if (!this.isLoggedIn()) {
-        this.showChatError("must login to chat")
-        return
-      }
+      // if (!this.isLoggedIn()) {
+      //   this.showChatError("must login to chat")
+      //   return
+      // }
 
       message = this.replaceBadWords(message)
 

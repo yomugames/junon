@@ -811,12 +811,11 @@ class Main {
   initGame() {
     window.game = this.game = new Game(this)
 
-    if (!Cookies.get("list_mode") || Cookies.get("list_mode") === 'true') {
+    if (!Cookies.get("list_mode") || Cookies.get("list_mode") === 'false') {
       // default
+    } else if (Cookies.get("list_mode") === 'true') {
       document.querySelector(".main_colony_list").classList.add("list_mode")
       document.querySelector(".search_colony_list").classList.add("list_mode")
-    } else if (Cookies.get("list_mode") === 'false') {
-
     }
   }
 

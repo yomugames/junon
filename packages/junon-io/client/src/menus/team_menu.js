@@ -1138,11 +1138,12 @@ class TeamMenu extends BaseMenu {
   createCommandLogEl(commandLog) {
     let date = new Date(commandLog.timestamp)
     let formattedTime = date.toLocaleDateString() + " " + date.toLocaleTimeString()
+    let escapedCommand = ClientHelper.escapeHTML(commandLog.command)
 
     let el = "<tr class='activity_log_row'>" +
                "<td class='activity_log_stat'>" + formattedTime + "</td>" +
                "<td class='activity_log_stat'>" + commandLog.username + "</td>" +
-               "<td class='activity_log_stat command_entry_stat'>" + commandLog.command + "</td>" +
+               "<td class='activity_log_stat command_entry_stat'>" + escapedCommand  + "</td>" +
              "</tr>"
 
     return el

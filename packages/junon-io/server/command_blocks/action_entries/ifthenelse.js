@@ -46,7 +46,8 @@ class IfThenElse extends ActionEntry {
         id: node.id,
         operation: "add",
         value: "",
-        tempId: data.tempId
+        tempId: data.tempId,
+        parentId: data.parentId
       })
     }
   }

@@ -106,7 +106,8 @@ class Player extends BaseEntity {
 
   canEditCommandBlock() {
     if (this.sector.isTutorial()) return true
-    return this.isSectorOwner()
+    if(this.isSectorOwner()) return true
+    return this.getRole().permissions["EditCommandBlocks"]
   }
 
   initVisionLight() {

@@ -1476,6 +1476,15 @@ class TeamMenu extends BaseMenu {
     } else {
       this.editRole(permission, isEnabled)
     }
+    if (permission === "EditCommandBlocks" && isEnabled) {
+      this.game.confirmMenu.open({
+        dontCloseMenus: true,
+        message: "Warning! This permission will allow people to make/edit command blocks, potentially giving them command access. Proceed?",
+        proceedCallback: this.editRole.bind(this, permission, isEnabled)
+      })
+  } else {
+    this.editRole(permission, isEnabled)
+  }
 
     return false
   }

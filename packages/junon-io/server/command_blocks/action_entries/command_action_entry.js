@@ -57,7 +57,8 @@ class CommandActionEntry extends ActionEntry {
       id: actionValue.id,
       operation: "add",
       value: actionValue.value,
-      tempId: tempId
+      tempId: tempId,
+      parentId: data.parentId
     })
   }
 

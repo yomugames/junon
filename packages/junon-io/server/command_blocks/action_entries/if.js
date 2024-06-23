@@ -55,7 +55,8 @@ class If extends Node {
         id: node.id,
         operation: "add",
         value: "",
-        tempId: data.tempId
+        tempId: data.tempId,
+        parentId: data.parentId
       })
     }
   }

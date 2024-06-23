@@ -149,8 +149,8 @@ class CommandBlockMenu extends BaseMenu {
     }
   }
 
-  createTrigger(event) {
-    let trigger = new Trigger(this, { event: event })
+  createTrigger(event, render=true) {
+    let trigger = new Trigger(this, { event: event }, render)
     trigger.submitSave()
   }
 
@@ -178,10 +178,17 @@ class CommandBlockMenu extends BaseMenu {
         node.remove()
       }
     } else if (data.operation === "add") {
-      let node = this.getNode(data.tempId)
-      if (node) {
-        node.finishAdd(data)
-      }
+      if(data.parentId == 0) { //node is a trigger
+        let trigger = new Trigger(this, {event: data.value})
+        delete this.nodes[trigger.id] //trigger.id should be a temp-id
+        this.nodes[data.id] = trigger //renaming name from the temp-id to the actual id
+        trigger.id = data.id
+      } else { //node is an action
+        data.actionKey = data.value
+        let actionEntry = this.getActionEntryFor(data.actionKey)
+        let action = new actionEntry(this.getNode(data.parentId), data)
+        console.log(action)
+      } 
     }
   }
 

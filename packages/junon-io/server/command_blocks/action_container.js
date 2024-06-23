@@ -45,14 +45,14 @@ ActionContainer.prototype = {
     let tempId = data.tempId
     let value = data.value
     let actionKey = value
-
     let actionEntry = this.commandBlock.getActionEntryFor(actionKey).build(this, { actionKey: actionKey})
     if (actionEntry) {
       this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
         id: actionEntry.id,
         operation: "add",
         value: actionEntry.actionKey,
-        tempId: tempId
+        tempId: tempId,
+        parentId: data.parentId
       })
     }
   }

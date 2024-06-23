@@ -204,7 +204,7 @@ class GameExplorer {
     selectedColonyFilterTab = tab
     selectedColonyFilterTab.classList.add("selected")
 
-    document.querySelector(".new_colony_launch_btn").style.display = 'none'
+    // document.querySelector(".new_colony_launch_btn").style.display = 'none'
     document.querySelector("#minigames_tab_content").style.display = 'none'
     document.querySelector("#region_tab_content").style.display = 'inline-block'
 
@@ -216,7 +216,7 @@ class GameExplorer {
       this.filterColonyList("top")
     } else if (selectedColonyFilterTab.classList.contains("mine_colonies_tab")) {
       this.filterColonyList("mine")
-      document.querySelector(".new_colony_launch_btn").style.display = 'inline-block'
+      // document.querySelector(".new_colony_launch_btn").style.display = 'inline-block'
     } else if (selectedColonyFilterTab.classList.contains("favorite_colonies_tab")) {
       this.filterColonyList("favorite")
     } else if (selectedColonyFilterTab.classList.contains("minigames_tab")) {

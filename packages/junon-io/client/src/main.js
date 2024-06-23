@@ -311,7 +311,7 @@ class Main {
 
           this.updateItchChangelogUrl()
           this.updateItchPrivacyUrl()
-          this.displayHomePageAd()
+          // this.displayHomePageAd()
           this.initVideoAd()
 
           this.isClientUpToDate((isUpToDate) => {
@@ -517,10 +517,6 @@ class Main {
 
     tabPanes += "<div class='tab-pane'>" +
         "<div class='game_browser_container'>" +
-            "<div class='new_colony_launch_btn main_menu_btn'>" +
-                "<span>" +  i18n.t('New Colony') + "</span>" +
-                "<div class='play_spinner lds-ring'><div></div><div></div><div></div><div></div></div>" +
-            "</div>" +
             "<div class='search_colony_list colony_list' cellspacing='0' cellpadding='0'>" +
             "</div>" +
             "<div class='main_colony_list colony_list' cellspacing='0' cellpadding='0'>" +
@@ -811,12 +807,11 @@ class Main {
   initGame() {
     window.game = this.game = new Game(this)
 
-    if (!Cookies.get("list_mode") || Cookies.get("list_mode") === 'true') {
+    if (!Cookies.get("list_mode") || Cookies.get("list_mode") === 'false') {
       // default
+    } else if (Cookies.get("list_mode") === 'true') {
       document.querySelector(".main_colony_list").classList.add("list_mode")
       document.querySelector(".search_colony_list").classList.add("list_mode")
-    } else if (Cookies.get("list_mode") === 'false') {
-
     }
   }
 
@@ -1051,25 +1046,21 @@ class Main {
   }
 
   onNameInputKeyup(e) {
-    if (e.which === 13) { // enter
-      this.onPlayBtnClick()
-    }
+    // if (e.which === 13) { // enter
+    //   this.onPlayBtnClick()
+    // }
   }
 
   onPlayBtnClick() {
-    if (this.hasZeroGames()) {
-      this.onNewColonyLaunchBtnClick()
-      return
-    }
 
-    if (this.isJoinInProgress) return
-    this.lockJoin()
+    // if (this.isJoinInProgress) return
+    // this.lockJoin()
 
-    document.getElementById("play_btn").querySelector("span").innerText = ""
-    document.querySelector("#play_btn .play_spinner").style.display = 'inline-block'
-    this.clearHomeErrorMessage()
+    // document.getElementById("play_btn").querySelector("span").innerText = ""
+    // document.querySelector("#play_btn .play_spinner").style.display = 'inline-block'
+    // this.clearHomeErrorMessage()
 
-    this.gameExplorer.joinRandomSectorEntry()
+    // this.gameExplorer.joinRandomSectorEntry()
   }
 
   onLoginBtnClick(e) {
@@ -1495,13 +1486,11 @@ class Main {
     document.querySelector(".search_world_btn").addEventListener("click", this.onSearchWorldBtnClick.bind(this), true)
     document.querySelector(".search_world_input").addEventListener("keyup", this.onSearchWorldInputKeyup.bind(this), true)
     document.getElementById("set_username_btn").addEventListener("click", this.onSetUsernameBtnClick.bind(this), true)
-    document.getElementById("play_btn").addEventListener("click", this.onPlayBtnClick.bind(this), true)
     document.getElementById("login_btn").addEventListener("click", this.onLoginBtnClick.bind(this), true)
     document.querySelector(".mobile_login_btn").addEventListener("click", this.onLoginBtnClick.bind(this), true)
     document.getElementById("logout_btn").addEventListener("click", this.onLogoutBtnClick.bind(this), true)
     document.querySelector(".mobile_logout_btn").addEventListener("click", this.onLogoutBtnClick.bind(this), true)
-    document.getElementById("name_input").addEventListener("keyup", this.onNameInputKeyup.bind(this), true)
-    document.querySelector(".new_colony_launch_btn").addEventListener("click", this.onNewColonyLaunchBtnClick.bind(this), true)
+    document.querySelector(".new_colony_name_input").addEventListener("keyup", this.onNewColonyNameInputKeyup.bind(this), true)
     document.querySelector(".new_colony_menu_btn").addEventListener("click", this.onNewColonyMenuBtnClick.bind(this), true)
     document.querySelector(".tutorial_menu_btn").addEventListener("click", this.onTutorialMenuBtnClick.bind(this), true)
     document.querySelector(".default_play_btn").addEventListener("click", this.onDefaultPlayBtnClick.bind(this), true)
@@ -1755,16 +1744,7 @@ class Main {
   }
 
   onDefaultPlayBtnClick(e) {
-    if (!Cookies.get('tutorial_done')) {
-      this.game.confirmMenu.open({
-        message: i18n.t('AskTutorialMessage'),
-        proceedCallback: this.onTutorialMenuBtnClick.bind(this),
-        cancelCallback: this.onPlayBtnClick.bind(this)
-      })
-      return
-    } else {
-      this.onPlayBtnClick()
-    }
+    this.onNewColonyLaunchBtnClick()
   }
 
   hasZeroGames() {

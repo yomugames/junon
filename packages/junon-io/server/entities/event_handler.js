@@ -128,6 +128,16 @@ class EventHandler {
     return parseInt(value1) % parseInt(value2)
   }
 
+  index(value1, value2) {
+    value1 = parseFloat(value1);
+    value2 = parseFloat(value2);
+    if (value2 < 0) {
+        return 1 / (value1 ** Math.abs(value2));
+    } else {
+        return value1 ** value2;
+    }
+}
+
   length(value) {
     return value.toString().length
   }
@@ -1051,6 +1061,7 @@ class EventHandler {
       "$divide": true,
       "$round": true,
       "$modulo": true,
+      "$index": true,
       "$isLoggedIn": true,
       "$getEquipId": true,
       "$getBuildingType": true,

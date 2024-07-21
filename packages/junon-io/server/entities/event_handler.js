@@ -661,6 +661,19 @@ class EventHandler {
     return entity.getTypeName()
   }
 
+  isGetEffect(entityId, effectName) {
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.hasEffect(effectName) ? true : false
+    }
+    
+    let entity = this.game.getEntity(entityId)
+    if (!entity) return false
+      return entity.hasEffect(effectName) ? true : false
+  }
+
+
+
   getDay() {
     return this.game.sector.getDayCount()
   }
@@ -1069,7 +1082,8 @@ class EventHandler {
       "$getHour": true,
       "$getContent": true,
       "$getPlatformByCoords": true,
-      "$getStructureByCoords": true
+      "$getStructureByCoords": true,
+      "$isGetEffect": true
     }
   }
 

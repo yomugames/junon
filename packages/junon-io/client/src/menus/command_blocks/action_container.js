@@ -28,7 +28,7 @@ ActionContainer.prototype = {
   },
 
   createActionEntry(actionKey) {
-    let actionEntry = this.commandBlock.getActionEntryFor(actionKey).build(this, { actionKey: actionKey }, false)
+    let actionEntry = this.commandBlock.getActionEntryFor(actionKey).build(this, { actionKey: actionKey })
     actionEntry.submitSave()
   },
 

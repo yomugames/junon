@@ -4,17 +4,16 @@ const Node = require("./node")
 const Constants = require("../../../../common/constants.json")
 
 class Trigger extends Node {
-  constructor(commandBlock, trigger, render=true) {
+  constructor(commandBlock, trigger) {
     super(commandBlock.game, trigger)
 
     this.event = trigger.event || ""
-    if(render) {
-      this.el = this.createEl()
-      this.el.addEventListener("click", this.onContainerClick.bind(this), true)
-      this.el.querySelector(".event_help_btn").addEventListener("mouseover", this.onHelpMouseOver.bind(this), true)
-      this.el.querySelector(".event_help_btn").addEventListener("mouseout", this.onHelpMouseOut.bind(this), true)
-      this.el.querySelector(".add_action_btn").addEventListener("click", this.onAddActionBtnClick.bind(this), true)
-    }
+    this.el = this.createEl()
+    this.el.addEventListener("click", this.onContainerClick.bind(this), true)
+    this.el.querySelector(".event_help_btn").addEventListener("mouseover", this.onHelpMouseOver.bind(this), true)
+    this.el.querySelector(".event_help_btn").addEventListener("mouseout", this.onHelpMouseOut.bind(this), true)
+    this.el.querySelector(".add_action_btn").addEventListener("click", this.onAddActionBtnClick.bind(this), true)
+
     this.initActionContainer(trigger)
 
     this.commandBlock.addTrigger(this)

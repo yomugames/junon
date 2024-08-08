@@ -4,24 +4,23 @@ const Node = require("../node")
 const SocketUtil = require("../../../util/socket_util")
 
 class ActionEntry extends Node {
-  static build(parent, data, render) {
+  static build(parent, data) {
     let klass = this
-    return new klass(parent, data, render)
+    return new klass(parent, data)
   }
 
-  constructor(parent, data, render=true) {
+  constructor(parent, data) {
     super(parent.game, data)
 
     this.parent = parent
     this.commandBlock = parent.commandBlock
 
     this.actionKey = data.actionKey || ""
-    if(render) {
-      this.el = this.createEl()
-      this.el.addEventListener("click", this.onContainerClick.bind(this), true)
-    }
-    
-    this.handleActionValues(data, render) 
+
+    this.el = this.createEl()
+    this.el.addEventListener("click", this.onContainerClick.bind(this), true)
+
+    this.handleActionValues(data) 
 
     this.parent.addAction(this)
   }

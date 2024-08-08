@@ -2,12 +2,12 @@ const Node = require("../node")
 const Comparison = require("../comparison")
 
 class If extends Node {
-  constructor(parent, data, render) {
+  constructor(parent, data) {
     super(parent.game, data)
 
     this.parent = parent
 
-    if(render) this.el = this.createEl()
+    this.el = this.createEl()
 
     this.parseData(data)
   }

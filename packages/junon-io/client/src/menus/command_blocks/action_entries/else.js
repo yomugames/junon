@@ -3,14 +3,12 @@ const ActionContainer = require("../action_container")
 
 class Else extends Node {
 
-  constructor(parent, data, render) {
+  constructor(parent, data) {
     super(parent.game, data)
 
     this.parent = parent
-    if(render) {
-      this.el = this.createEl()
-      this.el.querySelector(".add_action_btn").addEventListener("click", this.onAddActionBtnClick.bind(this), true)
-    } 
+    this.el = this.createEl()
+    this.el.querySelector(".add_action_btn").addEventListener("click", this.onAddActionBtnClick.bind(this), true)
 
     this.initActionContainer(data)
   }

@@ -7,13 +7,13 @@ const Then = require("./then")
 
 
 class IfThenElse extends ActionEntry {
-  handleActionValues(data, render) {
+  handleActionValues(data) {
     data.ifthenelse = data.ifthenelse || { if: [], else: [], then: [] }
 
     this.ifthenelse = {
-      if: new If(this, data.ifthenelse.if, render),
-      then: new Then(this, data.ifthenelse.then, render),
-      else: new Else(this, data.ifthenelse.else, render)
+      if: new If(this, data.ifthenelse.if),
+      then: new Then(this, data.ifthenelse.then),
+      else: new Else(this, data.ifthenelse.else)
     }
   }
 

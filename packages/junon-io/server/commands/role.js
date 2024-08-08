@@ -13,6 +13,10 @@ class Role extends BaseCommand {
     return true
   }
 
+  isNonSandboxCommand() {
+    return true
+  }
+
   perform(player, args) {
     let selector = args[0]
 

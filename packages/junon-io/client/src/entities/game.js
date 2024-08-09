@@ -34,6 +34,9 @@ const Bowser = require("bowser")
 const Cookies = require("js-cookie")
 const FirebaseClientHelper = require('../util/firebase_client_helper')
 const uuidv4 = require('uuid/v4')
+const Trigger = require("../menus/command_blocks/trigger")
+const ActionValue = require("../menus/command_blocks/action_value")
+const Comparison = require("../menus/command_blocks/comparison")
 
 class Game {
   constructor(main) {
@@ -1563,6 +1566,42 @@ class Game {
     SocketUtil.on("KeypadUnsuccessful", this.onKeypadUnsuccessful.bind(this))
     SocketUtil.on("OpenMenu", this.openMenu.bind(this))
     SocketUtil.on("CloseMenu", this.closeMenu.bind(this))
+    SocketUtil.on("TempCommandBlockData", this.onTempCommandBlockData.bind(this))
+  }
+
+  onTempCommandBlockData(data) {
+    if(this.commandBlockMenu.getNode(data.tempId)) return
+    let parent = this.commandBlockMenu.getNode(data.parentId)
+    if(!parent && data.type != "Trigger") return
+
+    if(data.type === "Trigger" && data.parentId === 0) {
+      let trigger = new Trigger(this.commandBlockMenu, {id: data.tempId, event: data.value})
+      this.commandBlockMenu.addTrigger(trigger)
+    }
+    else if(data.value == 'ifthenelse') {
+      parent.commandBlock.getActionEntryFor(data.value).build(parent, { actionKey: data.value, id: data.tempId }, false) 
+      //create ifthenelse, without adding if, then, and else
+    }
+    else if(data.type === 'if') {
+      parent.addIf(data.tempId)
+    }
+    else if(data.type === 'then') {
+      parent.addThen(data.tempId)
+    }
+    else if(data.type === 'else') {
+      parent.addElse(data.tempId)
+    }
+    else if(data.type == "ActionEntry") { //command action entry, timer
+      parent.commandBlock.getActionEntryFor(data.value).build(parent, { actionKey: data.value, id: data.tempId })
+    }
+    else if(!data.type) {
+      if(parent.actionKey != "commands") {//comparison
+        new Comparison(parent, {id: data.tempId})
+        return
+      }
+      //command value
+      new ActionValue(parent, {value: data.value, id: data.tempId})
+    } 
   }
 
   openMenu(data) {

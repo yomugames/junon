@@ -95,8 +95,10 @@ class Player extends BaseEntity {
   canEditCommandBlock() {
     if (this.sector.isLobby()) return true
     if (!this.sector.canUseCommandBlocks()) return false
+    if(this.isSectorOwner()) return true
+    if(this.getRole().isAllowedTo("EditCommandBlocks")) return true
 
-    return this.isSectorOwner()
+    return false
   }
 
   applyNonZoomScreenDimensions() {

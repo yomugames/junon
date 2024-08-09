@@ -8,13 +8,29 @@ const Then = require("./then")
 
 class IfThenElse extends ActionEntry {
   handleActionValues(data) {
+    this.isCreator = true
+
     data.ifthenelse = data.ifthenelse || { if: [], else: [], then: [] }
 
     this.ifthenelse = {
-      if: new If(this, data.ifthenelse.if),
+      if: new If(this, data.ifthenelse.if, true),
       then: new Then(this, data.ifthenelse.then),
       else: new Else(this, data.ifthenelse.else)
     }
+  }
+  addIf(id) {
+    if(!this.ifthenelse) this.ifthenelse = {}
+    this.ifthenelse.if = new If(this, {id: id})
+  }
+
+  addThen(id) {
+    if(!this.ifthenelse) this.ifthenelse = {}
+    this.ifthenelse.if = new Then(this, {id: id})
+  }
+
+  addElse(id) {
+    if(!this.ifthenelse) this.ifthenelse = {}
+    this.ifthenelse.if = new Else(this, {id: id})
   }
 
   finishAdd(data) {
@@ -22,6 +38,7 @@ class IfThenElse extends ActionEntry {
     this.replaceId(data.id)
     this.redraw()
 
+    if(!this.ifthenelse) return //this is a client who didn't edit command blocks
     this.ifthenelse.if.submitSave()
     this.ifthenelse.else.submitSave()
     this.ifthenelse.then.submitSave()

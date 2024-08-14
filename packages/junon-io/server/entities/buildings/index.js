@@ -109,6 +109,7 @@ Buildings.BluePresent = require("./blue_present")
 Buildings.GreenPresent = require("./green_present")
 Buildings.ChristmasTree = require("./christmas_tree")
 Buildings.Tree = require("./tree")
+Buildings.MiasmaGate = require('./miasma_gate')
 
 Buildings.MineralMiner = require("./towers/mineral_miner")
 Buildings.Turret = require("./towers/turret")

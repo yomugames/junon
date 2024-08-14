@@ -265,6 +265,7 @@ enum BuildingType {
   KeypadDoor = 269;
   UnbreakableWall = 270;
   Dynamite = 271;
+  MiasmaGate = 272;
 }
 
 enum TerrainType {

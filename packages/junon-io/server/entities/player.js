@@ -2559,6 +2559,9 @@ class Player extends BaseEntity {
   onHitEntity(entity, hit) {
     if (this.isControllingGhost()) return
 
+    if(entity.getType() === 272) { //miasma gate
+      this.removeEffect('miasma')
+    }
     // does nothing by default
     if (entity.hasCategory("door") && entity.isAutomatic()) {
       if (!this.sector.isTutorial() && !entity.isOwnedBy(this)) return

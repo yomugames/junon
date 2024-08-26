@@ -168,9 +168,17 @@ message MessageWrapper {
     KeypadUnsuccessful KeypadUnsuccessful = 175;
     OpenMenu OpenMenu = 176;
     CloseMenu CloseMenu = 177;
+    TempCommandBlockData TempCommandBlockData = 178;
   }
 }
 
+message TempCommandBlockData {
+  string operation = 1;
+  string value = 2;
+  string tempId = 3;
+  uint32 parentId = 4;
+  string type = 5;
+}
 
 message OpenMenu {
   string menuName = 1;

@@ -2,8 +2,9 @@ const Node = require("../node")
 const Comparison = require("../comparison")
 
 class If extends Node {
-  constructor(parent, data) {
+  constructor(parent, data, isCreator) {
     super(parent.game, data)
+    this.isCreator = isCreator
 
     this.parent = parent
 
@@ -38,8 +39,10 @@ class If extends Node {
   finishAdd(data) {
     super.finishAdd(data)
 
-    let comparison = new Comparison(this, {})
-    comparison.submitSave()
+    if(this.isCreator) {
+      let comparison = new Comparison(this, {})
+      comparison.submitSave()
+    }
   }
 
   createEl() {

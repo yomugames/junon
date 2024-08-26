@@ -1474,7 +1474,13 @@ class TeamMenu extends BaseMenu {
           message: "Warning! Commands allow people to delete your world. Proceed?",
           proceedCallback: this.editRole.bind(this, permission, isEnabled)
         })
-    } else {
+    }else if (permission === "EditCommandBlocks" && isEnabled) {
+      this.game.confirmMenu.open({
+        dontCloseMenus: true,
+        message: "Warning! This permission can potentially allow anyone with this role to do anything to your world. Proceed?",
+        proceedCallback: this.editRole.bind(this, permission, isEnabled)
+      })
+  } else {
       this.editRole(permission, isEnabled)
     }
 

@@ -34,6 +34,9 @@ const Bowser = require("bowser")
 const Cookies = require("js-cookie")
 const FirebaseClientHelper = require('../util/firebase_client_helper')
 const uuidv4 = require('uuid/v4')
+const Trigger = require("../menus/command_blocks/trigger")
+const ActionValue = require("../menus/command_blocks/action_value")
+const Comparison = require("../menus/command_blocks/comparison")
 
 class Game {
   constructor(main) {
@@ -1402,7 +1405,7 @@ class Game {
 
     // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 
-    let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png','pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png', 'deconstructor.png', 'blue_laser.png', 'keypad_door.png', 'keypad_door_lower.png', 'keypad_door_upper.png', 'unbreakable_wall.png', 'sapper.png', 'sapper_corpse.png', 'dynamite.png']
+    let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png','pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png', 'deconstructor.png', 'blue_laser.png', 'keypad_door.png', 'keypad_door_lower.png', 'keypad_door_upper.png', 'unbreakable_wall.png', 'sapper.png', 'sapper_corpse.png', 'dynamite.png', 'miasma_gate.png']
     tempAssets.forEach((asset) => {
       PIXI.Texture.addToCache(PIXI.Texture.fromImage('/assets/images/' + asset), asset)
     })
@@ -1563,6 +1566,42 @@ class Game {
     SocketUtil.on("KeypadUnsuccessful", this.onKeypadUnsuccessful.bind(this))
     SocketUtil.on("OpenMenu", this.openMenu.bind(this))
     SocketUtil.on("CloseMenu", this.closeMenu.bind(this))
+    SocketUtil.on("TempCommandBlockData", this.onTempCommandBlockData.bind(this))
+  }
+
+  onTempCommandBlockData(data) {
+    if(this.commandBlockMenu.getNode(data.tempId)) return
+    let parent = this.commandBlockMenu.getNode(data.parentId)
+    if(!parent && data.type != "Trigger") return
+
+    if(data.type === "Trigger" && data.parentId === 0) {
+      let trigger = new Trigger(this.commandBlockMenu, {id: data.tempId, event: data.value})
+      this.commandBlockMenu.addTrigger(trigger)
+    }
+    else if(data.value == 'ifthenelse') {
+      parent.commandBlock.getActionEntryFor(data.value).build(parent, { actionKey: data.value, id: data.tempId }, false) 
+      //create ifthenelse, without adding if, then, and else
+    }
+    else if(data.type === 'if') {
+      parent.addIf(data.tempId)
+    }
+    else if(data.type === 'then') {
+      parent.addThen(data.tempId)
+    }
+    else if(data.type === 'else') {
+      parent.addElse(data.tempId)
+    }
+    else if(data.type == "ActionEntry") { //command action entry, timer
+      parent.commandBlock.getActionEntryFor(data.value).build(parent, { actionKey: data.value, id: data.tempId })
+    }
+    else if(!data.type) {
+      if(parent.actionKey != "commands") {//comparison
+        new Comparison(parent, {id: data.tempId})
+        return
+      }
+      //command value
+      new ActionValue(parent, {value: data.value, id: data.tempId})
+    } 
   }
 
   openMenu(data) {

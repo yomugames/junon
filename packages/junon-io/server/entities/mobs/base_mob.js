@@ -1966,7 +1966,9 @@ class BaseMob extends BaseEntity {
   }
 
   onHitEntity(entity) {
-
+    if(entity.getType() === 272) {
+      this.removeEffect('miasma')
+    }
   }
 
   onClosedDoorEncountered(door) {

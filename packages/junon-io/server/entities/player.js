@@ -95,8 +95,10 @@ class Player extends BaseEntity {
   canEditCommandBlock() {
     if (this.sector.isLobby()) return true
     if (!this.sector.canUseCommandBlocks()) return false
+    if(this.isSectorOwner()) return true
+    if(this.getRole().isAllowedTo("EditCommandBlocks")) return true
 
-    return this.isSectorOwner()
+    return false
   }
 
   applyNonZoomScreenDimensions() {
@@ -2557,6 +2559,9 @@ class Player extends BaseEntity {
   onHitEntity(entity, hit) {
     if (this.isControllingGhost()) return
 
+    if(entity.getType() === 272) { //miasma gate
+      this.removeEffect('miasma')
+    }
     // does nothing by default
     if (entity.hasCategory("door") && entity.isAutomatic()) {
       if (!this.sector.isTutorial() && !entity.isOwnedBy(this)) return

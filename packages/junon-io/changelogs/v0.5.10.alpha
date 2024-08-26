@@ -1,0 +1,16 @@
+{
+  "version": "v0.5.10.alpha",
+  "date": "Aug 26, 2024",
+  "title": "",
+  "content": {
+    "bugs": [
+    ],
+    "features": [
+      "Updates made by chickemeeple",
+      "Miasma Gate to remove miasma when entities pass through",
+      "Added Edit Command Block Permission for Roles"
+    ]
+  }
+}
+
+

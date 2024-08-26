@@ -2559,7 +2559,7 @@ class Player extends BaseEntity {
   onHitEntity(entity, hit) {
     if (this.isControllingGhost()) return
 
-    if(entity.getType() === 272) { //miasma gate
+    if(entity.getType() === Protocol.definition().BuildingType.MiasmaGate) { //miasma gate
       this.removeEffect('miasma')
     }
     // does nothing by default

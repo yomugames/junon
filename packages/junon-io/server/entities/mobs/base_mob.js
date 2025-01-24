@@ -1966,7 +1966,7 @@ class BaseMob extends BaseEntity {
   }
 
   onHitEntity(entity) {
-    if(entity.getType() === 272) {
+    if(entity.getType() === Protocol.definition().BuildingType.MiasmaGate) {
       this.removeEffect('miasma')
     }
   }

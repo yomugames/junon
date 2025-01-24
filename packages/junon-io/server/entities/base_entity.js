@@ -15,7 +15,7 @@ class BaseEntity extends BaseTransientEntity {
   constructor(sector, data) {
     super(sector.game, data.id)
     this.sector = sector
-    this.world  = sector.game.world
+    this.world = sector.game.world
 
     this.w = data.w
     this.h = data.h
@@ -194,8 +194,8 @@ class BaseEntity extends BaseTransientEntity {
     let targets = this.getMeleeTargets(meleeRange, options)
 
     let closestTarget = targets.sort((a, b) => {
-      let distanceA =  this.game.distanceBetween(this, a)
-      let distanceB =  this.game.distanceBetween(this, b)
+      let distanceA = this.game.distanceBetween(this, a)
+      let distanceB = this.game.distanceBetween(this, b)
       return distanceA - distanceB
     })[0]
 
@@ -215,7 +215,7 @@ class BaseEntity extends BaseTransientEntity {
 
     const meleeCircle = { x: this.getX() + xp, y: this.getY() + yp, radius: radius }
 
-    if (process.env.DEBUG_COLLISION ) {
+    if (process.env.DEBUG_COLLISION) {
       if (this.isPlayer()) {
         this.getSocketUtil().emit(this.getSocket(), "CircleCollision", { circles: [meleeCircle] })
       }
@@ -238,10 +238,10 @@ class BaseEntity extends BaseTransientEntity {
         let canDamage = this.canDamage(target)
 
         let isValidForTarget = isNotSelf &&
-                               isCircleOverlap &&
-                               canDamage &&
-                               !this.isObstructed(target) &&
-                               target.health > 0
+          isCircleOverlap &&
+          canDamage &&
+          !this.isObstructed(target) &&
+          target.health > 0
 
         return isValidForTarget
       })
@@ -311,7 +311,7 @@ class BaseEntity extends BaseTransientEntity {
       let obstacles = container.getRaycastObstacles(this.getX(), this.getY(), entity.getX(), entity.getY(), distance, entityToIgnore)
       let hasWallDoorInBetween = obstacles.find((hit) => {
         return (hit.entity.hasCategory("wall") || hit.entity.hasCategory("door")) &&
-               hit.entity !== entity
+          hit.entity !== entity
       })
 
       return !hasWallDoorInBetween
@@ -367,6 +367,9 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   resetVerticalVelocity(body, obstacle, hit) {
+    if (body.velocity[1] > 0) {
+      this.canJump = true;
+    }
     const isObstacleSolid = obstacle
     if (isObstacleSolid) {
       if (obstacle.shouldObstruct(body, hit)) {
@@ -400,11 +403,11 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   isOutOfBounds() {
-    let maxWidth  = this.getContainer().getColCount() * Constants.tileSize
+    let maxWidth = this.getContainer().getColCount() * Constants.tileSize
     let maxHeight = this.getContainer().getRowCount() * Constants.tileSize
 
     return this.getX() < 0 || this.getX() > maxWidth ||
-           this.getY() < 0 || this.getY() > maxHeight
+      this.getY() < 0 || this.getY() > maxHeight
   }
 
   resetHorizontalVelocity(body, obstacle, hit) {
@@ -424,23 +427,23 @@ class BaseEntity extends BaseTransientEntity {
     }
   }
 
-//   edgifyBodyPositionHorizontal(obstacle) {
-//     let col = obstacle.getCol()
-//     if (this.body.velocity[0] < 0) { // going left
-//       this.body.position[0] = (col + 1) * Constants.tileSize + (this.getWidth() / 2)
-//     } else if (this.body.velocity[0] > 0) { // going right
-//       this.body.position[0] = col       * Constants.tileSize - (this.getWidth() / 2)
-//     }
-//   }
-//
-//   edgifyBodyPositionVertical(obstacle) {
-//     let row = obstacle.getRow()
-//     if (this.body.velocity[1] > 0) { // going up
-//       this.body.position[1] = row       * Constants.tileSize - (this.getHeight() / 2)
-//     } else if (this.body.velocity[1] < 0) { // going down
-//       this.body.position[1] = (row + 1) * Constants.tileSize + (this.getHeight() / 2)
-//     }
-//   }
+  //   edgifyBodyPositionHorizontal(obstacle) {
+  //     let col = obstacle.getCol()
+  //     if (this.body.velocity[0] < 0) { // going left
+  //       this.body.position[0] = (col + 1) * Constants.tileSize + (this.getWidth() / 2)
+  //     } else if (this.body.velocity[0] > 0) { // going right
+  //       this.body.position[0] = col       * Constants.tileSize - (this.getWidth() / 2)
+  //     }
+  //   }
+  //
+  //   edgifyBodyPositionVertical(obstacle) {
+  //     let row = obstacle.getRow()
+  //     if (this.body.velocity[1] > 0) { // going up
+  //       this.body.position[1] = row       * Constants.tileSize - (this.getHeight() / 2)
+  //     } else if (this.body.velocity[1] < 0) { // going down
+  //       this.body.position[1] = (row + 1) * Constants.tileSize + (this.getHeight() / 2)
+  //     }
+  //   }
 
 
   onVelocitySetByPosition() {
@@ -574,8 +577,8 @@ class BaseEntity extends BaseTransientEntity {
   forEachOccupiedTile(cb) {
     let topLeftRow = this.getTopLeftRow()
     let topLeftCol = this.getTopLeftCol()
-    let rowCount   = 2 // bottomRight
-    let colCount   = 2 // bottomRight
+    let rowCount = 2 // bottomRight
+    let colCount = 2 // bottomRight
 
     for (let row = topLeftRow; row < topLeftRow + rowCount; row++) {
       for (let col = topLeftCol; col < topLeftCol + colCount; col++) {
@@ -656,7 +659,7 @@ class BaseEntity extends BaseTransientEntity {
     let isChunkPositionChanged = currChunk.row !== prevChunk.row || currChunk.col !== prevChunk.col
     this.onPositionChanged({
       isGridPositionChanged: true,
-      isChunkPositionChanged: isChunkPositionChanged ,
+      isChunkPositionChanged: isChunkPositionChanged,
       chunkRow: currChunk.row,
       chunkCol: currChunk.col
     })
@@ -793,7 +796,7 @@ class BaseEntity extends BaseTransientEntity {
       if (this.shouldIgnoreObstacle()) return
 
       if (process.env.DEBUG_COLLISION) {
-          let otherBox
+        let otherBox
         if (tileHit.entity) {
           otherBox = tileHit.entity.getBox()
         } else {
@@ -823,9 +826,9 @@ class BaseEntity extends BaseTransientEntity {
       this.onObstructed(tileHit)
 
       if (isMovingVertically &&
-          (this.isPlayer() || this.isMob()) ) {
+        (this.isPlayer() || this.isMob())) {
         let normalizedHorizontalVelocity = Math.floor(body.velocity[0] * 100)
-        if (normalizedHorizontalVelocity < 0 ) {
+        if (normalizedHorizontalVelocity < 0) {
           // moving left
           if (this.hasOpenSpace(result.hits[0])) {
             this.velocityAdjustmentX = -sliderSpeed
@@ -901,15 +904,15 @@ class BaseEntity extends BaseTransientEntity {
       this.onObstructed(tileHit)
 
       if (isMovingHorizontally &&
-          !isGoingOutofBounds &&
-          (this.isPlayer() || this.isMob())) {
+        !isGoingOutofBounds &&
+        (this.isPlayer() || this.isMob())) {
         let normalizedVerticalVelocity = Math.floor(body.velocity[1] * 100)
-        if (normalizedVerticalVelocity < 0 ) {
+        if (normalizedVerticalVelocity < 0) {
           // going up
           if (this.hasOpenSpace(result.hits[0])) {
             this.carryOverVerticalSpeed = -sliderSpeed
           }
-        } else if (normalizedVerticalVelocity > 0 ) {
+        } else if (normalizedVerticalVelocity > 0) {
           // going down
           if (this.hasOpenSpace(result.hits[2])) {
             this.carryOverVerticalSpeed = sliderSpeed
@@ -1038,7 +1041,7 @@ class BaseEntity extends BaseTransientEntity {
 
   steerTowardsAngle(radian) {
     const targetAngle = radian - this.getDirectionRadianModifier()
-    const angleDelta  = Helper.angleDeltaSigned(targetAngle, this.getRadAngle())
+    const angleDelta = Helper.angleDeltaSigned(targetAngle, this.getRadAngle())
     const allowableAngleDelta = this.getTurnSpeed() > Math.abs(angleDelta) ? angleDelta : this.getTurnSpeed() * Math.sign(angleDelta)
     const degDelta = Math.floor(allowableAngleDelta * (180 / Math.PI))
     this.angle += degDelta
@@ -1059,7 +1062,7 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   getBodyVelocity() {
-    if (!this.body) return [0,0]
+    if (!this.body) return [0, 0]
     return this.body.velocity
   }
 
@@ -1078,8 +1081,8 @@ class BaseEntity extends BaseTransientEntity {
     console.log("lerp velocity: targetVelocity: " + JSON.stringify(targetVelocity) + " velocity: " + JSON.stringify(this.body.velocity) + " , factor: " + factor)
 
     // min velocity
-    if(Math.abs(this.body.velocity[0]) < velocityMin) this.body.velocity[0] = 0
-    if(Math.abs(this.body.velocity[1]) < velocityMin) this.body.velocity[1] = 0
+    if (Math.abs(this.body.velocity[0]) < velocityMin) this.body.velocity[0] = 0
+    if (Math.abs(this.body.velocity[1]) < velocityMin) this.body.velocity[1] = 0
   }
 
   getDirectionRadianModifier() {
@@ -1127,7 +1130,7 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   decreaseForce() {
-    if (vec2.len(this.body.force) < 0.1 ) {
+    if (vec2.len(this.body.force) < 0.1) {
       this.body.force[0] = 0
       this.body.force[1] = 0
       this.disableCustomVelocity()
@@ -1221,7 +1224,7 @@ class BaseEntity extends BaseTransientEntity {
     }
   }
 
-  initPhysics(x,y) {
+  initPhysics(x, y) {
     // Create an infinite ground plane body
     this.body = new p2.Body(this.getBodyProperties(x, y))
 
@@ -1230,7 +1233,7 @@ class BaseEntity extends BaseTransientEntity {
 
     this.shape = this.getShape()
     this.shape.collisionGroup = this.getCollisionGroup()
-    this.shape.collisionMask  = this.getCollisionMask()
+    this.shape.collisionMask = this.getCollisionMask()
 
     this.addShape()
     this.addBodyToWorld()
@@ -1323,18 +1326,18 @@ class BaseEntity extends BaseTransientEntity {
     if (!this.getContainer().platformMap) return []
 
     return this.getContainer().platformMap.getNeighbors(this.getRow(), this.getCol())
-               .map((hit) => {
-      return hit.entity
-    })
+      .map((hit) => {
+        return hit.entity
+      })
   }
 
   getNeighborGrounds() {
     if (!this.getContainer().groundMap) return []
 
     return this.getContainer().groundMap.getNeighbors(this.getRow(), this.getCol())
-               .map((hit) => {
-      return hit.entity
-    })
+      .map((hit) => {
+        return hit.entity
+      })
   }
 
   getNeighborReachableTileForRoom(room) {
@@ -1489,9 +1492,9 @@ class BaseEntity extends BaseTransientEntity {
       })
 
       hasMiasma = [players, mobs, crops].flat()
-                                        .find((entity) => {
-                                           return entity.hasEffect("miasma")
-                                        })
+        .find((entity) => {
+          return entity.hasEffect("miasma")
+        })
     }
 
     if (hasMiasma) {
@@ -1525,13 +1528,13 @@ class BaseEntity extends BaseTransientEntity {
         }
       })
 
-      mobs.forEach((entity)    => {
+      mobs.forEach((entity) => {
         if (!entity.isImmuneTo("miasma")) {
           entity.addMiasma()
         }
       })
 
-      crops.forEach((entity)   => {
+      crops.forEach((entity) => {
         if (!entity.isImmuneTo("miasma")) {
           entity.addMiasma()
         }
@@ -1776,17 +1779,17 @@ class BaseEntity extends BaseTransientEntity {
 
   static getSideTiles(tilemap, relativeBox) {
     const paddedRelativeBox = this.getPaddedRelativeBox(relativeBox)
-    let   coreHits = tilemap.hitTestTile(relativeBox)
-    let   paddedHits = tilemap.hitTestTile(paddedRelativeBox)
+    let coreHits = tilemap.hitTestTile(relativeBox)
+    let paddedHits = tilemap.hitTestTile(paddedRelativeBox)
     const coreEdges = tilemap.getDiagonalEdges(paddedRelativeBox)
 
     return paddedHits.filter((hit) => {
       const isPartOfCoreOrDiagonal = coreHits.find((coreHit) => {
         return this.isSameHit(coreHit, hit) ||
-               this.isSameHit(coreEdges.upperLeft, hit) ||
-               this.isSameHit(coreEdges.upperRight, hit) ||
-               this.isSameHit(coreEdges.lowerLeft, hit) ||
-               this.isSameHit(coreEdges.lowerRight, hit)
+          this.isSameHit(coreEdges.upperLeft, hit) ||
+          this.isSameHit(coreEdges.upperRight, hit) ||
+          this.isSameHit(coreEdges.lowerLeft, hit) ||
+          this.isSameHit(coreEdges.lowerRight, hit)
       })
       return !isPartOfCoreOrDiagonal
     })
@@ -1947,8 +1950,8 @@ class BaseEntity extends BaseTransientEntity {
 
   getBodyProperties(x, y) {
     return {
-        mass: 0,
-        position: [x,y]
+      mass: 0,
+      position: [x, y]
     }
   }
 
@@ -1987,10 +1990,10 @@ class BaseEntity extends BaseTransientEntity {
     let h = this.getHeight()
 
     let boundingBox = {
-      minX: x - w/2 + padding,
-      minY: y - h/2 + padding,
-      maxX: x + w/2 - padding,
-      maxY: y + w/2 - padding
+      minX: x - w / 2 + padding,
+      minY: y - h / 2 + padding,
+      maxX: x + w / 2 - padding,
+      maxY: y + w / 2 - padding
     }
 
     let regions = this.sector.regionTree.search(boundingBox)
@@ -2008,7 +2011,7 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   getCircle() {
-    return { x: this.getX(), y: this.getY() , radius: this.getWidth()/2 }
+    return { x: this.getX(), y: this.getY(), radius: this.getWidth() / 2 }
   }
 
 }

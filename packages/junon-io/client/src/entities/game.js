@@ -4118,10 +4118,6 @@ class Game {
       document.querySelector("#rules_menu").style.display = 'block'
     }
 
-    if (typeof aipAPItag !== 'undefined') {
-      aipAPItag.hideConsentToolButton()
-    }
-
     if (data.fullMap) {
       data.fullMap.chunks.forEach((chunk) => {
         this.sector.onChunk(chunk, { sync: true })

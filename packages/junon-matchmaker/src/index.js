@@ -53,7 +53,7 @@ function toArrayBuffer(buffer) {
 class MatchmakerServer {
   constructor() {
     this.bootTime = Date.now()
-    this.APP_SERVER_PORT = debugMode ? 3000 : 80
+    this.APP_SERVER_PORT = debugMode ? 3000 : 443
     this.GAME_WEBSOCKET_SERVER_PORT = 2095
 
     this.ENVIRONMENT_LIST = ["vm", "development", "staging", "production"]
@@ -301,10 +301,17 @@ class MatchmakerServer {
     }
   }
 
-  buildUwsApp() {
+  buildUwsApp(isSSL) {
     let app
 
-    app = uws.App()
+    if (isSSL) {
+      app = uws.SSLApp({
+        key_file_name:  "/root/certbot/tls.key",
+        cert_file_name: "/root/certbot/tls.crt"
+      })
+    } else {
+      app = uws.App()
+    }
 
     return app
   }
@@ -348,7 +355,8 @@ class MatchmakerServer {
   }
 
   initServerForPlayers() {
-    let app = this.buildUwsApp()
+    let isSSL = true
+    let app = this.buildUwsApp(isSSL)
 
     app.get('/servers', (res, req) => {
       res.writeHeader('Access-Control-Allow-Origin','*')

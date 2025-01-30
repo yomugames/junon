@@ -370,8 +370,7 @@ class BaseEntity extends BaseTransientEntity {
     if (body.velocity[1] > 0) {
       this.canJump = true;
     }
-    const isObstacleSolid = obstacle
-    if (isObstacleSolid) {
+    if (obstacle) {
       if (obstacle.shouldObstruct(body, hit)) {
         this.edgifyBodyPositionVertical(obstacle, hit)
         this.onEdgeHit(obstacle, hit)

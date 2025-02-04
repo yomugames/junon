@@ -12,23 +12,29 @@ class GetNthWord extends BaseCommand {
         return true;
     }
     perform(caller,args) {
-        let index = args[0];
-        if(isNaN(index)) {
-            caller.showChatError(`index must be a number`)
-            // In commandblocks, you can't tell if $word is the last word of the message, so making it undefined should fix this
-            this.game.executeCommand(this.sector,`/variable set word undefined`)
-            return
+        if (args.length < 2) { 
+            caller.showChatError(`Usage: /getnthword [index] [message]`);
+            this.game.executeCommand(this.sector, `/variable set word undefined`);
+            return;
         }
+
+        let index = parseInt(args[0], 10);
+        if (isNaN(index) || index < 1) {
+            caller.showChatError(`Index must be a positive number.`);
+            this.game.executeCommand(this.sector, `/variable set word undefined`);
+            return;
+        }
+
         let text = args.slice(1).join(" ")
-        
         let stringArray = text.split(" ")
 
         if(index > stringArray.length+1) {
             caller.showChatError(`Invalid index`);
+            this.game.executeCommand(this.sector, `/variable set word undefined`); 
             return;
         }
 
-        this.game.executeCommand(this.sector,`/variable set word ${stringArray[index-1]}`)
+        this.game.executeCommand(this.sector,`/variable set word ${stringArray[index - 1]}`)
         caller.showChatSuccess('Success')
     }
     

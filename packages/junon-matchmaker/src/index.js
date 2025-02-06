@@ -355,7 +355,7 @@ class MatchmakerServer {
   }
 
   initServerForPlayers() {
-    let isSSL = true
+    let isSSL = !debugMode
     let app = this.buildUwsApp(isSSL)
 
     app.get('/servers', (res, req) => {

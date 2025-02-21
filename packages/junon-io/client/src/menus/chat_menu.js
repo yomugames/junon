@@ -314,24 +314,32 @@ class ChatMenu extends BaseMenu {
     } else if (message.startsWith("%#")) { //regular expressions are consusing lol
         let colorEndIndex = message.indexOf("%", 2);
 
-        if (colorEndIndex === -1) return
+        if (colorEndIndex === -1) {
+          return { status: "normal", message: message };
+        }
             
         let colorCode = message.slice(2, colorEndIndex);
         let restOfMessage = message.slice(colorEndIndex + 1);
         return { status: "hexcolor", message: restOfMessage, color: colorCode };
     } else if (message.startsWith("%")) {
       const colorEndIndex = message.indexOf("%", 2)
-      if(colorEndIndex === -1) return
+      if(colorEndIndex === -1) {
+        return { status: "normal", message: message };
+      }
 
       const allowedColors = ["blue", "red", "green", "yellow", "brown", "purple", "pink", "gray", "orange", "black", "white",]
 
       const color = message.slice(1, colorEndIndex)
-      if(allowedColors.indexOf(color) === -1) return { status: "normal", message: message };
+
+      if(allowedColors.indexOf(color) === -1) {
+        return { status: "normal", message: message }
+      }
 
       let restOfMessage = message.slice(colorEndIndex + 1);
 
       return { status: "color", message: restOfMessage, color:color}
     }
+
     return { status: "normal", message: message };
   }
 

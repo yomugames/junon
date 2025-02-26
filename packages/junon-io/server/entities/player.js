@@ -3392,9 +3392,10 @@ class Player extends BaseEntity {
       velocity = this.getTargetVelocityFromControls(this.controlKeys)
       if (this.sector.hasGravity() && velocity[1] < 0) {
         // apply force instead of gravity
+        this.jump()
+
         if (!this.isFlying) {
           velocity[1] = 0
-          this.jump() //no jump if fly enabled
         }
       }
     }
@@ -5118,6 +5119,8 @@ class Player extends BaseEntity {
   }
 
   onEdgeHit(obstacle) {
+    this.canJump = true
+
     const isObstacleSolid = obstacle
     if (isObstacleSolid && this.isEntity(obstacle) && obstacle.hasCategory("door")) {
       // obstacle.openFor(3000)

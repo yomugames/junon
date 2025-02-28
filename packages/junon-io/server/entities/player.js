@@ -98,6 +98,7 @@ class Player extends BaseEntity {
    * @returns {Promise<Date>}
    */
   async getUserCreatedAt() {
+    if(!this.isLoggedIn()) return new Date()
     let user = await User.findOne({where: {uid: this.uid}})
     return new Date(user.dataValues.createdAt)
   }

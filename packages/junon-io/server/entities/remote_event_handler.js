@@ -127,9 +127,10 @@ class RemoteEventHandler {
       duration: 5
     })
   }
-  onGetBadges(player, data, socket) {
-    let badges = player.getBadges()
+  async onGetBadges(player, data, socket) {
+    let badges = await player.getBadges()
     this.getSocketUtil().emit(socket, "BadgesData", { badges: badges });
+    console.log(badges)
   }
   onEquipBadge(player, data, socket) {
     player.equipBadge(data.name)

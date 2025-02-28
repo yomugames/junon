@@ -115,7 +115,7 @@ class Player extends BaseEntity {
 
     return diffDays > 730
   }
-  getBadges() {
+  async getBadges() {
     let badges = []
      for(let badge in Badges) {
       let badgeInstance = new Badges[badge]()
@@ -123,7 +123,7 @@ class Player extends BaseEntity {
         name: badgeInstance.getName(),
         description: badgeInstance.getDescription(),
         imageUrl: badgeInstance.getImageUrl(),
-        qualified: badgeInstance.isQualified(this),
+        isQualified: await badgeInstance.isQualified(this),
         color: badgeInstance.getColor()
       })
      }

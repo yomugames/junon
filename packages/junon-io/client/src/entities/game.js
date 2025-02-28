@@ -1586,8 +1586,12 @@ class Game {
     document.querySelector('#badge_container').innerHTML = '';
     for(let badge in data.badges) {
       console.log(data.badges[badge].description)
-      let el = `<div title="${data.badges[badge].description}" onclick="game.equipBadge('${data.badges[badge].name}')" style="display:inline-block;margin-right:10px;"><p style="margin:0px;font-size:10px;">${data.badges[badge].name}</p><div class="badge"><img src="/assets/images/${data.badges[badge].imageUrl}" width="50" height="50"></div></div>`
+      let el = `<div title="${data.badges[badge].description}" onclick="game.equipBadge('${data.badges[badge].name}')" style="display:inline-block;margin-right:10px;"><p style="margin:0px;font-size:10px;">${data.badges[badge].name}</p><div class="badge" id="${data.badges[badge].name}"><img class="${data.badges[badge].isQualified ? "qualified" : "unqualified"}" src="/assets/images/${data.badges[badge].imageUrl}" width="50" height="50"></div></div>`
       document.querySelector('#badge_container').innerHTML += el;
+      if(!data.badges[badge].isQualified) {
+        let coveringEl = `<img class="cover-badge" src="/assets/images/badges/lock.png" width="50" height="50">`;
+        document.querySelector(`#${data.badges[badge].name}`).innerHTML += coveringEl;
+      }
     }
   }
 

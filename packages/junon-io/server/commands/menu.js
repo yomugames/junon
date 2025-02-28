@@ -6,7 +6,7 @@ class Menu extends BaseCommand {
             "/menu close [menu name] [player name]",
             "/menu open [menu name] [player name]",
             "Available menu names:",
-            "keypadMenu, craftMenu, atmMenu, friendsMenu, commandBlockMenu, teamMenu, welcomeMenu, stoveMenu, tradeMenu, slaveTradeMenu"
+            "keypadMenu, craftMenu, atmMenu, friendsMenu, commandBlockMenu, teamMenu, welcomeMenu, stoveMenu, tradeMenu, slaveTradeMenu, badgeMenu"
         ]
     }
 

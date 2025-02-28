@@ -19,6 +19,19 @@ html {
     display: none;
 }
 
+.badge {
+    width:fit-content;
+    height: fit-content;
+    background-color: #333;
+    display: inline-block;
+    margin: 5px;
+}
+
+.badge:hover {
+    cursor:pointer;
+    background-color: #555;
+}
+
 /* https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_custom_scrollbar2 */
 ::-webkit-scrollbar {
     width: 8px;

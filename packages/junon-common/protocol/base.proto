@@ -169,7 +169,35 @@ message MessageWrapper {
     OpenMenu OpenMenu = 176;
     CloseMenu CloseMenu = 177;
     TempCommandBlockData TempCommandBlockData = 178;
+    GetBadges GetBadges = 179;
+    BadgesData BadgesData = 180;
+    EquipBadge EquipBadge = 181;
+    BadgeEquipped BadgeEquipped = 182;
   }
+}
+
+message BadgeEquipped {
+  Badge badge = 1;
+  uint32 playerId = 2;
+}
+
+message EquipBadge {
+  string name = 1;
+}
+
+message Badge {
+  string name = 1;
+  bool isQualified = 2;
+  string description = 3;
+  string imageUrl = 4;
+  string color = 5;
+}
+
+message BadgesData {
+  repeated Badge badges = 1;
+}
+
+message GetBadges {
 }
 
 message TempCommandBlockData {

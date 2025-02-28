@@ -47,6 +47,7 @@ const NeedsServer = require('./../interfaces/needs')
 const Dragger = require('./../interfaces/dragger')
 const WalkthroughManager = require("./walkthrough_manager")
 const xss = require("xss")
+const Badges = require('./badges/index')
 
 class Player extends BaseEntity {
 
@@ -90,6 +91,66 @@ class Player extends BaseEntity {
     this.register()
 
     this.replacePhysicalGoldWithVirtual()
+  }
+
+  /**
+   * Use await with this function!!!!
+   * @returns {Promise<Date>}
+   */
+  async getUserCreatedAt() {
+    let user = await User.findOne({where: {uid: this.uid}})
+    return new Date(user.dataValues.createdAt)
+  }
+
+  /**
+   * Use await with this function!!!!
+   * @returns {Promise<boolean>}
+   */
+  async hasUserPlayed2Years() {
+    let userCreatedAt = await this.getUserCreatedAt()
+
+    let now = new Date()
+    let diff = now - userCreatedAt
+    let diffDays = diff / (1000 * 60 * 60 * 24)
+
+    return diffDays > 730
+  }
+  getBadges() {
+    let badges = []
+     for(let badge in Badges) {
+      let badgeInstance = new Badges[badge]()
+      badges.push({
+        name: badgeInstance.getName(),
+        description: badgeInstance.getDescription(),
+        imageUrl: badgeInstance.getImageUrl(),
+        qualified: badgeInstance.isQualified(this),
+        color: badgeInstance.getColor()
+      })
+     }
+    return badges;
+  }
+
+  async equipBadge(badgeName) {
+    try {
+      let badge = new Badges[badgeName]()
+      if(await badge.isQualified(this) === false) {
+        return
+      }
+      this.badge = badge
+      this.getSocketUtil().broadcast(this.game.getSocketIds(), "BadgeEquipped", {
+        badge: {
+          name: badge.getName(),
+          imageUrl: badge.getImageUrl(),
+          description: badge.getDescription(),
+          color: badge.getColor()
+        },
+        playerId: this.id
+      })
+    } catch(e) {
+      return
+    }
+    
+    
   }
 
   canEditCommandBlock() {
@@ -611,6 +672,8 @@ class Player extends BaseEntity {
     if (this.sector.getUid().match("PnGkJd5xZsb0v")) {
       this.tutorialIndex["main"] = 1
     }
+
+    this.equipBadge("None")
 
     this.game.sendToMatchmaker({ event: "PlayerJoin",
       data: {

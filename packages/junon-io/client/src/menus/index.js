@@ -49,6 +49,7 @@ Menus.TerminalMenu = require("./terminal_menu")
 Menus.FriendsMenu = require("./friends_menu")
 Menus.FriendRequestMenu = require("./friend_request_menu")
 Menus.KeypadMenu = require("./keypad_menu")
+Menus.BadgeMenu = require('./badge_menu')
 
 Menus.TeamMenu = require("./team_menu")
 Menus.TeamRequestMenu = require("./team_request_menu")

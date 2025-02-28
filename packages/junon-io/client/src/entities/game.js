@@ -252,6 +252,8 @@ class Game {
     this.commandBlockMenu = new Menus.CommandBlockMenu(this, document.querySelector("#command_block_menu"))
     this.commandBlockPicker = new Menus.CommandBlockPicker(this, document.querySelector("#command_block_picker"))
     this.friendRequestMenu  = new Menus.FriendRequestMenu(this, document.querySelector("#friend_request_menu"))
+    this.badgeMenu = new Menus.BadgeMenu(this, document.querySelector("#badge_menu"))
+
 
     this.visitColonyMenu = this.main.gameExplorer
 
@@ -259,6 +261,10 @@ class Game {
       this.createMobileBuildActionMenu()
       document.querySelector("#base_hud .resources").style.display = 'none'
     }
+  }
+
+  equipBadge(name) {
+    SocketUtil.emit("EquipBadge", {name: name})
   }
 
   onFriendRequestReceived(request) {
@@ -1567,6 +1573,22 @@ class Game {
     SocketUtil.on("OpenMenu", this.openMenu.bind(this))
     SocketUtil.on("CloseMenu", this.closeMenu.bind(this))
     SocketUtil.on("TempCommandBlockData", this.onTempCommandBlockData.bind(this))
+    SocketUtil.on("BadgesData", this.onBadgesData.bind(this))
+    SocketUtil.on("BadgeEquipped", this.onBadgeEquipped.bind(this))
+  }
+
+  onBadgeEquipped(data) {
+    let tint = Number("0x"+data.badge.color);
+    this.sector.players[data.playerId].sprite.children[1].children[0].tint = tint;
+  }
+
+  onBadgesData(data) {
+    document.querySelector('#badge_container').innerHTML = '';
+    for(let badge in data.badges) {
+      console.log(data.badges[badge].description)
+      let el = `<div title="${data.badges[badge].description}" onclick="game.equipBadge('${data.badges[badge].name}')" style="display:inline-block;margin-right:10px;"><p style="margin:0px;font-size:10px;">${data.badges[badge].name}</p><div class="badge"><img src="/assets/images/${data.badges[badge].imageUrl}" width="50" height="50"></div></div>`
+      document.querySelector('#badge_container').innerHTML += el;
+    }
   }
 
   onTempCommandBlockData(data) {
@@ -5070,6 +5092,7 @@ class Game {
       "zoom out":    189,         // -
       "camera mode": 117,         // f6
       "stats view":  116,         // f5
+      "view badges": 66,          // b
     }
 
     if (navigator.userAgent.search("Firefox") !== -1) {

@@ -667,10 +667,9 @@ class MatchmakerServer {
             return
           }
 
-          let email = body.email
           let username = body.username
 
-          let user = await User.createOne({ uid: uid, username: username, email: email })
+          let user = await User.createOne({ uid: uid, username: username })
           if (user.error) {
             return res.end(JSON.stringify({ error: user.error }))
           }

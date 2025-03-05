@@ -1578,8 +1578,13 @@ class Game {
   }
 
   onBadgeEquipped(data) {
-    let tint = Number("0x"+data.badge.color);
-    this.sector.players[data.playerId].sprite.children[1].children[0].tint = tint;
+    try {
+      let tint = Number("0x"+data.badge.color);
+      this.sector.players[data.playerId].sprite.children[1].children[0].tint = tint;
+    }
+    catch(e) {
+      //server sent this before the player was initialized
+    }
   }
 
   onBadgesData(data) {

@@ -784,6 +784,12 @@ class Sector {
   editSetting(key, value) {
     if (typeof this.settings[key] !== 'undefined') {
 
+      if (value != "true" && value != "false") {
+        return;
+      }
+
+      if(!this.canEditSetting(key)) return;
+
       // convert to bool
       if (value === "true") value = true
       if (value === "false") value = false
@@ -795,6 +801,17 @@ class Sector {
         settings: this.settings
       })
     }
+  }
+
+  canEditSetting(key) {
+    if(this.gameMode === 'hardcore' || !this.gameMode) return false;
+    if(this.gameMode === 'survival') {
+      let allowedSettingChanges = ['isPvPAllowed',"isFovMode", "isZoomAllowed", "showMiniMap", "showPlayerList", "isFloorAutodirt", "isChatEnabled", "isShadowsEnabled", "isPlayerSavingEnabled", "isBloodEnabled", "isGravityEnabled"]
+
+      if(allowedSettingChanges.indexOf(key) === -1) return false;
+    }
+
+    return true;
   }
 
   onSettingChanged(key, value) {

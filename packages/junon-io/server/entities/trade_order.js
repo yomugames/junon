@@ -15,6 +15,7 @@ const Constants = require('../../common/constants.json')
 class TradeOrder {
 
   static create(options = {}) {
+    if(!options.recipientId) return;
     let klassGroup = this.getGroup(options.group)
     if (!klassGroup) return
 
@@ -65,9 +66,27 @@ class TradeOrder {
         return inventoryItemCount >= purchaseCost
       }
     }
-    let entity = this.game.getEntity(this.entityId)
+    let entity = this.game.getEntity(this.recipientId)
 
+    if(this.isSoldByTrader()) {
+      if(this.sector.sellables[this.klass.prototype.getTypeName()] && this.customer.gold >= this.getTotalPurchaseCost()) {
+        return true;
+      }
+    }
+
+    if(this.isSoldBySlaveTrader()) {
+      return this.customer.gold >= this.getTotalPurchaseCost()
+    }
+
+    //for vending machines. ensure the item is stored, to prevent buying an item that doesn't exist
+    if(!entity || entity.storage[this.index].type !== this.type) {
+      return false
+    }
     return this.customer.gold >= this.getTotalPurchaseCost()
+  }
+
+  isSoldBySlaveTrader() {
+    return this.klass.prototype.getTypeName().includes("Slave")
   }
 
   canSell() {
@@ -116,7 +135,7 @@ class TradeOrder {
   }
 
   isSoldByTrader() {
-    return this.recipientId <= 0
+    return this.game.getEntity(this.recipientId).getTypeName() === "Trader"
   }
 
   validatePurchasable() {

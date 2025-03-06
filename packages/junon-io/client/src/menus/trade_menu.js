@@ -238,7 +238,7 @@ class TradeMenu extends BaseMenu {
     let type = this.selectedRow.dataset.type
     let index = this.selectedRow.dataset.index
 
-    SocketUtil.emit("Trade", { group: group, type: type, count: buyCount, index: index })
+    SocketUtil.emit("Trade", { group: group, type: type, count: buyCount, index: index, recipientId: this.seller.id })
   }
 
   onMenuInteract(cmd) {

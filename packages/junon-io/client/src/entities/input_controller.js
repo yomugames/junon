@@ -326,9 +326,17 @@ class InputController {
         }
       } 
 
-      if (keyCode === this.game.keyBindings["craft"] || keyCode === 66) { // c or b
+    if (keyCode === this.game.keyBindings["craft"]) { // c
         game.toggleBlueprintMenu()
       } 
+
+      if (keyCode === this.game.keyBindings["view badges"]) { // b 
+        if(this.game.badgeMenu.isOpen()) {
+          this.game.badgeMenu.close()
+          return
+        }
+        this.game.badgeMenu.open()
+      }
 
       if (keyCode === this.game.keyBindings["map"]) { // m
         game.toggleMapMenu()

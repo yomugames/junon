@@ -127,6 +127,14 @@ class RemoteEventHandler {
       duration: 5
     })
   }
+  async onGetBadges(player, data, socket) {
+    let badges = await player.getBadges()
+    this.getSocketUtil().emit(socket, "BadgesData", { badges: badges });
+  }
+  onEquipBadge(player, data, socket) {
+    player.equipBadge(data.name)
+  }
+
   onEditCommandBlock(player, data, socket) {
     if (!player.canEditCommandBlock()) return
     player.sector.commandBlock.edit(data, player)

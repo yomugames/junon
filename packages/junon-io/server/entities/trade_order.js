@@ -15,7 +15,7 @@ const Constants = require('../../common/constants.json')
 class TradeOrder {
 
   static create(options = {}) {
-    if(!options.recipientId) return;
+    if(!options.recipientId && !options.sell) return;
     let klassGroup = this.getGroup(options.group)
     if (!klassGroup) return
 

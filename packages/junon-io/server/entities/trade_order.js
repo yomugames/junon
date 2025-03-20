@@ -135,6 +135,9 @@ class TradeOrder {
   }
 
   isSoldByTrader() {
+    if(!this.recipientId) {
+      return true //for sell
+    }
     return this.game.getEntity(this.recipientId).getTypeName() === "Trader"
   }
 

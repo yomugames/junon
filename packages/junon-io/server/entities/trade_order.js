@@ -15,7 +15,7 @@ const Constants = require('../../common/constants.json')
 class TradeOrder {
 
   static create(options = {}) {
-    if(!options.recipientId) return;
+    if(!options.recipientId && !options.sell) return;
     let klassGroup = this.getGroup(options.group)
     if (!klassGroup) return
 
@@ -135,6 +135,9 @@ class TradeOrder {
   }
 
   isSoldByTrader() {
+    if(!this.recipientId) {
+      return true //for sell
+    }
     return this.game.getEntity(this.recipientId).getTypeName() === "Trader"
   }
 

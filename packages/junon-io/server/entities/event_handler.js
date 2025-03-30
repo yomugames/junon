@@ -128,6 +128,16 @@ class EventHandler {
     return parseInt(value1) % parseInt(value2)
   }
 
+  index(value1, value2) {
+    value1 = parseFloat(value1);
+    value2 = parseFloat(value2);
+    if (value2 < 0) {
+        return 1 / (value1 ** Math.abs(value2));
+    } else {
+        return value1 ** value2;
+    }
+}
+
   length(value) {
     return value.toString().length
   }
@@ -651,6 +661,19 @@ class EventHandler {
     return entity.getTypeName()
   }
 
+  isGetEffect(entityId, effectName) {
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.hasEffect(effectName) ? true : false
+    }
+    
+    let entity = this.game.getEntity(entityId)
+    if (!entity) return false
+      return entity.hasEffect(effectName) ? true : false
+  }
+
+
+
   getDay() {
     return this.game.sector.getDayCount()
   }
@@ -1051,6 +1074,7 @@ class EventHandler {
       "$divide": true,
       "$round": true,
       "$modulo": true,
+      "$index": true,
       "$isLoggedIn": true,
       "$getEquipId": true,
       "$getBuildingType": true,
@@ -1058,7 +1082,8 @@ class EventHandler {
       "$getHour": true,
       "$getContent": true,
       "$getPlatformByCoords": true,
-      "$getStructureByCoords": true
+      "$getStructureByCoords": true,
+      "$isGetEffect": true
     }
   }
 

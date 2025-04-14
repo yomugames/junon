@@ -3717,7 +3717,7 @@
       "isUnbreakable": true,
       "isCostIndependent": true,
       "cost": {
-        "gold": 750
+        "gold": 1600
       },
       "stats": {
         "damage": 25,

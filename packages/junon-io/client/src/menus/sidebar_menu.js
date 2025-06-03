@@ -1,6 +1,7 @@
 const SocketUtil = require("./../util/socket_util")
 const BaseMenu = require("./base_menu")
 const Constants = require("./../../../common/constants.json")
+const ClientHelper = require("./../util/client_helper")
 
 class SidebarMenu extends BaseMenu {
   onMenuConstructed() {
@@ -71,7 +72,8 @@ class SidebarMenu extends BaseMenu {
   }
 
   buildTextEl(text) {
-    let characters = text.split('')
+    const htmlSafeText = ClientHelper.escapeHTML(text)
+    let characters = htmlSafeText.split('')
     let result = ""
     let buffer = ""
     let isTagOpen = false

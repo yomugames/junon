@@ -102,6 +102,12 @@ class Player extends BaseEntity {
     let user = await User.findOne({where: {uid: this.uid}})
     return new Date(user.dataValues.createdAt)
   }
+  
+  async getUserGold() {
+    if(!this.isLoggedIn()) return 0;
+    let user = await User.findOne({where: {uid: this.uid}});
+    return user.dataValues.gold;
+  }
 
   /**
    * Use await with this function!!!!
@@ -152,6 +158,10 @@ class Player extends BaseEntity {
     }
     
     
+  }
+  async hasOneMillionGold() {
+    let gold = await this.getUserGold()
+    return gold >= 1000000
   }
 
   canEditCommandBlock() {

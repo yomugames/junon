@@ -2373,6 +2373,7 @@ class Game {
     document.getElementById("map_open_btn").addEventListener("click", this.onMapOpenBtnClick.bind(this), true)
     document.getElementById("visit_colony_hud_btn").addEventListener("click", this.onVisitColonyHudBtnClick.bind(this), true)
     document.getElementById("command_block_hud_btn").addEventListener("click", this.onCommandBlockHudBtnClick.bind(this), true)
+    document.getElementById("badge_hud_btn").addEventListener("click", this.onBadgeMenuHudBtnClick.bind(this), true)
     document.getElementById("room_display_toggle_btn").addEventListener("click", this.onRoomDisplayToggleBtnClick.bind(this), true)
     document.getElementById("home_area_display_toggle_btn").addEventListener("click", this.onHomeAreaDisplayToggleBtnClick.bind(this), true)
     document.getElementById("chunk_toggle_btn").addEventListener("click", this.onChunkToggleBtnClick.bind(this), true)
@@ -2407,6 +2408,10 @@ class Game {
 
     })
 
+  }
+
+  onBadgeMenuHudBtnClick(e) {
+    this.badgeMenu.toggle()
   }
 
   onDockClicked(entity) {

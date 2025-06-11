@@ -78,10 +78,16 @@ class TradeOrder {
       return this.customer.gold >= this.getTotalPurchaseCost()
     }
 
-    //for vending machines. ensure the item is stored, to prevent buying an item that doesn't exist
-    if(!entity || entity.storage[this.index].type !== this.type) {
+    if(!entity) {
       return false
     }
+
+    //for vending machines. ensure the item is stored, to prevent buying an item that doesn't exist
+    if (entity.storage) {
+      const itemExistsOnStorage = entity.storage[this.index].type === this.type
+      if (!itemExistsOnStorage) return false
+    }
+
     return this.customer.gold >= this.getTotalPurchaseCost()
   }
 

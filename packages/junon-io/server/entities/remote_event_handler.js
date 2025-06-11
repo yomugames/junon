@@ -389,6 +389,7 @@ class RemoteEventHandler {
   }
   onButtonClick(player, data, socket) {
     player.sector.onButtonClicked({
+      player: player.name, 
       playerId: player.id,
       entityId: data.entityId,
       name: data.name

@@ -3234,7 +3234,9 @@ class Player extends BaseEntity {
       this.repositionTo(beacon.getX(), beacon.getY())
     } else {
       let position = this.getRespawnPosition()
-      this.repositionTo(position.x, position.y)
+      if (position) {
+        this.repositionTo(position.x, position.y)
+      }
     }
   }
 

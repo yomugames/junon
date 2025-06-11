@@ -1,8 +1,8 @@
 const BaseBadge = require('./base_badge')
 
-class ScroogeMode extends BaseBadge {
+class Scrooge extends BaseBadge {
     getName() {
-        return 'ScroogeMode'
+        return 'Scrooge'
     }
 
     async isQualified(player) {
@@ -10,7 +10,7 @@ class ScroogeMode extends BaseBadge {
     }
 
     getImageUrl() {
-        return 'badges/scrooge_mode.png'
+        return 'badges/scrooge.png'
     }
 
     getDescription() {
@@ -23,4 +23,4 @@ class ScroogeMode extends BaseBadge {
     }
 }
 
-module.exports = ScroogeMode
+module.exports = Scrooge

@@ -1,0 +1,17 @@
+// Anti Bot Spam
+
+var guestCount = guestCount
+
+// When a player joins, guestCount goes up by 1, guestCount = counter of how many Guests there are in the sector
+
+game.onSectorJoin(guestCount + 1); if (!player.isLoggedIn) 
+
+//if player is not logged In (guest), then it will check if guestCount is 13, if so, it kicks the guest
+
+{return (guestCount = 13) ? true : false; document.player;)};
+
+// document.player; kicks the player out of the website (they can rejoin)
+
+ game.onSectorLeave(guestCount - 1);
+
+// When a player leaves the guestCount goes down by 1

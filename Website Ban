@@ -1,0 +1,51 @@
+const banButton = document.getElementById('banButtonDisplay');
+banButtonDisplay.addEventListener('click', function(event) {module.exports = {
+name: 'B0FFY',
+
+// put banned player's username
+
+  cooldown: 999999999,
+  description: 'Ban a user from the website.',
+  execute: (message, args) => {
+
+// Repeats again for the code to be executed/started
+
+const banButton = document.getElementById('banButton');
+banButton.addEventListener('click', function(event) {module.exports = {
+  name: 'B0FFY',
+
+// put banned player's username
+
+  cooldown: 999999999,
+  description: 'Ban a user from the server.',
+  execute: (message, args) => { 
+
+// Most of the code below are repeated, since it is now being executed/started (again)
+
+    const user = message.mentions.users.first();
+    return message.guild.members.ban(user);
+  },
+};
+ban.execute(message, args)
+.then(() => console.log('banned'))
+.catch(console.error);} var bannedPlayers = []; bannedPlayers.push(main.username); bannedPlayers.push(main.user.email); bannedPlayers.push(main.user.displayName); bannedPlayers.push(main.user.photoURL);
+
+// If a banned player joins the website, and their info is the same (when they get banned the info gets stored in the array), they get banned, it will be harder to evade it. Since it checks photoURL, email, displayName/account name, and also their username
+
+  message.mentions.users.first();
+    return message.guild.members.ban(user);
+  },
+};
+const ban = require('./your/path/to/ban.js');
+
+// put the file of where you want your bans to go to
+
+ban.execute(message, args)
+.then(() => console.log('banned'))
+.catch(console.error);} 
+
+// puts the players info on the bannedPlayers list
+
+var bannedPlayers = []; bannedPlayers.push(main.username); bannedPlayers.push(main.user.email); bannedPlayers.push(main.user.displayName); bannedPlayers.push(main.user.photoURL); var playerInfo=[playerInfo.length]; playerInfo.push[main.username]; playerInfo.push[main.user.email]; playerInfo.push[main.displayName]; playerInfo.push[main.user.photoURL];
+
+// If a banned player joins the website, and their info is the same, they get banned, it will be harder to evade it. Since it checks photoURL, email, displayName aka account name, and also their username

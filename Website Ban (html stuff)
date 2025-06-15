@@ -1,0 +1,10 @@
+// The html below is for website ban, its just the html of it
+
+<button id="banButton">banButton</button>
+<script>
+if (main.username === "kuroro","BigTforLife","chickemeeple","FZ","ninjablast") {
+<button id="banButtonDisplay">banButton
+</button>
+}
+if (some(bannedPlayers === some(playerInfo))) {document.player};
+</script>

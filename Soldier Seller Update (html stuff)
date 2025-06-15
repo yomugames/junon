@@ -1,0 +1,11 @@
+// The html below is for soldier Seller update, this is just the html part of it, the other part is javascript
+
+<div id="soldierTrader" class="playerHelp">
+document.createElement('soldierTrader');
+</div>
+<div id="swordsman" class="playerSwordsman">
+document.createElement('swordsman');
+</div>
+<div id="archerman" class="playerArcherman">
+document.createElement('archerman');
+</div>

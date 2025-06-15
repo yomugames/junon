@@ -1,0 +1,22 @@
+const chainsawImage = 'https://images.app.goo.gl/maExnk9t7hL7c8k58';
+this.physics.overlap(player_slot_1,chainsawImage, () => {item.body.setVelocity(0);
+
+// Stops the Chainsaw's movement, and puts it in the slot that it touched
+
+item.setPosition(player_slot_1.x,player_slot_1.y);});
+
+// Aligns the Chainsaw to the Slot
+
+// The html below is also needed for Chainsaw Update
+
+document.createElement('coordinates');
+<script>
+    chainsawImage.addEventListener('dragend', function(event) {
+document.addEventListener('mousemove', function(event) {
+                    const x = event.clientX;
+                    const y = event.clientY;
+                    document.getElementById('coordinates').textContent = `X: ${x}, Y: ${y}`;
+                }}));
+</script>
+
+/* Lets player drop the item, once dragged away from the player's inventory *\

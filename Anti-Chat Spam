@@ -1,0 +1,12 @@
+// Anti Chat Spam
+
+'use strict';
+var chatCount = chatCount;
+
+// chatCount = counts how many messages the Player sent
+
+function chatRemoveTimer() {if (game.getSocketUtil().emit("ClientChat",{message:""}) = true) {if (chatCount = 10) {document.player}}};
+
+const intervalId = setInterval(chatRemoveTimer, 10000)
+
+// document.player kicks the player off website, they can rejoin though

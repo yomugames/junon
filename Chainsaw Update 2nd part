@@ -1,0 +1,38 @@
+<div id="gameArea"></div>
+<div id="item" draggable="true></div>
+<script src="script.js"></script>
+#gameArea {
+width: 600px;
+height: 400px;
+border: 2px solid #000;
+position: relative;
+margin: 20px;
+}
+
+#item {
+font-size: 50px;
+cursor: grab;
+}
+const gameArea = document.getElementById('gameArea');
+const item = document.getElementById('item');
+
+item.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', 'item');
+});
+
+gameArea.addEventListener('dragover', (e) => {
+    e.preventDefault(); // Prevent default to allow drop
+});
+
+gameArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const itemType = e.dataTransfer.getData('text/plain');
+    if (itemType === 'item') {
+        const newItem = document.createElement('div');
+        newItem.textContent = ''; // The item being placed
+        newItem.style.position = 'absolute';
+        newItem.style.left = `${e.offsetX}px`;
+        newItem.style.top = `${e.offsetY}px`;
+        gameArea.appendChild(newItem);
+    }
+});

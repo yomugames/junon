@@ -1033,7 +1033,7 @@ class TeamMenu extends BaseMenu {
   updateRole(role) {
     let roleEl = this.el.querySelector(".role[data-id='" + role.id + "']")
     if (roleEl) {
-      roleEl.innerText = role.name
+      roleEl.innerText = role.name.replace(/</g, "&lt;").replace(/>/g, "&gt;")
     }
 
     if (this.activeRoleId === role.id) {
@@ -1647,7 +1647,7 @@ class TeamMenu extends BaseMenu {
 
     for (let id in roles) {
       let role = roles[id]
-      let roleEl = "<li class='role' data-id='" + role.id + "'>" + role.name + "</li>"
+      let roleEl = "<li class='role' data-id='" + role.id + "'>" + role.name.replace(/</g, "&lt;").replace(/>/g, "&gt;")
       result += roleEl
     }
 
@@ -1655,7 +1655,7 @@ class TeamMenu extends BaseMenu {
   }
 
   addRole(role) {
-    let roleEl = "<li class='role' data-id='" + role.id + "'>" + role.name + "</li>"
+    let roleEl = "<li class='role' data-id='" + role.id + "'>" + role.name.replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</li>"
 
     this.el.querySelector(".colony_roles_container .role_list ul").innerHTML += roleEl
 

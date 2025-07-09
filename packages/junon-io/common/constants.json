@@ -511,6 +511,15 @@
          "storageType": "type of storage"
       }
     },
+    "ButtonClicked": {
+      "description": "Event triggered when a player clicks custom button",
+      "variables": {
+        "player": "username of player that clicked",
+        "playerId":"id of player",
+        "entityId": "id of entity button attached",
+        "name": "name of button clicked"
+      }
+    },
     "Timer:start": {
       "description": "Event triggered when timer starts",
       "variables": {
@@ -4989,6 +4998,21 @@
         "health": 100
       },
       "description": "Door that restricts pets/bots/slaves but allows players"
+    },
+    "MiasmaGate": {
+      "width": 128,
+      "height": 32,
+      "isPassable": true,
+      "requirements": {
+        "Disinfectant": 3,
+        "Bottle": 4,
+        "CopperBar": 50,
+        "CircuitBoard": 25
+      },
+      "stats": {
+        "health": 50
+      },
+      "description": "A gate that strips any entity of miasma"
     },
     "SecurityCamera": {
       "width": 32,

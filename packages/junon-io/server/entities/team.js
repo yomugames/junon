@@ -147,7 +147,8 @@ class Team extends BaseTransientEntity {
       EditSign: false,
       Kick: false,
       Ban: false,
-      UseCommands: false
+      UseCommands: false,
+      EditCommandBlocks: false
     })
   }
 
@@ -173,7 +174,8 @@ class Team extends BaseTransientEntity {
     role.setPermissions({
       Kick: false,
       Ban: false,
-      UseCommands: false
+      UseCommands: false,
+      EditCommandBlocks: false
     })
   }
 

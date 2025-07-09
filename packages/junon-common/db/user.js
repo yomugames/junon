@@ -37,15 +37,6 @@ class User extends Sequelize.Model {
       return `uid is already taken`
     }
 
-    // email
-
-    if (attributes.email) {
-      user = await this.findOne({ where: { email: attributes.email } })
-      if (user) {
-        return `Email is already taken`
-      }
-    }
-
   }
 
   static async isUsernameTaken(name) {
@@ -77,7 +68,6 @@ User.init({
     primaryKey: true
   },
   username: Sequelize.STRING,
-  email: Sequelize.STRING,
   gold: Sequelize.INTEGER,
   currentSectorUid: {
     type: Sequelize.STRING,

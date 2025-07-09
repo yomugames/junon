@@ -34,6 +34,9 @@ const Bowser = require("bowser")
 const Cookies = require("js-cookie")
 const FirebaseClientHelper = require('../util/firebase_client_helper')
 const uuidv4 = require('uuid/v4')
+const Trigger = require("../menus/command_blocks/trigger")
+const ActionValue = require("../menus/command_blocks/action_value")
+const Comparison = require("../menus/command_blocks/comparison")
 
 class Game {
   constructor(main) {
@@ -249,6 +252,8 @@ class Game {
     this.commandBlockMenu = new Menus.CommandBlockMenu(this, document.querySelector("#command_block_menu"))
     this.commandBlockPicker = new Menus.CommandBlockPicker(this, document.querySelector("#command_block_picker"))
     this.friendRequestMenu  = new Menus.FriendRequestMenu(this, document.querySelector("#friend_request_menu"))
+    this.badgeMenu = new Menus.BadgeMenu(this, document.querySelector("#badge_menu"))
+
 
     this.visitColonyMenu = this.main.gameExplorer
 
@@ -256,6 +261,10 @@ class Game {
       this.createMobileBuildActionMenu()
       document.querySelector("#base_hud .resources").style.display = 'none'
     }
+  }
+
+  equipBadge(name) {
+    SocketUtil.emit("EquipBadge", {name: name})
   }
 
   onFriendRequestReceived(request) {
@@ -1402,7 +1411,7 @@ class Game {
 
     // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 
-    let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png','pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png', 'deconstructor.png', 'blue_laser.png', 'keypad_door.png', 'keypad_door_lower.png', 'keypad_door_upper.png', 'unbreakable_wall.png', 'sapper.png', 'sapper_corpse.png', 'dynamite.png']
+    let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png','pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png', 'deconstructor.png', 'blue_laser.png', 'keypad_door.png', 'keypad_door_lower.png', 'keypad_door_upper.png', 'unbreakable_wall.png', 'sapper.png', 'sapper_corpse.png', 'dynamite.png', 'miasma_gate.png']
     tempAssets.forEach((asset) => {
       PIXI.Texture.addToCache(PIXI.Texture.fromImage('/assets/images/' + asset), asset)
     })
@@ -1563,6 +1572,66 @@ class Game {
     SocketUtil.on("KeypadUnsuccessful", this.onKeypadUnsuccessful.bind(this))
     SocketUtil.on("OpenMenu", this.openMenu.bind(this))
     SocketUtil.on("CloseMenu", this.closeMenu.bind(this))
+    SocketUtil.on("TempCommandBlockData", this.onTempCommandBlockData.bind(this))
+    SocketUtil.on("BadgesData", this.onBadgesData.bind(this))
+    SocketUtil.on("BadgeEquipped", this.onBadgeEquipped.bind(this))
+  }
+
+  onBadgeEquipped(data) {
+    try {
+      let tint = Number("0x"+data.badge.color);
+      this.sector.players[data.playerId].sprite.children[1].children[0].tint = tint;
+    }
+    catch(e) {
+      //server sent this before the player was initialized
+    }
+  }
+
+  onBadgesData(data) {
+    document.querySelector('#badge_container').innerHTML = '';
+    for(let badge in data.badges) {
+      let el = `<div title="${data.badges[badge].description}" onclick="game.equipBadge('${data.badges[badge].name}')" style="display:inline-block;margin-right:10px;"><p style="margin:0px;font-size:10px;">${data.badges[badge].name}</p><div class="badge" id="${data.badges[badge].name}"><img class="${data.badges[badge].isQualified ? "qualified" : "unqualified"}" src="/assets/images/${data.badges[badge].imageUrl}" width="50" height="50"></div></div>`
+      document.querySelector('#badge_container').innerHTML += el;
+      if(!data.badges[badge].isQualified) {
+        let coveringEl = `<img class="cover-badge" src="/assets/images/badges/lock.png" width="50" height="50">`;
+        document.querySelector(`#${data.badges[badge].name}`).innerHTML += coveringEl;
+      }
+    }
+  }
+
+  onTempCommandBlockData(data) {
+    if(this.commandBlockMenu.getNode(data.tempId)) return
+    let parent = this.commandBlockMenu.getNode(data.parentId)
+    if(!parent && data.type != "Trigger") return
+
+    if(data.type === "Trigger" && data.parentId === 0) {
+      let trigger = new Trigger(this.commandBlockMenu, {id: data.tempId, event: data.value})
+      this.commandBlockMenu.addTrigger(trigger)
+    }
+    else if(data.value == 'ifthenelse') {
+      parent.commandBlock.getActionEntryFor(data.value).build(parent, { actionKey: data.value, id: data.tempId }, false) 
+      //create ifthenelse, without adding if, then, and else
+    }
+    else if(data.type === 'if') {
+      parent.addIf(data.tempId)
+    }
+    else if(data.type === 'then') {
+      parent.addThen(data.tempId)
+    }
+    else if(data.type === 'else') {
+      parent.addElse(data.tempId)
+    }
+    else if(data.type == "ActionEntry") { //command action entry, timer
+      parent.commandBlock.getActionEntryFor(data.value).build(parent, { actionKey: data.value, id: data.tempId })
+    }
+    else if(!data.type) {
+      if(parent.actionKey != "commands") {//comparison
+        new Comparison(parent, {id: data.tempId})
+        return
+      }
+      //command value
+      new ActionValue(parent, {value: data.value, id: data.tempId})
+    } 
   }
 
   openMenu(data) {
@@ -2304,6 +2373,7 @@ class Game {
     document.getElementById("map_open_btn").addEventListener("click", this.onMapOpenBtnClick.bind(this), true)
     document.getElementById("visit_colony_hud_btn").addEventListener("click", this.onVisitColonyHudBtnClick.bind(this), true)
     document.getElementById("command_block_hud_btn").addEventListener("click", this.onCommandBlockHudBtnClick.bind(this), true)
+    document.getElementById("badge_hud_btn").addEventListener("click", this.onBadgeMenuHudBtnClick.bind(this), true)
     document.getElementById("room_display_toggle_btn").addEventListener("click", this.onRoomDisplayToggleBtnClick.bind(this), true)
     document.getElementById("home_area_display_toggle_btn").addEventListener("click", this.onHomeAreaDisplayToggleBtnClick.bind(this), true)
     document.getElementById("chunk_toggle_btn").addEventListener("click", this.onChunkToggleBtnClick.bind(this), true)
@@ -2338,6 +2408,10 @@ class Game {
 
     })
 
+  }
+
+  onBadgeMenuHudBtnClick(e) {
+    this.badgeMenu.toggle()
   }
 
   onDockClicked(entity) {
@@ -4079,10 +4153,6 @@ class Game {
       document.querySelector("#rules_menu").style.display = 'block'
     }
 
-    if (typeof aipAPItag !== 'undefined') {
-      aipAPItag.hideConsentToolButton()
-    }
-
     if (data.fullMap) {
       data.fullMap.chunks.forEach((chunk) => {
         this.sector.onChunk(chunk, { sync: true })
@@ -5035,6 +5105,7 @@ class Game {
       "zoom out":    189,         // -
       "camera mode": 117,         // f6
       "stats view":  116,         // f5
+      "view badges": 66,          // b
     }
 
     if (navigator.userAgent.search("Firefox") !== -1) {

@@ -123,9 +123,9 @@ class EntityMenu extends BaseMenu {
 
   createPermissionEl(role) {
     return "<div class='permission_role' data-role-id='" + role.id + "'>" + 
-      "<input type='checkbox'  id='" + role.name + "_role' >" +
-      "<label                 for='" + role.name + "_role' >" +
-        i18n.t(role.name) +
+      "<input type='checkbox'  id='" + role.name.replace(/</g, "&lt;").replace(/>/g, "&gt;") + "_role' >" +
+      "<label                 for='" + role.name.replace(/</g, "&lt;").replace(/>/g, "&gt;") + "_role' >" +
+        i18n.t(role.name.replace(/</g, "&lt;").replace(/>/g, "&gt;")) +
       "</label>" +
     "</div>"
   }

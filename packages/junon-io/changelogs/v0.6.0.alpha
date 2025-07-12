@@ -1,0 +1,16 @@
+{
+  "version": "v0.6.0.alpha",
+  "date": "Jul 10, 2025",
+  "title": "",
+  "content": {
+    "bugs": [
+      "Fix bug in trader and pocket trader",
+      "Fix xss in role menu"
+    ],
+    "features": [
+      "Updates made by chickemeeple",
+      "Add badges",
+      "Remove email from database"
+    ]
+  }
+}

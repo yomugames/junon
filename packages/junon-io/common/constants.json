@@ -511,6 +511,15 @@
          "storageType": "type of storage"
       }
     },
+    "ButtonClicked": {
+      "description": "Event triggered when a player clicks custom button",
+      "variables": {
+        "player": "username of player that clicked",
+        "playerId":"id of player",
+        "entityId": "id of entity button attached",
+        "name": "name of button clicked"
+      }
+    },
     "Timer:start": {
       "description": "Event triggered when timer starts",
       "variables": {

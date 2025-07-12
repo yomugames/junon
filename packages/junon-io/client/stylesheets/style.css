@@ -19,6 +19,33 @@ html {
     display: none;
 }
 
+.badge {
+    width:50px;
+    height: 50px;
+    background-color: #333;
+    display: inline-block;
+    margin: 5px;
+    position:relative;
+}
+
+.badge:hover {
+    cursor:pointer;
+    background-color: #555;
+}
+
+.cover-badge {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    right: 0;
+    opacity:90%;
+}
+
+.unqualified {
+    filter: blur(5px);
+}
+
 /* https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_custom_scrollbar2 */
 ::-webkit-scrollbar {
     width: 8px;
@@ -8929,8 +8956,8 @@ body.imposter_mode .minigame_poster {
 }
 
 .io_game_promo img {
-    width: 100%;
-    border: solid 1px #555;
+    width: 170px;
+    border: solid 1px #777;
     margin-bottom: 15px;
 }
 

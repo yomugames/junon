@@ -9,3 +9,4 @@ packages/junon-io/Dockerfile
 packages/junon-io/deploy_server.sh
 packages/junon-io/deploy/
 .env
+.env*

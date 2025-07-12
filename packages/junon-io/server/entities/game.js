@@ -2166,6 +2166,18 @@ class Game {
       }
     }
 
+    //check if ip address is already in sector (don't allow more than 2 of the same ip)
+    let ipCount = 0;
+    for(let id in this.players) {
+      if(Helper.getSocketRemoteAddress(this.players[id].socket) === ipAddress) {
+        ipCount ++;
+        if(ipCount >= 2) {
+          this.getSocketUtil().emit(socket, "CantJoin", { message: "You are already in this sector" })
+          return
+        }
+      }
+    }
+
     if (this.hasPlayerAlreadyJoined({ sessionId: socket.sessionId })) return
 
     let uid

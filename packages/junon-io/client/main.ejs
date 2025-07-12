@@ -44,6 +44,9 @@
 
         <div class='left_sidebar_contents'>
             <div class="io_game_promo">
+                <a href="https://fishbaitgame.com" target="_blank">
+                    <img src="/assets/images/background/fishbait_1.jpg" />
+                </a>
             </div>
             <div id='changelogs'>
                 <% let changeLog = changeLogs[0] %>
@@ -1106,6 +1109,13 @@
         </div>
     </div>
 
+    <div id="badge_menu" class="modal_menu">
+        <div id="badge_container_header" class="menu_main_header"><%= t('Badges') %></div>   
+        <div id="badge_container">
+            
+        </div>
+    </div>
+
     <div id="keypad_menu" class="modal_menu">
         <div id="keypad_container_header" class="menu_main_header"><%= t('Keypad') %></div>
         <div id='keypad_container_cancel_btn' class='cancel_btn'></div>
@@ -1178,6 +1188,11 @@
         <div id='command_block_hud_btn' class='hud_btn'>
             <img src='/assets/images/chunk_icon.png'>
             <div class='hud_btn_shortcut'>K</div>
+        </div>
+
+        <div id="badge_hud_btn" class="hud_btn">
+            <img src="/assets/images/badge.png" alt="view badges">
+            <div class="hud_btn_shortcut">B</div>
         </div>
 
         <div id='debug_control_panel' >

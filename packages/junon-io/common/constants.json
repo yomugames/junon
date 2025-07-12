@@ -665,7 +665,8 @@
     "SpiderInfestation": "spider_infestation",
     "TraderArrived": "trader_arrived",
     "SlaveTraderArrived": "slave_trade_arrived",
-    "MeteorShower": "meteor_shower"
+    "MeteorShower": "meteor_shower",
+    "IceMeteorShower": "ice_meteor_shower"
   },
   "FloorTextures": {
     "solid_texture":       { "index": 1 },
@@ -2013,6 +2014,11 @@
       "height": 64,
       "speed": 30
     },
+    "IceMeteor": {
+      "width": 64,
+      "height": 64,
+      "speed": 30
+    },
     "PoisonGrenade": {
       "width": 16,
       "height": 16,
@@ -2406,7 +2412,7 @@
       "width": 20,
       "height": 25,
       "cost": {
-        "gold": 10
+        "gold": 150
       },
       "stats": {
         "health": 100,
@@ -6941,7 +6947,10 @@
     },
     "IceAsteroid": {
       "parent": "Terrains.Asteroid",
-      "health": 100
+      "description": "Ice Asteroid",
+      "label": "Ice",
+      "health": 100,
+      "minimapColor": "#2b1e14"
     },
     "IronAsteroid": {
       "parent": "Terrains.Asteroid",

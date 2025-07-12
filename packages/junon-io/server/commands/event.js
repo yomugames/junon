@@ -13,7 +13,7 @@ class Event extends BaseCommand {
   }
 
   getValidEvents() {
-    return ["meteor", "spider", "raid", "raid_end"] 
+    return ["meteor", "spider", "raid", "raid_end", "ice_meteor"] 
   }
 
   allowOwnerOnly() {
@@ -62,6 +62,9 @@ class Event extends BaseCommand {
       default:
         if (eventName) {
           this.game.eventManager.emitEvent(player, eventName)
+       case "ice_meteor":
+        this.sector.createIceMeteorEvent(options)
+        break
         }
     }
   }

@@ -128,7 +128,7 @@ class EventHandler {
     return parseInt(value1) % parseInt(value2)
   }
 
-  index(value1, value2) {
+  pow(value1, value2) {
     value1 = parseFloat(value1);
     value2 = parseFloat(value2);
     if (value2 < 0) {
@@ -1074,7 +1074,7 @@ class EventHandler {
       "$divide": true,
       "$round": true,
       "$modulo": true,
-      "$index": true,
+      "$pow": true,
       "$isLoggedIn": true,
       "$getEquipId": true,
       "$getBuildingType": true,

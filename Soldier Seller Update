@@ -1,0 +1,143 @@
+// Actions for SoldierSeller Update (This is the shortest code i could make)
+
+function updateEntity(entity, deltaTime) {
+
+  // Check for attack cooldown
+
+  if (entity.attackCooldown !== 0) {console.log('not yet')} else {const target = chooseTarget(entity, potentialTargets)};
+
+      // Perform the attack
+
+      performAttack(entity, target);
+
+      // Reset cooldown
+
+      entity.attackCooldown = entity.attackSpeed;
+    }
+  } else {
+
+    // Decrement cooldown
+
+    entity.attackCooldown -= deltaTime;
+  }
+}
+
+// Function to find entities within range
+
+function findEntitiesInRange(entity, range) {
+
+  // Implement logic to find entities within the specified range, potentially using spatial indexing
+
+  return [];
+
+// Return an array of potential targets
+
+}
+
+// Function to choose a target
+
+function chooseTarget(entity, potentialTargets) {
+
+  // Implement logic to select the best target from the potential targets
+
+  return potentialTargets[0]; 
+
+// Example: choose the first target found
+
+}
+
+// Function to perform an attack
+
+function performAttack(attacker, target) {
+
+  // Calculate damage, apply to target's health, etc.
+
+}
+
+// Buying Options for SoldierTrader
+
+const SoldierTraderMenu = document.getElementById('soldierTrader'); const soldierTraderShop = [{ name: "Swordsman", description: "More people to help protect you.", price: 1500 }, { name: "Bowman", description: "More people to watch your 360, long ranged.", price: 2000 }];
+const SoldierTraderShop = document.getElementById("SoldierTraderMenu");
+
+const itemList = shopMenu.querySelector("ul");
+SoldierSellerShop.forEach(item => {
+
+// Basically repeats the SoldierTraderMenu code above, just in a different way
+
+  const listItem = document.createElement("li"); listItem.classList.add("shopItem");
+  const itemName = document.createElement("h3");
+  itemName.textContent = item.name; listItem.appendChild(itemName);
+  const itemDescription = document.createElement("p"); itemDescription.textContent = item.description; listItem.appendChild(itemDescription);
+  const itemPrice = document.createElement("p");
+  itemPrice.textContent = Price: ${item.price} gold; listItem.appendChild(itemPrice);
+  const buyButton = document.createElement("button"); buyButton.classList.add("buyButton");
+  buyButton.textContent = "Buy"; buyButton.addEventListener("click", () => handlePurchase(item)); listItem.appendChild(buyButton); itemList.appendChild(listItem);
+});
+if (menu.classList.contains('menu-open')) {const myElement = document.getElementById('Swordsman');
+myElement.addEventListener('click', function() {if (game.playerGold >= 1500){const entityType = 'Knight';
+     const spawnPosition = { x: player.getRow y: player.getCol }; game.spawnEntity(entityType, spawnPosition)}}}}}; if (menu.classList.contains('menu-open')) {const myElement = document.getElementById('Archerman');
+myElement.addEventListener('click', function() {if (game.playerGold >= 1500){const entityType = 'Archer';
+     const spawnPosition = { x: player.getRow y: player.getCol }; game.spawnEntity(entityType, spawnPosition)}}};
+
+class Projectile {
+  constructor(x, y, velocityX, velocityY) {
+    this.x = x;
+    this.y = y;
+    this.velocityX = velocityX;
+    this.velocityY = velocityY;
+    this.radius = 5;
+  }
+
+  update() {
+    this.x += this.velocityX;
+    this.y += this.velocityY;
+  }
+
+  draw(ctx) {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "red";
+    ctx.fill();
+  }
+}
+
+let projectiles = [];
+function shoot(entityX, entityY, directionX, directionY) {
+  const speed = 10;
+  const projectile = new Projectile(entityX, entityY, directionX * speed, directionY * speed);
+  projectiles.push(projectile);
+}
+
+function updateGame() {
+  for (let i = 0; i < projectiles.length; i++) {
+    projectiles[i].update();
+
+    // Collision detection with other entities here
+
+    if (projectiles[i].x < 0 || projectiles[i].x > canvas.width || projectiles[i].y < 0 || projectiles[i].y > canvas.height) {
+      projectiles.splice(i, 1);
+      i--;
+    }
+  }
+}
+
+function drawGame() {
+  for (const projectile of projectiles) {
+    projectile.draw(ctx);
+  }
+}
+
+// projectile for Archerman
+
+// if player gold is equal or over 1500 and they clicked on knight, a knight would spawn in player's location. Same thing with Archer
+
+if (menu.classList.contains('menu-open')) {const SwordsmanBuyButton = document.getElementById('Swordsman'); SwordsmanBuyButton.addEventListener('click', function() {if (game.playerGold >= 1500){const entityType = 'Knight'};
+     const spawnPosition = { x: player.getRow y: player.getCol }; game.spawnEntity(entityType, spawnPosition)}} else {if (const ArchermanBuyButton = document.getElementById('Archerman');
+ArchermanBuyButton.addEventListener('click', function() === true) {if menu.classList.contains('menu-open'))
+
+// if SoldierTrader Menu is open, and player has 1500 gold, it spawns an Archerman where the players coordinates are
+
+{game.playerGold >= 1500){const entityType = 'Archerman'};
+     const spawnPosition = { x: player.getRow y: player.getCol }; game.spawnEntity(entityType, spawnPosition)}}};
+
+// Spawn location for mobs, would be on the player (to protect them)

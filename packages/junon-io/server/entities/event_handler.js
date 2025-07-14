@@ -717,7 +717,11 @@ class EventHandler {
       return entity.hasEffect(effectName) ? true : false
   }
 
-
+  getTotalMobCount() {
+    const hostileCount = this.sector.getHostileMobCount();
+    const friendlyCount = this.sector.neutralMobCount;
+    return hostileCount + friendlyCount;
+  }
 
   getDay() {
     return this.game.sector.getDayCount()
@@ -1128,7 +1132,8 @@ class EventHandler {
       "$getContent": true,
       "$getPlatformByCoords": true,
       "$getStructureByCoords": true,
-      "$isGetEffect": true
+      "$isGetEffect": true,
+      "$getTotalMobCount": true
     }
   }
 

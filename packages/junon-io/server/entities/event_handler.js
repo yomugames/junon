@@ -104,20 +104,29 @@ class EventHandler {
     return player.score
   }
 
-  add(value1, value2) {
-    return parseFloat(value1) + parseFloat(value2)
+  add(...values) {
+    return values.reduce((sum, val) => sum + parseFloat(val), 0)
   }
 
-  subtract(value1, value2) {
-    return parseFloat(value1) - parseFloat(value2)
+  subtract(...values) {
+    if (values.length === 0) return 0
+    const initial = parseFloat(values[0])
+    return values.slice(1).reduce((result, val) => result - parseFloat(val), initial)
   }
 
-  multiply(value1, value2) {
-    return parseFloat(value1) * parseFloat(value2)
+  multiply(...values) {
+    if (values.length === 0) return 0
+    return values.reduce((product, val) => product * parseFloat(val), 1)
   }
 
-  divide(value1, value2) {
-    return parseFloat(value1) / parseFloat(value2)
+  divide(...values) {
+    if (values.length === 0) return 0
+    const initial = parseFloat(values[0])
+    return values.slice(1).reduce((result, val) => {
+      const num = parseFloat(val)
+      if (num === 0) return NaN
+      return result / num
+    }, initial)
   }
 
   round(value) {
@@ -128,15 +137,51 @@ class EventHandler {
     return parseInt(value1) % parseInt(value2)
   }
 
-  pow(value1, value2) {
-    value1 = parseFloat(value1);
-    value2 = parseFloat(value2);
-    if (value2 < 0) {
-        return 1 / (value1 ** Math.abs(value2));
-    } else {
-        return value1 ** value2;
+  pow(base, exponent) {
+    return Math.pow(parseFloat(base), parseFloat(exponent))
+  }
+
+  root(value, degree = 2) {
+    const numValue = parseFloat(value)
+    const numDegree = parseFloat(degree)
+    
+    if (numValue < 0 && numDegree % 2 === 0) {
+      return NaN
     }
-}
+    
+    return Math.pow(numValue, 1 / numDegree)
+  }
+
+  abs(value) {
+    return Math.abs(parseFloat(value))
+  }
+
+  log(value, base = Math.E) {
+    const numValue = parseFloat(value)
+    const numBase = parseFloat(base)
+    
+    if (numValue <= 0 || numBase <= 0 || numBase === 1) {
+      return NaN
+    }
+    
+    return Math.log(numValue) / Math.log(numBase)
+  }
+  
+  min(...values) {
+    return Math.min(...values.map(v => parseFloat(v)))
+  }
+  
+  max(...values) {
+    return Math.max(...values.map(v => parseFloat(v)))
+  }
+  
+  floor(value) {
+    return Math.floor(parseFloat(value))
+  }
+  
+  ceil(value) {
+    return Math.ceil(parseFloat(value))
+  }
 
   length(value) {
     return value.toString().length

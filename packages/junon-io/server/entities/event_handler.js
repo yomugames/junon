@@ -706,7 +706,7 @@ class EventHandler {
     return entity.getTypeName()
   }
 
-  isGetEffect(entityId, effectName) {
+  hasEffect(entityId, effectName) {
     let player = this.getPlayer(entityId)
     if (player) {
       return player.hasEffect(effectName) ? true : false
@@ -1124,6 +1124,13 @@ class EventHandler {
       "$round": true,
       "$modulo": true,
       "$pow": true,
+      "$root": true,
+      "$abs": true,
+      "$log": true,
+      "$min": true,
+      "$max": true,
+      "$floor": true,
+      "$ceil": true,
       "$isLoggedIn": true,
       "$getEquipId": true,
       "$getBuildingType": true,
@@ -1132,7 +1139,7 @@ class EventHandler {
       "$getContent": true,
       "$getPlatformByCoords": true,
       "$getStructureByCoords": true,
-      "$isGetEffect": true,
+      "$hasEffect": true,
       "$getTotalMobCount": true
     }
   }

@@ -104,20 +104,44 @@ class EventHandler {
     return player.score
   }
 
-  add(value1, value2) {
-    return parseFloat(value1) + parseFloat(value2)
+  _safeNumber(value) {
+    if (value === null || value === undefined) return 0
+    
+    if (typeof value === 'boolean') return value ? 1 : 0
+    
+    const num = parseFloat(value)
+    
+    if (isNaN(num)) {
+      const match = value.toString().match(/-?\d+(\.\d+)?/)
+      return match ? parseFloat(match[0]) : 0
+    }
+    
+    return num
   }
 
-  subtract(value1, value2) {
-    return parseFloat(value1) - parseFloat(value2)
+  add(...values) {
+    return values.reduce((sum, val) => sum + this._safeNumber(val), 0)
   }
 
-  multiply(value1, value2) {
-    return parseFloat(value1) * parseFloat(value2)
+  subtract(...values) {
+    if (values.length === 0) return 0
+    const initial = this._safeNumber(values[0])
+    return values.slice(1).reduce((result, val) => result - this._safeNumber(val), initial)
   }
 
-  divide(value1, value2) {
-    return parseFloat(value1) / parseFloat(value2)
+  multiply(...values) {
+    if (values.length === 0) return 0
+    return values.reduce((product, val) => product * this._safeNumber(val), 1)
+  }
+
+  divide(...values) {
+    if (values.length === 0) return 0
+    const initial = this._safeNumber(values[0])
+    
+    return values.slice(1).reduce((result, val) => {
+      const num = this._safeNumber(val)
+      return num === 0 ? NaN : result / num
+    }, initial)
   }
 
   round(value) {
@@ -126,6 +150,54 @@ class EventHandler {
 
   modulo(value1, value2) {
     return parseInt(value1) % parseInt(value2)
+  }
+
+  pow(base, exponent) {
+    return Math.pow(this._safeNumber(base), this._safeNumber(exponent))
+  }
+
+  root(value, degree = 2) {
+    const numValue = this._safeNumber(value)
+    const numDegree = this._safeNumber(degree)
+    
+    if (numValue < 0 && numDegree % 2 === 0) {
+      return NaN
+    }
+    
+    return Math.pow(numValue, 1 / numDegree)
+  }
+
+  abs(value) {
+    return Math.abs(this._safeNumber(value))
+  }
+
+  log(value, base = Math.E) {
+    const numValue = this._safeNumber(value)
+    const numBase = this._safeNumber(base)
+    
+    if (numValue <= 0 || numBase <= 0 || numBase === 1) {
+      return NaN
+    }
+    
+    return Math.log(numValue) / Math.log(numBase)
+  }
+
+  floor(value) {
+    return Math.floor(this._safeNumber(value))
+  }
+
+  ceil(value) {
+    return Math.ceil(this._safeNumber(value))
+  }
+
+  min(...values) {
+    if (values.length === 0) return Infinity
+    return Math.min(...values.map(v => this._safeNumber(v)))
+  }
+  
+  max(...values) {
+    if (values.length === 0) return -Infinity
+    return Math.max(...values.map(v => this._safeNumber(v)))
   }
 
   length(value) {
@@ -651,6 +723,23 @@ class EventHandler {
     return entity.getTypeName()
   }
 
+  hasEffect(entityId, effectName) {
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.hasEffect(effectName) ? true : false
+    }
+    
+    let entity = this.game.getEntity(entityId)
+    if (!entity) return false
+      return entity.hasEffect(effectName) ? true : false
+  }
+
+  getTotalMobCount() {
+    const hostileCount = this.sector.getHostileMobCount();
+    const friendlyCount = this.sector.neutralMobCount;
+    return hostileCount + friendlyCount;
+  }
+
   getDay() {
     return this.game.sector.getDayCount()
   }
@@ -1051,6 +1140,14 @@ class EventHandler {
       "$divide": true,
       "$round": true,
       "$modulo": true,
+      "$pow": true,
+      "$root": true,
+      "$abs": true,
+      "$log": true,
+      "$min": true,
+      "$max": true,
+      "$floor": true,
+      "$ceil": true,
       "$isLoggedIn": true,
       "$getEquipId": true,
       "$getBuildingType": true,
@@ -1058,7 +1155,9 @@ class EventHandler {
       "$getHour": true,
       "$getContent": true,
       "$getPlatformByCoords": true,
-      "$getStructureByCoords": true
+      "$getStructureByCoords": true,
+      "$hasEffect": true,
+      "$getTotalMobCount": true
     }
   }
 
@@ -1139,8 +1238,10 @@ class EventHandler {
           keyword = ""
         }
       } else if (character === ")") {
-        stack.push(keyword)
-        keyword = ""
+        if (keyword) {
+          stack.push(keyword)
+          keyword = ""
+        }
 
         let args = []
         let arg

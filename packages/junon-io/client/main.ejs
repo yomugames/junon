@@ -905,23 +905,28 @@
                         </tr>
                         <tr>
                             <td class='function_name'>$add</td>
-                            <td>value1, value2</td>
-                            <td>add two numbers. Ex. /chat @a $add(2,5)</td>
+                            <td>value1, value2, ... , valueN</td>
+                            <td>Sums all given values. Ex. $add(2,5,8) = 15</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$subtract</td>
-                            <td>value1, value2</td>
-                            <td>subtract two numbers. Ex. /chat @a $subtract(2,5)</td>
+                            <td>value1, value2, ... , valueN</td>
+                            <td>Subtracts subsequent values from the first. Ex. $subtract(2,5,1) = -4</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$multiply</td>
-                            <td>value1, value2</td>
-                            <td>multiply two numbers. Ex. /chat @a $multiply(2,5)</td>
+                            <td>value1, value2, ... , valueN</td>
+                            <td>Multiplies all given values. Ex. $multiply(2,5,6,7) = 420</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$divide</td>
+                            <td>value1, value2, ... , valueN</td>
+                            <td>Divides first value by subsequent values. Ex. $divide(2,4,1) = 0.5</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$modulo</td>
                             <td>value1, value2</td>
-                            <td>divide two numbers. Ex. /chat @a $divide(2,4)</td>
+                            <td>modulo gives the remaining of a division</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$round</td>
@@ -929,9 +934,44 @@
                             <td>round a number. Ex. /chat @a $round(2.5927)</td>
                         </tr>
                         <tr>
-                            <td class='function_name'>$modulo</td>
+                            <td class='function_name'>$floor</td>
+                            <td>value</td>
+                            <td>Rounds a number down to the nearest integer. Ex. $floor(4.5) = 4</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$ceil</td>
+                            <td>value</td>
+                            <td>Rounds a number up to the nearest integer. Ex. $ceil(1.2) = 2</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$pow</td>
                             <td>value1, value2</td>
-                            <td>modulo gives the remaining of a division</td>
+                            <td>Calculates the power of a base raised to an exponent. Ex. $pow(3,2) = 9</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$root</td>
+                            <td>value1, value2</td>
+                            <td>Calculates the nth root of a number. Ex. $root(8,3) = 2</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$log</td>
+                            <td>value1, value2</td>
+                            <td>Calculates the logarithm of a number with optional base. Ex. $log(100,10) = 2</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$abs</td>
+                            <td>value</td>
+                            <td>Returns the absolute value of a number. Ex. $abs(-4.5) = 4.5</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$max</td>
+                            <td>value1, value2, ... , valueN</td>
+                            <td>Returns the largest value among the given arguments. Ex. $max(9,2,15) = 15</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$min</td>
+                            <td>value1, value2, ... , valueN</td>
+                            <td>Returns the smallest value among the given arguments. Ex. $min(1,2,3,4,5) = 1</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$isLoggedIn</td>
@@ -967,6 +1007,16 @@
                             <td class='function_name'>$getPlatformByCoords</td>
                             <td>$row, $col</td>
                             <td>Returns the id of a platform based on the row and col specified. Ex. /chat @a the id of the floor at 2, 2 is $getPlatformByCoords(2,2)td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$hasEffect</td>
+                            <td>$entityId, effectName</td>
+                            <td>true if the entity, player, or building gets the specified effect. false if not.</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getTotalMobCount</td>
+                            <td>None</td>
+                            <td>Returns the total count of all mobs in the game sector (hostile + neutral).</td>
                         </tr>
                     </table>
                 </div>

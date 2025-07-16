@@ -104,28 +104,43 @@ class EventHandler {
     return player.score
   }
 
+  _safeNumber(value) {
+    if (value === null || value === undefined) return 0
+    
+    if (typeof value === 'boolean') return value ? 1 : 0
+    
+    const num = parseFloat(value)
+    
+    if (isNaN(num)) {
+      const match = value.toString().match(/-?\d+(\.\d+)?/)
+      return match ? parseFloat(match[0]) : 0
+    }
+    
+    return num
+  }
+
   add(...values) {
-    return values.reduce((sum, val) => sum + parseFloat(val), 0)
+    return values.reduce((sum, val) => sum + this._safeNumber(val), 0)
   }
 
   subtract(...values) {
     if (values.length === 0) return 0
-    const initial = parseFloat(values[0])
-    return values.slice(1).reduce((result, val) => result - parseFloat(val), initial)
+    const initial = this._safeNumber(values[0])
+    return values.slice(1).reduce((result, val) => result - this._safeNumber(val), initial)
   }
 
   multiply(...values) {
     if (values.length === 0) return 0
-    return values.reduce((product, val) => product * parseFloat(val), 1)
+    return values.reduce((product, val) => product * this._safeNumber(val), 1)
   }
 
   divide(...values) {
     if (values.length === 0) return 0
-    const initial = parseFloat(values[0])
+    const initial = this._safeNumber(values[0])
+    
     return values.slice(1).reduce((result, val) => {
-      const num = parseFloat(val)
-      if (num === 0) return NaN
-      return result / num
+      const num = this._safeNumber(val)
+      return num === 0 ? NaN : result / num
     }, initial)
   }
 
@@ -138,12 +153,12 @@ class EventHandler {
   }
 
   pow(base, exponent) {
-    return Math.pow(parseFloat(base), parseFloat(exponent))
+    return Math.pow(this._safeNumber(base), this._safeNumber(exponent))
   }
 
   root(value, degree = 2) {
-    const numValue = parseFloat(value)
-    const numDegree = parseFloat(degree)
+    const numValue = this._safeNumber(value)
+    const numDegree = this._safeNumber(degree)
     
     if (numValue < 0 && numDegree % 2 === 0) {
       return NaN
@@ -153,12 +168,12 @@ class EventHandler {
   }
 
   abs(value) {
-    return Math.abs(parseFloat(value))
+    return Math.abs(this._safeNumber(value))
   }
 
   log(value, base = Math.E) {
-    const numValue = parseFloat(value)
-    const numBase = parseFloat(base)
+    const numValue = this._safeNumber(value)
+    const numBase = this._safeNumber(base)
     
     if (numValue <= 0 || numBase <= 0 || numBase === 1) {
       return NaN
@@ -166,21 +181,23 @@ class EventHandler {
     
     return Math.log(numValue) / Math.log(numBase)
   }
-  
+
+  floor(value) {
+    return Math.floor(this._safeNumber(value))
+  }
+
+  ceil(value) {
+    return Math.ceil(this._safeNumber(value))
+  }
+
   min(...values) {
-    return Math.min(...values.map(v => parseFloat(v)))
+    if (values.length === 0) return Infinity
+    return Math.min(...values.map(v => this._safeNumber(v)))
   }
   
   max(...values) {
-    return Math.max(...values.map(v => parseFloat(v)))
-  }
-  
-  floor(value) {
-    return Math.floor(parseFloat(value))
-  }
-  
-  ceil(value) {
-    return Math.ceil(parseFloat(value))
+    if (values.length === 0) return -Infinity
+    return Math.max(...values.map(v => this._safeNumber(v)))
   }
 
   length(value) {

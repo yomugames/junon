@@ -1273,8 +1273,10 @@ class EventHandler {
           keyword = ""
         }
       } else if (character === ")") {
-        stack.push(keyword)
-        keyword = ""
+        if (keyword) {
+          stack.push(keyword)
+          keyword = ""
+        }
 
         let args = []
         let arg

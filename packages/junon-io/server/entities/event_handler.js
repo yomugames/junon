@@ -119,6 +119,11 @@ class EventHandler {
     return num
   }
 
+  _fixFloat(value, precision = 12) {
+    const factor = Math.pow(10, precision)
+    return Math.round(value * factor) / factor
+  }
+
   add(...values) {
     return values.reduce((sum, val) => sum + this._safeNumber(val), 0)
   }
@@ -144,8 +149,15 @@ class EventHandler {
     }, initial)
   }
 
-  round(value) {
-    return Math.round(value)
+  round(value, precision = 0) {
+    const num = this._safeNumber(value)
+    const prec = this._safeNumber(precision)
+    
+    if (prec === 0) return this._fixFloat(Math.round(num))
+    
+    const factor = Math.pow(10, prec)
+    const result = Math.round(num / factor) * factor
+    return this._fixFloat(result, Math.max(12, -prec + 2))
   }
 
   modulo(value1, value2) {
@@ -182,12 +194,26 @@ class EventHandler {
     return Math.log(numValue) / Math.log(numBase)
   }
 
-  floor(value) {
-    return Math.floor(this._safeNumber(value))
+  floor(value, precision = 0) {
+    const num = this._safeNumber(value)
+    const prec = this._safeNumber(precision)
+    
+    if (prec === 0) return this._fixFloat(Math.floor(num))
+    
+    const factor = Math.pow(10, prec)
+    const result = Math.floor(num / factor) * factor
+    return this._fixFloat(result, Math.max(12, -prec + 2))
   }
 
-  ceil(value) {
-    return Math.ceil(this._safeNumber(value))
+ ceil(value, precision = 0) {
+    const num = this._safeNumber(value)
+    const prec = this._safeNumber(precision)
+    
+    if (prec === 0) return this._fixFloat(Math.ceil(num))
+    
+    const factor = Math.pow(10, prec)
+    const result = Math.ceil(num / factor) * factor
+    return this._fixFloat(result, Math.max(12, -prec + 2))
   }
 
   min(...values) {
@@ -718,9 +744,18 @@ class EventHandler {
 
   getBuildingType(entityId) {
     let entity = this.game.getEntity(entityId)
+    
     if (!entity) return ""
-
-    return entity.getTypeName()
+    
+    if (entity.isPlayer()) {
+      return "Player"
+    }
+    
+    if (typeof entity.getTypeName === 'function') {
+      return entity.getTypeName()
+    }
+    
+    return entity.type || ""
   }
 
   hasEffect(entityId, effectName) {

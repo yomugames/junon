@@ -17,7 +17,7 @@ class Effect extends BaseCommand {
   }
 
   getAllowedEffects() {
-    return ["poison", "fire", "drunk", "fear", "miasma", "spin", "rage", "invisible", "haste", "paralyze"]
+    return ["poison", "fire", "drunk", "fear", "miasma", "spin", "rage", "invisible", "haste", "paralyze", "smoke"]
   }
 
   perform(player, args) {

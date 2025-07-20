@@ -280,7 +280,7 @@
                 </div>
                 <div class='game_invite_player_count'>
                     <span><%= t('ColonyOnline') %>: </span>
-                    <span class="team_member_count">0 / 20</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <span class="team_member_count">0 / 20</span>
                 </div>
             </div>
         </div>
@@ -1023,8 +1023,19 @@
                 <div>
                     <p></p>
                     <h3>Examples</h3>
-                    <p>On a PlayerDestroyed trigger, you can run this command</p>
+                    <p>On a PlayerDestroyed trigger, you can run this command:</p>
                     <p><span class='code'>/caption subtitle $player was killed with $getEquip($killingPlayer)</span></p> 
+                    <p>On an InteractBuilding trigger, you can run these two commands:</p>
+                    <p><span class='code'>/give $player potato 1</span></p>  
+                    <p><span class='code'>/chat @a $player has gotten a potato from $entityId</span></p>
+                    <p>On a PlayerJoined trigger, you can set up a welcoming script:</p>  
+                    <p><span class='code'>/chat @a %green% Welcome our newest player, $player !</span></p>  
+                    <p>You can alarm everyone that a player has bought the ultimate weapon from the trader on a ItemBuy trigger:</p>  
+                    <p><span class='code'>(if [$itemType] == [RocketLauncher])</span></p>  
+                    <p><span class='code'>/caption title $player has bought the rocket launcher!</span></p>  
+                    <p>At the end of the timer 'healthreset', loop and reset everyone's health (Timer:healthreset:end):</p>
+                    <p><span class='code'>/timer start healthreset 10</span></p>
+                    <p><span class='code'>/sethealth @a 100</span></p>      
                 </div>
             </div>
         </div>

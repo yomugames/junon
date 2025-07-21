@@ -110,7 +110,7 @@ class SecurityCameraMenu extends BaseMenu {
     let el = ""
 
     for (let id in cameraFeeds) {
-      let name = cameraFeeds[id].content
+      let name = cameraFeeds[id].content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
       let translated = i18n.t(name)
       el += `<div class='camera_feed_item' data-id='${id}'>${translated}</div>`
     }

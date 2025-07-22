@@ -451,7 +451,7 @@ class BaseEntity extends BaseTransientEntity {
     let isLimited = false
 
     if (this.body.position[0] < 0) {
-      this.body.position[1] = 0
+      this.body.position[0] = 0
       isLimited = true
     }
 

@@ -462,7 +462,7 @@ class RemoteEventHandler {
       } else if (player.game.isTeamNameTaken(name)) {
         player.showError("Name is already taken")
       } else {
-        if (!team.isSectorOwner()) {
+        if (!team.isSectorOwner() &&!player.isSectorOwner()) {
           name = name.replace(/\s+/g, "")
         }
         team.setName(name)

@@ -93,8 +93,8 @@ class BaseTower extends BaseBuilding {
   hasAmmo() {
     let storageItem = this.getStorageItem()
     if (!storageItem) return false
-
-    return storageItem.isAmmo()
+    return true;
+    //return storageItem.isAmmo()
   }
 
   getDefaultTargets() {

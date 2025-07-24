@@ -50,6 +50,10 @@ class Team extends BaseCommand {
         break
 
       case "editrole":
+        if(!player.isSectorOwner()) {
+          player.showChatError("Only the owner can edit team roles")
+          return;
+        }
         name = args[1]
         let roleName = args[2]
         let permission = args[3]
@@ -282,6 +286,10 @@ class Team extends BaseCommand {
 
         break
       case "setleader":
+        if(!player.isSectorOwner()) {
+          player.showChatError("Only the owner can set team leaders")
+          return
+        }
         name = args[1]
         if (!name) {
           player.showChatError("Must specify team name")

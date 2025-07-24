@@ -309,7 +309,8 @@ class Item extends BaseTransientEntity {
   use(player, targetEntity, options = {}) {
     let itemInstance = this.instance ? this.instance : this.getKlass(this.type)
     if (!itemInstance) return
-
+    if (!this.count) return
+    
     if (typeof itemInstance.use !== 'function') {
       if (this.alreadyReported) return
       this.alreadyReported = true

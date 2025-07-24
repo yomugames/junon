@@ -453,7 +453,7 @@ class RemoteEventHandler {
     let team = player.game.teams[data.id]
     if (!team) return
     if (!team.hasMember(player)) return
-    if (!player.isAdmin()) return
+    if (!player.isSectorOwner()) return
     if (data.hasOwnProperty("name")) {
       let maxNameLength = 40
       let name = data.name.slice(0, maxNameLength)
@@ -462,7 +462,7 @@ class RemoteEventHandler {
       } else if (player.game.isTeamNameTaken(name)) {
         player.showError("Name is already taken")
       } else {
-        if (!team.isSectorOwner() &&!player.isSectorOwner()) {
+        if (!team.isSectorOwner()) {
           name = name.replace(/\s+/g, "")
         }
         team.setName(name)

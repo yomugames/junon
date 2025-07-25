@@ -647,6 +647,10 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   setPosition(x, y) {
+    if (x < 0) x = 0
+    if (y < 0) y = 0
+    if (x > this.sector.getGridWidth()) x = this.sector.getGridWidth() - 1
+    if (y > this.sector.getGridHeight()) y = this.sector.getGridHeight() - 1
     const prevChunk = { row: this.getChunkRow(), col: this.getChunkCol() }
 
     this.setPositionInternal(x, y)

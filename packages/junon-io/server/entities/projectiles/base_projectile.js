@@ -277,35 +277,35 @@ class BaseProjectile extends BaseEntity {
   }
 
   canDamage(entity) {
-    return this.sourceEntity.canAttack(entity)
+    if(this.sourceEntity && this.sourceEntity.canAttack) return this.sourceEntity.canAttack(entity)
     /* if can/can't attack, then can/can't damage. 
      Edit constraints in Attacker.canAttack(target) */
 
 
-    // if (!entity) return false
+    if (!entity) return false
 
-    // if (this.owner && this.owner.isPlayer() && !this.owner.canDamage(entity)) {
-    //   return false
-    // }
+    if (this.owner && this.owner.isPlayer() && !this.owner.canDamage(entity)) {
+      return false
+    }
 
-    // if (this.isFriendlyUnit(entity)) return false
-    // if (entity.isOwnedBy(this.owner)) return false
-    // if (entity.hasCategory("ghost")) return false
+    if (this.isFriendlyUnit(entity)) return false
+    if (entity.isOwnedBy(this.owner)) return false
+    if (entity.hasCategory("ghost")) return false
 
-    // const isWeaponDestroyed = this.owner && this.owner.isSector()
-    // const isSelfHit = entity === this.owner || (isWeaponDestroyed && entity.isPlayer())
-    // const isUnownedBuilding = entity.isBuilding() && !entity.hasOwner()
-    // const isDistribution = entity.isDistribution()
+    const isWeaponDestroyed = this.owner && this.owner.isSector()
+    const isSelfHit = entity === this.owner || (isWeaponDestroyed && entity.isPlayer())
+    const isUnownedBuilding = entity.isBuilding() && !entity.hasOwner()
+    const isDistribution = entity.isDistribution()
 
-    // if (isSelfHit || isUnownedBuilding || isDistribution || !entity.setHealth) return false
+    if (isSelfHit || isUnownedBuilding || isDistribution || !entity.setHealth) return false
 
-    // if (entity.hasCategory("trap")) return true
-    // if (entity.hasCategory("platform") && this.shouldHitFloor) return true
-    // if (entity.hasCategory("lamp")) return true
-    // if (!entity.isCollidable(this)) return false
-    // if (entity.isBuilding() && entity.getConstants().isPassable) return false
+    if (entity.hasCategory("trap")) return true
+    if (entity.hasCategory("platform") && this.shouldHitFloor) return true
+    if (entity.hasCategory("lamp")) return true
+    if (!entity.isCollidable(this)) return false
+    if (entity.isBuilding() && entity.getConstants().isPassable) return false
 
-    // return true
+    return true
   }
 
   setPosition(x, y) {

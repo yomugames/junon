@@ -3460,7 +3460,7 @@ class Sector {
   }
 
   getPlayerAttackables() {
-    return [this.mobTree, this.buildingTree, this.playerTree]
+    return [this.mobTree, this.buildingTree, this.playerTree, this.distributionMap]
   }
 
   displaceUnit(unit) {

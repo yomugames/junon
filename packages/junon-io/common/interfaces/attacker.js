@@ -96,16 +96,11 @@ Attacker.prototype = {
       return false
     }
 
-    if(!this.isFriendlyUnit(target) &&
-        this.shouldChooseTarget(target) &&
-        !target.isDestroyed() &&
-        !target.isRemoved) {
-          return true
-    }
-    if(target.hasCategory("pipe")) {
-      return true;
-    }
-    return false
+    if(this.isFriendlyUnit(target)) return false
+    if(!this.shouldChooseTarget(target)) return false
+    if(target.isDestroyed() || target.isRemoved) return false
+    if(target.godMode) return false
+    return true
   },
 
   canAttackInvisible() {

@@ -4527,9 +4527,7 @@ class Player extends BaseEntity {
     let isTargetInsideCryotube = target.storage && target.storage.getType && target.storage.getType() === Protocol.definition().BuildingType.CryoTube
     if (isTargetInsideCryotube) return false
 
-    if (target.hasCategory("platform") ||
-        target.hasCategory("pipe") ||
-        target.hasCategory("wire")) return false
+    if (target.hasCategory("platform")) return false
 
     let isOwnedBySector = target.getOwner() === this.sector
     if (isOwnedBySector) return false

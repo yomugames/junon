@@ -25,7 +25,7 @@ class Chat extends BaseCommand {
     let subcommand
     let text
 
-    let isSelectorProvided = selector[0] === "@"
+    let isSelectorProvided = selector ? selector[0] === "@" : false
     let targetPlayers = this.getPlayersBySelector(selector)
 
     if (!isSelectorProvided && targetPlayers.length === 0) {

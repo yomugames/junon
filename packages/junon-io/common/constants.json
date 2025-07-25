@@ -1044,7 +1044,7 @@
       "cost": {
         "gold": 500
       },
-      "attackGroups": ["players", "buildings", "mobs"],
+      "attackGroups": ["players", "buildings", "mobs", "distributions"],
       "sprite": {
         "width": 40,
         "height": 40

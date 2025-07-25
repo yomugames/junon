@@ -12,7 +12,7 @@ class Car extends BaseMob {
   }
 
   interact(user) {
-    if (!this.owner) return
+    if (!this.owner) this.setOwner(user)
     if (!this.isOwnedBy(user)) return
 
     if (!this.passenger) {

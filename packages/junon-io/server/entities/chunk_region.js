@@ -15,6 +15,7 @@ class ChunkRegion {
     this.groundSkyEdges = {}
     this.waterEdges = {}
     this.structures = {}
+    this.distributions = {}
     this.players = {}
     this.mobs = {}
     this.walls = {}
@@ -54,6 +55,15 @@ class ChunkRegion {
     let continent = this.getContinent()
     if (!continent) return false
     return continent.hasEdge(this)
+  }
+
+  getDistributions() {
+    let distributions = [];
+
+    this.forEachDistributionUntil((distribution) => {
+      distributions.push(distribution)
+    })
+    return distributions
   }
 
   getCrops() {
@@ -211,6 +221,16 @@ class ChunkRegion {
       let shouldStop = condition(soilNetwork)
       if (shouldStop) {
         break
+      }
+    }
+  }
+
+  forEachDistributionUntil(condition) {
+    for(let id in this.distributions) {
+      let distribution = this.distributions[id]
+      let shouldStop = condition(distribution)
+      if(shouldStop) {
+        break;
       }
     }
   }
@@ -456,6 +476,7 @@ class ChunkRegion {
     this.groundEdges = {}
     this.skyEdges = {}
     this.groundSkyEdges = {}
+    this.distributions = {}
 
     this.unregisterFromChunk()
 
@@ -948,7 +969,11 @@ class ChunkRegion {
     let wall = this.chunk.sector.armorMap.get(row, col)
     if (wall) {
       this.walls[wall.id] = wall
-      this.structures[wall.id] = wall
+    }
+
+    let distribution = this.chunk.sector.distributionMap.get(row, col)
+    if(distribution) {
+      this.distributions[distribution.id] = distribution
     }
   }
 
@@ -1012,10 +1037,14 @@ class ChunkRegion {
       this.unsetDirt(row, col)
     }
 
+    let distribution = this.chunk.sector.distributionMap.get(row, col)
+    if(distribution) {
+      this.distributions[distribution.id] = distribution
+    }
+
     let wall = this.chunk.sector.armorMap.get(row, col)
     if (wall) {
       this.walls[wall.id] = wall
-      this.structures[wall.id] = wall
       // since wall is on top, it will hide the dirt
       this.unsetDirt(row, col)
     }

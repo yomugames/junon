@@ -99,8 +99,8 @@ Attacker.prototype = {
     return !this.isFriendlyUnit(target) &&
            this.shouldChooseTarget(target) &&
            !target.isDestroyed() &&
-           !target.isRemoved &&
-           !target.isCollidable()
+           !target.isRemoved// &&
+//           !target.isCollidable()
   },
 
   canAttackInvisible() {

@@ -129,7 +129,41 @@ class SpawnMob extends BaseCommand {
       }
     }
 
+    if (keyValueMap["raid"] === "true") {
+      if (!keyValueMap["attackables"]) {
+        data.attackables = ["players", "mobs", "buildings"]
+      }
+      if (!keyValueMap["status"]) {
+        let status = Protocol.definition().MobStatus.Hostile
+        if (typeof status !== 'undefined' && status !== null) {
+          data.status = status
+        }
+      }
+    }
+
+    if (!keyValueMap["attackables"]) {
+      data.attackables = ["players", "mobs", "buildings"]
+    }
+
     const mobs = this.sector.spawnMob(data)
+
+    if (keyValueMap["raid"] === "true") {
+      const Raid = require("../entities/raid")
+      const fakeEventManager = this.game.eventManager
+      const raidData = {
+        sector: this.sector,
+        team: caller.getTeam ? caller.getTeam() : undefined,
+        permanent: true 
+      }
+      const raid = new Raid(fakeEventManager, raidData)
+      raid.prepare() 
+      if (!fakeEventManager.raids) fakeEventManager.raids = []
+      fakeEventManager.raids.push(raid)
+      mobs.forEach((mob) => {
+        mob.setRaid(raid)
+      })
+    }
+
     mobs.forEach((mob) => {
       mob.onCommandSpawned(caller)
 

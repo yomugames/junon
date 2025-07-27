@@ -2,7 +2,7 @@ const Constants = require('../../common/constants.json')
 const Protocol = require('../../common/util/protocol')
 const EventBus = require('eventbusjs')
 const winston = require("winston")
-
+const Helper = require('../../common/helper')
 const Dragger = () => {
 }
 
@@ -68,7 +68,7 @@ Dragger.prototype = {
     if (entity === this) return // cant drag self
     if (entity && entity.isPlayer()) return // cant drag player
     if (entity.isClaimed()) return
-
+    
     entity.claim(this)
   },
 
@@ -76,7 +76,11 @@ Dragger.prototype = {
     if (entity === this) return // cant drag self
     if (entity && entity.isPlayer()) return // cant drag player
     if (entity && entity.dragger) return // already being dragged by someone
-
+    if(!Helper.isTargetWithinRange(this, entity)) {
+      this.showError("Too far", { isWarning: true })
+      return false
+    }
+  
     if (this.dragTarget && entity) {
       // if were setting a new drag target, release prev one first
       this.releaseDragTarget()

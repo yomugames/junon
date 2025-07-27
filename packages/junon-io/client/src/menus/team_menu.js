@@ -1809,7 +1809,7 @@ class TeamMenu extends BaseMenu {
 
   buildOption(member, roleType, roleLabel) {
     let isSelected = member.roleType === roleType
-    return `<option value='${roleType}' ${isSelected ? 'selected' : ''}>${i18n.t(roleLabel)}</option>`
+    return `<option value='${roleType}' ${isSelected ? 'selected' : ''}>${i18n.t(roleLabel.replace(/</g, "&lt;").replace(/>/g, "&gt;"))}</option>`
   }
 
   initSelectRoleListeners() {
@@ -1923,7 +1923,7 @@ class TeamMenu extends BaseMenu {
       let actionBtns = ""
 
       let roleName = this.game.roles[member.roleType] && this.game.roles[member.roleType].name
-      let roleLabel = `<span class='member_role'>${roleName}</span>`
+      let roleLabel = `<span class='member_role'>${roleName.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>`
 
       let roleSelection = this.buildRoleSelect(member)
 

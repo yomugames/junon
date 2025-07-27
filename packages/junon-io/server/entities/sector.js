@@ -680,7 +680,7 @@ class Sector {
       return
     }
 
-    if (entities.sellables) {
+    if (entities.sellables && this.isPeaceful()) {
       for (let typeName in entities.sellables) {
         let sellableData = entities.sellables[typeName]
         let data = { group: sellableData.group, type: sellableData.type, cost: sellableData.cost }

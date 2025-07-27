@@ -296,6 +296,7 @@ class BaseProjectile extends BaseEntity {
 
     if (entity.hasCategory("trap")) return true
     if (entity.hasCategory("platform") && this.shouldHitFloor) return true
+    if (entity.hasCategory("lamp")) return true
     if (!entity.isCollidable(this)) return false
     if (entity.isBuilding() && entity.getConstants().isPassable) return false
 

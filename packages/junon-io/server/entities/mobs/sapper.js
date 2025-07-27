@@ -37,7 +37,7 @@ class Sapper extends Guard {
     })
   }
 
-  canDamage(target, checkTrap = true, allowWall = false) {
+  canDamage(target, checkTrap = true, allowWall = true) {
     if (target.isMob()) return false
     if (this.isFriendlyUnit(target)) return false
     if (target.hasCategory("ghost")) return false

@@ -124,7 +124,7 @@ class Lamp extends BaseBuilding {
     } else {
       let radius = this.content.split(":")[1]
       if (radius) {
-        return parseInt(radius)
+        return parseInt(radius) > 50 ? 50 : parseInt(radius) //50 is a nice number, this wouldn't cause any server lag if abused anyhow.
       } else {
         return super.getLightRadius()
       }

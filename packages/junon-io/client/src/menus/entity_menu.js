@@ -85,7 +85,7 @@ class EntityMenu extends BaseMenu {
     for (let id in this.game.roles) {
       let role = this.game.roles[id]
       let key = "role-" + role.id
-      let value = "Role: " + role.name
+      let value = "Role: " + role.name.replace(/</g, "&lt;").replace(/>/g, "&gt;")
       el += this.createSpawnPointEl(key, value)
     }
 

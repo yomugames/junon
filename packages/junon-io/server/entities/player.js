@@ -173,6 +173,10 @@ class Player extends BaseEntity {
     return false
   }
 
+  canEditTeam() {
+    return this.getRole().isAllowedTo("EditTeamName")
+  }
+  
   applyNonZoomScreenDimensions() {
     this.screenWidth  = Constants.tileSize * 40
     this.screenHeight = Constants.tileSize * 24

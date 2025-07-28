@@ -148,7 +148,8 @@ class Team extends BaseTransientEntity {
       Kick: false,
       Ban: false,
       UseCommands: false,
-      EditCommandBlocks: false
+      EditCommandBlocks: false,
+      EditTeamName: false
     })
   }
 
@@ -175,7 +176,7 @@ class Team extends BaseTransientEntity {
       Kick: false,
       Ban: false,
       UseCommands: false,
-      EditCommandBlocks: false
+      EditCommandBlocks: false,
     })
   }
 

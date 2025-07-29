@@ -794,18 +794,23 @@ class EventHandler {
   }
 
   getBuildingType(entityId) {
+    let player = this.game.getPlayerByName(entityId)
+    if (player) {
+      return "Player"
+    }
+
     let entity = this.game.getEntity(entityId)
-    
+
     if (!entity) return ""
-    
+
     if (entity.isPlayer()) {
       return "Player"
     }
-    
+
     if (typeof entity.getTypeName === 'function') {
       return entity.getTypeName()
     }
-    
+
     return entity.type || ""
   }
 

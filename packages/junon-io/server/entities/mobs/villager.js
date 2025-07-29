@@ -21,4 +21,4 @@ class Villager extends LandMob {
   }
 }
 
-module.exports = Slime
+module.exports = Villager

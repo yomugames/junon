@@ -861,13 +861,15 @@
         "position": {
           "x":0,
           "y":0
-        },
-        "width":20,
-        "height": 8,
-        "rotation":0
+        }
+      },
+      "sprite": {
+          "height": 49,
+          "width": 54,
+          "rotation":180
       },
       "stats": {
-        "speed": 2,
+        "speed": 3,
         "reload":2000,
         "health": 20,
         "damage":10,

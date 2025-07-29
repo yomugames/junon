@@ -19,6 +19,16 @@ class Villager extends LandMob {
   setNeutral(isNeutral) {
     this.isNeutral = true // always neutral
   }
+
+  onPositionChanged() {
+    super.onPositionChanged()
+    let tile = this.getTile()
+    if (!tile) this.remove() //sky
+  }
+
+  getTile(row=this.getRow(), col=this.getCol()) {
+    return this.getPathFinder().getTile(row,col)
+  }
 }
 
 module.exports = Villager

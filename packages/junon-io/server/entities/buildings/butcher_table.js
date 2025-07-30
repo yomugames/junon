@@ -75,7 +75,7 @@ class ButcherTable extends BaseBuilding {
 
   onCorpseRemoved() {
     let data = {
-      corpseType: this.activeCorpse.type,
+      corpseType: Protocol.definition().MobType[this.activeCorpse.type],
       entityId: this.activeUser.getId(),
       player: ""
     }

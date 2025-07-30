@@ -27,7 +27,7 @@ class TimerBomb extends BaseBuilding {
     this.setBuildingContent(this.seconds.toString())
 
     let duration = 10
-    if (this.seconds === duration) {
+    if (this.seconds >= duration) {
       this.trigger()
       this.remove()
     }

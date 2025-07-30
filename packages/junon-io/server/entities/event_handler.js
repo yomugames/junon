@@ -474,6 +474,12 @@ class EventHandler {
     return player.getTeam().scoreIndex || 0
   }
 
+  getAngle(playerId) {
+    let player = this.getPlayer(playerId)
+    if (!player) return 0
+    return player.angle
+  }
+
   getTeamColor(playerId) {
     let player = this.game.players[playerId]
     if (!player) return 'f'
@@ -1192,7 +1198,8 @@ class EventHandler {
       "$getPlatformByCoords": true,
       "$getStructureByCoords": true,
       "$hasEffect": true,
-      "$getTotalMobCount": true
+      "$getTotalMobCount": true,
+      "$getAngle": true
     }
   }
 

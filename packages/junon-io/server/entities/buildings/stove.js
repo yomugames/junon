@@ -121,7 +121,7 @@ class Stove extends BaseBuilding {
           this.activeUser.inventory.store(item)
 
           let data = { 
-            foodType: item.type, 
+            foodType: Protocol.definition().BuildingType[item.type], 
             entityId: this.activeUser.getId(),
             player: ""
           }

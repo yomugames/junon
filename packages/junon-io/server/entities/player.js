@@ -173,6 +173,10 @@ class Player extends BaseEntity {
     return false
   }
 
+  canEditTeam() {
+    return this.getRole().isAllowedTo("EditTeamName")
+  }
+  
   applyNonZoomScreenDimensions() {
     this.screenWidth  = Constants.tileSize * 40
     this.screenHeight = Constants.tileSize * 24
@@ -1924,8 +1928,8 @@ class Player extends BaseEntity {
 
     const item = new Item(this, data.type, { count: count })
     let requirements = item.getRequirements()
-    if (Object.keys(requirements).length === 0) {
-      // item without requirements cant be crafted
+    if (Object.keys(requirements).length === 0 && !(Protocol.definition().TerrainType[item.type] && this.isSectorOwner())) {
+      // item without requirements other than terrains cant be crafted
       return
     }
 
@@ -4527,9 +4531,7 @@ class Player extends BaseEntity {
     let isTargetInsideCryotube = target.storage && target.storage.getType && target.storage.getType() === Protocol.definition().BuildingType.CryoTube
     if (isTargetInsideCryotube) return false
 
-    if (target.hasCategory("platform") ||
-        target.hasCategory("pipe") ||
-        target.hasCategory("wire")) return false
+    if (target.hasCategory("platform")) return false
 
     let isOwnedBySector = target.getOwner() === this.sector
     if (isOwnedBySector) return false

@@ -148,8 +148,7 @@ class MiningDrill extends BaseProcessor {
   }
 
   canStore(item) {
-      let type = Protocol.definition().BuildingType[item.type]
-      if(type != "IronOre" && type != "CopperOre") return
+      return false;
   } 
 
 }

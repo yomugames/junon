@@ -1,3 +1,4 @@
+
 const Constants = require('../../../common/constants.json')
 const Protocol = require('../../../common/util/protocol')
 const BaseBuilding = require("./base_building")
@@ -146,6 +147,10 @@ class MiningDrill extends BaseProcessor {
     }
   }
 
+  canStore(item) {
+      let type = Protocol.definition().BuildingType[item.type]
+      if(type != "IronOre" && type != "CopperOre") return
+  } 
 
 }
 

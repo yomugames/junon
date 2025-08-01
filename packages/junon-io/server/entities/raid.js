@@ -488,6 +488,7 @@ class Raid {
   }
 
   onRaidGoalTargetRemoved() {
+    if (this.data && this.data.permanent) return
     if (this.game.isHardcore()) return
     if (this.boss) return
 

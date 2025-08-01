@@ -26,18 +26,19 @@ class Spectate extends BaseCommand {
       const lastArg = args[args.length - 1].toLowerCase()
       if (lastArg === "on" || lastArg === "off") {
         state = lastArg
-        args = args.slice(0, -1) 
+        args = args.slice(0, -1)
       }
     }
 
     const selector = args[0]
     
     if (selector) {
-      if (!this.game.isPeaceful()) {
+      if (!caller.isAdminMode && !this.game.isPeaceful()) {
         return
       }
 
-      if (!caller.isSectorOwner()) {
+      const hasPermission = caller.isAdminMode || caller.isSectorOwner() || caller.hasCommandsPermission()
+      if (!hasPermission) {
         return
       }
     }

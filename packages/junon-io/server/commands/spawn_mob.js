@@ -129,7 +129,51 @@ class SpawnMob extends BaseCommand {
       }
     }
 
+    if (keyValueMap["raid"] === "true") {
+      if (!keyValueMap["attackables"]) {
+        data.attackables = ["players", "mobs", "buildings"]
+      }
+      if (!keyValueMap["status"]) {
+        let status = Protocol.definition().MobStatus.Hostile
+        if (typeof status !== 'undefined' && status !== null) {
+          data.status = status
+        }
+      }
+    }
+
+    if (!keyValueMap["attackables"]) {
+      data.attackables = ["players", "mobs", "buildings"]
+    }
+
     const mobs = this.sector.spawnMob(data)
+
+    if (keyValueMap["raid"] === "true") {
+      const Raid = require("../entities/raid")
+      const eventManager = this.game.eventManager
+      let permanentRaid = null
+
+      if (eventManager.raids && Array.isArray(eventManager.raids)) {
+        permanentRaid = eventManager.raids.find(raid => raid.data && raid.data.permanent === true)
+      }
+
+      if (!permanentRaid) {
+        const raidData = {
+          sector: this.sector,
+          team: caller.getTeam ? caller.getTeam() : undefined,
+          permanent: true
+        }
+        permanentRaid = new Raid(eventManager, raidData)
+        permanentRaid.prepare()
+      }
+
+      if (permanentRaid) {
+        mobs.forEach((mob) => {
+          mob.setRaid(permanentRaid)
+          permanentRaid.addToMobGroup(mob)
+        })
+      }
+    }
+
     mobs.forEach((mob) => {
       mob.onCommandSpawned(caller)
 
@@ -142,7 +186,7 @@ class SpawnMob extends BaseCommand {
       }
     })
 
-    if (mobs.length > 1) {
+    if (mobs.length > 1 && keyValueMap["raid"] !== "true") {
       let entityGroup = new EntityGroup()
       mobs.forEach((mob) => {
         entityGroup.addChild(mob)

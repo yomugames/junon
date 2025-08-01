@@ -5,6 +5,7 @@ const EventBus = require('eventbusjs')
 
 class Raid {
   constructor(eventManager, data) {
+    this.data = data
     this.eventManager = eventManager
     this.game = eventManager.game
 
@@ -71,6 +72,7 @@ class Raid {
   }
 
   isRaidTooLong() {
+    if (this.data && this.data.permanent) return false
     let twelveHours = Constants.physicsTimeStep * Constants.secondsPerHour * 12
     return (this.game.timestamp - this.occurTimestamp) > twelveHours
   }
@@ -96,8 +98,6 @@ class Raid {
       this.team = this.game.getEntity(data.team.id)
     }
 
-    if (!this.team) return
-
     if (data.spawnGroundRow) {
       let ground = this.sector.groundMap.get(data.spawnGroundRow, data.spawnGroundCol)
       if (!ground) {
@@ -115,11 +115,12 @@ class Raid {
       this.occurTimestamp = this.game.timestamp + (Constants.physicsTimeStep * Constants.secondsPerHour)
     }
     
-
-    let structures = this.team.getRaidableOwnedStructures()
-    this.structureCount = structures.length
-
-    if (structures.length === 0) return
+    if (this.team) {
+        let structures = this.team.getRaidableOwnedStructures()
+        this.structureCount = structures.length
+    } else {
+        this.structureCount = 0
+    }
   }
 
   determineSpawnRoom(team) {
@@ -487,6 +488,7 @@ class Raid {
   }
 
   onRaidGoalTargetRemoved() {
+    if (this.data && this.data.permanent) return
     if (this.game.isHardcore()) return
     if (this.boss) return
 

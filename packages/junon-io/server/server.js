@@ -28,6 +28,7 @@ const Polyglot = require('node-polyglot')
 const englishTranslationMap = require('../common/translations/en')
 const japaneseTranslationMap = require('../common/translations/ja')
 const russianTranslationMap = require('../common/translations/ru')
+const trationalChineseTranslationMap = require('../common/translations/zh-Hant')
 const SectorModel = require("junon-common/db/sector")
 const ObjectPool = require("../common/entities/object_pool")
 const TileHit = require("./entities/tile_hit")
@@ -44,6 +45,7 @@ global.i18n = {
     this.instances["en"] = new Polyglot({ phrases: englishTranslationMap, allowMissing: true })
     this.instances["ja"] = new Polyglot({ phrases: japaneseTranslationMap, allowMissing: true })
     this.instances["ru"] = new Polyglot({ phrases: russianTranslationMap, allowMissing: true })
+    this.instances["zh-Hant"] = new Polyglot({ phrases: trationalChineseTranslationMap, allowMissing: true })
   },
   hasLanguage(language) {
     return this.instances[language]

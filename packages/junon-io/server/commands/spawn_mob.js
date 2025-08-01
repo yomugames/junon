@@ -149,19 +149,29 @@ class SpawnMob extends BaseCommand {
 
     if (keyValueMap["raid"] === "true") {
       const Raid = require("../entities/raid")
-      const fakeEventManager = this.game.eventManager
-      const raidData = {
-        sector: this.sector,
-        team: caller.getTeam ? caller.getTeam() : undefined,
-        permanent: true 
+      const eventManager = this.game.eventManager
+      let permanentRaid = null
+
+      if (eventManager.raids && Array.isArray(eventManager.raids)) {
+        permanentRaid = eventManager.raids.find(raid => raid.data && raid.data.permanent === true)
       }
-      const raid = new Raid(fakeEventManager, raidData)
-      raid.prepare() 
-      if (!fakeEventManager.raids) fakeEventManager.raids = []
-      fakeEventManager.raids.push(raid)
-      mobs.forEach((mob) => {
-        mob.setRaid(raid)
-      })
+
+      if (!permanentRaid) {
+        const raidData = {
+          sector: this.sector,
+          team: caller.getTeam ? caller.getTeam() : undefined,
+          permanent: true
+        }
+        permanentRaid = new Raid(eventManager, raidData)
+        permanentRaid.prepare()
+      }
+
+      if (permanentRaid) {
+        mobs.forEach((mob) => {
+          mob.setRaid(permanentRaid)
+          permanentRaid.addToMobGroup(mob)
+        })
+      }
     }
 
     mobs.forEach((mob) => {
@@ -176,7 +186,7 @@ class SpawnMob extends BaseCommand {
       }
     })
 
-    if (mobs.length > 1) {
+    if (mobs.length > 1 && keyValueMap["raid"] !== "true") {
       let entityGroup = new EntityGroup()
       mobs.forEach((mob) => {
         entityGroup.addChild(mob)

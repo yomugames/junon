@@ -504,9 +504,6 @@ class Raid {
   }
 
   endRaid() {
-    // mobs with "raid:true" flag in /spawnmob will never end (it has bug in sandbox mode after you spawn mobs with raid:true flag, raid event mob will never despawn)
-    if (this.data && this.data.permanent) return 
-
     if (this.isRaidEnded) {
       if (this.isRaidTooLong()) {
         // if i still have mobs alive, remove them immediately

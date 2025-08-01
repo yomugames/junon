@@ -6,7 +6,9 @@ class God extends BaseCommand {
   getUsage() {
     return [
       "/god",
-      "/god [player]"
+      "/god [on|off]",
+      "/god [player]",
+      "/god [player] [on|off]"
     ]
   }
 
@@ -20,31 +22,37 @@ class God extends BaseCommand {
 
 
   perform(caller, args) {
-    const selector = args[0]
-    if (selector) {
-      if (!caller.isSectorOwner()) {
-        caller.showChatError("permission denied")
-        return
-      }
-
-      let targetPlayers = this.getPlayersBySelector(selector) 
-      if (targetPlayers.length === 0) {
-        caller.showChatError("no players found")
-        return
-      }
-
-      targetPlayers.forEach((player) => {
-        this.toggleGod(player)
-      })
-    } else {
-      if (caller.isPlayer()) {
-        this.toggleGod(caller)
+    let state = null
+    if (args.length > 0) {
+      const lastArg = args[args.length - 1].toLowerCase()
+      if (lastArg === "on" || lastArg === "off") {
+        state = lastArg
+        args = args.slice(0, -1)
       }
     }
+
+    const selector = args[0]
+    let targetPlayers = this.getPlayersBySelector(selector)
+
+    if (targetPlayers.length === 0 && caller.isPlayer()) {
+      targetPlayers = [caller]
+    }
+
+    if (targetPlayers.length === 0 && selector) {
+        caller.showChatError("no players found")
+        return
+    }
+
+    targetPlayers.forEach(targetPlayer => {
+        const shouldEnable = state === null ? !targetPlayer.godMode : (state === "on")
+        this.setGod(targetPlayer, shouldEnable)
+    })
   }
 
-  toggleGod(player) {
-    player.godMode = !player.godMode
+  setGod(player, enabled) {
+    if (player.godMode === enabled) return
+
+    player.godMode = enabled
     if (player.godMode) {
       player.setHealth(player.getMaxHealth())
     }
@@ -54,8 +62,3 @@ class God extends BaseCommand {
 }
 
 module.exports = God
-
-
-
-
-

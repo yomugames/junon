@@ -6,7 +6,9 @@ class Fly extends BaseCommand {
   getUsage() {
     return [
       "/fly",
-      "/fly [player]"
+      "/fly [on|off]",
+      "/fly [player]",
+      "/fly [player] [on|off]"
     ]
   }
 
@@ -19,21 +21,37 @@ class Fly extends BaseCommand {
   }
 
   perform(player, args) {
-    const username = args[0]
-
-    let targetPlayers = this.getPlayersBySelector(username)
-    if (targetPlayers.length === 0) {
-      if (player.isPlayer()) {
-        player.toggleFly()
+    let state = null
+    if (args.length > 0) {
+      const lastArg = args[args.length - 1].toLowerCase()
+      if (lastArg === "on" || lastArg === "off") {
+        state = lastArg
+        args = args.slice(0, -1)
       }
+    }
+
+    const selector = args[0]
+    let targetPlayers = this.getPlayersBySelector(selector)
+
+    if (targetPlayers.length === 0 && player.isPlayer()) {
+      targetPlayers = [player]
+    }
+
+    if (targetPlayers.length === 0 && selector) {
+      player.showChatError("no players found")
       return
     }
 
-    targetPlayers.forEach((targetPlayer) => {
-      targetPlayer.toggleFly()
+    targetPlayers.forEach(targetPlayer => {
+      const shouldEnable = state === null ? !targetPlayer.isFlying : (state === "on")
+      this.setFly(targetPlayer, shouldEnable)
     })
   }
 
+  setFly(player, enabled) {
+    if (player.isFlying === enabled) return
+    player.toggleFly()
+  }
 }
 
 module.exports = Fly

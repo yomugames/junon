@@ -18,7 +18,7 @@ class Poison extends BaseEffect {
 
   onPostInit() {
     this.affectedEntity.getTintableSprites().forEach((sprite) => {
-      sprite.originalTint = sprite.defaultTint ? sprite.defaultTint : sprite.tint
+      sprite.originalTint = sprite.tint ? sprite.tint : sprite.defaultTint
       sprite.tint = this.getTint()
     })
   }  

@@ -34,21 +34,13 @@ class HandEquipment extends BaseEquipment {
   }
 
   getDamage(targetEntity) {
-    let baseDamage = this.getEquipmentDamage()
-    if (!this.game.isMiniGame() && 
-         targetEntity && 
-         targetEntity.hasCategory("melee_resistant")) {
-      baseDamage = 2
-    }
-
-    if (!this.owner) return baseDamage
-
-    if (this.owner.isMob() || this.owner.isPlayer()) {
-      return Math.floor(this.owner.getDamageMultiplier() * baseDamage)
-    } else {
-      return baseDamage
-    }
+  const customStats = this.sector.entityCustomStats[this.item.id];
+  if (customStats && typeof customStats.damage !== 'undefined') {
+    return customStats.damage;
   }
+
+  return this.getEquipmentDamage() || 0;
+}
 
   getEquipmentDamage() {
     if (this.sector) {

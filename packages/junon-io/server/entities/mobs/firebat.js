@@ -124,10 +124,14 @@ class Firebat extends LandMob {
   }
 
   getWeapon() {
-    let item = this.equipments.get(Protocol.definition().EquipmentRole.Hand)
-    if (!item) return null
-    return item.instance || item.getKlass(item.type)
+  if (!this.equipments) {
+    return null;
   }
+
+  let item = this.equipments.get(Protocol.definition().EquipmentRole.Hand)
+  if (!item) return null
+  return item.instance || item.getKlass(item.type)
+}
 
   remove() {
     super.remove()

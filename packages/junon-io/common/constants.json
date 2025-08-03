@@ -985,6 +985,7 @@
         "gold": 2000
       },
       "isBuildingDestroyer": true,
+      "canDamageWalls": true,
       "attackGroups": ["players", "buildings", "mobs"],
       "drop": ["Web"],
       "resistance": ["fire"],
@@ -1044,6 +1045,8 @@
       "cost": {
         "gold": 500
       },
+      "isBuildingDestroyer": true,
+      "canDamageWalls": true,
       "attackGroups": ["players", "buildings", "mobs", "distributions"],
       "sprite": {
         "width": 40,
@@ -1121,6 +1124,7 @@
     },
     "Sapper": {
       "parent": "Mobs.Guard",
+      "resistance": ["fire"],
       "sprite": {
         "width": 60,
         "height": 181
@@ -1143,6 +1147,8 @@
       "cost": {
         "gold": 2500
       },
+      "isBuildingDestroyer": true,
+      "canDamageWalls": true,
       "attackGroups": ["players", "buildings", "mobs"],
       "sprite": {
         "width": 50,
@@ -1168,6 +1174,8 @@
     "Firebat": {
       "parent": "Mobs.BaseMob",
       "hasBlood": true,
+      "isBuildingDestroyer": true,
+      "canDamageWalls": true,
       "drop": ["Flamethrower"],
       "resistance": ["fire"],
       "immunity": ["poison"],

@@ -40,7 +40,13 @@ class MeleeEquipment extends HandEquipment {
 
       success = true
     } else {
-      let target = user.getMeleeTarget(this.getMeleeRange(), meleeTargetOptions) //this.getMeleeTarget(user)
+      let target
+      if (user.isMob && user.isMob()) {
+        target = targetEntity
+      } else {
+        target = user.getMeleeTarget(this.getMeleeRange(), meleeTargetOptions)
+      }
+      
       success = this.useOnTarget(user, target)
     }
 
@@ -86,19 +92,20 @@ class MeleeEquipment extends HandEquipment {
   }
 
   useOnTarget(user, target) {
-    const damage = this.getDamage(target)
-    if (target) {
-      target.damage(damage, user, this)
-      if (user.isPlayer()) {
-      }
-
-      if (this.canStunEnemy()) {
-        this.applyStun(target)
-      }
+  const damage = user.getDamage(target);
+  if (target) {
+    target.damage(damage, user, this);
+    
+  if (user.isPlayer()) {
     }
 
-    return true
+    if (this.canStunEnemy()) {
+      this.applyStun(target);
+    }
   }
+
+  return true;
+}
 
   applyStun(target) {
     let knockChance = 1 //0.15

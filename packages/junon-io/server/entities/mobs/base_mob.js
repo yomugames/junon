@@ -2147,6 +2147,39 @@ class BaseMob extends BaseEntity {
     return false
   }
 
+  getWeapon() {
+  if (this.equipments && typeof this.equipments.get === 'function') {
+    const item = this.equipments.get(Protocol.definition().EquipmentRole.Hand);
+    return item ? item.instance : null;
+  }
+  return null;
+}
+
+getDamage(attackTarget) {
+  const weapon = this.getWeapon();
+  let totalDamage;
+
+  if (weapon) {
+    const baseDamage = super.getDamage();
+    const weaponDamage = weapon.getDamage(attackTarget);
+    totalDamage = baseDamage + weaponDamage;
+  } else {
+    totalDamage = super.getDamage();
+  }
+
+  // 處理自訂傷害覆蓋 (此處的自訂傷害是針對 Mob 本身)
+  if (this.sector) {
+    if (this.sector.entityCustomStats[this.id] && typeof this.sector.entityCustomStats[this.id].damage !== 'undefined') {
+      totalDamage = this.sector.entityCustomStats[this.id].damage;
+    } else if (this.sector.mobCustomStats[this.type] && typeof this.sector.mobCustomStats[this.type].damage !== 'undefined') {
+      totalDamage = this.sector.mobCustomStats[this.type].damage;
+    }
+  }
+
+  const damageMultiplier = this.getDamageMultiplier(attackTarget);
+  return Math.floor(totalDamage * damageMultiplier);
+}
+
   getRotatedAngle() {
     return this.angle
   }
@@ -2162,20 +2195,33 @@ class BaseMob extends BaseEntity {
   }
 
   getDamage(attackTarget) {
-    let damage = super.getDamage()
+  const weapon = this.getWeapon();
+  let totalDamage;
 
-    if (this.sector) {
-      if (this.sector.entityCustomStats[this.id]) {
-        damage = this.sector.entityCustomStats[this.id].damage
-      } else if (this.sector.mobCustomStats[this.type]) {
-        damage = this.sector.mobCustomStats[this.type].damage
-      }
-    }
-
-    let damageMultiplier = this.getDamageMultiplier(attackTarget)
-
-    return Math.floor(damageMultiplier * damage)
+  // 檢查 mob 是否裝備了武器
+  if (weapon) {
+    // 如果有武器，則傷害 = mob 基礎傷害 + 武器傷害
+    const baseDamage = super.getDamage(); // 取得 mob 在 constants.json 中設定的空手傷害
+    const weaponDamage = weapon.getDamage(attackTarget); // 取得武器自身的傷害
+    totalDamage = baseDamage + weaponDamage;
+  } else {
+    // 如果沒有武器，則只使用 mob 的基礎傷害
+    totalDamage = super.getDamage();
   }
+
+  // 檢查是否有來自伺服器設定的自訂傷害值，若有則覆蓋計算結果 (保留原有邏輯)
+  if (this.sector) {
+    if (this.sector.entityCustomStats[this.id] && typeof this.sector.entityCustomStats[this.id].damage !== 'undefined') {
+      totalDamage = this.sector.entityCustomStats[this.id].damage;
+    } else if (this.sector.mobCustomStats[this.type] && typeof this.sector.mobCustomStats[this.type].damage !== 'undefined') {
+      totalDamage = this.sector.mobCustomStats[this.type].damage;
+    }
+  }
+
+  // 最後，應用傷害乘數 (例如對建築物的加成)
+  const damageMultiplier = this.getDamageMultiplier(attackTarget);
+  return Math.floor(damageMultiplier * totalDamage);
+}
 
   getResistance() {
     return this.getConstants().resistance || []
@@ -2278,13 +2324,24 @@ Object.assign(BaseMob.prototype, Movable.prototype, {
 
 
 Object.assign(BaseMob.prototype, Destroyable.prototype, {
-  getDamageResistance(amount, attackEntity) {
-    if (attackEntity.hasCategory("fire") && this.isResistantTo("fire")) {
-      return Math.floor(amount / 2)
-    }
+  damage(amount, attacker) {
+  if (!this.isDestroyable() || this.godMode || this.isInvincible) return;
+  amount -= this.getDamageResistance(amount, attacker); 
+  if (amount <= 0) return;
+  this.reduceHealth(amount);
+  this.onDamaged(attacker, amount);
+},
 
-    return 0
-  },
+  getDamageResistance(amount, attacker) {
+  const isMeleeAttack = attacker && typeof attacker.hasMeleeWeapon === 'function' && attacker.hasMeleeWeapon();
+
+  if (this.hasCategory("melee_resistant") && isMeleeAttack) {
+    return Math.floor(amount * 0.5);
+  }
+
+  return 0; 
+},
+
   onDamaged(attacker, amount) {
     this.attackerId = attacker.id
 

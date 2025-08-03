@@ -102,12 +102,6 @@ class Pirate extends LandMob {
     }
   }
 
-  getWeapon() {
-    let item = this.equipments.get(Protocol.definition().EquipmentRole.Hand)
-    if (!item) return null
-    return item.instance
-  }
-
   remove() {
     super.remove()
 

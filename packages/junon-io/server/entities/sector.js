@@ -2746,7 +2746,10 @@ class Sector {
       return false
     }
 
-    options.owner = this
+    if (!options.owner) {
+      options.owner = this
+    }
+    
     options.source = { x: x, y: y}
     options.destination = { x: x, y: y}
     klass.build(options)

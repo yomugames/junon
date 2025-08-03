@@ -60,6 +60,7 @@ class Grenade extends BaseProjectile {
 
   createExplosion() {
     return this.sector.createProjectile("Explosion", {
+      owner:       this.getOwner(),
       weapon:        this.weapon,
       source:      { x: this.getX(),         y: this.getY() },
       destination: { x: this.getX(),         y: this.getY() }

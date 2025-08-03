@@ -23,8 +23,22 @@ class Projectile extends BaseCommand {
     const type = args[0]
     const row = parseInt(args[1])
     const col = parseInt(args[2])
-    let keyValueArgs = isNaN(row) ? args.slice(3) : args.slice(1)
+    let keyValueArgs = isNaN(row) ? args.slice(1) : args.slice(3)
     let keyValueMap = this.convertKeyValueArgsToObj(keyValueArgs)
+
+    let owner = caller
+
+    if (keyValueMap.owner) {
+      const entityId = parseInt(keyValueMap.owner, 10)
+      
+      if (!isNaN(entityId)) {
+        const foundOwner = this.game.getEntity(entityId)
+        
+        if (foundOwner) {
+          owner = foundOwner
+        }
+      }
+    }
 
     let x, y
 
@@ -42,6 +56,12 @@ class Projectile extends BaseCommand {
 
     if (typeof x === 'undefined' || typeof y === 'undefined') return
 
+    const baseSpawnConfig = {
+      owner: owner,
+      type: type,
+      keyValueMap: keyValueMap
+    };
+
     if (keyValueMap["scatter"]) {
       let scatterCount = 10
       let rowSpread = 8
@@ -50,10 +70,10 @@ class Projectile extends BaseCommand {
         let deltaCol = rowSpread - Math.floor(Math.random() * rowSpread) * 2
         let otherX = x + deltaCol * Constants.tileSize + Constants.tileSize/2
         let otherY = y + deltaRow * Constants.tileSize + Constants.tileSize/2
-        this.sector.spawnProjectile({ caller: caller, type: type, x: otherX, y: otherY, keyValueMap: keyValueMap })
+        this.sector.spawnProjectile({ ...baseSpawnConfig, caller: caller, x: otherX, y: otherY })
       }
     } else {
-      this.sector.spawnProjectile({ caller: caller, type: type, x: x, y: y, keyValueMap: keyValueMap })
+      this.sector.spawnProjectile({ ...baseSpawnConfig, caller: caller, x: x, y: y })
     }
     
   }

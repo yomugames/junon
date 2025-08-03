@@ -2868,6 +2868,7 @@ class Sector {
   }
 
   insertEntityToTreeByName(entity, groupName) {
+    if(entity.isRemoved && entity.isRemoved()) return
     let tree = this.getTreeFromEntityType(groupName, entity.getContainer())
     entity.updateRbushCoords()
     entity.onWorldPostStep()
@@ -3460,7 +3461,7 @@ class Sector {
   }
 
   getPlayerAttackables() {
-    return [this.mobTree, this.buildingTree, this.playerTree]
+    return [this.mobTree, this.buildingTree, this.playerTree, this.distributionMap]
   }
 
   displaceUnit(unit) {

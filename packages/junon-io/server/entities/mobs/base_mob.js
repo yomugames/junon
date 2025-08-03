@@ -2453,6 +2453,13 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
     })
   },
 
+  findDistributionsInChunkRegion(chunkRegion, range) {
+    let distributions = chunkRegion.getDistributions()
+    return distributions.filter((distribution) => {
+      return this.canAttack(distribution) && this.isWithinRange(distribution, range)
+    })
+  },
+
   findCropsInChunkRegion(chunkRegion, range) {
     let crops = chunkRegion.getCrops()
     return crops.filter((crop) => {
@@ -2494,6 +2501,8 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
         case "mobs":
           targets = this.findMobsInChunkRegion(chunkRegion, range)
           break
+        case "distributions":
+          targets = this.findDistributionsInChunkRegion(chunkRegion, range)
       }
 
       if (targets.length > 0) {
@@ -2836,8 +2845,11 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
       return this.canDestroyDoor(target)
     }
 
-    if (target.hasCategory("distribution") ||
-        target.hasCategory("platform") ||
+    if(target.hasCategory("distribution")) {
+      return this.canTargetDistributions()
+    }
+
+    if (target.hasCategory("platform") ||
         target.hasCategory("terrain") ||
         target.hasCategory("walkable") ||
         target.hasCategory("rail") ||
@@ -2848,6 +2860,11 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
 
     return true
   },
+
+  canTargetDistributions() {
+    return true;
+  },
+
   canTargetTraps() {
     return this.getConstants().canTargetTraps
   },
@@ -2922,7 +2939,7 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
     if (this.status === Protocol.definition().MobStatus.Obedient ||
         this.status === Protocol.definition().MobStatus.Guardian) {
       if (this.master) {
-        return ["buildings", "mobs"]
+        return ["buildings", "mobs", "distributions"]
       } else {
         return []
       }
@@ -2936,6 +2953,7 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
       if (group === 'players') return this.sector.playerTree
       if (group === 'buildings') return this.sector.structureMap
       if (group === 'mobs') return this.sector.mobTree
+      if (group === 'distributions') return this.sector.distributionMap
     })
   }
 })

@@ -1169,7 +1169,7 @@ class BaseBuilding extends BaseEntity {
 
   onBuildingPlaced() {
     this.container.registerComponent(this.getGroup(), this.getMapName(), this)
-
+    this.hasCategory("wall") && this.container.registerComponent("structures", "structureMap", this)
     // when loading save file, we want to batch insert into tree
     // so dont do it one by one
     if (!this.sector.shouldDisableBuildingTreeInsert) {

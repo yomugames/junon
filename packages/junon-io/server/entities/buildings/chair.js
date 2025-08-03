@@ -11,11 +11,6 @@ class Chair extends BaseBuilding {
   getType() {
     return Protocol.definition().BuildingType.Chair
   }
-  
-  isCollidable() {
-    return false
-  }
-
 }
 
 module.exports = Chair

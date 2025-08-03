@@ -261,10 +261,6 @@ class RailStop extends BaseBuilding {
     super.breakBuilding(lastBreaker)
   }
 
-  isCollidable() {
-    return false
-  }
-
   shouldObstruct(body, hit) {
     let box = this.getCollisionBox()
 

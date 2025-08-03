@@ -11,11 +11,6 @@ class RedPresent extends BaseBuilding {
   getType() {
     return Protocol.definition().BuildingType.RedPresent
   }
-  
-  isCollidable() {
-    return false
-  }
-
 }
 
 module.exports = RedPresent

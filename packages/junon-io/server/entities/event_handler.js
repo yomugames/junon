@@ -259,10 +259,21 @@ class EventHandler {
     return this._fixFloat(Math.atan(num) * 180 / Math.PI)
   }
 
-  getAngle(playerId) {
-    let player = this.getPlayer(playerId)
-    if (!player) return 0
-    return player.angle
+  getAngle(entityId) {
+    let player = this.getPlayer(entityId)
+    let angle = 0
+
+    if (player && typeof player.angle === 'number') {
+      angle = player.angle
+    } else {
+      let entity = this.game.getEntity(entityId)
+      if (entity && typeof entity.angle === 'number') {
+        angle = entity.angle
+      }
+    }
+
+    angle = ((angle % 360) + 360) % 360
+    return angle
   }
 
   length(value) {
@@ -1243,7 +1254,13 @@ class EventHandler {
       "$getStructureByCoords": true,
       "$hasEffect": true,
       "$getTotalMobCount": true,
-      "$getAngle": true
+      "$getAngle": true,
+      "$sin": true,
+      "$cos": true,
+      "$tan": true,
+      "$asin": true,
+      "$acos": true,
+      "$atan": true,
     }
   }
 

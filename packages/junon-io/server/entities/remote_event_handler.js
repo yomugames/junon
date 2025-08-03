@@ -453,7 +453,7 @@ class RemoteEventHandler {
     let team = player.game.teams[data.id]
     if (!team) return
     if (!team.hasMember(player)) return
-    if (!player.isSectorOwner()) return
+    if (!player.canEditTeam() && !player.isSectorOwner()) return
     if (data.hasOwnProperty("name")) {
       let maxNameLength = 40
       let name = data.name.slice(0, maxNameLength)

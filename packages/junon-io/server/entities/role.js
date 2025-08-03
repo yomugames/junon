@@ -19,8 +19,9 @@ class Role {
       "AccessMiningDrill": false,
       "DamagePvpPlayers":  true,
       "UseVents":          false,
+      "EditTeamName":      false,
       "UseCommands":       false,
-      "EditCommandBlocks": false
+      "EditCommandBlocks": false,
     }
 
     this.applyData(options)

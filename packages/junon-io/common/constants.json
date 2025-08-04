@@ -1125,6 +1125,7 @@
     "Sapper": {
       "parent": "Mobs.Guard",
       "resistance": ["fire"],
+      "immunity": ["poison"],
       "sprite": {
         "width": 60,
         "height": 181

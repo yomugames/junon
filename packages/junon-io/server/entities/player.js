@@ -5164,9 +5164,27 @@ class Player extends BaseEntity {
     return true
   }
 
-  getDamage() {
-    let damage = super.getDamage()
-    return Math.floor(this.getDamageMultiplier() * damage)
+  getWeapon() {
+  const activeItem = this.getActiveItem();
+  if (activeItem && activeItem.instance && typeof activeItem.instance.isWeapon === 'function' && activeItem.instance.isWeapon()) {
+    return activeItem.instance;
+  }
+  return null;
+}
+
+  getDamage(attackTarget) {
+    const weapon = this.getWeapon();
+    let damage;
+
+    if (weapon) {
+     damage = weapon.getDamage(attackTarget);
+    } else {
+     damage = super.getDamage();
+   }
+
+   const damageMultiplier = this.getDamageMultiplier(attackTarget);
+
+    return Math.floor(damage * damageMultiplier);
   }
 
 

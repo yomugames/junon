@@ -1252,6 +1252,15 @@ class TeamMenu extends BaseMenu {
       this.el.querySelector(".colony_chat_allowed").style.display = 'none'
       this.el.querySelector(".is_infinite_ammo").style.display = 'none'
       this.el.querySelector(".is_infinite_power").style.display = 'none'
+      this.el.querySelector(".show_team_join").style.display = 'none'
+      this.el.querySelector(".is_mob_autospawn").style.display = 'none'
+      this.el.querySelector(".is_mob_autospawn").style.display = 'none'
+      this.el.querySelector(".is_crafting_enabled").style.display = 'none'
+      this.el.querySelector(".is_mob_autospawn").style.display = 'none'
+      this.el.querySelector(".is_suit_change_enabled").style.display = 'none'
+      this.el.querySelector(".is_drop_inventory_on_death").style.display = 'none'
+      this.el.querySelector(".is_corpse_enabled").style.display = 'none'
+      this.el.querySelector(".is_mutant_enabled").style.display = 'none'
     }
 
     this.renderVisitorActionsState()

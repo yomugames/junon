@@ -23,7 +23,7 @@ class Villager extends LandMob {
   onPositionChanged() {
     super.onPositionChanged()
     let tile = this.getTile()
-    if (!tile) this.remove() //sky
+    if (!tile) this.setHealth(0) //sky
   }
 
   getTile(row=this.getRow(), col=this.getCol()) {

@@ -38,7 +38,6 @@ class HandEquipment extends BaseEquipment {
   if (customStats && typeof customStats.damage !== 'undefined') {
     return customStats.damage;
   }
-
   return this.getEquipmentDamage() || 0;
 }
 

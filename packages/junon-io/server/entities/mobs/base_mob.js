@@ -2158,7 +2158,6 @@ class BaseMob extends BaseEntity {
 getDamage(attackTarget) {
   const weapon = this.getWeapon();
   let totalDamage;
-
   if (weapon) {
     const baseDamage = super.getDamage();
     const weaponDamage = weapon.getDamage(attackTarget);

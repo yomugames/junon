@@ -276,6 +276,14 @@ class BaseProjectile extends BaseEntity {
     this.remove()
   }
 
+  canDamageWalls() {
+    if (this.sourceEntity && typeof this.sourceEntity.canDamageWalls === 'function') {
+      return this.sourceEntity.canDamageWalls();
+    }
+    
+    return this.getConstants().canDamageWalls;
+  }
+
   canDamage(entity) {
     if(this.sourceEntity && this.sourceEntity.canAttack) return this.sourceEntity.canAttack(entity)
     /* if can/can't attack, then can/can't damage. 

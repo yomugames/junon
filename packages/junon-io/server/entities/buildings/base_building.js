@@ -1940,16 +1940,12 @@ Object.assign(BaseBuilding.prototype, Destroyable.prototype, {
   },
 
   getDamageResistance(amount, attacker) {
-  if (attacker && attacker.hasCategory && attacker.hasCategory("fire") && this.isResistantTo("fire")) {
-    return Math.floor(amount / 2);
-  }
-
   const isMeleeAttack = attacker && typeof attacker.hasMeleeWeapon === 'function' && attacker.hasMeleeWeapon();
   if (this.hasCategory("melee_resistant") && isMeleeAttack) {
     return Math.floor(amount * 0.5);
   }
 
-  return 0;
+  return 0; 
 },
   
   onDamaged(attacker, amount) {

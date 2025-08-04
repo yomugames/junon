@@ -133,8 +133,8 @@ class CollidableProjectile extends BaseProjectile {
   }
 
   getCollidables() {
-    return [this.sector.playerTree, this.sector.mobTree, this.sector.structureMap]  
-  }
+  return [this.sector.playerTree, this.sector.mobTree, this.sector.structureMap, this.sector.armorMap]  
+}
 
 }
 

@@ -871,6 +871,13 @@ class Sector {
     })
 
     this.enableChunkInvalidations()
+    // after loading, we can rebuild invalidated chunks
+    this.forEachPlayer((player) => {
+      if (player.isClientReadyAndWaitingForSector) {
+        player.finishPlayerReadySetup();
+      }
+    })
+
     this.game.postGameReady()
   }
 
@@ -3131,8 +3138,6 @@ class Sector {
   }
 
   processMiasma() {
-    if (this.game.isPeaceful()) return
-
     const isOneMinuteInterval = this.game.timestamp % (Constants.physicsTimeStep * 60) === 0
     if (!isOneMinuteInterval) return
 

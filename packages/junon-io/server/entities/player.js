@@ -60,6 +60,7 @@ class Player extends BaseEntity {
     this.sessionId = socket.sessionId
     this.remoteAddress = Helper.getSocketRemoteAddress(socket)
     this.fingerprint = data.fingerprint
+    this.isClientReadyAndWaitingForSector = false
 
     if (this.sector.isZoomAllowed()) {
       this.screenWidth = this.socket.screenWidth
@@ -2652,7 +2653,19 @@ class Player extends BaseEntity {
 
   onPlayerReady() {
     // we just got notified by client that they received connection
+    // if sector is not ready yet, wait for it to finish loading
+    if (!this.sector.sectorLoader.isFinished) {
+      this.isClientReadyAndWaitingForSector = true
+      // sectorLoader will call this.onPlayerReady again when it is done
+      return
+    }
+    
+    this.finishPlayerReadySetup();
+  }
+
+  finishPlayerReadySetup() {
     this.isPlayerReady = true
+    this.isClientReadyAndWaitingForSector = false
 
     for (let tutorialName in this.tutorialIndex) {
       this.sendClientTutorialIndex(tutorialName)

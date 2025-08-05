@@ -2166,7 +2166,6 @@ getDamage(attackTarget) {
     totalDamage = super.getDamage();
   }
 
-  // 處理自訂傷害覆蓋 (此處的自訂傷害是針對 Mob 本身)
   if (this.sector) {
     if (this.sector.entityCustomStats[this.id] && typeof this.sector.entityCustomStats[this.id].damage !== 'undefined') {
       totalDamage = this.sector.entityCustomStats[this.id].damage;
@@ -2196,19 +2195,14 @@ getDamage(attackTarget) {
   getDamage(attackTarget) {
   const weapon = this.getWeapon();
   let totalDamage;
-
-  // 檢查 mob 是否裝備了武器
   if (weapon) {
-    // 如果有武器，則傷害 = mob 基礎傷害 + 武器傷害
-    const baseDamage = super.getDamage(); // 取得 mob 在 constants.json 中設定的空手傷害
-    const weaponDamage = weapon.getDamage(attackTarget); // 取得武器自身的傷害
+    const baseDamage = super.getDamage(); 
+    const weaponDamage = weapon.getDamage(attackTarget); 
     totalDamage = baseDamage + weaponDamage;
   } else {
-    // 如果沒有武器，則只使用 mob 的基礎傷害
     totalDamage = super.getDamage();
   }
 
-  // 檢查是否有來自伺服器設定的自訂傷害值，若有則覆蓋計算結果 (保留原有邏輯)
   if (this.sector) {
     if (this.sector.entityCustomStats[this.id] && typeof this.sector.entityCustomStats[this.id].damage !== 'undefined') {
       totalDamage = this.sector.entityCustomStats[this.id].damage;
@@ -2217,7 +2211,6 @@ getDamage(attackTarget) {
     }
   }
 
-  // 最後，應用傷害乘數 (例如對建築物的加成)
   const damageMultiplier = this.getDamageMultiplier(attackTarget);
   return Math.floor(damageMultiplier * totalDamage);
 }

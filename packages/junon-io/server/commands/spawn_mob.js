@@ -141,10 +141,6 @@ class SpawnMob extends BaseCommand {
       }
     }
 
-    if (!keyValueMap["attackables"]) {
-      data.attackables = ["players", "mobs", "buildings"]
-    }
-
     const mobs = this.sector.spawnMob(data)
 
     if (keyValueMap["raid"] === "true") {

@@ -182,7 +182,7 @@ class BaseEquipment extends BaseTransientEntity {
 
 Object.assign(BaseEquipment.prototype, Drainable.prototype, {
   getUsageCapacity() {
-    return this.getStats().usageCapacity || 100
+    return this.sector?.entityCustomStats[this.item.id]?.capacity || this.sector?.itemCustomStats[this.getType()]?.capacity || this.getStats().usageCapacity || 100
   },
   onUsageChanged() {
     if (this.owner && this.owner.isPlayer()) {

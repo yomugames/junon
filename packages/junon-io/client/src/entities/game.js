@@ -82,29 +82,29 @@ class Game {
     this.mutedPlayers = {}
     this.commandBlockTimers = {}
     this.isAFK = false
-    this.totalTaskBar        = document.querySelector('.total_task_stat')
-    this.healthBar        = document.querySelector('.health_stat')
-    this.shieldBar        = document.querySelector('.shield_stat')
-    this.oxygenBar        = document.querySelector('.oxygen_stat')
-    this.hungerBar        = document.querySelector('.hunger_stat')
-    this.staminaBar       = document.querySelector('.stamina_stat')
-    this.roomOxygenBar    = document.querySelector('.room_oxygen_stat')
-    this.energyBar        = document.querySelector('.energy_stat')
-    this.errorContent     = document.querySelector('#error_menu_content')
-    this.errorTitle       = document.querySelector('#error_title')
-    this.shipStatSpeed    = document.querySelector('.ship_stat_speed')
-    this.shipStatHealth   = document.querySelector('.ship_stat_health')
-    this.shipStatShield   = document.querySelector('.ship_stat_shield')
-    this.shipStatEnergy   = document.querySelector('.ship_stat_energy')
+    this.totalTaskBar = document.querySelector('.total_task_stat')
+    this.healthBar = document.querySelector('.health_stat')
+    this.shieldBar = document.querySelector('.shield_stat')
+    this.oxygenBar = document.querySelector('.oxygen_stat')
+    this.hungerBar = document.querySelector('.hunger_stat')
+    this.staminaBar = document.querySelector('.stamina_stat')
+    this.roomOxygenBar = document.querySelector('.room_oxygen_stat')
+    this.energyBar = document.querySelector('.energy_stat')
+    this.errorContent = document.querySelector('#error_menu_content')
+    this.errorTitle = document.querySelector('#error_title')
+    this.shipStatSpeed = document.querySelector('.ship_stat_speed')
+    this.shipStatHealth = document.querySelector('.ship_stat_health')
+    this.shipStatShield = document.querySelector('.ship_stat_shield')
+    this.shipStatEnergy = document.querySelector('.ship_stat_energy')
     this.shipStatMiningRate = document.querySelector('.ship_stat_mining_rate')
-    this.playerPos        = document.querySelector(".player_pos")
+    this.playerPos = document.querySelector(".player_pos")
     this.waveIncomingTime = document.querySelector("#wave_remaining_time_value")
-    this.deathScreen      = document.querySelector("#death_screen_container")
-    this.zoomInBtn        = document.querySelector("#zoom_in_btn")
-    this.zoomOutBtn       = document.querySelector("#zoom_out_btn")
-    this.chatInput        = document.querySelector("#chat_input")
+    this.deathScreen = document.querySelector("#death_screen_container")
+    this.zoomInBtn = document.querySelector("#zoom_in_btn")
+    this.zoomOutBtn = document.querySelector("#zoom_out_btn")
+    this.chatInput = document.querySelector("#chat_input")
     this.chatInputContainer = document.querySelector("#chat_input_container")
-    this.restartBtn       = document.querySelector("#restart_btn")
+    this.restartBtn = document.querySelector("#restart_btn")
     this.mobilePrimaryActionBtn = document.querySelector("#mobile_primary_action_btn")
     this.isTracingChunkRegionPath = false
     this.isChunkDisplayEnabled = false
@@ -201,31 +201,31 @@ class Game {
   initMenus() {
     this.openMenus = []
 
-    this.keypadMenu    = new Menus.KeypadMenu(this, document.querySelector("#keypad_menu"))
-    this.entityMenu    = new Menus.EntityMenu(this, document.querySelector("#entity_menu"))
+    this.keypadMenu = new Menus.KeypadMenu(this, document.querySelector("#keypad_menu"))
+    this.entityMenu = new Menus.EntityMenu(this, document.querySelector("#entity_menu"))
     this.blueprintMenu = new Menus.BlueprintMenu(this, document.querySelector("#blueprint_menu"))
-    this.craftMenu     = new Menus.CraftMenu(this, document.querySelector("#craft_menu"))
+    this.craftMenu = new Menus.CraftMenu(this, document.querySelector("#craft_menu"))
     this.processorMenu = new Menus.ProcessorMenu(this, document.querySelector("#processor_menu"))
-    this.storageMenu   = new Menus.StorageMenu(this, document.querySelector("#storage_menu"))
+    this.storageMenu = new Menus.StorageMenu(this, document.querySelector("#storage_menu"))
     this.inventoryMenu = new Menus.InventoryMenu(this, document.querySelector("#inventory_menu"))
     this.oxygenTankMenu = new Menus.OxygenTankMenu(this, document.querySelector("#oxygen_tank_menu"))
-    this.debugMenu      = new Menus.DebugMenu(this, document.querySelector("#debug_menu"))
-    this.chatMenu       = new Menus.ChatMenu(this, document.querySelector("#chat_container"))
-    this.tradeMenu      = new Menus.TradeMenu(this, document.querySelector("#trade_menu"))
-    this.playerMenu     = new Menus.PlayerMenu(this, document.querySelector("#player_menu"))
-    this.lightPathMenu  = new Menus.LightPathMenu(this, document.querySelector("#light_path_menu"))
-    this.welcomeMenu    = new Menus.WelcomeMenu(this, document.querySelector("#welcome_menu"))
-    this.tutorialMenu   = new Menus.TutorialMenu(this, document.querySelector("#tutorial_menu"))
-    this.mapMenu        = new Menus.MapMenu(this, document.querySelector("#map_menu"))
-    this.miniMapMenu    = new Menus.MiniMapMenu(this, document.querySelector("#mini_map_menu"))
+    this.debugMenu = new Menus.DebugMenu(this, document.querySelector("#debug_menu"))
+    this.chatMenu = new Menus.ChatMenu(this, document.querySelector("#chat_container"))
+    this.tradeMenu = new Menus.TradeMenu(this, document.querySelector("#trade_menu"))
+    this.playerMenu = new Menus.PlayerMenu(this, document.querySelector("#player_menu"))
+    this.lightPathMenu = new Menus.LightPathMenu(this, document.querySelector("#light_path_menu"))
+    this.welcomeMenu = new Menus.WelcomeMenu(this, document.querySelector("#welcome_menu"))
+    this.tutorialMenu = new Menus.TutorialMenu(this, document.querySelector("#tutorial_menu"))
+    this.mapMenu = new Menus.MapMenu(this, document.querySelector("#map_menu"))
+    this.miniMapMenu = new Menus.MiniMapMenu(this, document.querySelector("#mini_map_menu"))
     this.statusListMenu = new Menus.StatusListMenu(this, document.querySelector("#status_list_menu"))
-    this.teamMenu       = new Menus.TeamMenu(this, document.querySelector("#manage_team_menu"))
-    this.teamRequestMenu  = new Menus.TeamRequestMenu(this, document.querySelector("#team_request_menu"))
-    this.teamStatusMenu  = new Menus.TeamStatusMenu(this, document.querySelector("#team_status_menu"))
-    this.friendsMenu  = new Menus.FriendsMenu(this, document.querySelector("#friends_menu"))
-    this.npcDialogMenu  = new Menus.NPCDialogMenu(this, document.querySelector("#npc_dialog_menu"))
-    this.railStopMenu  = new Menus.RailStopMenu(this, document.querySelector("#rail_stop_menu"))
-    this.signMenu  = new Menus.SignMenu(this, document.querySelector("#sign_menu"))
+    this.teamMenu = new Menus.TeamMenu(this, document.querySelector("#manage_team_menu"))
+    this.teamRequestMenu = new Menus.TeamRequestMenu(this, document.querySelector("#team_request_menu"))
+    this.teamStatusMenu = new Menus.TeamStatusMenu(this, document.querySelector("#team_status_menu"))
+    this.friendsMenu = new Menus.FriendsMenu(this, document.querySelector("#friends_menu"))
+    this.npcDialogMenu = new Menus.NPCDialogMenu(this, document.querySelector("#npc_dialog_menu"))
+    this.railStopMenu = new Menus.RailStopMenu(this, document.querySelector("#rail_stop_menu"))
+    this.signMenu = new Menus.SignMenu(this, document.querySelector("#sign_menu"))
     this.userProfileMenu = new Menus.UserProfileMenu(this, document.querySelector("#user_profile_menu"))
     this.confirmMenu = new Menus.ConfirmMenu(this, document.querySelector("#confirm_menu"))
     this.permissionsMenu = new Menus.PermissionsMenu(this, document.querySelector("#permissions_menu"))
@@ -233,7 +233,7 @@ class Game {
     this.vendingMachineMenu = new Menus.VendingMachineMenu(this, document.querySelector("#vending_machine_menu"))
     this.atmMenu = new Menus.AtmMenu(this, document.querySelector("#atm_menu"))
     this.soilMenu = new Menus.SoilMenu(this, document.querySelector("#soil_menu"))
-    this.slaveTradeMenu      = new Menus.SlaveTradeMenu(this, document.querySelector("#slave_trade_menu"))
+    this.slaveTradeMenu = new Menus.SlaveTradeMenu(this, document.querySelector("#slave_trade_menu"))
     this.stoveMenu = new Menus.StoveMenu(this, document.querySelector("#stove_menu"))
     this.walkthroughMenu = new Menus.WalkthroughMenu(this, document.querySelector("#walkthrough_menu"))
     this.leaderboardMenu = new Menus.LeaderboardMenu(this, document.querySelector("#leaderboard_menu"))
@@ -251,7 +251,7 @@ class Game {
     this.terminalMenu = new Menus.TerminalMenu(this, document.querySelector("#terminal_menu"))
     this.commandBlockMenu = new Menus.CommandBlockMenu(this, document.querySelector("#command_block_menu"))
     this.commandBlockPicker = new Menus.CommandBlockPicker(this, document.querySelector("#command_block_picker"))
-    this.friendRequestMenu  = new Menus.FriendRequestMenu(this, document.querySelector("#friend_request_menu"))
+    this.friendRequestMenu = new Menus.FriendRequestMenu(this, document.querySelector("#friend_request_menu"))
     this.badgeMenu = new Menus.BadgeMenu(this, document.querySelector("#badge_menu"))
 
 
@@ -264,7 +264,7 @@ class Game {
   }
 
   equipBadge(name) {
-    SocketUtil.emit("EquipBadge", {name: name})
+    SocketUtil.emit("EquipBadge", { name: name })
   }
 
   onFriendRequestReceived(request) {
@@ -431,7 +431,7 @@ class Game {
         }
 
         if (this.destinationIndex) {
-          data['destinationIndex'] =  this.destinationIndex
+          data['destinationIndex'] = this.destinationIndex
         }
 
         SocketUtil.emit("SwapInventory", data)
@@ -492,7 +492,7 @@ class Game {
     let ownerId = entity.owner.id
 
     return ownerId === teamId &&
-           team.leader && team.leader.id === player.id
+      team.leader && team.leader.id === player.id
   }
 
   renderUpgradeDetails(entity) {
@@ -506,7 +506,7 @@ class Game {
     if (isMaxUpgradeReached) {
       this.entityMenu.querySelector(".upgrade_cost").style.display = 'none'
       this.entityMenu.querySelector("#upgrade_btn").querySelector(".action_label").innerText = "Max"
-      stats = { health: { before: entity.getMaxHealth() }, damage: { before: entity.getDamage() } , range: { before: entity.getRange() } }
+      stats = { health: { before: entity.getMaxHealth() }, damage: { before: entity.getDamage() }, range: { before: entity.getRange() } }
 
     } else {
       this.entityMenu.querySelector(".upgrade_cost").style.display = 'block'
@@ -570,7 +570,7 @@ class Game {
       document.querySelector("#sell_btn").className = ""
 
       const sell = entity.getSellCost()
-      const sellDetails = Object.keys(sell).map((resourceName) => { return [sell[resourceName], resourceName].join(" ")  } ).join(", ")
+      const sellDetails = Object.keys(sell).map((resourceName) => { return [sell[resourceName], resourceName].join(" ") }).join(", ")
       this.entityMenu.el.querySelector("#sell_cost").innerText = sellDetails.length > 0 ? sellDetails : ""
     }
   }
@@ -608,7 +608,7 @@ class Game {
     if (isSandboxOwner) return true
 
     return game.player.getRole() &&
-           game.player.getRole().permissions["UseCommands"]
+      game.player.getRole().permissions["UseCommands"]
   }
 
   hideEntityMenu(entity) {
@@ -618,7 +618,7 @@ class Game {
   getHighlightedEntity() {
     if (!this.sector) return null
     return this.sector.selection.selectedEntity ||
-           this.sector.persistentSelection.selectedEntity
+      this.sector.persistentSelection.selectedEntity
   }
 
   highlight(entity) {
@@ -667,7 +667,7 @@ class Game {
     document.querySelector("#player_action_tooltip").style.display = 'block'
     let tooltipWidth = document.querySelector("#player_action_tooltip").offsetWidth
     document.querySelector("#player_action_tooltip").style.top = "35%"
-    document.querySelector("#player_action_tooltip").style.left = (window.innerWidth/2 - tooltipWidth/2) + "px"
+    document.querySelector("#player_action_tooltip").style.left = (window.innerWidth / 2 - tooltipWidth / 2) + "px"
   }
 
   getNewBuildingStatsHTML(buildingKlass) {
@@ -680,9 +680,9 @@ class Game {
 
       let progress = stats[statKey]
       let el = "<div class='stats_growth'>" +
-                 "<div class='stats_type'>" + statKey + "</div>" +
-                 "<div class='stats_before'>" + progress.before + "</div>" +
-               "</div>"
+        "<div class='stats_type'>" + statKey + "</div>" +
+        "<div class='stats_before'>" + progress.before + "</div>" +
+        "</div>"
       statsEl += el
     }
 
@@ -742,11 +742,11 @@ class Game {
 
   getEffectsSoundNames() {
     return ["raid_2", "melee_hit", "airlock", "pistol", "machine_gun_2_b",
-            "pickup", "place_object", "shotgun", "light_laser", "rock_grind",
-            "assault_rifle", "explosion", "missile",
-            "harvest_plant", "melee_damage",
-            "water_step", "flame", "gas_release", "burning", "eating", "saber_one", "saber_two", "alert", "tesla",
-            "cannon", "plasma_gun", "bubble", "deep_laser"]
+      "pickup", "place_object", "shotgun", "light_laser", "rock_grind",
+      "assault_rifle", "explosion", "missile",
+      "harvest_plant", "melee_damage",
+      "water_step", "flame", "gas_release", "burning", "eating", "saber_one", "saber_two", "alert", "tesla",
+      "cannon", "plasma_gun", "bubble", "deep_laser"]
   }
 
   initSoundManager() {
@@ -835,7 +835,7 @@ class Game {
     try {
       soundId = sound.play()
       this.addCurrentSound(name, options.shouldDelete)
-    } catch(e) {
+    } catch (e) {
       console.error(e)
     }
 
@@ -847,7 +847,7 @@ class Game {
     if (sound) {
       try {
         sound.stop()
-      } catch(e) {
+      } catch (e) {
         console.error(e)
       }
     }
@@ -939,7 +939,7 @@ class Game {
   }
 
   parseEvent(type, eventData) {
-    switch(type) {
+    switch (type) {
       case Protocol.definition().EventType.TaxCollection:
         return {
           description: i18n.t("Events.TaxCollection"),
@@ -1107,44 +1107,44 @@ class Game {
     let quakeMagnitude = 5
 
     this.screenShakeTween = new TWEEN.Tween(position)
-        .to({ y: origY + quakeMagnitude  }, 60)
-        .onUpdate(() => { // Called after tween.js updates 'coords'.
-            targetSprite.position.y = position.y
-        })
+      .to({ y: origY + quakeMagnitude }, 60)
+      .onUpdate(() => { // Called after tween.js updates 'coords'.
+        targetSprite.position.y = position.y
+      })
 
     let bTween = new TWEEN.Tween(position)
-        .to({ y: origY - quakeMagnitude  }, 160)
-        .onUpdate(() => { // Called after tween.js updates 'coords'.
-            targetSprite.position.y = position.y
-        })
+      .to({ y: origY - quakeMagnitude }, 160)
+      .onUpdate(() => { // Called after tween.js updates 'coords'.
+        targetSprite.position.y = position.y
+      })
 
     let cTween = new TWEEN.Tween(position)
-        .to({ y: origY + quakeMagnitude  }, 60)
-        .onUpdate(() => { // Called after tween.js updates 'coords'.
-            targetSprite.position.y = position.y
-        })
+      .to({ y: origY + quakeMagnitude }, 60)
+      .onUpdate(() => { // Called after tween.js updates 'coords'.
+        targetSprite.position.y = position.y
+      })
 
     let dTween = new TWEEN.Tween(position)
-        .to({ y: origY - quakeMagnitude  }, 160)
-        .onUpdate(() => { // Called after tween.js updates 'coords'.
-            targetSprite.position.y = position.y
-        })
+      .to({ y: origY - quakeMagnitude }, 160)
+      .onUpdate(() => { // Called after tween.js updates 'coords'.
+        targetSprite.position.y = position.y
+      })
 
     let eTween = new TWEEN.Tween(position)
-        .to({ y: origY + quakeMagnitude  }, 60)
-        .onUpdate(() => { // Called after tween.js updates 'coords'.
-            targetSprite.position.y = position.y
-        })
+      .to({ y: origY + quakeMagnitude }, 60)
+      .onUpdate(() => { // Called after tween.js updates 'coords'.
+        targetSprite.position.y = position.y
+      })
 
     let fTween = new TWEEN.Tween(position)
-        .to({ y: origY - quakeMagnitude  }, 160)
-        .onUpdate(() => { // Called after tween.js updates 'coords'.
-            targetSprite.position.y = position.y
-        })
-        .onComplete(() => {
-            targetSprite.position.y = origY
-            this.screenShakeTween = null
-        })
+      .to({ y: origY - quakeMagnitude }, 160)
+      .onUpdate(() => { // Called after tween.js updates 'coords'.
+        targetSprite.position.y = position.y
+      })
+      .onComplete(() => {
+        targetSprite.position.y = origY
+        this.screenShakeTween = null
+      })
 
     this.screenShakeTween.chain(bTween)
     bTween.chain(cTween)
@@ -1245,14 +1245,14 @@ class Game {
     let alpha = { alpha: this.hudAlertContainer.alpha }
 
     this.hudAlertTween = new TWEEN.Tween(alpha)
-        .to({ alpha: 0.1 }, 800)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .onUpdate(() => {
-          this.hudAlertContainer.alpha = alpha.alpha
-          document.querySelector(".hud_alert_container").style.opacity = 0.1 + alpha.alpha
-        })
-        .yoyo(true)
-        .repeat(Infinity)
+      .to({ alpha: 0.1 }, 800)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate(() => {
+        this.hudAlertContainer.alpha = alpha.alpha
+        document.querySelector(".hud_alert_container").style.opacity = 0.1 + alpha.alpha
+      })
+      .yoyo(true)
+      .repeat(Infinity)
 
     this.hudAlertTween.start()
   }
@@ -1330,7 +1330,7 @@ class Game {
     return Math.atan2(y2 - y1, x2 - x1)
   }
 
-  getPlainArmorSprite(){
+  getPlainArmorSprite() {
     if (!this.plainArmorSprite) {
       let container = new PIXI.Container()
       container.name = "SpaceSuitContainer"
@@ -1338,7 +1338,7 @@ class Game {
       container.pivot.y = 0
 
       if (!this.isCanvasMode()) {
-        container.rotation = -Math.PI/2
+        container.rotation = -Math.PI / 2
         container.scale.set(0.69)
       }
 
@@ -1411,7 +1411,7 @@ class Game {
 
     // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 
-    let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png','pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png', 'deconstructor.png', 'blue_laser.png', 'keypad_door.png', 'keypad_door_lower.png', 'keypad_door_upper.png', 'unbreakable_wall.png', 'sapper.png', 'sapper_corpse.png', 'dynamite.png', 'miasma_gate.png']
+    let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png', 'pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png', 'deconstructor.png', 'blue_laser.png', 'keypad_door.png', 'keypad_door_lower.png', 'keypad_door_upper.png', 'unbreakable_wall.png', 'sapper.png', 'sapper_corpse.png', 'dynamite.png', 'miasma_gate.png']
     tempAssets.forEach((asset) => {
       PIXI.Texture.addToCache(PIXI.Texture.fromImage('/assets/images/' + asset), asset)
     })
@@ -1431,7 +1431,7 @@ class Game {
         let selfTime = (new Date()).getTime() - window.textureSetupTime
         let time = (new Date()).getTime() - window.initializeTime
         cb()
-    })
+      })
   }
 
   getPreloadedGraphics() {
@@ -1579,20 +1579,20 @@ class Game {
 
   onBadgeEquipped(data) {
     try {
-      let tint = Number("0x"+data.badge.color);
+      let tint = Number("0x" + data.badge.color);
       this.sector.players[data.playerId].sprite.children[1].children[0].tint = tint;
     }
-    catch(e) {
+    catch (e) {
       //server sent this before the player was initialized
     }
   }
 
   onBadgesData(data) {
     document.querySelector('#badge_container').innerHTML = '';
-    for(let badge in data.badges) {
+    for (let badge in data.badges) {
       let el = `<div title="${data.badges[badge].description}" onclick="game.equipBadge('${data.badges[badge].name}')" style="display:inline-block;margin-right:10px;"><p style="margin:0px;font-size:10px;">${data.badges[badge].name}</p><div class="badge" id="${data.badges[badge].name}"><img class="${data.badges[badge].isQualified ? "qualified" : "unqualified"}" src="/assets/images/${data.badges[badge].imageUrl}" width="50" height="50"></div></div>`
       document.querySelector('#badge_container').innerHTML += el;
-      if(!data.badges[badge].isQualified) {
+      if (!data.badges[badge].isQualified) {
         let coveringEl = `<img class="cover-badge" src="/assets/images/badges/lock.png" width="50" height="50">`;
         document.querySelector(`#${data.badges[badge].name}`).innerHTML += coveringEl;
       }
@@ -1600,38 +1600,38 @@ class Game {
   }
 
   onTempCommandBlockData(data) {
-    if(this.commandBlockMenu.getNode(data.tempId)) return
+    if (this.commandBlockMenu.getNode(data.tempId)) return
     let parent = this.commandBlockMenu.getNode(data.parentId)
-    if(!parent && data.type != "Trigger") return
+    if (!parent && data.type != "Trigger") return
 
-    if(data.type === "Trigger" && data.parentId === 0) {
-      let trigger = new Trigger(this.commandBlockMenu, {id: data.tempId, event: data.value})
+    if (data.type === "Trigger" && data.parentId === 0) {
+      let trigger = new Trigger(this.commandBlockMenu, { id: data.tempId, event: data.value })
       this.commandBlockMenu.addTrigger(trigger)
     }
-    else if(data.value == 'ifthenelse') {
-      parent.commandBlock.getActionEntryFor(data.value).build(parent, { actionKey: data.value, id: data.tempId }, false) 
+    else if (data.value == 'ifthenelse') {
+      parent.commandBlock.getActionEntryFor(data.value).build(parent, { actionKey: data.value, id: data.tempId }, false)
       //create ifthenelse, without adding if, then, and else
     }
-    else if(data.type === 'if') {
+    else if (data.type === 'if') {
       parent.addIf(data.tempId)
     }
-    else if(data.type === 'then') {
+    else if (data.type === 'then') {
       parent.addThen(data.tempId)
     }
-    else if(data.type === 'else') {
+    else if (data.type === 'else') {
       parent.addElse(data.tempId)
     }
-    else if(data.type == "ActionEntry") { //command action entry, timer
+    else if (data.type == "ActionEntry") { //command action entry, timer
       parent.commandBlock.getActionEntryFor(data.value).build(parent, { actionKey: data.value, id: data.tempId })
     }
-    else if(!data.type) {
-      if(parent.actionKey != "commands") {//comparison
-        new Comparison(parent, {id: data.tempId})
+    else if (!data.type) {
+      if (parent.actionKey != "commands") {//comparison
+        new Comparison(parent, { id: data.tempId })
         return
       }
       //command value
-      new ActionValue(parent, {value: data.value, id: data.tempId})
-    } 
+      new ActionValue(parent, { value: data.value, id: data.tempId })
+    }
   }
 
   openMenu(data) {
@@ -1656,7 +1656,7 @@ class Game {
   }
 
   onDoorStatus(status) {
-    if(status && status.status) {
+    if (status && status.status) {
       document.querySelector("#keypad_submit_button").innerHTML = status.status
     } else {
       document.querySelector("#keypad_submit_button").innerHTML = status
@@ -1826,33 +1826,33 @@ class Game {
   }
 
   increaseLetterBox() {
-    let topBar    = document.querySelector("#top_bar_container")
+    let topBar = document.querySelector("#top_bar_container")
     let bottomBar = document.querySelector("#bottom_bar_container")
 
     let height = { height: 45 }
     this.letterBoxTween = new TWEEN.Tween(height)
-        .to({ height: 75 }, 1000)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .onUpdate(() => {
-          topBar.style.height = (height.height) + "px"
-          bottomBar.style.height = (height.height + 15) + "px"
-        })
+      .to({ height: 75 }, 1000)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate(() => {
+        topBar.style.height = (height.height) + "px"
+        bottomBar.style.height = (height.height + 15) + "px"
+      })
 
     this.letterBoxTween.start()
   }
 
   decreaseLetterBox() {
-    let topBar    = document.querySelector("#top_bar_container")
+    let topBar = document.querySelector("#top_bar_container")
     let bottomBar = document.querySelector("#bottom_bar_container")
 
     let height = { height: 75 }
     this.letterBoxTween = new TWEEN.Tween(height)
-        .to({ height: 45 }, 1000)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .onUpdate(() => {
-          topBar.style.height = (height.height) + "px"
-          bottomBar.style.height = (height.height + 15) + "px"
-        })
+      .to({ height: 45 }, 1000)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate(() => {
+        topBar.style.height = (height.height) + "px"
+        bottomBar.style.height = (height.height + 15) + "px"
+      })
 
     this.letterBoxTween.start()
   }
@@ -1943,7 +1943,7 @@ class Game {
     if (this.sector) {
       if (this.isRoundStarted) {
         if (this.sector.originalPlayers[data.playerId] &&
-            this.sector.originalPlayers[data.playerId].health === 0) {
+          this.sector.originalPlayers[data.playerId].health === 0) {
           this.sector.setOriginalPlayerLeft(data.playerId)
         } else {
           this.sector.removeFromOriginalPlayers(data.playerId)
@@ -2303,7 +2303,7 @@ class Game {
   }
 
   updateShipStats(ship) {
-    this.shipStatSpeed.innerText  = ship.speed
+    this.shipStatSpeed.innerText = ship.speed
     this.shipStatHealth.innerText = ship.health
     this.shipStatShield.innerText = (ship.shield && ship.shield.health) || 0
     this.shipStatEnergy.innerText = ship.energyUsage + "/" + ship.energyCapacity
@@ -2355,7 +2355,7 @@ class Game {
   initListeners() {
     window.addEventListener('resize', this.resizeCanvas.bind(this), false)
 
-    let isOnIOS = navigator.userAgent.match(/iPad/i)|| navigator.userAgent.match(/iPhone/i)
+    let isOnIOS = navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPhone/i)
     let unloadEvent = isOnIOS ? "pagehide" : "beforeunload"
     window.addEventListener(unloadEvent, this.onBeforeUnload.bind(this), false)
 
@@ -2470,7 +2470,7 @@ class Game {
     if (this.player.health > 0) {
       this.hideDeathMessage()
     } else {
-      SocketUtil.emit("RespawnRequest", { })
+      SocketUtil.emit("RespawnRequest", {})
     }
   }
 
@@ -2490,7 +2490,7 @@ class Game {
 
   isImposterGame() {
     return this.sector.getOriginalUid() === "eWC1CfZymRExY" ||
-           this.sector.getOriginalUid() === "Ap9OYBkw3dQvJ"
+      this.sector.getOriginalUid() === "Ap9OYBkw3dQvJ"
   }
 
   showGameHuds() {
@@ -2717,7 +2717,7 @@ class Game {
   }
 
   onStartMiniGameBtnClick(e) {
-    SocketUtil.emit("StartRound", { })
+    SocketUtil.emit("StartRound", {})
   }
 
   onMiniGameInviteInputClick(e) {
@@ -3073,10 +3073,10 @@ class Game {
     this.gameLayer.scale.set(this.resolution)
 
     let browserResolution = this.getPixelRatio()
-    let canvasWidth  = this.getCanvasWidth() * browserResolution
+    let canvasWidth = this.getCanvasWidth() * browserResolution
     let canvasHeight = this.getCanvasHeight() * browserResolution
 
-    this.app.renderer.view.style.width  = this.getCanvasWidth()  + 'px'
+    this.app.renderer.view.style.width = this.getCanvasWidth() + 'px'
     this.app.renderer.view.style.height = this.getCanvasHeight() + 'px'
 
     this.app.renderer.resize(canvasWidth, canvasHeight)
@@ -3093,11 +3093,11 @@ class Game {
     }
 
     let browserResolution = this.getPixelRatio()
-    let canvasWidth  = this.getCanvasWidth() * browserResolution
+    let canvasWidth = this.getCanvasWidth() * browserResolution
     let canvasHeight = this.getCanvasHeight() * browserResolution
 
     this.app.renderer.resize(canvasWidth, canvasHeight)
-    this.app.renderer.view.style.width  = this.getCanvasWidth()  + 'px'
+    this.app.renderer.view.style.width = this.getCanvasWidth() + 'px'
     this.app.renderer.view.style.height = this.getCanvasHeight() + 'px'
     this.autoAdjustResolution()
 
@@ -3178,7 +3178,7 @@ class Game {
     stats.forEach((stat) => {
       if (data.hasOwnProperty(stat)) {
         let setter = "set" + Helper.capitalize(stat)
-        let value  = data[stat]
+        let value = data[stat]
 
         if (data.entityId) {
           let entity = this.sector.getEntity(data.entityId)
@@ -3350,7 +3350,7 @@ class Game {
       let screenshotPosition = this.sector.screenshots[screenshotKey]
 
       if (screenshotPosition === Constants.autoscreenshotPosition &&
-          (!this.lastScreenshotDay || this.day - this.lastScreenshotDay >= 5)) {
+        (!this.lastScreenshotDay || this.day - this.lastScreenshotDay >= 5)) {
         SocketUtil.emit("RemoveScreenshot", { id: screenshotKey })
         this.screenshot(Constants.autoscreenshotPosition)
       }
@@ -3432,7 +3432,7 @@ class Game {
 
   isContentFillable(inventoryType) {
     const fillables = [Protocol.definition().BuildingType.Syringe,
-                       Protocol.definition().BuildingType.Bottle]
+    Protocol.definition().BuildingType.Bottle]
 
     return fillables.indexOf(inventoryType) !== -1
   }
@@ -3522,9 +3522,9 @@ class Game {
   renderInventorySlot(inventorySlot, data) {
     inventorySlot.querySelector("img").src = this.getImageSrcForItemType(data.type)
     if (data.id) {
-      inventorySlot.dataset.id    = data.id
+      inventorySlot.dataset.id = data.id
     }
-    inventorySlot.dataset.type  = data.type
+    inventorySlot.dataset.type = data.type
 
     inventorySlot.dataset.content = data.count === 1 ? "" : data.count
     inventorySlot.dataset.special = data.instance ? data.instance.content : ""
@@ -3573,8 +3573,10 @@ class Game {
     if (!equipmentKlass) return
     if (equipmentKlass.prototype.isUnbreakable() && !equipmentKlass.prototype.shouldShowUsage()) return
 
-    let maxUsage = equipmentKlass.prototype.getUsageCapacity()
-
+    let maxUsage;
+    if(this.sector.entityCustomStats[inventorySlot.dataset.id]) maxUsage = this.sector.entityCustomStats[inventorySlot.dataset.id].capacity
+    else if(this.sector.itemCustomStats[inventorySlot.dataset.type]) maxUsage = this.sector.itemCustomStats[inventorySlot.dataset.type].capacity
+    else maxUsage = equipmentKlass.prototype.getStats().usageCapacity || 100
     this.renderItemUsageFor(inventorySlot, usage, maxUsage)
 
     if (this.isMobile() && inventorySlot.dataset.id === this.mobilePrimaryActionBtn.dataset.id) {
@@ -3591,7 +3593,7 @@ class Game {
     }
 
     let curr = usage
-    usageBar.querySelector(".bar_fill").style.width = (curr/max * 100) + "%"
+    usageBar.querySelector(".bar_fill").style.width = (curr / max * 100) + "%"
   }
 
   removeInventorySlotUsage(inventorySlot) {
@@ -3623,10 +3625,10 @@ class Game {
   createEntity(group, data) {
     let entity
 
-    switch(group) {
+    switch (group) {
       case "terrains":
-        data.x = data.col * Constants.tileSize + Constants.tileSize/2
-        data.y = data.row * Constants.tileSize + Constants.tileSize/2
+        data.x = data.col * Constants.tileSize + Constants.tileSize / 2
+        data.y = data.row * Constants.tileSize + Constants.tileSize / 2
         entity = Terrains.forType(data.type).build(this, data)
         break
       case "ships":
@@ -3833,7 +3835,7 @@ class Game {
 
   playBackgroundMusic() {
     if (this.isPvP()) return
-    let musicName =  this.getPeacefulMusicName()
+    let musicName = this.getPeacefulMusicName()
     this.backgroundMusicSoundId = this.playSoundLazyDownload(musicName, { loop: true })
   }
 
@@ -3864,13 +3866,13 @@ class Game {
     try {
       let backgroundSound = this.sounds[this.getPeacefulMusicName()]
       if (backgroundSound.playing()) {
-        backgroundSound.once('fade', () => { backgroundSound.stop( this.backgroundMusicSoundId ); }, this.backgroundMusicSoundId)
+        backgroundSound.once('fade', () => { backgroundSound.stop(this.backgroundMusicSoundId); }, this.backgroundMusicSoundId)
         backgroundSound.fade(this.getSavedOrDefaultBackgroundVolume(), 0, 3000, this.backgroundMusicSoundId)
       }
 
       this.meetingMusicSoundId = this.playSound("meeting", { loop: true })
       this.sounds["meeting"].fade(0, this.getSavedOrDefaultBackgroundVolume(), 3000, this.meetingMusicSoundId)
-    } catch(e) {
+    } catch (e) {
       console.error(e)
     }
   }
@@ -3879,13 +3881,13 @@ class Game {
     try {
       let meetingSound = this.sounds["meeting"]
       if (meetingSound.playing()) {
-        meetingSound.once('fade', () => { meetingSound.stop( this.meetingMusicSoundId ); }, this.meetingMusicSoundId)
+        meetingSound.once('fade', () => { meetingSound.stop(this.meetingMusicSoundId); }, this.meetingMusicSoundId)
         meetingSound.fade(this.getSavedOrDefaultBackgroundVolume(), 0, 3000, this.meetingMusicSoundId)
       }
 
       this.backgroundMusicSoundId = this.playSound(this.getPeacefulMusicName(), { loop: true })
       this.sounds[this.getPeacefulMusicName()].fade(0, this.getSavedOrDefaultBackgroundVolume(), 3000, this.backgroundMusicSoundId)
-    } catch(e) {
+    } catch (e) {
       console.error(e)
     }
   }
@@ -3895,13 +3897,13 @@ class Game {
     try {
       let backgroundSound = this.sounds[this.getPeacefulMusicName()]
       if (backgroundSound.playing()) {
-        backgroundSound.once('fade', () => { backgroundSound.stop( this.backgroundMusicSoundId ); }, this.backgroundMusicSoundId)
+        backgroundSound.once('fade', () => { backgroundSound.stop(this.backgroundMusicSoundId); }, this.backgroundMusicSoundId)
         backgroundSound.fade(this.getSavedOrDefaultBackgroundVolume(), 0, 3000, this.backgroundMusicSoundId)
       }
 
       this.raidMusicSoundId = this.playSound("enemy_invasion", { loop: true })
       this.sounds["enemy_invasion"].fade(0, this.getSavedOrDefaultBackgroundVolume(), 3000, this.raidMusicSoundId)
-    } catch(e) {
+    } catch (e) {
       console.error(e)
     }
   }
@@ -3941,13 +3943,13 @@ class Game {
     try {
       let raidSound = this.sounds["enemy_invasion"]
       if (raidSound.playing()) {
-        raidSound.once('fade', () => { raidSound.stop( this.raidMusicSoundId ); }, this.raidMusicSoundId)
+        raidSound.once('fade', () => { raidSound.stop(this.raidMusicSoundId); }, this.raidMusicSoundId)
         raidSound.fade(this.getSavedOrDefaultBackgroundVolume(), 0, 3000, this.raidMusicSoundId)
       }
 
       this.backgroundMusicSoundId = this.playSound(this.getPeacefulMusicName(), { loop: true })
       this.sounds[this.getPeacefulMusicName()].fade(0, this.getSavedOrDefaultBackgroundVolume(), 3000, this.backgroundMusicSoundId)
-    } catch(e) {
+    } catch (e) {
       console.error(e)
     }
   }
@@ -4033,7 +4035,7 @@ class Game {
     }
 
     document.querySelector(".disconnected_msg").style.display = 'none'
-    this.updateRoomOxygenBar(0,100)
+    this.updateRoomOxygenBar(0, 100)
 
     this.deathScreen.style.display = 'none'
     document.getElementById("save_progress").style.display = 'none'
@@ -4045,7 +4047,7 @@ class Game {
       app.ticker.add((time) => {
         try {
           this.updateGame(time)
-        } catch(e) {
+        } catch (e) {
           ExceptionReporter.captureException(e)
         }
       })
@@ -4185,8 +4187,8 @@ class Game {
 
   shouldBeAddedToMineColonies(sectorUid) {
     return this.isLoggedIn() &&
-           this.isCreatedByPlayer() &&
-           !this.main.gameExplorer.mineColonyEntries[sectorUid]
+      this.isCreatedByPlayer() &&
+      !this.main.gameExplorer.mineColonyEntries[sectorUid]
   }
 
   initSidebar(data) {
@@ -4347,12 +4349,12 @@ class Game {
     }
 
     this.deathMessageTween = new TWEEN.Tween(opacity)
-        .to({ opacity: 0.85 }, 2000)
-        .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
-        .onUpdate(() => { // Called after tween.js updates 'coords'.
-            // Move 'box' to the position described by 'coords' with a CSS translation.
-            this.deathScreen.style.opacity = opacity.opacity
-        })
+      .to({ opacity: 0.85 }, 2000)
+      .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
+      .onUpdate(() => { // Called after tween.js updates 'coords'.
+        // Move 'box' to the position described by 'coords' with a CSS translation.
+        this.deathScreen.style.opacity = opacity.opacity
+      })
 
     this.deathMessageTween.start()
 
@@ -4363,9 +4365,9 @@ class Game {
     if (debugMode) return
     let threeMinutes = 1000 * 60 * 3
     let shouldRefreshAd = !this.lastDeathAdDisplay ||
-                          (this.lastDeathAdDisplay && ((Date.now() - this.lastDeathAdDisplay) > threeMinutes))
+      (this.lastDeathAdDisplay && ((Date.now() - this.lastDeathAdDisplay) > threeMinutes))
     if (shouldRefreshAd) {
-      aiptag.cmd.display.push(function() {
+      aiptag.cmd.display.push(function () {
         aipDisplayTag.display('junon-io_728x90');
       })
       this.lastDeathAdDisplay = Date.now()
@@ -4464,7 +4466,7 @@ class Game {
       clearInterval(this.waveCountdownInterval)
 
       this.initVariables(options)
-    } catch(e) {
+    } catch (e) {
       ExceptionReporter.captureException(e)
     }
   }
@@ -4656,7 +4658,7 @@ class Game {
 
   updateShieldBar(curr, max) {
     this.shieldBar.querySelector(".bar_label").innerText = curr
-    this.shieldBar.querySelector(".bar_fill").style.width = max ? (curr/max * 100) + "%" : "0%"
+    this.shieldBar.querySelector(".bar_fill").style.width = max ? (curr / max * 100) + "%" : "0%"
   }
 
   startOxygenLowTween() {
@@ -4665,20 +4667,20 @@ class Game {
 
     if (!this.oxygenLowTween) {
       this.oxygenLowTween = new TWEEN.Tween(opacity)
-          .to({ opacity: 0 }, 1000)
-          .easing(TWEEN.Easing.Quadratic.Out)
-          .onUpdate(() => {
-            let color = "rgb(88,151,209," + opacity.opacity + ")"
-            barContainer.style.backgroundColor = color
-          })
-          .onComplete(() => {
-            barContainer.style.background = 'none'
-          })
-          .onStop(() => {
-            barContainer.style.background = 'none'
-          })
-          .repeat(Infinity)
-          .start()
+        .to({ opacity: 0 }, 1000)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onUpdate(() => {
+          let color = "rgb(88,151,209," + opacity.opacity + ")"
+          barContainer.style.backgroundColor = color
+        })
+        .onComplete(() => {
+          barContainer.style.background = 'none'
+        })
+        .onStop(() => {
+          barContainer.style.background = 'none'
+        })
+        .repeat(Infinity)
+        .start()
     }
   }
 
@@ -4695,20 +4697,20 @@ class Game {
 
     if (!this.hungerLowTween) {
       this.hungerLowTween = new TWEEN.Tween(opacity)
-          .to({ opacity: 0 }, 1000)
-          .easing(TWEEN.Easing.Quadratic.Out)
-          .onUpdate(() => {
-            let color = "rgb(212,115,35," + opacity.opacity + ")"
-            barContainer.style.backgroundColor = color
-          })
-          .onComplete(() => {
-            barContainer.style.background = 'none'
-          })
-          .onStop(() => {
-            barContainer.style.background = 'none'
-          })
-          .repeat(Infinity)
-          .start()
+        .to({ opacity: 0 }, 1000)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onUpdate(() => {
+          let color = "rgb(212,115,35," + opacity.opacity + ")"
+          barContainer.style.backgroundColor = color
+        })
+        .onComplete(() => {
+          barContainer.style.background = 'none'
+        })
+        .onStop(() => {
+          barContainer.style.background = 'none'
+        })
+        .repeat(Infinity)
+        .start()
     }
   }
 
@@ -4745,12 +4747,12 @@ class Game {
 
   updateStaminaBar(curr, max) {
     this.staminaBar.querySelector(".bar_label").innerText = curr
-    this.staminaBar.querySelector(".bar_fill").style.width = max ? (curr/max * 100) + "%" : "0%"
+    this.staminaBar.querySelector(".bar_fill").style.width = max ? (curr / max * 100) + "%" : "0%"
   }
 
   updateRoomOxygenBar(curr, max) {
     this.roomOxygenBar.querySelector("#oxygen_percentage_value").innerText = curr
-    this.roomOxygenBar.querySelector(".bar_fill").style.width = max ? (curr/max * 100) + "%" : "0%"
+    this.roomOxygenBar.querySelector(".bar_fill").style.width = max ? (curr / max * 100) + "%" : "0%"
   }
 
   updateOxygenBar(curr, max) {
@@ -4761,7 +4763,7 @@ class Game {
     }
 
     this.oxygenBar.querySelector(".bar_label").innerText = curr
-    this.oxygenBar.querySelector(".bar_fill").style.width = max ? (curr/max * 100) + "%" : "0%"
+    this.oxygenBar.querySelector(".bar_fill").style.width = max ? (curr / max * 100) + "%" : "0%"
   }
 
   updateHungerBar(curr, max) {
@@ -4772,17 +4774,17 @@ class Game {
     }
 
     this.hungerBar.querySelector(".bar_label").innerText = curr
-    this.hungerBar.querySelector(".bar_fill").style.width = max ? (curr/max * 100) + "%" : "0%"
+    this.hungerBar.querySelector(".bar_fill").style.width = max ? (curr / max * 100) + "%" : "0%"
   }
 
   updateHealthBar(curr, max) {
     this.healthBar.querySelector(".bar_label").innerText = curr
-    this.healthBar.querySelector(".bar_fill").style.width = max ? (curr/max * 100) + "%" : "0%"
+    this.healthBar.querySelector(".bar_fill").style.width = max ? (curr / max * 100) + "%" : "0%"
   }
 
   updateTotalTasksBar(curr, max) {
     this.totalTaskBar.querySelector(".bar_label").innerText = curr
-    this.totalTaskBar.querySelector(".bar_fill").style.width = max ? (curr/max * 100) + "%" : "0%"
+    this.totalTaskBar.querySelector(".bar_fill").style.width = max ? (curr / max * 100) + "%" : "0%"
   }
 
   onLeaderboard(data) {
@@ -4808,7 +4810,7 @@ class Game {
     window.app = this.app = new PIXI.Application(options)
 
     let type = "WebGL"
-    if(!PIXI.utils.isWebGLSupported()){
+    if (!PIXI.utils.isWebGLSupported()) {
       type = "canvas"
     }
 
@@ -4879,9 +4881,9 @@ class Game {
 
     let icon = new PIXI.Sprite(PIXI.utils.TextureCache[spritePath])
     icon.anchor.set(0.5)
-    icon.width  = size
+    icon.width = size
     icon.height = size
-    icon.tint   = tint
+    icon.tint = tint
 
     container.addChild(buttonBackground)
     container.addChild(icon)
@@ -4989,7 +4991,7 @@ class Game {
     window.zoomEnabled = false // dont allow another zoom until this one is finished
 
     new TWEEN.Tween(resolution)
-      .to({ resolution: 1 / level  }, 300)
+      .to({ resolution: 1 / level }, 300)
       .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
       .onUpdate(() => {
         this.resolution = resolution.resolution
@@ -5010,10 +5012,10 @@ class Game {
       let zoomLevel = 1 / this.resolution
       if (zoomLevel <= 1.5) {
         this.zoomOutBtn.style.display = 'block'
-        this.zoomInBtn.style.display  = 'none'
+        this.zoomInBtn.style.display = 'none'
       } else if (zoomLevel >= 3.5) {
         this.zoomOutBtn.style.display = 'none'
-        this.zoomInBtn.style.display  = 'block'
+        this.zoomInBtn.style.display = 'block'
       }
     }
   }
@@ -5024,12 +5026,12 @@ class Game {
 
   scaleUsernameSprites(resolution) {
     Object.values(this.sector.players).forEach((player) => {
-      player.usernameSprite.scale.set(1/resolution)
+      player.usernameSprite.scale.set(1 / resolution)
     })
   }
 
   initMyPlayer(player) {
-    this.player   = player
+    this.player = player
     window.player = player
 
     const inputController = this.getInputController()
@@ -5085,26 +5087,26 @@ class Game {
 
   initKeyBindings() {
     this.keyBindings = {
-      "move up":     87,          // 'w'
-      "move left":   65,          // 'a'
-      "move down":   83,          // 's'
-      "move right":  68,          // 'd'
-      "rotate":      82,          // 'r'
-      "craft":       67,          // 'c'
-      "inventory":   73,          // 'i'
-      "map":         77,          // 'm'
-      "colony":      80,          // 'p'
-      "alliance":    70,          // 'f'
-      "visit":       86,          // 'v'
+      "move up": 87,          // 'w'
+      "move left": 65,          // 'a'
+      "move down": 83,          // 's'
+      "move right": 68,          // 'd'
+      "rotate": 82,          // 'r'
+      "craft": 67,          // 'c'
+      "inventory": 73,          // 'i'
+      "map": 77,          // 'm'
+      "colony": 80,          // 'p'
+      "alliance": 70,          // 'f'
+      "visit": 86,          // 'v'
       "command block": 75,        // k
-      "interact":    69,          // 'e'
-      "attack":      32,          // 'space'
-      "upgrade":     85,          // 'u'
-      "chat":        90,          // 'z'
-      "zoom in":     187,         // =
-      "zoom out":    189,         // -
+      "interact": 69,          // 'e'
+      "attack": 32,          // 'space'
+      "upgrade": 85,          // 'u'
+      "chat": 90,          // 'z'
+      "zoom in": 187,         // =
+      "zoom out": 189,         // -
       "camera mode": 117,         // f6
-      "stats view":  116,         // f5
+      "stats view": 116,         // f5
       "view badges": 66,          // b
     }
 
@@ -5122,7 +5124,7 @@ class Game {
     renderTexture.destroy(true)
 
     this.cropImage(screenshot, 600, 480, (dataUrl) => {
-      let base64Image = dataUrl.replace("data:image/png;base64,","")
+      let base64Image = dataUrl.replace("data:image/png;base64,", "")
       SocketUtil.emit("AddScreenshot", { imageData: base64Image, position: position })
 
       this.lastScreenshotDay = this.day
@@ -5157,7 +5159,7 @@ class Game {
     this.app.renderer.render(container, renderTexture, true, m, true)
     let screenshot = this.app.renderer.plugins.extract.image(renderTexture)
     let ctx = canvas.getContext("2d")
-    screenshot.onload = function() {
+    screenshot.onload = function () {
       ctx.clearRect(0, 0, 512, 512)
       ctx.drawImage(screenshot, 0, 0, 512, 512)
     }
@@ -5165,9 +5167,9 @@ class Game {
 
   upgradeSelectedEntity() {
     if (this.entityMenu.entity &&
-        this.entityMenu.entity.isBuildingType() &&
-        this.entityMenu.entity.getConstants().isUpgradable &&
-        this.entityMenu.entity.isOwnedBy(this.player)) {
+      this.entityMenu.entity.isBuildingType() &&
+      this.entityMenu.entity.getConstants().isUpgradable &&
+      this.entityMenu.entity.isOwnedBy(this.player)) {
       SocketUtil.emit("EditBuilding", { id: this.entityMenu.entity.id, action: 'upgrade' })
     }
   }
@@ -5177,7 +5179,7 @@ class Game {
     canvas.width = width
     canvas.height = height
     let ctx = canvas.getContext("2d")
-    let frameWidth  = width
+    let frameWidth = width
     let frameHeight = height
     let sx = (window.innerWidth - frameWidth) / 2
     if (sx < 0) sx = 0
@@ -5193,7 +5195,7 @@ class Game {
     let dw = frameWidth
     let dh = frameHeight
 
-    image.onload = function() {
+    image.onload = function () {
       ctx.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh)
       cb(canvas.toDataURL())
     }
@@ -5263,7 +5265,7 @@ class Game {
     const playerYDiff = cameraFocusTarget.getY() - this.prevPlayerPosY
 
     if (playerXDiff !== 0) {
-      this.cameraDisplacement.x   -= playerXDiff * this.resolution
+      this.cameraDisplacement.x -= playerXDiff * this.resolution
       this.gameLayer.position.x = this.cameraDisplacement.x
 
       const mousePos = this.app.renderer.plugins.interaction.mouse.global
@@ -5273,7 +5275,7 @@ class Game {
     }
 
     if (playerYDiff !== 0) {
-      this.cameraDisplacement.y   -= playerYDiff * this.resolution
+      this.cameraDisplacement.y -= playerYDiff * this.resolution
       this.gameLayer.position.y = this.cameraDisplacement.y
 
       const mousePos = this.app.renderer.plugins.interaction.mouse.global
@@ -5287,22 +5289,22 @@ class Game {
   panViaControl(controlKeys) {
     const panSpeed = 4
     if (controlKeys & Constants.Control.left) {
-      this.cameraDisplacement.x   += panSpeed
+      this.cameraDisplacement.x += panSpeed
       this.gameLayer.position.x = this.cameraDisplacement.x
     }
 
     if (controlKeys & Constants.Control.right) {
-      this.cameraDisplacement.x   -= panSpeed
+      this.cameraDisplacement.x -= panSpeed
       this.gameLayer.position.x = this.cameraDisplacement.x
     }
 
     if (controlKeys & Constants.Control.up) {
-      this.cameraDisplacement.y   += panSpeed
+      this.cameraDisplacement.y += panSpeed
       this.gameLayer.position.y = this.cameraDisplacement.y
     }
 
     if (controlKeys & Constants.Control.down) {
-      this.cameraDisplacement.y   -= panSpeed
+      this.cameraDisplacement.y -= panSpeed
       this.gameLayer.position.y = this.cameraDisplacement.y
     }
   }
@@ -5409,25 +5411,25 @@ class Game {
     const friendlyItemName = itemName.replace(/([A-Z])/g, ' $1').trim()
     const label = "+" + data.count + " " + i18n.t(friendlyItemName)
 
-    const style  = { fontFamily : 'PixelForce', fontSize: 28, fill : 0x00ff00, align : 'center', stroke: "#000000", strokeThickness: 5, miterLimit: 3 }
+    const style = { fontFamily: 'PixelForce', fontSize: 28, fill: 0x00ff00, align: 'center', stroke: "#000000", strokeThickness: 5, miterLimit: 3 }
     let text = document.createElement("span")
     text.className = "craft_success_label"
     text.innerText = label
     document.body.appendChild(text)
 
-    text.style.top  = data.y + "px"
+    text.style.top = data.y + "px"
     text.style.left = data.x + "px"
 
     let position = { y: data.y }
     var tween = new TWEEN.Tween(position)
-        .to({ y: data.y - 150 }, 1500)
-        .onUpdate(() => {
-          text.style.top = position.y + "px"
-        })
-        .onComplete(() => {
-          document.body.removeChild(text)
-        })
-        .start()
+      .to({ y: data.y - 150 }, 1500)
+      .onUpdate(() => {
+        text.style.top = position.y + "px"
+      })
+      .onComplete(() => {
+        document.body.removeChild(text)
+      })
+      .start()
   }
 
   onServerChat(data) {
@@ -5500,8 +5502,8 @@ class Game {
 
     this.lastPressedKey = pressedKey
     this.lastControlKeys = controlKeys
-    this.lastMoveAngle   = moveAngle
-    this.lastIdle        = idle
+    this.lastMoveAngle = moveAngle
+    this.lastIdle = idle
   }
 
   getCoordFromMouse(clientX, clientY) {

@@ -316,6 +316,7 @@ enum ProjectileType {
   BlueLaser = 26;
   Dynamite = 27;
   MiningExplosion = 28;
+  IceMeteor = 21
 }
 
 enum MobStatus {
@@ -345,6 +346,7 @@ enum EventType {
   AlarmEnd = 10;
   FixLights = 11;
   FixLightsEnd = 12;
+  IceMeteorShower = 13
 }
 
 enum BehaviorType {

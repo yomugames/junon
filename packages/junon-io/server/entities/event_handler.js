@@ -799,6 +799,18 @@ class EventHandler {
   }
 
   getBuildingType(entityId) {
+    let entity = this.game.getEntity(entityId)
+
+    if (!entity) return ""
+
+    if (typeof entity.getTypeName === 'function') {
+      return entity.getTypeName()
+    }
+
+    return entity.type || ""
+  }
+
+  getEntityType(entityId) {
     let player = this.game.getPlayerByName(entityId)
     if (player) {
       return "Player"
@@ -1261,6 +1273,7 @@ class EventHandler {
       "$asin": true,
       "$acos": true,
       "$atan": true,
+      "$getEntityType" : true,
     }
   }
 

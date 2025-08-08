@@ -127,7 +127,7 @@ Equipper.prototype = {
     if (handEquipment && handEquipment.isAnimatable()) {
       handEquipment.animate()
       handEquipment.playSound()
-    } else {
+    } else if(!handEquipment.isWeapon()) {
       this.animateHands()
     }
   },

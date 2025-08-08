@@ -871,6 +871,13 @@ class Sector {
     })
 
     this.enableChunkInvalidations()
+    // after loading, we can rebuild invalidated chunks
+    this.forEachPlayer((player) => {
+      if (player.isClientReadyAndWaitingForSector) {
+        player.finishPlayerReadySetup();
+      }
+    })
+
     this.game.postGameReady()
   }
 
@@ -2746,7 +2753,10 @@ class Sector {
       return false
     }
 
-    options.owner = this
+    if (!options.owner) {
+      options.owner = this
+    }
+    
     options.source = { x: x, y: y}
     options.destination = { x: x, y: y}
     klass.build(options)
@@ -3128,8 +3138,6 @@ class Sector {
   }
 
   processMiasma() {
-    if (this.game.isPeaceful()) return
-
     const isOneMinuteInterval = this.game.timestamp % (Constants.physicsTimeStep * 60) === 0
     if (!isOneMinuteInterval) return
 

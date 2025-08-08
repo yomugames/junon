@@ -2147,6 +2147,37 @@ class BaseMob extends BaseEntity {
     return false
   }
 
+  getWeapon() {
+  if (this.equipments && typeof this.equipments.get === 'function') {
+    const item = this.equipments.get(Protocol.definition().EquipmentRole.Hand);
+    return item ? item.instance : null;
+  }
+  return null;
+}
+
+getDamage(attackTarget) {
+  const weapon = this.getWeapon();
+  let totalDamage;
+  if (weapon) {
+    const baseDamage = super.getDamage();
+    const weaponDamage = weapon.getDamage(attackTarget);
+    totalDamage = baseDamage + weaponDamage;
+  } else {
+    totalDamage = super.getDamage();
+  }
+
+  if (this.sector) {
+    if (this.sector.entityCustomStats[this.id] && typeof this.sector.entityCustomStats[this.id].damage !== 'undefined') {
+      totalDamage = this.sector.entityCustomStats[this.id].damage;
+    } else if (this.sector.mobCustomStats[this.type] && typeof this.sector.mobCustomStats[this.type].damage !== 'undefined') {
+      totalDamage = this.sector.mobCustomStats[this.type].damage;
+    }
+  }
+
+  const damageMultiplier = this.getDamageMultiplier(attackTarget);
+  return Math.floor(totalDamage * damageMultiplier);
+}
+
   getRotatedAngle() {
     return this.angle
   }
@@ -2162,20 +2193,27 @@ class BaseMob extends BaseEntity {
   }
 
   getDamage(attackTarget) {
-    let damage = super.getDamage()
-
-    if (this.sector) {
-      if (this.sector.entityCustomStats[this.id]) {
-        damage = this.sector.entityCustomStats[this.id].damage
-      } else if (this.sector.mobCustomStats[this.type]) {
-        damage = this.sector.mobCustomStats[this.type].damage
-      }
-    }
-
-    let damageMultiplier = this.getDamageMultiplier(attackTarget)
-
-    return Math.floor(damageMultiplier * damage)
+  const weapon = this.getWeapon();
+  let totalDamage;
+  if (weapon) {
+    const baseDamage = super.getDamage(); 
+    const weaponDamage = weapon.getDamage(attackTarget); 
+    totalDamage = baseDamage + weaponDamage;
+  } else {
+    totalDamage = super.getDamage();
   }
+
+  if (this.sector) {
+    if (this.sector.entityCustomStats[this.id] && typeof this.sector.entityCustomStats[this.id].damage !== 'undefined') {
+      totalDamage = this.sector.entityCustomStats[this.id].damage;
+    } else if (this.sector.mobCustomStats[this.type] && typeof this.sector.mobCustomStats[this.type].damage !== 'undefined') {
+      totalDamage = this.sector.mobCustomStats[this.type].damage;
+    }
+  }
+
+  const damageMultiplier = this.getDamageMultiplier(attackTarget);
+  return Math.floor(damageMultiplier * totalDamage);
+}
 
   getResistance() {
     return this.getConstants().resistance || []
@@ -2278,13 +2316,24 @@ Object.assign(BaseMob.prototype, Movable.prototype, {
 
 
 Object.assign(BaseMob.prototype, Destroyable.prototype, {
-  getDamageResistance(amount, attackEntity) {
-    if (attackEntity.hasCategory("fire") && this.isResistantTo("fire")) {
-      return Math.floor(amount / 2)
-    }
+  damage(amount, attacker) {
+  if (!this.isDestroyable() || this.godMode || this.isInvincible) return;
+  amount -= this.getDamageResistance(amount, attacker); 
+  if (amount <= 0) return;
+  this.reduceHealth(amount);
+  this.onDamaged(attacker, amount);
+},
 
-    return 0
-  },
+  getDamageResistance(amount, attacker) {
+  const isMeleeAttack = attacker && typeof attacker.hasMeleeWeapon === 'function' && attacker.hasMeleeWeapon();
+
+  if (this.hasCategory("melee_resistant") && isMeleeAttack) {
+    return Math.floor(amount * 0.5);
+  }
+
+  return 0; 
+},
+
   onDamaged(attacker, amount) {
     this.attackerId = attacker.id
 

@@ -11,11 +11,6 @@ class BluePresent extends BaseBuilding {
   getType() {
     return Protocol.definition().BuildingType.BluePresent
   }
-  
-  isCollidable() {
-    return false
-  }
-
 }
 
 module.exports = BluePresent

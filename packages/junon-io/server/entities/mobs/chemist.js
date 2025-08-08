@@ -150,6 +150,10 @@ class Chemist extends LandMob {
   }
 
   getWeapon() {
+    if (!this.equipments) {
+      return null;
+    }
+
     let item = this.equipments.get(Protocol.definition().EquipmentRole.Hand)
     if (!item) return null
     return item.instance || item.getKlass(item.type)

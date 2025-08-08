@@ -226,6 +226,56 @@ class EventHandler {
     return Math.max(...values.map(v => this._safeNumber(v)))
   }
 
+  sin(degrees) {
+    const deg = this._safeNumber(degrees)
+    return this._fixFloat(Math.sin(deg * Math.PI / 180))
+  }
+
+  cos(degrees) {
+    const deg = this._safeNumber(degrees)
+    return this._fixFloat(Math.cos(deg * Math.PI / 180))
+  }
+
+  tan(degrees) {
+    const deg = this._safeNumber(degrees)
+    if (Math.abs(deg % 180) === 90) return NaN
+    return this._fixFloat(Math.tan(deg * Math.PI / 180))
+  }
+
+  asin(value) {
+    const num = this._safeNumber(value)
+    if (num < -1 || num > 1) return NaN
+    return this._fixFloat(Math.asin(num) * 180 / Math.PI)
+  }
+
+  acos(value) {
+    const num = this._safeNumber(value)
+    if (num < -1 || num > 1) return NaN
+    return this._fixFloat(Math.acos(num) * 180 / Math.PI)
+  }
+
+  atan(value) {
+    const num = this._safeNumber(value)
+    return this._fixFloat(Math.atan(num) * 180 / Math.PI)
+  }
+
+  getAngle(entityId) {
+    let player = this.getPlayer(entityId)
+    let angle = 0
+
+    if (player && typeof player.angle === 'number') {
+      angle = player.angle
+    } else {
+      let entity = this.game.getEntity(entityId)
+      if (entity && typeof entity.angle === 'number') {
+        angle = entity.angle
+      }
+    }
+
+    angle = ((angle % 360) + 360) % 360
+    return angle
+  }
+
   length(value) {
     return value.toString().length
   }
@@ -750,17 +800,34 @@ class EventHandler {
 
   getBuildingType(entityId) {
     let entity = this.game.getEntity(entityId)
-    
+
     if (!entity) return ""
-    
-    if (entity.isPlayer()) {
-      return "Player"
-    }
-    
+
     if (typeof entity.getTypeName === 'function') {
       return entity.getTypeName()
     }
-    
+
+    return entity.type || ""
+  }
+
+  getEntityType(entityId) {
+    let player = this.game.getPlayerByName(entityId)
+    if (player) {
+      return "Player"
+    }
+
+    let entity = this.game.getEntity(entityId)
+
+    if (!entity) return ""
+
+    if (entity.isPlayer()) {
+      return "Player"
+    }
+
+    if (typeof entity.getTypeName === 'function') {
+      return entity.getTypeName()
+    }
+
     return entity.type || ""
   }
 
@@ -1199,7 +1266,14 @@ class EventHandler {
       "$getStructureByCoords": true,
       "$hasEffect": true,
       "$getTotalMobCount": true,
-      "$getAngle": true
+      "$getAngle": true,
+      "$sin": true,
+      "$cos": true,
+      "$tan": true,
+      "$asin": true,
+      "$acos": true,
+      "$atan": true,
+      "$getEntityType" : true,
     }
   }
 

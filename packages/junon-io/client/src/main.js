@@ -21,6 +21,7 @@ const Polyglot = require('node-polyglot')
 const japaneseTranslationMap = require("../../common/translations/ja")
 const englishTranslationMap = require("../../common/translations/en")
 const russianTranslationMap = require("../../common/translations/ru")
+const trationalChineseTranslationMap = require("../../common/translations/zh-Hant")
 const ObjectPool = require("../../common/entities/object_pool")
 const TeamEntry = require("./components/team_entry")
 const Lighting = require("./entities/lighting")
@@ -141,6 +142,8 @@ class Main {
         phrases = Object.assign({}, phrases, japaneseTranslationMap)
       } else if (language === "ru") {
         phrases = Object.assign({}, phrases, russianTranslationMap)
+      } else if (language === "zh-Hant") {
+        phrases = Object.assign({}, phrases, trationalChineseTranslationMap)
       }
     }
 

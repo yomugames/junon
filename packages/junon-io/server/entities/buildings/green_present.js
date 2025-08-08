@@ -11,11 +11,6 @@ class GreenPresent extends BaseBuilding {
   getType() {
     return Protocol.definition().BuildingType.GreenPresent
   }
-  
-  isCollidable() {
-    return false
-  }
-
 }
 
 module.exports = GreenPresent

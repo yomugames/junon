@@ -49,11 +49,6 @@ class Lamp extends BaseBuilding {
   getType() {
     return Protocol.definition().BuildingType.Lamp
   }
-  
-  isCollidable() {
-    return false
-  }
-
 }
 
 

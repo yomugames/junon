@@ -24,7 +24,8 @@ class BaseProjectile extends BaseEntity {
     super(sector, { id: data.id, x: data.source.x, y: data.source.y, w: data.w, h: data.h })
 
     this.weapon            = data.weapon
-    this.sourceEntity      = data.weapon
+    this.owner             = data.owner ? data.owner : data.weapon.owner 
+    this.sourceEntity      = this.owner
     this.destinationEntity = data.destinationEntity
 
     if (data.keyValueMap) {
@@ -32,7 +33,6 @@ class BaseProjectile extends BaseEntity {
       this.shouldHitFloor = data.keyValueMap.shouldHitFloor
     }
 
-    this.owner       = data.owner ? data.owner : data.weapon.owner
     this.source      = data.source
     this.destination = data.destination
 
@@ -274,6 +274,14 @@ class BaseProjectile extends BaseEntity {
     this.setPosition(this.destination.x, this.destination.y)
 
     this.remove()
+  }
+
+  canDamageWalls() {
+    if (this.sourceEntity && typeof this.sourceEntity.canDamageWalls === 'function') {
+      return this.sourceEntity.canDamageWalls();
+    }
+    
+    return this.getConstants().canDamageWalls;
   }
 
   canDamage(entity) {

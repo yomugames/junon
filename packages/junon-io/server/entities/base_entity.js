@@ -1737,21 +1737,28 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   getKillerFromAttacker(attacker) {
-    if (attacker.isMob()) return attacker
-    if (attacker.isPlayer()) return attacker
-    if (typeof attacker.isProjectile !== 'function') return null
+  if (attacker.isMob && attacker.isMob() || attacker.isPlayer && attacker.isPlayer()) {
+    return attacker;
+  }
 
-    if (attacker.isProjectile()) {
-      if (attacker.weapon) {
-        if (attacker.weapon.isBuilding()) {
-          return attacker.weapon.placer
-        } else {
-          // weapon equipment
-          return attacker.owner
-        }
+  if (attacker.isBuilding && attacker.isBuilding()) {
+    return attacker;
+  }
+
+  if (attacker.isProjectile && attacker.isProjectile()) {
+    const shooter = attacker.sourceEntity; 
+
+    if (shooter) {
+      if (shooter.isBuilding && shooter.isBuilding()) {
+        return shooter;
+      } else {
+        return shooter;
       }
     }
   }
+
+  return null; 
+}
 
   getDamage() {
     return this.getStats(this.level).damage

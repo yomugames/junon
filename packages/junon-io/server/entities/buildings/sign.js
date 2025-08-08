@@ -17,11 +17,6 @@ class Sign extends BaseBuilding {
   getType() {
     return Protocol.definition().BuildingType.Sign
   }
-  
-  isCollidable() {
-    return false
-  }
-
 }
 
 module.exports = Sign

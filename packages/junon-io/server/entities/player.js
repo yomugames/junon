@@ -5818,16 +5818,22 @@ Object.assign(Player.prototype, Movable.prototype, {
 
     // apply buffs
 
-    if (this.mounted) {
+    if (this.mounted && Protocol.definition().MobType[this.mounted.type] == "BioRaptor") {
       const platform = this.getStandingPlatform()
       if (!platform) {
         speed += 3
+      }
+    } else if(this.mounted && Protocol.definition().MobType[this.mounted.type] == "Car") {
+      const platform = this.getStandingPlatform()
+      if(platform) {
+        speed += 5
       }
     } else if (!this.getArmorEquipment()) {
       if (!this.game.isMiniGame()) {
         speed += 2
       }
     }
+    
 
     speed = this.isLowStatus("stamina") ? speed / 2 : speed
 

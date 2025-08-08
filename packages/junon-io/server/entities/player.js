@@ -4517,6 +4517,7 @@ class Player extends BaseEntity {
     }
 
     if (!target) return false
+    if (target.id === this.id) return false
     if (target.isBuilding() && target.isOnFire()) return true
     if (target.isDestroyed()) return false
 

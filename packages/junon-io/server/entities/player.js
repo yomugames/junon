@@ -3784,7 +3784,7 @@ class Player extends BaseEntity {
     this.setUserOxygen(this.getOxygen() - 1)
 
     if (this.getOxygen() <= 0) {
-      this.damage(10)
+      this.setHealth(this.health - 10)
     }
   }
 
@@ -6062,7 +6062,7 @@ Object.assign(Player.prototype, Needs.prototype, {
     }
   },
   onHungerZero() {
-    this.damage(2)
+    this.setHealth(this.health - 2)
   }
 })
 

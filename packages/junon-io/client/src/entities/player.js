@@ -1552,7 +1552,7 @@ class Player extends BaseEntity {
     if (this.building) {
       this.sector.invalidAreaSprite.alpha = 0
       this.sector.removeEntity(this.building, this.building.getGroup())
-      this.building.onBuildStop()
+      this.building.onBuildStop() // wires/pipes opacity
       this.building = null
     }
   }

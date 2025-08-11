@@ -4756,7 +4756,7 @@ class Game {
   }
 
   updateOxygenBar(curr, max) {
-    if (this.player && this.player.isLowStatus("oxygen")) {
+    if (this.player && this.player.isLowStatus("oxygen") && this.sector.settings.isOxygenEnabled) {
       this.startOxygenLowTween()
     } else {
       this.stopOxygenLowTween()
@@ -4767,7 +4767,7 @@ class Game {
   }
 
   updateHungerBar(curr, max) {
-    if (this.player && this.player.isLowStatus("hunger")) {
+    if (this.player && this.player.isLowStatus("hunger") && this.sector.settings.isHungerEnabled) {
       this.startHungerLowTween()
     } else {
       this.stopHungerLowTween()

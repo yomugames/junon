@@ -1826,7 +1826,7 @@ class Player extends BaseEntity {
   }
 
   notifyLowStatus(stat) {
-    if (this.isLowStatus(stat)) {
+    if (this.isLowStatus(stat) && this.sector.settings["is"+stat[0].toUpperCase()+stat.slice(1)+"Enabled"]) {
       this.addStatus(stat)
     } else {
       this.removeStatus(stat)

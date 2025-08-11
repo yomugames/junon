@@ -531,8 +531,8 @@ class BaseBuilding extends BaseEntity {
     return false
   }
 
-  isBottleFillable() {
-    if (this.hasEffect("blood")) return true
+  isBottleFillable(bottle) {
+    if (this.hasEffect("blood") && Protocol.definition().BuildingType[bottle?.getType()] !== "WaterBottle") return true
 
     return super.isBottleFillable()
   }

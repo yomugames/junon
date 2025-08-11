@@ -342,14 +342,14 @@ class EventHandler {
 
   getUsage(itemId) {
     let item = this.game.getEntity(itemId)
-    if(!item.isItem() || !item.isWeapon()) return
+    if(!item?.isItem() || !item?.isWeapon()) return
 
     return item.instance.usage
   }
 
   getCapacity(itemId) {
     let item = this.game.getEntity(itemId)
-    if(!item.isWeapon()) return
+    if(!item?.isWeapon()) return
     return item.instance.getUsageCapacity()
   }
 

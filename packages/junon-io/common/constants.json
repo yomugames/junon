@@ -3896,6 +3896,26 @@
       },
       "description": "Basic Melee weapon. Damage 7"
     },
+ "Pitchfork": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 300
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 12,
+        "range": 55,
+        "meleeRange": 55
+      },
+      "requirements": {
+        "IronBar": 30,
+        "Wood": 10
+      },
+      "description": "Farms crops to left and right. Damage 12"
+    
+    },
     "PlasmaBlade": {
       "parent": "Equipments.MeleeEquipment",
       "isWeapon": true,

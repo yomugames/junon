@@ -266,6 +266,7 @@ enum BuildingType {
   UnbreakableWall = 270;
   Dynamite = 271;
   MiasmaGate = 272;
+  Pitchfork - 273;
 }
 
 enum TerrainType {

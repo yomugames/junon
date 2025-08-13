@@ -448,7 +448,7 @@ class BaseEntity {
   }
 
   initSprite(x, y) {
-    this.sprite = this.getSprite()
+    this.sprite = this.getSprite(x, y)
     let baseSprite = this.getLightableSprites()
     // baseSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY // for blending against lightmap
 

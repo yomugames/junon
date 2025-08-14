@@ -1362,6 +1362,7 @@ class BaseBuilding extends BaseEntity {
 
   unregister() {
     this.container.unregisterComponent(this.getGroup(), this.getMapName(), this)
+    if(this.isWall()) this.container.unregisterComponent("structures", "structureMap", this)
     this.sector.removeEntityFromTreeByName(this, "buildings")
     // this.sector.unregisterBuildingDecay(this)
 

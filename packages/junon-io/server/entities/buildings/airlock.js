@@ -81,6 +81,7 @@ class Airlock extends BaseBuilding {
     let armorHits = container.armorMap.hitTestTile(this.prototype.getBox(x, y, w, h))
     const isEnemyArmor = armorHits.find((hit) => { return hit.entity && !hit.entity.isOwnedBy(player) })
     if (isEnemyArmor) return false
+    if (armorHits.length === 2) return true
 
     return  this.isOnValidPlatform(container, x, y, w, h, angle, player) &&
                              !this.isOnHangar(container, x, y, w, h) &&

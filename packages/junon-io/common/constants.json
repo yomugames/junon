@@ -687,7 +687,8 @@
     "checker_texture":     { "index": 8 },
     "xchecker_texture":    { "index": 9 },
     "x_texture":           { "index": 10 },
-    "noise_texture":       { "index": 11 }
+    "noise_texture":       { "index": 11 },
+    "floormap":            { "index": 12 }
   },
   "SuitColors": {
     "gray":   { "index": 1 , "value": "#999999" },

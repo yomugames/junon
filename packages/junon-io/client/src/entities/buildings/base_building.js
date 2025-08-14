@@ -745,12 +745,12 @@ class BaseBuilding extends BaseEntity {
     graphics.endFill()
   }
 
-  getSprite() {
+  getSprite(x, y) {
     const sprite = new PIXI.Container()
     sprite.name = this.constructor.name
 
     // building sprite
-    this.buildingSprite = this.getBuildingSprite()
+    this.buildingSprite = this.getBuildingSprite(x, y)
     this.buildingSprite.name = "Building"
 
     if (this.hasFillBar()) {

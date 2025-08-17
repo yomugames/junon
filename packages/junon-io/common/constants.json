@@ -3912,6 +3912,25 @@
       "cost": {
         "gold": 1000
       },
+      "Scythe": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 350
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 12,
+        "range": 55,
+        "meleeRange": 55
+      },
+      "requirements": {
+        "IronBar": 30,
+        "Wood":10
+      },
+      "description": "Farms crops to left and right. Can be seconded as a weapon"
+    },
       "categories": {"melee_damage": true},
       "isAnimatable": true,
       "stats": {

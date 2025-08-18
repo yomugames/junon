@@ -1928,8 +1928,8 @@ class Player extends BaseEntity {
 
     const item = new Item(this, data.type, { count: count })
     let requirements = item.getRequirements()
-    if (Object.keys(requirements).length === 0) {
-      // item without requirements cant be crafted
+    if (Object.keys(requirements).length === 0 && !(Protocol.definition().TerrainType[item.type] && this.isSectorOwner())) {
+      // item without requirements other than terrains cant be crafted
       return
     }
 

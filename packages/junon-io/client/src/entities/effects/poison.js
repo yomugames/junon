@@ -18,7 +18,8 @@ class Poison extends BaseEffect {
 
   onPostInit() {
     this.affectedEntity.getTintableSprites().forEach((sprite) => {
-      sprite.originalTint = sprite.tint ? sprite.tint : sprite.defaultTint
+      if(sprite.tint !== 16739693) /*Player red from being attacked*/sprite.originalTint = sprite.tint ? sprite.tint : sprite.defaultTint
+      else sprite.originalTint = sprite.defaultTint ? sprite.defaultTint : sprite.tint
       sprite.tint = this.getTint()
     })
   }  

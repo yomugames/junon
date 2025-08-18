@@ -1766,11 +1766,11 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   canSpreadFire() {
-    return false
+    return this.sector.settings.isFireSpreadEnabled
   }
 
   spreadFire() {
-    const hits = this.getSideTiles(this.container.platformMap)
+    const hits = this.getSideTiles(this.container.structureMap)
     hits.forEach((hit) => {
       if (hit.entity && hit.entity.isFlamable() && !hit.entity.isOnFire()) {
         hit.entity.addFire()

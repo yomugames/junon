@@ -860,8 +860,14 @@
       "dizzySprite": {
         "position": {
           "x":0,
-          "y":0
-        }
+          "y":-10,
+          "rotation":90
+        },
+        "width":20,
+        "height":5,
+        "rotation":0,
+        "tint":"#000000"
+
       },
       "sprite": {
           "height": 49,

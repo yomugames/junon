@@ -4,7 +4,7 @@ const Protocol = require("../../../../common/util/protocol")
 const ClientHelper = require("../../util/client_helper")
 
 
-class Guest extends LandMob {
+class Visitor extends LandMob {
     animateEquipment() {
         let targetPosition = this.getMeleeTarget()
         this.attackTween = this.getMeleeChargeTween(targetPosition)
@@ -12,17 +12,17 @@ class Guest extends LandMob {
     }
    
     getSpritePath() {
-        return "guest.png"
+        return "visitor.png"
     }
 
     getType() {
-        return Protocol.definition().MobType.Guest
+        return Protocol.definition().MobType.Visitor
     }
 
     getConstantsTable() {
-        return "Mobs.Guest"
+        return "Mobs.Visitor"
     }
 
 }
 
-module.exports = Guest
+module.exports = Visitor

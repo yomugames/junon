@@ -3,13 +3,13 @@ const Protocol = require("../../../common/util/protocol")
 const Constants = require("../../../common/constants.json")
 const Projectiles = require('../projectiles/index')
 
-class Guest extends LandMob {
+class Visitor extends LandMob {
   getType() {
-    return Protocol.definition().MobType.Guest
+    return Protocol.definition().MobType.Visitor
   }
 
   getConstantsTable() {
-    return "Mobs.Guest"
+    return "Mobs.Visitor"
   }
 
   canBeKnocked() {
@@ -31,4 +31,4 @@ class Guest extends LandMob {
   }
 }
 
-module.exports = Guest
+module.exports = Visitor

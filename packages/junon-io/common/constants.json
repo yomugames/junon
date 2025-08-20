@@ -848,7 +848,7 @@
         "damage": "+5"
       }
     },
-    "Guest": {
+    "Visitor": {
       "parent": "Mobs.BaseMob",
       "drop": "HumanMeat",
       "isNonHostile": true,

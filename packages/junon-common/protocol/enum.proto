@@ -415,7 +415,7 @@ enum MobType {
   Raven = 35;
   Car = 36;
   Sapper = 37;
-  Guest = 38;
+  Visitor = 38;
 }
 
 enum EntityType {

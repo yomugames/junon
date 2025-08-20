@@ -177,7 +177,7 @@ class Sector {
     return this.game.server.socketUtil
   }
 
-  initPR() {
+  initRP() {
     this.PR = new RP(this)
   }
 

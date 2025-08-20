@@ -24,7 +24,7 @@ Mobs.SquidLord = require("./squid_lord")
 Mobs.Firebat = require("./firebat")
 Mobs.Car = require("./car")
 Mobs.Sapper = require("./sapper")
-Mobs.Villager = require("./villager")
+Mobs.Guest = require("./guest")
 
 Mobs.Raven = require("./raven")
 Mobs.Drone = require("./drone")

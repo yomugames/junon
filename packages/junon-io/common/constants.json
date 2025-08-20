@@ -848,7 +848,7 @@
         "damage": "+5"
       }
     },
-    "Villager": {
+    "Guest": {
       "parent": "Mobs.BaseMob",
       "drop": "HumanMeat",
       "isNonHostile": true,

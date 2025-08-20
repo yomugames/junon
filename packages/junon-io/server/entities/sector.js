@@ -68,6 +68,7 @@ const Domination = require("./minigames/domination")
 const CommandBlock = require("../command_blocks/command_block")
 const PositionSearchRequest = require("./position_search_request")
 const Foods = require("./foods/index")
+const RP = require("./RP")
 
 class Sector {
 
@@ -156,6 +157,7 @@ class Sector {
     this.initCommandBlock(entities)
     this.initBuildLimits(entities)
     this.initKeyCodes(entities)
+    this.initRP()
 
     this.initObjectives()
 
@@ -173,6 +175,10 @@ class Sector {
 
   getSocketUtil() {
     return this.game.server.socketUtil
+  }
+
+  initPR() {
+    this.PR = new RP(this)
   }
 
   initObjectives() {

@@ -1933,6 +1933,8 @@ class Player extends BaseEntity {
       return
     }
 
+    if(item.isRPItem() && !item.hasMetRPRequirements()) return
+
     const isSuccess = storage.craft(item, this.inventory.storage)
     if (!isSuccess) return
 

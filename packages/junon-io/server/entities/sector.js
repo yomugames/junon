@@ -178,7 +178,7 @@ class Sector {
   }
 
   initRP() {
-    this.PR = new RP(this)
+    this.RP = new RP(this)
   }
 
   initObjectives() {
@@ -1546,7 +1546,7 @@ class Sector {
   async onDayCountChanged() {
     this.game.incrementTeamsDayCount()
     this.resetVendingMachinePurchaseHistory()
-
+    this.RP.onDayCountChanged()
     this.updateSectorModelDayCount()
   }
 

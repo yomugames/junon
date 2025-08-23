@@ -1217,11 +1217,19 @@
             </div>
             <div class="RP_craftable_items">
                 <div class="menu_main_header" style="margin-top:40px;">Unlockable items</div>
-                <div class="RP_items_menu">
+                <div id='product_main_container' class=''>
+                    <div class='product_container'>
+                        <!-- <img class='blueprint_image' src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="/>
+                        <div class='blueprint_name'></div>    
+                        <div class='blueprint_description'></div>     -->
+                    </div>
                     
+                    <div class='inventory_header'><%= t('Required RP (Reputation points)') %></div>
+                    <div class='crafting_requirements'><span id="RP_count">0</span> RP Required</div>
+                    <button class='craft_btn' ><%= t('Unlock') %></button>
                 </div>
-            </div>
             
+            </div>
         </div>
     </div>
 

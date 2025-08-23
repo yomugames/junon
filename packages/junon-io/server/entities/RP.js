@@ -11,14 +11,35 @@ class RP {
         if(this.sector.isPeaceful()) return;
 
         let daycount = this.sector.getDayCount()
-        if(daycount < 10) return;
-        if(Math.floor(Math.random)*2) {
-            return;
-        }
-        
+        if (daycount < 2/*10*/) return;
 
+        if (this.sector.visitors) {
+            let totalHappiness = 0;
+            for (let i in this.sector.visitors) {
+                totalHappiness += this.sector.visitors[i].Happiness.value;
+                this.sector.visitors[i].remove();
+                delete this.sector.visitors[i];
+            }
+
+            this.addToCurrentRP(totalHappiness)
+            this.sector.getSocketUtil().broadcast(this.sector.getSocketIds(), "ErrorMessage", { message: "All visitors have left." })
+
+        }
+
+        if (Math.floor(Math.random) * 2) {
+            //  return;
+        }
+
+        let newMobs = this.sector.spawnMob({ player: this.sector, type: "visitor", count: 1 })
+        this.sector.visitors = newMobs;
+        
+        this.sector.getSocketUtil().broadcast(this.sector.getSocketIds(), "ErrorMessage", { message: "A visitor has arrived!" })
     }
-    
+
+    addToCurrentRP(value) {
+        this.level += value
+    }
+
 }
 
 module.exports = RP;

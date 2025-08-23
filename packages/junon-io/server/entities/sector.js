@@ -179,6 +179,9 @@ class Sector {
 
   initRP() {
     this.RP = new RP(this)
+    this.visitors = [];
+    this.totalHappiness = 0;
+    this.unlockedItems = []
   }
 
   initObjectives() {

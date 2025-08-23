@@ -6,7 +6,7 @@ const Projectiles = require('../projectiles/index')
 class Visitor extends LandMob {
   constructor(sector, data) {
     super(sector, data)
-    this.Happiness = new Happiness(); //this.happiness already exists in a mob, and causes weird effects.
+    this.Happiness = new Happiness(this); //this.happiness already exists in a mob, and causes weird effects.
     //note: onPositionChanged() will happen before this.Happiness is initialized
   }
 
@@ -26,8 +26,8 @@ class Visitor extends LandMob {
     this.isNeutral = true // always neutral
   }
 
-  onPositionChanged() {
-    super.onPositionChanged()
+  onPositionChanged(options={}) {
+    super.onPositionChanged(options)
     if(this.Happiness) {
       this.updateHappiness()
     }
@@ -43,7 +43,16 @@ class Visitor extends LandMob {
   }
 
   checkForPlants() {
-    
+    let room = this.getRoom()
+    if(!room) return;
+    let structures = room.structures;
+    let validStructures = [];
+    for(let i in structures) {
+      if(structures[i].entity.constructor.name === "Pot" && Object.keys(structures[i].entity.storage).length) validStructures.push(structures[i].entity)
+    } 
+    if(validStructures.length > 2){
+      this.Happiness.changeHappinessForEvent("findPottedPlants")
+    }
   }
 
   checkForLights() {
@@ -67,10 +76,17 @@ class Visitor extends LandMob {
 
 
 class Happiness {
-  constructor(level) {
+  /**
+   * 
+   * @param {Visitor} visitor 
+   * @param {Number} level 
+  */
+  constructor(visitor, level) {
     this.level = level || 0;
+    this.visitor = visitor
     this.eventDefinitions = {
-      findColoredLights: 10
+      findColoredLights: 10,
+      findPottedPlants: 10
     }
   }
 
@@ -83,7 +99,7 @@ class Happiness {
 
   changeHappinessBy(value) {
     this.level += value;
-    console.log(this.level)
+    this.visitor.sector.totalHappiness += value;
   }
 }
 

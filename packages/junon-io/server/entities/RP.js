@@ -2,7 +2,7 @@
 class RP {
     constructor(sector) {
         this.sector = sector;
-        this.level;
+        this.level = 0;
     }
     getRPLevel() {
         return this.level;
@@ -38,6 +38,8 @@ class RP {
 
     addToCurrentRP(value) {
         this.level += value
+        console.log("value added to rp level level now ", this.getRPLevel())
+        this.sector.getSocketUtil().broadcast(this.sector.getSocketIds(), "RPUpdated", { RP: this.getRPLevel() });
     }
 
 }

@@ -1575,6 +1575,11 @@ class Game {
     SocketUtil.on("TempCommandBlockData", this.onTempCommandBlockData.bind(this))
     SocketUtil.on("BadgesData", this.onBadgesData.bind(this))
     SocketUtil.on("BadgeEquipped", this.onBadgeEquipped.bind(this))
+    SocketUtil.on("RPUpdated", this.onRPUpdated.bind(this))
+  }
+
+  onRPUpdated(data) {
+    this.sector.RPLevel = data.RP
   }
 
   onBadgeEquipped(data) {

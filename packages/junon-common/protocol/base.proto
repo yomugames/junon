@@ -173,7 +173,12 @@ message MessageWrapper {
     BadgesData BadgesData = 180;
     EquipBadge EquipBadge = 181;
     BadgeEquipped BadgeEquipped = 182;
+    RPUpdated RPUpdated = 183;
   }
+}
+
+message RPUpdated {
+  uint32 RP = 1;
 }
 
 message BadgeEquipped {

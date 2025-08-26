@@ -786,7 +786,7 @@ class Sector {
 
   editSetting(key, value) {
     if (typeof this.settings[key] !== 'undefined') {
-
+      value = String(value)
       if (value != "true" && value != "false") {
         return;
       }

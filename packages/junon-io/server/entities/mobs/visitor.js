@@ -102,6 +102,7 @@ class Happiness {
   changeHappinessBy(value) {
     this.level += value;
     this.visitor.sector.visitorHappiness += value;
+    this.visitor.sector.getSocketUtil().broadcast(this.visitor.sector.getSocketIds(), "RPUpdated", {visitorHappiness: this.visitor.sector.visitorHappiness})
   }
 }
 

@@ -20,7 +20,7 @@ class RP {
                 this.sector.visitors[i].remove();
                 delete this.sector.visitors[i];
             }
-
+            this.sector.visitorHappiness = 0;
             this.addToCurrentRP(totalHappiness)
             this.sector.getSocketUtil().broadcast(this.sector.getSocketIds(), "ErrorMessage", { message: "All visitors have left." })
 
@@ -42,7 +42,7 @@ class RP {
     addToCurrentRP(value) {
         if(!value) return;
         this.level += value
-        this.sector.getSocketUtil().broadcast(this.sector.getSocketIds(), "RPUpdated", { RP: this.getRPLevel() || 0 });
+        this.sector.getSocketUtil().broadcast(this.sector.getSocketIds(), "RPUpdated", { RP: this.getRPLevel() || 0, visitorHappiness: this.sector.visitorHappiness || 0 });
     }
 
 }

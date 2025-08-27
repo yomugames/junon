@@ -181,7 +181,7 @@ class Sector {
     let RPLevel = entities.RP || 0
     this.RP = new RP(this, RPLevel)
     this.visitors = [];
-    this.visitorHappiness = 0;
+    this.visitorHappiness = entities.visitorHappiness || 0;
     this.unlockedItems = []
   }
 

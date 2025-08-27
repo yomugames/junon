@@ -3790,7 +3790,7 @@ class Player extends BaseEntity {
     this.setUserOxygen(this.getOxygen() - 1)
 
     if (this.getOxygen() <= 0) {
-      this.damage(10)
+      this.setHealth(this.health - 10)
     }
   }
 
@@ -4523,7 +4523,9 @@ class Player extends BaseEntity {
     }
 
     if (!target) return false
-    if (target.isBuilding() && target.isOnFire()) return true
+    if (target.id === this.id) return false
+    // if (target.isBuilding() && target.isOnFire()) return true
+    // allows player to attack buildings on fire, even if they are on the same team.
     if (target.isDestroyed()) return false
 
     if (target.isOwnedBy(this)) {
@@ -5824,16 +5826,22 @@ Object.assign(Player.prototype, Movable.prototype, {
 
     // apply buffs
 
-    if (this.mounted) {
+    if (this.mounted && Protocol.definition().MobType[this.mounted.type] == "BioRaptor") {
       const platform = this.getStandingPlatform()
       if (!platform) {
         speed += 3
+      }
+    } else if(this.mounted && Protocol.definition().MobType[this.mounted.type] == "Car") {
+      const platform = this.getStandingPlatform()
+      if(platform) {
+        speed += 5
       }
     } else if (!this.getArmorEquipment()) {
       if (!this.game.isMiniGame()) {
         speed += 2
       }
     }
+    
 
     speed = this.isLowStatus("stamina") ? speed / 2 : speed
 
@@ -6060,7 +6068,7 @@ Object.assign(Player.prototype, Needs.prototype, {
     }
   },
   onHungerZero() {
-    this.damage(2)
+    this.setHealth(this.health - 2)
   }
 })
 

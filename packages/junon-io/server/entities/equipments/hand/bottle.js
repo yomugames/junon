@@ -32,14 +32,14 @@ class Bottle extends MeleeEquipment {
     // search platform tiles
     let hits = player.sector.platformMap.hitTestTile(relativeBox)
     let drainableHit = hits.find((hit) => {
-      return hit.entity && hit.entity.isBottleFillable()
+      return hit.entity && hit.entity.isBottleFillable(this)
     })
 
     // search buildings
     if (!drainableHit) {
       hits = player.sector.structureMap.hitTestTile(relativeBox)
       drainableHit = hits.find((hit) => {
-        return hit.entity && hit.entity.isBottleFillable()
+        return hit.entity && hit.entity.isBottleFillable(this)
       })
     }
 
@@ -47,7 +47,7 @@ class Bottle extends MeleeEquipment {
     if (!drainableHit) {
       hits = player.sector.groundMap.hitTestTile(relativeBox)
       drainableHit = hits.find((hit) => {
-        return hit.entity && hit.entity.isBottleFillable()
+        return hit.entity && hit.entity.isBottleFillable(this)
       })
     }
 
@@ -94,7 +94,7 @@ class Bottle extends MeleeEquipment {
 
   draw(user, entity) {
     if (!entity) return
-    if (!entity.isBottleFillable()) return
+    if (!entity.isBottleFillable(this)) return
     if (!this.isLegacyBottleWithWater() && this.isFull()) {
       return
     }

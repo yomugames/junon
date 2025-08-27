@@ -12,7 +12,8 @@ class Stat extends BaseCommand {
   getUsage() {
     return [
       "/stat [mob|building|weapon|player]",
-      "/stat [mob|building|weapon|player] <flags>"
+      "/stat [mob|building|weapon|player] <flags>",
+      "/stat [mob|building|weapon|player] <stat>:*[multiply]"
     ]
   }
   
@@ -63,6 +64,7 @@ class Stat extends BaseCommand {
       return
     }
 
+    //assigning stat
     let mobKlass = Mobs[klassName]
     if (mobKlass) {
       let mobType = mobKlass.prototype.getType()
@@ -102,7 +104,7 @@ class Stat extends BaseCommand {
       if (!entity.isMob() && !entity.isBuilding() && !entity.isPlayer() && !entity.isItem()) return
       let stat = this.getEntityStat(entity)
       this.modifyStat(stat, keyValueMap, caller)
-
+      if(stat.usage != null && entity.instance.usage != null) entity.instance.setUsage(stat.usage)
       this.sector.setCustomEntityStat(entity.id, stat)
       caller.showChatSuccess(this.formatEntityStat(entity))
     }
@@ -121,7 +123,7 @@ class Stat extends BaseCommand {
         
         if (this.isStatValid(key, value)) {
           stat[key] = value
-        } else {
+        } else if(key != "constructor") {
           caller.showChatError("valid value for " + key + " is " + this.getValidRange(key))
         }
       }
@@ -139,22 +141,32 @@ class Stat extends BaseCommand {
       return "[100-10000]"
     } else if (key === 'range') {
       return "[1-4096]"
+    } else if (key === 'capacity') {
+      return "[1-10000]"
+    } else if (key === 'usage') {
+      return "[0-10000]"
     }
   }
 
   isStatValid(key, value) {
     if (isNaN(value)) return false
 
-    if (key === 'health') {
-      return parseInt(value) >= 0 && parseInt(value) <= 9999999
-    } else if (key === 'damage') {
-      return parseInt(value) >= 0 && parseInt(value) <= 9999999
-    } else if (key === 'speed') {
-      return parseInt(value) >= 1 && parseInt(value) <= 15
-    } else if (key === 'range') {
-      return parseInt(value) >= 1 && parseInt(value) <= 4096
-    } else if (key === 'reload') {
-      return parseInt(value) >= 100 && parseInt(value) <= 10000
+    switch(key) {
+      case 'health':
+        return parseInt(value) >= 0 && parseInt(value) <= 9999999
+      case 'damage':
+        return parseInt(value) >= 0 && parseInt(value) <= 9999999
+      case 'speed':
+        return parseInt(value) >= 1 && parseInt(value) <= 15
+      case 'range':
+        return parseInt(value) >= 1 && parseInt(value) <= 4096
+      case 'reload':
+        return parseInt(value) >= 100 && parseInt(value) <= 10000
+      case 'capacity':
+        return parseInt(value) >= 1 && parseInt(value) <= 10000
+      case 'usage':
+        return parseInt(value) >= 0 && parseInt(value) <= 10000
+      default: return;
     }
   }
 
@@ -178,7 +190,8 @@ class Stat extends BaseCommand {
       return {
         damage: itemKlass.prototype.getEquipmentDamage(),
         range: itemKlass.prototype.getRange(),
-        reload: itemKlass.prototype.getReload()
+        reload: itemKlass.prototype.getReload(),
+        capacity: itemKlass.prototype.getUsageCapacity()
       }
     }
   }
@@ -210,7 +223,9 @@ class Stat extends BaseCommand {
       return {
         damage: entity.getDamage(),
         range: entity.getAttackRange(),
-        reload: entity.getReload()
+        reload: entity.getReload(),
+        usage: entity.instance.usage,
+        capacity: entity.instance.getUsageCapacity()
       }
     } else if (entity.isTower()) {
       return {
@@ -286,11 +301,13 @@ class Stat extends BaseCommand {
     if (this.sector.itemCustomStats[type]) {
       return `damage:${this.sector.itemCustomStats[type].damage} ` +
              `range:${this.sector.itemCustomStats[type].range} ` +
-             `reload:${this.sector.itemCustomStats[type].reload} `
+             `reload:${this.sector.itemCustomStats[type].reload} ` +
+             `capacity:${this.sector.itemCustomStats[type].capacity}`
     } else {
       return `damage:${klass.prototype.getEquipmentDamage()} ` +
              `range:${klass.prototype.getRange()} ` +
-             `reload:${klass.prototype.getReload()} ` 
+             `reload:${klass.prototype.getReload()} ` +
+             `capacity:${klass.prototype.getUsageCapacity()}`
     }
   }
 
@@ -314,9 +331,11 @@ class Stat extends BaseCommand {
           stats['health'] = this.sector.entityCustomStats[entity.id].health
         }
       } else if (entity.isItem() && entity.isWeapon()) {
-        stats['damage'] = this.sector.entityCustomStats[entity.id].damage
-        stats['range']  = this.sector.entityCustomStats[entity.id].range
-        stats['reload'] = this.sector.entityCustomStats[entity.id].reload
+        stats['damage']   = this.sector.entityCustomStats[entity.id].damage
+        stats['range']    = this.sector.entityCustomStats[entity.id].range
+        stats['reload']   = this.sector.entityCustomStats[entity.id].reload
+        stats['usage']    = entity.instance.usage
+        stats['capacity'] = entity.instance.getUsageCapacity()
       }
     } else {
       if (entity.isMob()) {
@@ -336,6 +355,8 @@ class Stat extends BaseCommand {
         stats['damage'] = entity.getDamage()
         stats['range'] = entity.getAttackRange()
         stats['reload'] = entity.getReload()
+        stats['usage'] = entity.instance.usage
+        stats['capacity'] = entity.instance.getUsageCapacity()
       }
     }
 

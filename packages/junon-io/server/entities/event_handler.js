@@ -339,6 +339,20 @@ class EventHandler {
     return content    
   }
 
+
+  getUsage(itemId) {
+    let item = this.game.getEntity(itemId)
+    if(!item?.isItem() || !item?.isWeapon()) return
+
+    return item.instance.usage
+  }
+
+  getCapacity(itemId) {
+    let item = this.game.getEntity(itemId)
+    if(!item?.isWeapon()) return
+    return item.instance.getUsageCapacity()
+  }
+
   getRegion(entityId) {
     let player = this.getPlayer(entityId)
     if (player) {
@@ -1199,7 +1213,9 @@ class EventHandler {
       "$getStructureByCoords": true,
       "$hasEffect": true,
       "$getTotalMobCount": true,
-      "$getAngle": true
+      "$getAngle": true,
+      "$getUsage": true,
+      "$getCapacity": true
     }
   }
 

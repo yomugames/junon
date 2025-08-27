@@ -1302,6 +1302,7 @@ message Sector {
   map<string, Button> buttons = 22;
   map<uint32, CommandBlockTimer> commandBlockTimers = 23; 
   uint32 buildSpeed = 24;
+  map<uint32, CustomStat> itemCustomStats = 25; 
 }
 
 message CustomStat {
@@ -1309,6 +1310,8 @@ message CustomStat {
   uint32 damage = 2;
   uint32 speed = 3;
   uint32 range = 4;
+  uint32 capacity = 5;
+  uint32 usage = 6;
 }
 
 message CameraFeedUpdated {

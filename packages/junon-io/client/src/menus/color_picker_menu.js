@@ -76,7 +76,7 @@ class ColorPickerMenu extends BaseMenu {
       if (this.textureIndex) {
         building.setTextureIndex(this.textureIndex)
         let value = this.game.floorTextures[this.textureIndex]
-        building.baseSprite.texture = PIXI.utils.TextureCache[value]
+        if(value !== 'floormap.png') building.baseSprite.texture = PIXI.utils.TextureCache[value]
       }
     }
   }
@@ -169,7 +169,7 @@ class ColorPickerMenu extends BaseMenu {
     if (texture === 'cornered_texture.png') {
       texture = 'cornered_texture_display.png'
     }
-    return `<div class='texture_cell' data-index='${index}'><img src='/assets/images/${texture}'></div>`
+    return `<div class='texture_cell' data-index='${index}'><img width="32" height="32" src='/assets/images/${texture}'></div>`
   }
 
   render() {

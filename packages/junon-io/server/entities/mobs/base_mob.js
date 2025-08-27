@@ -2821,7 +2821,7 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
     }
 
     if (target.hasCategory("wall")) {
-      if (allowWall) {
+      if (allowWall || this.canDamageWalls()) {
         return true
       } else {
         return this.desiredAttackTarget === target

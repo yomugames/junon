@@ -1023,6 +1023,16 @@
                             <td>$player</td>
                             <td>Returns the angle of the specified player. Ex. /chat @a $getAngle($player)</td>
                         </tr>
+                        <tr>
+                            <td class="function_name">$getUsage</td>
+                            <td>$itemId</td>
+                            <td>Returns the usage level of an item</td>
+                        </tr>
+                        <tr>
+                            <td class="function_name">$getCapacity</td>
+                            <td>$itemId</td>
+                            <td>Returns the usage capacity of an item</td>
+                        </tr>
                     </table>
                 </div>
                 <div>
@@ -1919,6 +1929,15 @@
                             <label for='enable_gravity'><%= t('Yes') %></label>
                             <input type="radio" id="disable_gravity" name='is_gravity_enabled' value='no'>
                             <label for='disable_gravity'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class="colony_info_entry is_fire_spread_enabled">
+                        <label><%= t('Enable Fire Spread') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_fire_spread" name='is_fire_spread_enabled' value='yes'>
+                            <label for='enable_fire_spread'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_fire_spread" name='is_fire_spread_enabled' value='no'>
+                            <label for='disable_fire_spread'><%= t('No') %></label>
                         </div>
                     </div>
                 </div>

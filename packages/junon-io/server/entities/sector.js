@@ -381,6 +381,8 @@ class Sector {
   }
 
   initSettings(entities) {
+    let firespread = true;
+    if(this.isPeaceful()) firespread = false;
     this.settings = {
       isPvPAllowed: false,
       isFovMode: false,
@@ -404,7 +406,8 @@ class Sector {
       isSuitChangeEnabled: true,
       isDropInventoryOnDeath: false,
       isMutantEnabled: true,
-      isGravityEnabled: false
+      isGravityEnabled: false,
+      isFireSpreadEnabled: firespread,
     }
 
     if (!entities) return
@@ -793,7 +796,7 @@ class Sector {
 
   editSetting(key, value) {
     if (typeof this.settings[key] !== 'undefined') {
-
+      value = String(value)
       if (value != "true" && value != "false") {
         return;
       }

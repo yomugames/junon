@@ -969,6 +969,7 @@ class ChunkRegion {
     let wall = this.chunk.sector.armorMap.get(row, col)
     if (wall) {
       this.walls[wall.id] = wall
+      this.structures[wall.id] = wall
     }
 
     let distribution = this.chunk.sector.distributionMap.get(row, col)
@@ -1045,6 +1046,7 @@ class ChunkRegion {
     let wall = this.chunk.sector.armorMap.get(row, col)
     if (wall) {
       this.walls[wall.id] = wall
+      this.structures[wall.id] = wall
       // since wall is on top, it will hide the dirt
       this.unsetDirt(row, col)
     }

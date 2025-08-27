@@ -350,6 +350,14 @@ class RemoteEventHandler {
         } else {
           player.showError("Permission Denied", { isWarning: true })
         }
+      }else if (building.constructor.name === "Beacon") {
+        if (player.hasCommandsPermission()) {
+          let maxLength = building.getMaxContentLength()
+          building.setBuildingContent(data.content.slice(0, maxLength), player)
+        } else {
+          player.showError("Permission Denied", { isWarning: true })
+        }
+
       } else {
         if (player.hasMemberPrivilege()) {
           let maxLength = building.getMaxContentLength()

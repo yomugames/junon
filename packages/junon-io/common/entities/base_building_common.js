@@ -10,8 +10,7 @@ BaseBuildingCommon.prototype = {
   },
 
   isStructure() {
-    return !this.hasCategory("terrain") && !this.hasCategory("platform") && 
-           !this.hasCategory("wall") && !this.hasCategory("distribution")
+    return !this.hasCategory("terrain") && !this.hasCategory("platform") && !this.hasCategory("distribution")
   },
 
   // account for structures only

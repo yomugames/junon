@@ -108,6 +108,9 @@ class TeamMenu extends BaseMenu {
     this.el.querySelector("#enable_gravity").addEventListener("click", this.onEnableGravity.bind(this), true)
     this.el.querySelector("#disable_gravity").addEventListener("click", this.onDisableGravity.bind(this), true)
 
+    this.el.querySelector("#enable_fire_spread").addEventListener("click", this.onEnableFireSpread.bind(this), true)
+    this.el.querySelector("#disable_fire_spread").addEventListener("click", this.onDisableFireSpread.bind(this), true)
+
     this.el.querySelector(".colony_logs_refresh_btn").addEventListener("click", this.onLogsRefreshClick.bind(this), true)
     this.el.querySelector(".command_logs_refresh_btn").addEventListener("click", this.onCommandLogsRefreshClick.bind(this), true)
   }
@@ -318,6 +321,15 @@ class TeamMenu extends BaseMenu {
           this.el.querySelector("#enable_gravity").checked = true
         } else {
           this.el.querySelector("#disable_gravity").checked = true
+        }
+      }
+
+      if(name === 'isFireSpreadEnabled') {
+        let value = settings[name]
+        if(value) {
+          this.el.querySelector("#enable_fire_spread").checked = true;
+        } else {
+          this.el.querySelector("#disable_fire_spread").checked = true;
         }
       }
 
@@ -856,6 +868,34 @@ class TeamMenu extends BaseMenu {
     }
   }
 
+  onEnableFireSpread(e) {
+    e.preventDefault()
+
+    let value = e.target.value
+    if(value === 'yes') {
+      SocketUtil.emit("SectorAction", {
+        action: 'editSetting',
+        sectorId: this.game.sector.uid,
+        key: 'isFireSpreadEnabled',
+        value: 'true'
+      })
+    }
+  }
+
+  onDisableFireSpread(e) {
+    e.preventDefault()
+
+    let value = e.target.value;
+    if(value === 'no') {
+      SocketUtil.emit("SectorAction", {
+        action: 'editSetting',
+        sectorId: this.game.sector.uid,
+        key: 'isFireSpreadEnabled',
+        value: 'false'
+      })
+    }
+  }
+
   onEnableMinimapClick(e) {
     e.preventDefault()
 
@@ -1252,6 +1292,14 @@ class TeamMenu extends BaseMenu {
       this.el.querySelector(".colony_chat_allowed").style.display = 'none'
       this.el.querySelector(".is_infinite_ammo").style.display = 'none'
       this.el.querySelector(".is_infinite_power").style.display = 'none'
+      this.el.querySelector(".colony_team_join").style.display = 'none'
+      this.el.querySelector(".colony_mob_autospawn").style.display = 'none'
+      this.el.querySelector(".is_crafting_enabled").style.display = 'none'
+      this.el.querySelector(".is_suit_change_enabled").style.display = 'none'
+      this.el.querySelector(".is_drop_inventory_on_death").style.display = 'none'
+      this.el.querySelector(".is_corpse_enabled").style.display = 'none'
+      this.el.querySelector(".is_mutant_enabled").style.display = 'none'
+      this.el.querySelector(".is_fire_spread_enabled").style.display = 'none'
     }
 
     this.renderVisitorActionsState()

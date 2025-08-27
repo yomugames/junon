@@ -118,6 +118,10 @@ class Pirate extends LandMob {
     }
   }
 
+
+  canDamageWalls(){
+    return true
+  }
 }
 
 module.exports = Pirate

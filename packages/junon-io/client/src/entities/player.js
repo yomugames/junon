@@ -1552,7 +1552,7 @@ class Player extends BaseEntity {
     if (this.building) {
       this.sector.invalidAreaSprite.alpha = 0
       this.sector.removeEntity(this.building, this.building.getGroup())
-      this.building.onBuildStop()
+      this.building.onBuildStop() // wires/pipes opacity
       this.building = null
     }
   }
@@ -1826,7 +1826,7 @@ class Player extends BaseEntity {
   }
 
   notifyLowStatus(stat) {
-    if (this.isLowStatus(stat)) {
+    if (this.isLowStatus(stat) && this.sector.settings["is"+stat[0].toUpperCase()+stat.slice(1)+"Enabled"]) {
       this.addStatus(stat)
     } else {
       this.removeStatus(stat)

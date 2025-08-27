@@ -39,7 +39,7 @@ class Oxygen extends BaseCommand {
     switch(subcommand) {
       case "set":
         targetEntities.forEach((entity) => {
-          entity.setOxygen(amount)
+          entity?.setOxygen(amount)
         })
         break
       case "gain":

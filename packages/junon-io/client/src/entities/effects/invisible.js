@@ -20,6 +20,15 @@ class Invisible extends BaseEffect {
       targetOpacity = 0.2
     }
 
+    if(this.affectedEntity.sector.settings.isFovMode && !this.affectedEntity.isMe()) {
+      return new TWEEN.Tween(opacity)
+      .to({ opacity: targetOpacity }, 0)
+      .onUpdate(() => {
+        this.affectedEntity.sprite.alpha = opacity.opacity
+      })
+    } 
+
+
     const tween = new TWEEN.Tween(opacity)
         .to({ opacity: targetOpacity }, 400)
         .onUpdate(() => {

@@ -42,6 +42,8 @@ class HandEquipment extends BaseEquipment {
     }
 
     if (!this.owner) return baseDamage
+    if (this.sector.entityCustomStats[this.owner.id]?.damage) baseDamage = this.sector.entityCustomStats[this.owner.id].damage
+    if (this.sector.mobCustomStats[this.owner.type]?.damage) baseDamage = this.sector.mobCustomStats[this.owner.type].damage
 
     if (this.owner.isMob() || this.owner.isPlayer()) {
       return Math.floor(this.owner.getDamageMultiplier() * baseDamage)

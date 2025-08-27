@@ -96,7 +96,7 @@ class BaseSeed extends BaseBuilding {
     let platform = this.getStandingPlatform()
     if (!platform) return
 
-    platform.applyTint(0xffffff)
+    if(platform.constructor.name === "Soil") platform.applyTint(0xffffff)
     platform.updateChunkSprite()
   }
 

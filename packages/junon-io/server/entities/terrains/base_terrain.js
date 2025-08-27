@@ -502,8 +502,8 @@ Object.assign(BaseTerrain.prototype, BoundingBox.prototype, {
 })
 
 Object.assign(BaseTerrain.prototype, Categorizable.prototype, {
-  isBottleFillable() {
-    return this.hasEffect("blood") || this.getConstants().isBottleFillable
+  isBottleFillable(bottle) {
+    return (this.hasEffect("blood") && Protocol.definition().BuildingType[bottle?.getType()] !== "WaterBottle") || this.getConstants().isBottleFillable
   }
 })
 

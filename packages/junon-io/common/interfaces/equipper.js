@@ -25,7 +25,7 @@ Equipper.prototype = {
     sprite.tint = tint
   },
   getTintableSprites() {
-    let sprites = [this.body, this.hands]
+    let sprites = [this.body, this.hands, this.rightHand, this.leftHand]
 
     let armorEquipment = this.getArmorEquipment()
     if (armorEquipment) {
@@ -127,7 +127,7 @@ Equipper.prototype = {
     if (handEquipment && handEquipment.isAnimatable()) {
       handEquipment.animate()
       handEquipment.playSound()
-    } else {
+    } else if(!handEquipment) {
       this.animateHands()
     }
   },

@@ -531,8 +531,8 @@ class BaseBuilding extends BaseEntity {
     return false
   }
 
-  isBottleFillable() {
-    if (this.hasEffect("blood")) return true
+  isBottleFillable(bottle) {
+    if (this.hasEffect("blood") && Protocol.definition().BuildingType[bottle?.getType()] !== "WaterBottle") return true
 
     return super.isBottleFillable()
   }
@@ -1169,7 +1169,7 @@ class BaseBuilding extends BaseEntity {
 
   onBuildingPlaced() {
     this.container.registerComponent(this.getGroup(), this.getMapName(), this)
-
+    this.hasCategory("wall") && this.container.registerComponent("structures", "structureMap", this)
     // when loading save file, we want to batch insert into tree
     // so dont do it one by one
     if (!this.sector.shouldDisableBuildingTreeInsert) {
@@ -1362,6 +1362,7 @@ class BaseBuilding extends BaseEntity {
 
   unregister() {
     this.container.unregisterComponent(this.getGroup(), this.getMapName(), this)
+    if(this.isWall()) this.container.unregisterComponent("structures", "structureMap", this)
     this.sector.removeEntityFromTreeByName(this, "buildings")
     // this.sector.unregisterBuildingDecay(this)
 

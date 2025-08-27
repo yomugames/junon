@@ -27,7 +27,7 @@ class Floor extends BaseFloor {
     const baseTexture = PIXI.utils.TextureCache[this.getTextureSpritePath()]
 
 
-    if (this.getTextureSpritePath() === "floormap.png") {
+    if (this.getTextureSpritePath() === "simplex_texture.png") {
       const chunk = new PIXI.Rectangle(x % (31 * 32), y % (31 * 32), 32, 32)
       const texture = new PIXI.Texture(baseTexture, chunk)
       this.texture = new PIXI.Sprite(texture)

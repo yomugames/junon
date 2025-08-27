@@ -1541,7 +1541,7 @@ class Sector {
   }
 
   onHourChanged(hour) {
-    let prevDay = this.day || this.getDatCount()
+    let prevDay = this.day || this.getDayCount()
     this.day = this.getDayCount()
     if (this.day !== prevDay) {
       this.onDayCountChanged()

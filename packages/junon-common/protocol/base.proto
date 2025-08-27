@@ -179,6 +179,7 @@ message MessageWrapper {
 
 message RPUpdated {
   uint32 RP = 1;
+  uint32 visitorHappiness = 2;
 }
 
 message BadgeEquipped {
@@ -1230,6 +1231,7 @@ message JoinGame {
   map<string, Objective> objectives = 28;
   map<uint32, EntityDialogues> dialogueMap = 29;
   FullMap fullMap = 30;
+  uint32 RP = 31;
 }
 
 message Objective {

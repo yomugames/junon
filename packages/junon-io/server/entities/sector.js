@@ -157,7 +157,7 @@ class Sector {
     this.initCommandBlock(entities)
     this.initBuildLimits(entities)
     this.initKeyCodes(entities)
-    this.initRP()
+    this.initRP(entities)
 
     this.initObjectives()
 
@@ -177,10 +177,11 @@ class Sector {
     return this.game.server.socketUtil
   }
 
-  initRP() {
-    this.RP = new RP(this)
+  initRP(entities) {
+    let RPLevel = entities.RP || 0
+    this.RP = new RP(this, RPLevel)
     this.visitors = [];
-    this.totalHappiness = 0;
+    this.visitorHappiness = 0;
     this.unlockedItems = []
   }
 

@@ -48,7 +48,7 @@ class Sector {
     this.mobCustomStats = data.mobCustomStats || {}
     this.buildingCustomStats = data.buildingCustomStats || {}
     this.entityCustomStats = data.entityCustomStats || {}
-    this.RPLevel = 0;
+    this.RPLevel = data.RP || 0;
     
     for (let name in data.buttons) {
       let buttonData = data.buttons[name]

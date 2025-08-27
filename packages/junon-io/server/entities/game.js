@@ -2394,7 +2394,8 @@ class Game {
       isMiniGame: this.isMiniGame(),
       sidebar: this.sidebars[player.getId()],
       objectives: player.objectives,
-      dialogueMap: this.dialogueMap
+      dialogueMap: this.dialogueMap,
+      RP: player.sector.RP.level
     }
 
     if (this.serverRestartTimestamp) {

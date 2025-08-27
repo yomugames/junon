@@ -6,8 +6,10 @@ const Projectiles = require('../projectiles/index')
 class Visitor extends LandMob {
   constructor(sector, data) {
     super(sector, data)
-    this.Happiness = new Happiness(this); //this.happiness already exists in a mob, and causes weird effects.
+    this.Happiness = new Happiness(this); //this.happiness (no uppercase) already exists in a mob, and causes weird effects.
     //note: onPositionChanged() will happen before this.Happiness is initialized
+
+    this.sector.visitors.push(this)
   }
 
   getType() {
@@ -99,7 +101,7 @@ class Happiness {
 
   changeHappinessBy(value) {
     this.level += value;
-    this.visitor.sector.totalHappiness += value;
+    this.visitor.sector.visitorHappiness += value;
   }
 }
 

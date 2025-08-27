@@ -3986,6 +3986,8 @@ class Game {
   }
 
   onJoinGame(data) {
+    data.sector.RP = data.RP
+
     document.body.style.overflow = 'hidden'
     this.joinGameTime = Date.now()
 

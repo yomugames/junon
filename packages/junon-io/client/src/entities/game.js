@@ -253,7 +253,7 @@ class Game {
     this.commandBlockPicker = new Menus.CommandBlockPicker(this, document.querySelector("#command_block_picker"))
     this.friendRequestMenu = new Menus.FriendRequestMenu(this, document.querySelector("#friend_request_menu"))
     this.badgeMenu = new Menus.BadgeMenu(this, document.querySelector("#badge_menu"))
-
+    this.RPMenu = new Menus.RPMenu(this, document.querySelector("#RP_menu"))
 
     this.visitColonyMenu = this.main.gameExplorer
 
@@ -1412,6 +1412,7 @@ class Game {
     // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 
     let tempAssets = ['displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png', 'pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png', 'deconstructor.png', 'blue_laser.png', 'keypad_door.png', 'keypad_door_lower.png', 'keypad_door_upper.png', 'unbreakable_wall.png', 'sapper.png', 'sapper_corpse.png', 'dynamite.png', 'miasma_gate.png', "solid_texture2.png", "simplex_texture.png"]
+
     tempAssets.forEach((asset) => {
       PIXI.Texture.addToCache(PIXI.Texture.fromImage('/assets/images/' + asset), asset)
     })
@@ -1575,6 +1576,12 @@ class Game {
     SocketUtil.on("TempCommandBlockData", this.onTempCommandBlockData.bind(this))
     SocketUtil.on("BadgesData", this.onBadgesData.bind(this))
     SocketUtil.on("BadgeEquipped", this.onBadgeEquipped.bind(this))
+    SocketUtil.on("RPUpdated", this.onRPUpdated.bind(this))
+  }
+
+  onRPUpdated(data) {
+    if(data.RP) this.sector.RPLevel = data.RP
+    if(data.visitorHappiness) this.sector.visitorHappiness = data.visitorHappiness
   }
 
   onBadgeEquipped(data) {
@@ -2668,6 +2675,10 @@ class Game {
     document.querySelector(".main_colony_list").style.display = 'block'
 
     this.visitColonyMenu.toggle()
+  }
+
+  toggleRPMenu() {
+    this.RPMenu.isOpen() ? this.RPMenu.close() : this.RPMenu.open()
   }
 
   toggleCommandBlockMenu() {
@@ -3979,6 +3990,9 @@ class Game {
   }
 
   onJoinGame(data) {
+    data.sector.RP = data.RP
+    data.sector.visitorHappiness = data.visitorHappiness
+
     document.body.style.overflow = 'hidden'
     this.joinGameTime = Date.now()
 
@@ -5108,6 +5122,7 @@ class Game {
       "camera mode": 117,         // f6
       "stats view": 116,         // f5
       "view badges": 66,          // b
+      "open RP menu":72,          // h
     }
 
     if (navigator.userAgent.search("Firefox") !== -1) {

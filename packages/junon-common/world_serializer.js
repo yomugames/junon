@@ -454,6 +454,8 @@ class WorldSerializer {
     entities["commandBlockFullJson"] = JSON.stringify(sector.commandBlock.toJson())
     entities["variables"] = sector.eventHandler.variables
     entities["keyCodes"] = sector.keyCodes
+    entities["RP"] = sector.RP.level
+    entities["visitorHappiness"] = sector.visitorHappiness
 
     let encoded = this.getCurrentProtocol()["SaveState"].encode(json)
     let buffer = encoded.finish()

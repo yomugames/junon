@@ -178,14 +178,6 @@ html[lang='ja'] div {
     top: calc(50vh - (200px / 2));
 }
 
-.RP_menu_container {
-    text-align: left;
-    font-size: 15px;
-}
-
-.RP_items_menu {
-    margin:10px;
-}
 .dialog_highlight {
     color: white;
     background: black;
@@ -5774,22 +5766,6 @@ html[lang='ja'] .mobile_authentication_container .btn {
     height: 24px;
     object-fit: contain;
     vertical-align: bottom;
-}
-
-.item_selection {
-    background-color: #222;
-    border:1px solid #000;
-    padding:5px;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    width:fit-content;
-}
-.item_selection:hover {
-    background-color: #333;
-}
-.item_selection.selected {
-    background-color: #333;
 }
 
 #soil_menu .menu_main_header {

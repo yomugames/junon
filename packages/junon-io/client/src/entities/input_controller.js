@@ -362,10 +362,6 @@ class InputController {
         game.toggleCommandBlockMenu()
       } 
 
-      if(keyCode === this.game.keyBindings["open RP menu"]) { // b
-        game.toggleRPMenu()
-      }
-
       if (keyCode === 81) { // q
         game.toggleTutorial()
       } 

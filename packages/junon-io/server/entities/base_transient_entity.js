@@ -20,23 +20,6 @@ class BaseTransientEntity {
 
   }
 
-  isRPItem() {
-    return false;
-  }
-  
-  hasMetRPRequirements() {
-    return this.sector.RP.level >= this.getRequiredRP()
-  }
-
-  getRequiredRP() {
-    if(!isRPItem) return 0;
-
-    if(this.getConstants().requiredRP) {
-      return this.getConstants().requiredRP;
-    }
-    throw new Error("Must implement getRequiredRP or add inside constants.json")
-  }
-
   setHealth() {
 
   }

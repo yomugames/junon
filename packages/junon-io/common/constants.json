@@ -849,41 +849,6 @@
         "damage": "+5"
       }
     },
-    "Visitor": {
-      "parent": "Mobs.BaseMob",
-      "drop": "HumanMeat",
-      "isNonHostile": true,
-      "isTamable":false,
-      "attackGroups": ["mobs"],
-      "cost": {
-        "gold": 20000
-      },
-      "dizzySprite": {
-        "position": {
-          "x":0,
-          "y":-10,
-          "rotation":90
-        },
-        "width":20,
-        "height":5,
-        "rotation":0,
-        "tint":"#000000"
-
-      },
-      "sprite": {
-          "height": 49,
-          "width": 54,
-          "rotation":180
-      },
-      "stats": {
-        "speed": 3,
-        "reload":2000,
-        "health": 20,
-        "damage":10,
-        "range":32,
-        "los":128
-      }
-    },
     "Slime": {
       "parent": "Mobs.BaseMob",
       "drop": "Gel",

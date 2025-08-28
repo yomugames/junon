@@ -48,8 +48,6 @@ class Sector {
     this.mobCustomStats = data.mobCustomStats || {}
     this.buildingCustomStats = data.buildingCustomStats || {}
     this.entityCustomStats = data.entityCustomStats || {}
-    this.RPLevel = data.RP || 0;
-    this.visitorHappiness = data.visitorHappiness || 0;
     this.itemCustomStats = data.itemCustomStats || {}
     
     for (let name in data.buttons) {

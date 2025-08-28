@@ -46,7 +46,7 @@ message Entities {
   map<uint32, CustomStat> itemCustomStats = 25; 
   map<string,KeyCode> keyCodes = 26;
   uint32 RP = 27;
-  uint32 VisitorHappiness = 28;
+  uint32 visitorHappiness = 28;
 }
 
 message KeyCode {
@@ -238,6 +238,16 @@ message Mob {
   uint32 level = 22;
   uint32 status = 23;
   repeated string attackables = 24;
+  Happiness Happiness = 25;
+}
+
+message Happiness {
+  EventDefinitions eventDefinitions = 1;
+}
+
+message EventDefinitions {
+  uint32 findColoredLights = 1;
+  uint32 findPottedPlants = 2;
 }
 
 message MasterRef {

@@ -1232,6 +1232,7 @@ message JoinGame {
   map<uint32, EntityDialogues> dialogueMap = 29;
   FullMap fullMap = 30;
   uint32 RP = 31;
+  uint32 visitorHappiness = 32;
 }
 
 message Objective {

@@ -1729,7 +1729,7 @@ class BaseEntity extends BaseTransientEntity {
 
     this.addFire()
 
-    if (this.canSpreadFire()) {
+    if (this.canSpreadFire() && this.isBuilding()) {
       if (this.isMaxEffectLevelReached("fire")) {
         this.spreadFire()
       }

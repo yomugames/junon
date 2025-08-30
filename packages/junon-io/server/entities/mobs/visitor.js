@@ -111,7 +111,7 @@ class Happiness {
     this.eventDefinitions = eventDefinitions || {
       findColoredLights: 10,
       findPottedPlants: 10,
-      damaged: -50,
+      damaged: -25,
       killed: -100,
       stepOnDirt: -5,
       stepOnCarpet: 5,

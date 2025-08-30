@@ -43,7 +43,6 @@ class Visitor extends LandMob {
   updateHappiness() {
     this.checkForPlants();
     this.checkForLights();
-    this.checkForDirt();
     this.checkForDirtAndCarpet();
   }
 

@@ -48,9 +48,16 @@ const Dragger = require('./../interfaces/dragger')
 const WalkthroughManager = require("./walkthrough_manager")
 const xss = require("xss")
 const Badges = require('./badges/index')
+const Sector = require("./sector")
 
 class Player extends BaseEntity {
 
+  /**
+   * 
+   * @param {*} socket 
+   * @param {*} data 
+   * @param {Sector} sector 
+   */
   constructor(socket, data, sector) {
     super(sector, { id: data.id, x: data.x, y: data.y, w: Constants.Player.width, h: Constants.Player.height })
 

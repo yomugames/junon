@@ -40,8 +40,15 @@ const Commands = require("../commands/index")
 const Sidebar = require("./sidebar")
 const xss = require("xss")
 const IpBan = require("junon-common/db/ip_ban")
+const Server = require('../server')
 
 class Game {
+
+  /**
+   * 
+   * @param {Server} server 
+   * @param {Object} sectorData 
+   */
   constructor(server, sectorData = {}) {
     this.server = server
     this.gameStartTime = Date.now()

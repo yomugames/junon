@@ -69,9 +69,16 @@ const CommandBlock = require("../command_blocks/command_block")
 const PositionSearchRequest = require("./position_search_request")
 const Foods = require("./foods/index")
 const RP = require("./RP")
+const Game = require("./game")
 
 class Sector {
 
+  /**
+   * @param {Game} game 
+   * @param {Object} metadata
+   * @param {Object} entities
+   * @returns 
+   */
   constructor(game, metadata, entities) {
     this.game  = game
 
@@ -178,10 +185,10 @@ class Sector {
   }
 
   initRP(entities) {
-    let RPLevel = entities.RP || 0
+    let RPLevel = entities?.RP || 0
     this.RP = new RP(this, RPLevel)
     this.visitors = [];
-    this.visitorHappiness = entities.visitorHappiness || 0;
+    this.visitorHappiness = entities?.visitorHappiness || 0;
     this.unlockedItems = []
   }
 

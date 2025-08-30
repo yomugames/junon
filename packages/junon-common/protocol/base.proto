@@ -174,7 +174,12 @@ message MessageWrapper {
     EquipBadge EquipBadge = 181;
     BadgeEquipped BadgeEquipped = 182;
     RPUpdated RPUpdated = 183;
+    UnlockItem UnlockItem = 184;
   }
+}
+
+message UnlockItem {
+  uint32 type = 1;
 }
 
 message RPUpdated {
@@ -1233,6 +1238,7 @@ message JoinGame {
   FullMap fullMap = 30;
   uint32 RP = 31;
   uint32 visitorHappiness = 32;
+  repeated string unlockedItems = 33;
 }
 
 message Objective {

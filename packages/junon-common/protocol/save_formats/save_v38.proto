@@ -47,6 +47,7 @@ message Entities {
   map<string,KeyCode> keyCodes = 26;
   uint32 RP = 27;
   uint32 visitorHappiness = 28;
+  repeated string unlockedItems = 29;
 }
 
 message KeyCode {

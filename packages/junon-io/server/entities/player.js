@@ -49,6 +49,7 @@ const WalkthroughManager = require("./walkthrough_manager")
 const xss = require("xss")
 const Badges = require('./badges/index')
 const Sector = require("./sector")
+const helper = require("../../common/helper")
 
 class Player extends BaseEntity {
 
@@ -1908,6 +1909,28 @@ class Player extends BaseEntity {
       }
 
     }
+  }
+
+  unlockItem(type) {
+    let klass = Item.getKlassByName(Protocol.definition().BuildingType[type])
+    if(!klass.prototype.isRPItem()) return;
+    
+    let requirements = klass.prototype.getConstants().requiredRP || klass.prototype.getRequiredRP()
+    if(!requirements) {
+      this.showError("Item has no requirements", {warning: true})
+      return;
+    }
+
+    if(requirements > this.sector.RP.level) {
+      this.showError("Not enough RP")
+      return;
+    }
+    if(this.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[type] != -1)) {
+      this.showError("Already unlocked")
+      return
+    }
+
+    this.sector.unlockItem(Protocol.definition().BuildingType[type])
   }
 
   craft(data) {

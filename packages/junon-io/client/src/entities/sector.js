@@ -50,6 +50,7 @@ class Sector {
     this.entityCustomStats = data.entityCustomStats || {}
     this.RPLevel = data.RP || 0;
     this.visitorHappiness = data.visitorHappiness || 0;
+    this.unlockedItems = data.unlockedItems || [];
     this.itemCustomStats = data.itemCustomStats || {}
     
     for (let name in data.buttons) {

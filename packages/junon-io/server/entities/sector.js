@@ -189,7 +189,11 @@ class Sector {
     this.RP = new RP(this, RPLevel)
     this.visitors = [];
     this.visitorHappiness = entities?.visitorHappiness || 0;
-    this.unlockedItems = []
+    this.unlockedItems = entities?.unlockedItems || []
+  }
+
+  unlockItem(itemname) {
+    this.unlockedItems.push(itemname)
   }
 
   initObjectives() {

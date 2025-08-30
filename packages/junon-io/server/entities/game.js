@@ -2403,7 +2403,8 @@ class Game {
       objectives: player.objectives,
       dialogueMap: this.dialogueMap,
       RP: player.sector.RP.level,
-      visitorHappiness: player.sector.visitorHappiness
+      visitorHappiness: player.sector.visitorHappiness,
+      unlockedItems: player.sector.unlockedItems
     }
 
     if (this.serverRestartTimestamp) {

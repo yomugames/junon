@@ -1,12 +1,30 @@
 const RPItems = require("../entities/RPItems/index")
 const BaseMenu = require("./base_menu");
+const SocketUtil = require("./../util/socket_util")
 
 class RPMenu extends BaseMenu {
   open() {
     super.open()
     this.el.querySelector("#RP_level").innerHTML = this.game.sector.RPLevel;
+    this.el.querySelector(".craft_btn").addEventListener("click", this.onUnlockBtnClick.bind(this) , true)
 
     this.render()
+  }
+
+  onUnlockBtnClick(e) {
+    if(!this.id) return;
+    let klass = this.game.getItemKlass(this.id)
+
+    if (!klass.prototype.isRPItem()) return;
+    let requiredRP = klass.prototype.getRequiredRP() || klass.prototype.getConstants().requiredRP
+    if (!requiredRP) return;
+
+    if (!this.game.sector.RPLevel < requiredRP) {
+      SocketUtil.emit("UnlockItem", {type: this.id})
+      
+      return;
+    }
+
   }
 
   onMenuConstructed() {
@@ -29,6 +47,8 @@ class RPMenu extends BaseMenu {
 
   renderItemStats(e) {
     let klass = this.game.getItemKlass(e.dataset.type)
+    this.id = e.dataset.type
+
     if (!klass.prototype.isRPItem()) return;
     let requiredRP = klass.prototype.getRequiredRP() || klass.prototype.getConstants().requiredRP
     if (!requiredRP) return;
@@ -38,7 +58,12 @@ class RPMenu extends BaseMenu {
       this.el.querySelector(".craft_btn").dataset.disabled = true
       return;
     }
-    
+
+    if(this.game.sector.unlockedItems.indexOf(klass.prototype.constructor.name) != -1) {
+      this.el.querySelector(".craft_btn").dataset.disabled = true
+      return;
+    }
+
     delete this.el.querySelector(".craft_btn").dataset.disabled
   }
 

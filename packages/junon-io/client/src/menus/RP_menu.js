@@ -6,6 +6,7 @@ class RPMenu extends BaseMenu {
   open() {
     super.open()
     this.el.querySelector("#RP_level").innerHTML = this.game.sector.RPLevel;
+    this.el.querySelector("#visitor_happiness_level").innerHTML = this.game.sector.visitorHappiness
     this.el.querySelector(".craft_btn").addEventListener("click", this.onUnlockBtnClick.bind(this) , true)
 
     this.render()

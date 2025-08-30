@@ -10,6 +10,7 @@ class Visitor extends LandMob {
     //note: onPositionChanged() will happen before this.Happiness is initialized
 
     this.sector.visitors.push(this)
+    this.setOwner(this.sector.getCreatorTeam()) 
   }
 
   getType() {
@@ -28,51 +29,73 @@ class Visitor extends LandMob {
     this.isNeutral = true // always neutral
   }
 
-  onPositionChanged(options={}) {
+  onPositionChanged(options = {}) {
     super.onPositionChanged(options)
-    if(this.Happiness) {
+    if (this.Happiness) {
       this.updateHappiness()
     }
   }
 
-  getTile(row=this.getRow(), col=this.getCol()) {
-    return this.getPathFinder().getTile(row,col)
+  getTile(row = this.getRow(), col = this.getCol()) {
+    return this.getPathFinder().getTile(row, col)
   }
 
   updateHappiness() {
     this.checkForPlants();
     this.checkForLights();
+    this.checkForDirt();
+    this.checkForDirtAndCarpet();
+  }
+
+  checkForDirtAndCarpet() {
+    let tile = this.getTile();
+    if(!tile) return;
+    if(tile.hasDirt()) {
+      this.Happiness.changeHappinessForEvent("stepOnDirt")
+    }
+    if(tile.constructor.name === "CarpetFloor") {
+      this.Happiness.changeHappinessForEvent("stepOnCarpet")
+    }
   }
 
   checkForPlants() {
     let room = this.getRoom()
-    if(!room) return;
+    if (!room) return;
     let structures = room.structures;
     let validStructures = [];
-    for(let i in structures) {
-      if(structures[i].entity.constructor.name === "Pot" && Object.keys(structures[i].entity.storage).length) validStructures.push(structures[i].entity)
-    } 
-    if(validStructures.length > 2){
+    for (let i in structures) {
+      if (structures[i].entity.constructor.name === "Pot" && Object.keys(structures[i].entity.storage).length) validStructures.push(structures[i].entity)
+    }
+    if (validStructures.length > 2) {
       this.Happiness.changeHappinessForEvent("findPottedPlants")
     }
   }
 
   checkForLights() {
     let room = this.getRoom()
-    if(!room) return
+    if (!room) return
 
-    let structures = room.structures;
-    let validStructures = [];
-    for(let i in structures) {
-      if(structures[i].entity.hasCategory("lamp") && structures[i].entity.content !== "" && structures[i].entity.content !== "#ffffff" && structures[i].entity.isOpen) {
+    let structures = room.structures; let validStructures = []; for (let i in structures) {
+      if (structures[i].entity.hasCategory("lamp") && structures[i].entity.content !== "" && structures[i].entity.content !== "#ffffff" && structures[i].entity.isOpen) {
         validStructures.push(structures[i].entity);
       }
     }
 
-    if(validStructures.length > 5) {
+    if (validStructures.length > 5) {
       this.Happiness.changeHappinessForEvent("findColoredLights");
     }
+  }
 
+  damage(amount, attacker, attackEntity) {
+    super.damage(amount, attacker, attackEntity)
+    if (this.getMaxHealth() - this.health > this.getMaxHealth() / 4) {
+      this.Happiness.changeHappinessForEvent("damaged");
+    }
+  }
+
+  onHealthZero() {
+    super.onHealthZero()
+    this.Happiness.changeHappinessForEvent("killed");
   }
 }
 
@@ -88,13 +111,17 @@ class Happiness {
     this.visitor = visitor
     this.eventDefinitions = eventDefinitions || {
       findColoredLights: 10,
-      findPottedPlants: 10
+      findPottedPlants: 10,
+      damaged: -50,
+      killed: -100,
+      stepOnDirt: -5,
+      stepOnCarpet: 5,
     }
   }
 
   changeHappinessForEvent(event) {
     let value = this.eventDefinitions[event]
-    if(!value) return;
+    if (!value) return;
     delete this.eventDefinitions[event] //ensure doesn't trigger again.
     this.changeHappinessBy(value)
   }
@@ -102,7 +129,7 @@ class Happiness {
   changeHappinessBy(value) {
     this.level += value;
     this.visitor.sector.visitorHappiness += value;
-    this.visitor.sector.getSocketUtil().broadcast(this.visitor.sector.getSocketIds(), "RPUpdated", {visitorHappiness: this.visitor.sector.visitorHappiness})
+    this.visitor.sector.getSocketUtil().broadcast(this.visitor.sector.getSocketIds(), "RPUpdated", { visitorHappiness: this.visitor.sector.visitorHappiness })
   }
 }
 

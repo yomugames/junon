@@ -45,7 +45,7 @@ message Entities {
   map <string,string> variables = 24;
   map<uint32, CustomStat> itemCustomStats = 25; 
   map<string,KeyCode> keyCodes = 26;
-  unt32 RP = 27;
+  int32 RP = 27;
   int32 visitorHappiness = 28;
   repeated string unlockedItems = 29;
 }

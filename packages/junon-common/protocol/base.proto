@@ -183,8 +183,8 @@ message UnlockItem {
 }
 
 message RPUpdated {
-  uint32 RP = 1;
-  uint32 visitorHappiness = 2;
+  int32 RP = 1;
+  int32 visitorHappiness = 2;
 }
 
 message BadgeEquipped {
@@ -1236,8 +1236,8 @@ message JoinGame {
   map<string, Objective> objectives = 28;
   map<uint32, EntityDialogues> dialogueMap = 29;
   FullMap fullMap = 30;
-  uint32 RP = 31;
-  uint32 visitorHappiness = 32;
+  unt32 RP = 31;
+  int32 visitorHappiness = 32;
   repeated string unlockedItems = 33;
 }
 

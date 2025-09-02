@@ -90,7 +90,7 @@ class Player extends BaseEntity {
 
     this.register()
 
-    this.replacePhysicalGoldWithVirtual()
+    // this.replacePhysicalGoldWithVirtual()
   }
 
   /**

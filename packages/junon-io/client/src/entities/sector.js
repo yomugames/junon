@@ -155,6 +155,10 @@ class Sector {
     this.buildingCustomStats[type] = stats
   }
 
+  setItemCustomStats(type, stats) {
+    this.itemCustomStats[type] = stats
+  }
+
   setEntityCustomStats(id, stats) {
     this.entityCustomStats[id] = stats
 

@@ -1717,6 +1717,8 @@ class Game {
       this.sector.setBuildingCustomStats(data.type, data.stats)
     } else if (data.group === 'entities') {
       this.sector.setEntityCustomStats(data.type, data.stats)
+    } else if (data.group === 'items') {
+      this.sector.setItemCustomStats(data.type, data.stats)
     }
   }
 

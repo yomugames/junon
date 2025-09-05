@@ -3029,6 +3029,10 @@ class Sector {
   executeTurn() {
     for (let entityId in this.flames) {
       let entity = this.flames[entityId]
+      if(!entity.effects.fire || entity.isRemoved) {
+        delete this.flames[entityId]
+        return;
+      } 
       this.safeGrowFire(entity)
     }
 

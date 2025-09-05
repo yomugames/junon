@@ -51,7 +51,10 @@ class Flame extends BaseProjectile {
     }).flat()
 
     flamableTargets.forEach((entity) => {
-      let canBeDamaged = (this.owner || this.weapon).canDamage(entity)
+      let weaponOrOwner;
+      if(this.weapon.canDamage) weaponOrOwner = this.weapon
+      if(this.owner.canDamage) weaponOrOwner = this.owner
+      let canBeDamaged = weaponOrOwner.canDamage(entity)
       if (entity.isFlamable() && canBeDamaged) {
         entity.damage(this.getDamage(entity), this, this)
         entity.addFire()

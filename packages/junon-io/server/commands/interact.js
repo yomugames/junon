@@ -53,7 +53,6 @@ class Interact extends BaseCommand {
 
         if (operation === "content") {
           if (entity.hasEditableContent()) {
-            const content = args.slice(2).join(" ").replace(/</g, "&lt;").replace(/>/g, "&gt;");
             if (this.isJson(content)) {
               let json = JSON.parse(content)
               entity.setLocaleContent(json.locale, json.text)

@@ -672,7 +672,7 @@ class BaseBuilding extends BaseEntity {
 
   setBuildingContent(content) {
     let oldContent = this.content
-    content = args.slice(2).join(" ").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    content = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     if (this.content !== content) {
       this.content = content
       this.onBuildingContentChanged(oldContent, this.content)

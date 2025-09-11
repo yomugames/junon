@@ -152,6 +152,14 @@ class Visitor extends LandMob {
     this.onStateChanged("weaponType")
   }
 
+  getExtraItem() {
+    return;
+  }
+
+  setArmorItem(item) {
+    this.equipments.storeAt(Protocol.definition().EquipmentRole.Armor, item)
+  }
+
   onHealthZero() {
     super.onHealthZero()
     this.Happiness.changeHappinessForEvent("killed");

@@ -2892,7 +2892,7 @@ class Sector {
   }
 
   insertEntityToTreeByName(entity, groupName) {
-    if(entity.isRemoved && entity.isRemoved()) return
+    if(entity.isRemoved) return
     let tree = this.getTreeFromEntityType(groupName, entity.getContainer())
     entity.updateRbushCoords()
     entity.onWorldPostStep()

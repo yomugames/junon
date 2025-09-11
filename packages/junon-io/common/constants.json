@@ -868,14 +868,13 @@
         },
         "width":20,
         "height":5,
-        "rotation":0,
         "tint":"#000000"
 
       },
       "sprite": {
           "height": 49,
           "width": 54,
-          "rotation":180
+          "rotation":-90
       },
       "stats": {
         "speed": 3,

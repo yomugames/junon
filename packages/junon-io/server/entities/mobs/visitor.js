@@ -2,6 +2,10 @@ const LandMob = require("./land_mob")
 const Protocol = require("../../../common/util/protocol")
 const Constants = require("../../../common/constants.json")
 const Projectiles = require('../projectiles/index')
+const Planner = require("./actions/planner")
+const Needs = require("../../../common/interfaces/needs")
+const NeedsServer = require("../../interfaces/needs")
+const EquipmentInventory = require("../equipment_inventory")
 
 class Visitor extends LandMob {
   constructor(sector, data) {
@@ -11,6 +15,40 @@ class Visitor extends LandMob {
 
     this.sector.visitors.push(this)
     this.setOwner(this.sector.getCreatorTeam()) 
+  }
+
+  onPostInit() {
+    this.planner = new Planner(this)
+  }
+
+  preApplyData() {
+    this.initNeeds()
+    this.initEquipment()
+  }
+
+  initEquipment() {
+    this.equipments = new EquipmentInventory(this, 2)
+  }
+
+  move(deltaTime) {
+    super.move(deltaTime)
+
+    this.consumeStamina()
+    this.consumeHunger()
+  }
+
+  feed(player, item) {
+    if (this.nextFeedTimestamp) {
+      if (this.game.timestamp < this.nextFeedTimestamp) {
+        return
+      }
+    }
+
+    if (!item.isFood()) return
+    if (!item.isEdible()) return
+    
+    this.nextFeedTimestamp = this.game.timestamp + this.getFeedTimestampInterval()
+    item.use(player, this)
   }
 
   getType() {
@@ -98,6 +136,10 @@ class Visitor extends LandMob {
   }
 }
 
+Object.assign(Visitor.prototype, Needs.prototype, {
+  //add event handlers for needs here (see packages/junon-io/server/entities/mobs/slave.js:136)
+})
+Object.assign(Visitor.prototype, NeedsServer.prototype)
 
 class Happiness {
   /**

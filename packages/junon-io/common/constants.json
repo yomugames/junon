@@ -855,6 +855,7 @@
       "isNonHostile": true,
       "isTamable":false,
       "attackGroups": ["mobs"],
+      "shouldShowNeeds": true,
       "cost": {
         "gold": 20000
       },

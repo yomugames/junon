@@ -9,7 +9,8 @@ Needs.prototype = {
     this.hunger = this.getMaxHunger()
     this.oxygen = this.getMaxOxygen()
     this.stamina = this.getMaxStamina()
-    this.happiness = this.getMaxHappiness()
+    // this.happiness = this.getMaxHappiness()
+    // creates protobuf errors if happiness is implemented
   },
   setStamina(stamina) {
     let prevStamina = this.stamina

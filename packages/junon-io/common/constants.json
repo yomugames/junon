@@ -856,6 +856,7 @@
       "isTamable":false,
       "attackGroups": ["mobs"],
       "shouldShowNeeds": true,
+      "isNPC": true,
       "cost": {
         "gold": 20000
       },

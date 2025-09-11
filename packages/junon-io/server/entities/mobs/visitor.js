@@ -15,9 +15,6 @@ class Visitor extends LandMob {
 
     this.sector.visitors.push(this)
     this.setOwner(this.sector.getCreatorTeam()) 
-  }
-
-  onPostInit() {
     this.planner = new Planner(this)
   }
 
@@ -36,6 +33,18 @@ class Visitor extends LandMob {
     this.consumeStamina()
     this.consumeHunger()
   }
+
+  consumeStamina() {
+    if (this.sector.settings['isStaminaEnabled'] === false) return
+      
+    const isSixSecondInterval = this.game.timestamp % (Constants.physicsTimeStep * 6) === 0
+    if (!isSixSecondInterval) return
+
+    if (this.isDormant) return
+
+    this.setStamina(this.stamina - 1)
+  }
+  
 
   feed(player, item) {
     if (this.nextFeedTimestamp) {
@@ -69,6 +78,14 @@ class Visitor extends LandMob {
 
   onPositionChanged(options = {}) {
     super.onPositionChanged(options)
+    if(this.planner) {
+      if(this.planner.isHungry()) {
+        this.planner.handleHunger();
+      }
+      if(this.planner.isSleepy()) {
+        this.planner.handleSleep();
+      }
+    }
     if (this.Happiness) {
       this.updateHappiness()
     }
@@ -130,6 +147,11 @@ class Visitor extends LandMob {
     }
   }
 
+  setHandItem(item) {
+    this.equipments.storeAt(Protocol.definition().EquipmentRole.Hand, item)
+    this.onStateChanged("weaponType")
+  }
+
   onHealthZero() {
     super.onHealthZero()
     this.Happiness.changeHappinessForEvent("killed");
@@ -139,7 +161,9 @@ class Visitor extends LandMob {
 Object.assign(Visitor.prototype, Needs.prototype, {
   //add event handlers for needs here (see packages/junon-io/server/entities/mobs/slave.js:136)
 })
-Object.assign(Visitor.prototype, NeedsServer.prototype)
+Object.assign(Visitor.prototype, NeedsServer.prototype, {
+  hasDragTarget() {} //for slaves only
+})
 
 class Happiness {
   /**

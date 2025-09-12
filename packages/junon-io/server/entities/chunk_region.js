@@ -249,6 +249,18 @@ class ChunkRegion {
     return result
   }
 
+  getSuitStation(owner) {
+    let result
+
+    this.forEachStructureUntil((structure) => {
+      if(Protocol.definition().BuildingType["SuitStation"] === structure.type && !Object.keys(structure.storage).length){
+        result = structure
+        return true
+      }
+    })
+
+    return result
+  }
   getWaterSource(owner) {
     let result 
 

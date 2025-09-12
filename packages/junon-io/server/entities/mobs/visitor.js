@@ -85,6 +85,9 @@ class Visitor extends LandMob {
       if(this.planner.isSleepy()) {
         this.planner.handleSleep();
       }
+      if(this.getRoom().checkIsOxygenated()) {
+        this.planner.handleOxygen();
+      }
     }
     if (this.Happiness) {
       this.updateHappiness()

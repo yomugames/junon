@@ -18,6 +18,7 @@ const Corpse = require("./../corpse")
 const EventBus = require('eventbusjs')
 const ExceptionReporter = require('junon-common/exception_reporter')
 const Item = require("../item")
+const Room = require("../networks/room.js")
 
 const p2 = require("p2")
 const vec2 = p2.vec2
@@ -1942,6 +1943,10 @@ class BaseMob extends BaseEntity {
     return platform.getRoom()
   }
 
+  /**
+   * 
+   * @returns {Room}
+   */
   getRoom() {
     return this.getOccupiedRoom()
   }

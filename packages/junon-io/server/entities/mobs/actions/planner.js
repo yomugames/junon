@@ -38,9 +38,9 @@ class Planner {
     let result
     this.sector.findOneChunkRegionUntil(this.entity.getChunkRegion(), {
       breakCondition: (chunkRegion) => {
-        let storage = chunkRegion.getWaterSource(this.entity.owner)
-        if (storage) result = storage
-        return storage
+        let source = chunkRegion.getWaterSource(this.entity.owner)
+        if (source) result = source
+        return source
       },
       neighborStopCondition: () => { return false }
     })
@@ -48,18 +48,18 @@ class Planner {
     return result
   }
 
-  getClosestWaterSource() {
+  getClosestSuitStation() {
     let result
     this.sector.findOneChunkRegionUntil(this.entity.getChunkRegion(), {
       breakCondition: (chunkRegion) => {
-        let storage = chunkRegion.getWaterSource(this.entity.owner)
-        if (storage) result = storage
-        return storage
+        let station = chunkRegion.getSuitStation(this.entity.owner)
+        if(station) result = station
+        return station
       },
       neighborStopCondition: () => { return false }
     })
 
-    return result
+    return result;
   }
 
   getClosestCorpse() {
@@ -883,6 +883,25 @@ class Planner {
 
     return success
   }
+
+  handleOxygen() {
+    let suitStation = this.getClosestSuitStation();
+    if(!suitStation) {
+      if(this.sentSuitMessage) return;
+      this.sector.game.server.socketUtil.broadcast(this.sector.getSocketIds(), "ErrorMessage", {message: "A visitor wants to take off their suit."})
+      this.sentSuitMessage = true;
+      return;
+    }
+    
+    let success = this.perform("SeekSuitStation", {
+      targetEntity: suitStation, 
+      onComplete: () => {
+        //TODO: change suit
+      }
+    }) 
+
+    return success;
+ }
 
   handleHunger() {
     let success

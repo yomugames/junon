@@ -375,6 +375,7 @@ enum BehaviorType {
   Repair = 24;
   SeekIngredient = 25;
   SeekMiner = 26;
+  SeekSuitStation = 27;
 }
 
 enum MobType {

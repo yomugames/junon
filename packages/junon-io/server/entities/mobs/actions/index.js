@@ -30,5 +30,6 @@ Actions.PickupCrop = require("./pickup_crop")
 Actions.SeekIngredient = require("./seek_ingredient")
 Actions.Cook = require("./cook")
 Actions.SeekMiner = require("./seek_miner")
+Actions.SeekSuitStation = require("./seek_suit_station")
 
 module.exports = Actions

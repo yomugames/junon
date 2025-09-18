@@ -896,7 +896,10 @@ class Planner {
     let success = this.perform("SeekSuitStation", {
       targetEntity: suitStation, 
       onComplete: () => {
-        //TODO: change suit
+       this.perform("ChangeSuit", {
+        suitStation: suitStation,
+        takeOff: true
+       }); 
       }
     }) 
 

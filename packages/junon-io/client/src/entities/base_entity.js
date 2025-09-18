@@ -1086,6 +1086,12 @@ class BaseEntity {
     return this.isPlayer() || this.isMob()
   }
 
+  selectRandomHatSpritePath() {
+    let hats = ["bluehat.png", "bowlhat.png", "mask.png", "tophat.png", "redhat.png"]; 
+    let random = Math.floor(Math.random()*5)
+    return hats[random]
+  } 
+
   getWidth() {
     return this.getConstants().width
   }

@@ -31,5 +31,6 @@ Actions.SeekIngredient = require("./seek_ingredient")
 Actions.Cook = require("./cook")
 Actions.SeekMiner = require("./seek_miner")
 Actions.SeekSuitStation = require("./seek_suit_station")
+Actions.ChangeSuit = require('./change_suit')
 
 module.exports = Actions

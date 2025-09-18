@@ -78,6 +78,7 @@ message Mob {
   uint32 tasks = 28;
   Happiness happiness = 29;
   string content = 30;
+  BuildingType armorType = 31;
   uint32 raycastX = 51;
   uint32 raycastY = 52;
   Goal goals = 53;

@@ -22,7 +22,7 @@ class Visitor extends LandMob {
     }
 
     getSpritePath() {
-        return "visitor.png"
+        return "player_body.png";
     }
 
     getType() {
@@ -32,27 +32,11 @@ class Visitor extends LandMob {
     getConstantsTable() {
         return "Mobs.Visitor"
     }
-
 }
 
 Object.assign(Visitor.prototype, Equipper.prototype, {
     getDefaultSpriteColor() {
-        return 0x3c2317;
+        return 0xd2b48c
     },
-    getBodySpriteTint() {
-        return 0xffffff
-    },
-    getEquipperBodySpritePath() {
-        return "visitor.png"
-    },
-    getBodyWidth() {
-        return 49
-    },
-    getBodyHeight() {
-        return 54
-    },
-    getBodyPositionX() {
-        return 0
-    }
 })
 module.exports = Visitor

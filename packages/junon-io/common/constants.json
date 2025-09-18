@@ -857,6 +857,7 @@
       "attackGroups": ["mobs"],
       "shouldShowNeeds": true,
       "isNPC": true,
+      "hat": true,
       "cost": {
         "gold": 20000
       },
@@ -869,12 +870,10 @@
         "width":20,
         "height":5,
         "tint":"#000000"
-
       },
       "sprite": {
-          "height": 49,
-          "width": 54,
-          "rotation":-90
+        "width":40,
+        "height":40
       },
       "stats": {
         "speed": 3,

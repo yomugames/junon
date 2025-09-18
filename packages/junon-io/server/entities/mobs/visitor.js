@@ -6,6 +6,7 @@ const Planner = require("./actions/planner")
 const Needs = require("../../../common/interfaces/needs")
 const NeedsServer = require("../../interfaces/needs")
 const EquipmentInventory = require("../equipment_inventory")
+const Item = require("../item")
 
 class Visitor extends LandMob {
   constructor(sector, data) {
@@ -16,6 +17,10 @@ class Visitor extends LandMob {
     this.sector.visitors.push(this)
     this.setOwner(this.sector.getCreatorTeam()) 
     this.planner = new Planner(this)
+  }
+
+  onPostInit() {
+    this.setArmorItem(new Item(this, "SpaceSuit")) 
   }
 
   preApplyData() {
@@ -86,6 +91,9 @@ class Visitor extends LandMob {
         this.planner.handleSleep();
       }
       if(this.getRoom().checkIsOxygenated()) {
+        this.planner.handleOxygen();
+      } else if(!this.armorType) {
+        this.Happiness.changeHappinessForEvent("noOxygen")
         this.planner.handleOxygen();
       }
     }
@@ -161,6 +169,7 @@ class Visitor extends LandMob {
 
   setArmorItem(item) {
     this.equipments.storeAt(Protocol.definition().EquipmentRole.Armor, item)
+    this.onStateChanged("armorType")
   }
 
   onHealthZero() {
@@ -189,9 +198,11 @@ class Happiness {
       findColoredLights: 10,
       findPottedPlants: 10,
       damaged: -25,
-      killed: -100,
+      killed: -80,
       stepOnDirt: -5,
       stepOnCarpet: 5,
+      takeOffSuit: 35,
+      noOxygen: -5
     }
   }
 

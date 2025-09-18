@@ -1218,17 +1218,28 @@ class BaseMob extends BaseEntity {
       this.weaponType = Protocol.definition().BuildingType.None
     }
 
+
+    if(this.getArmorItem() && !this.getArmorItem().isBuilding()) {
+      this.armorType = this.getArmorItem().getType()
+    } else {
+      this.armorType = Protocol.definition().BuildingType.None
+    }
+    
     // ensure owned by mob
     if (item && item.getOwner() !== this) {
       item.setOwner(this)
     }
 
-
     this.onStateChanged("weaponType")
+    this.onStateChanged("armorType")
   }
 
   getHandItem() {
     return this.equipments.get(Protocol.definition().EquipmentRole.Hand)
+  }
+
+  getArmorItem() {
+    return this.equipments.get(Protocol.definition().EquipmentRole.Armor)
   }
 
   canReachGoal(goal) {

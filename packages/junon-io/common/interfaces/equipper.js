@@ -104,6 +104,14 @@ Equipper.prototype = {
     sprite.addChild(this.body)
     sprite.addChild(this.armorEquipContainer)
 
+    // hat
+    if(!this.getConstants().hat) return sprite;
+
+    this.hatSpritePath = this.selectRandomHatSpritePath()
+    this.hat = new PIXI.Sprite(PIXI.utils.TextureCache[this.hatSpritePath])
+
+    sprite.addChild(this.hat)
+    
     return sprite
   },
 

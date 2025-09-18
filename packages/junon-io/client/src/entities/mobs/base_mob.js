@@ -263,6 +263,10 @@ class BaseMob extends BaseEntity {
     if (data.hasOwnProperty('weaponType')) {
       this.setWeaponType(data.weaponType)
     }
+    
+    if(data.hasOwnProperty('armorType')) {
+      this.setArmorType(data.armorType)
+    }
 
     if (data.hasOwnProperty("behavior")) {
       this.setBehavior(data.behavior)
@@ -302,8 +306,35 @@ class BaseMob extends BaseEntity {
     }
   }
 
+  setArmorType(armorType) {
+    if(!this.isEquipper()) return;
+    
+    if(this.armorType !== armorType) {
+      if(this.getArmorEquipment()) {
+        this.getArmorEquipment().remove()
+      }
+      
+      this.armorType = armorType;
+      if(armorType) {
+        this.initArmor(armorType);
+      }
+    }
+  }
+
   isEquipper() {
     return this.equipments
+  }
+
+  initArmor(armorType) {
+    let data = {
+      x: 0,
+      y: 0,
+      user: this,
+      instance: {}
+    }
+
+    let item = Item.getKlass(armorType).build(this.game, data)
+    this.setArmorEquipment(item)
   }
 
   initWeapon(weaponType) {

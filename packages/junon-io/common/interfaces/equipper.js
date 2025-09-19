@@ -86,8 +86,7 @@ Equipper.prototype = {
     this.setDefaultTint(this.leftHand, this.getDefaultSpriteColor())
     this.setDefaultTint(this.rightHand, this.getDefaultSpriteColor())
     this.setDefaultTint(this.body, this.getBodySpriteTint())
-
-    // equipments
+// equipments
     this.handEquipContainer = new PIXI.Container()
     this.handEquipContainer.name = "HandEquipment"
     this.handEquipContainer.position.x = -15
@@ -109,6 +108,14 @@ Equipper.prototype = {
 
     this.hatSpritePath = this.selectRandomHatSpritePath()
     this.hat = new PIXI.Sprite(PIXI.utils.TextureCache[this.hatSpritePath])
+    this.hat.name = "Hat"
+    this.hat.rotation = -90 * (Math.PI / 180)
+    let constants = this.getConstants().hat[this.hatSpritePath.replace(".png", "")]
+    if(constants) {
+      this.hat.x = constants.x 
+      this.hat.y = constants.y
+      this.hat.width = this.hat.height = constants.size
+    }
 
     sprite.addChild(this.hat)
     

@@ -1242,6 +1242,14 @@ class BaseMob extends BaseEntity {
     return this.equipments.get(Protocol.definition().EquipmentRole.Armor)
   }
 
+  retrieveHandItem() {
+    return this.equipments.retrieve(Protocol.definition().EquipmentRole.Hand)
+  }
+
+  retrieveArmorItem() {
+    return this.equipments.retrieve(Protocol.definition().EquipmentRole.Armor)
+  }
+
   canReachGoal(goal) {
     if (!goal) return false
 

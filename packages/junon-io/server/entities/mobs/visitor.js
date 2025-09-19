@@ -11,6 +11,12 @@ const Item = require("../item")
 class Visitor extends LandMob {
   constructor(sector, data) {
     super(sector, data)
+    if(data.constructor.name === 'Mob') { //data should be a Mob (from message Mob) if loaded from save file and should already have an equipment associated with it.
+      this.loadedFromSaveFile = true;
+    } else {
+      this.setArmorItem(new Item(this, "SpaceSuit")) 
+    }
+
     this.Happiness = new Happiness(this, data?.Happiness?.eventDefinitions); //this.happiness (no uppercase) already exists in a mob, and causes weird effects.
     //note: onPositionChanged() will happen before this.Happiness is initialized
 
@@ -19,9 +25,7 @@ class Visitor extends LandMob {
     this.planner = new Planner(this)
   }
 
-  onPostInit() {
-    this.setArmorItem(new Item(this, "SpaceSuit")) 
-  }
+    
 
   preApplyData() {
     this.initNeeds()

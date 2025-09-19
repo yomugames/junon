@@ -857,7 +857,35 @@
       "attackGroups": ["mobs"],
       "shouldShowNeeds": true,
       "isNPC": true,
-      "hat": true,
+      "hat": {
+        "bluehat": {
+          "x":-15,
+          "y":40,
+          "size": 40
+        },
+        "bowlhat": {
+          "x":-20,
+          "y":40,
+          "size": 40
+        },
+        "tophat": {
+          "x":-20,
+          "y":40,
+          "size":40
+        },
+        "redhat": {
+          "x":-15,
+          "y":40,
+          "size":40
+        },
+        "mask": {
+          "x":5,
+          "y":40,
+          "size":40
+        },
+        "x":0,
+        "y":0
+      },
       "cost": {
         "gold": 20000
       },

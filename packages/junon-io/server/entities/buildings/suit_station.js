@@ -60,6 +60,7 @@ class SuitStation extends BaseBuilding {
   }
 
   canBeInteracted(player) {
+    if (this.visitorId) return false; //has visitor associated with it. Team won't change for a visitor
     if (!this.owner) return true
 
     if (this.owner.isPlayer() || this.owner.isPlayerData()) {

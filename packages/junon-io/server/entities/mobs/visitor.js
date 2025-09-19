@@ -32,6 +32,10 @@ class Visitor extends LandMob {
     this.initEquipment()
   }
 
+  ignoreSaveFileDormant() {
+    return true;
+  }
+
   initEquipment() {
     this.equipments = new EquipmentInventory(this, 2)
   }
@@ -94,11 +98,11 @@ class Visitor extends LandMob {
       if(this.planner.isSleepy()) {
         this.planner.handleSleep();
       }
-      if(this.getRoom().checkIsOxygenated()) {
-        this.planner.handleOxygen();
-      } else if(!this.armorType) {
+      if(this.getRoom().checkIsOxygenated() && this.armorType) {
+        this.planner.handleOxygen(true);
+      } else if(!this.getRoom().checkIsOxygenated() && !this.armorType) {
         this.Happiness.changeHappinessForEvent("noOxygen")
-        this.planner.handleOxygen();
+        this.planner.handleOxygen(false);
       }
     }
     if (this.Happiness) {

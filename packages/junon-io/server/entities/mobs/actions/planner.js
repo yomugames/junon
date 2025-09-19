@@ -884,25 +884,42 @@ class Planner {
     return success
   }
 
-  handleOxygen() {
-    let suitStation = this.getClosestSuitStation();
-    if(!suitStation) {
-      if(this.sentSuitMessage) return;
-      this.sector.game.server.socketUtil.broadcast(this.sector.getSocketIds(), "ErrorMessage", {message: "A visitor wants to take off their suit."})
-      this.sentSuitMessage = true;
-      return;
-    }
-    
-    let success = this.perform("SeekSuitStation", {
-      targetEntity: suitStation, 
-      onComplete: () => {
-       this.perform("ChangeSuit", {
-        suitStation: suitStation,
-        takeOff: true
-       }); 
+  handleOxygen(takeOff) {
+    let success;
+    if(takeOff) {
+      let suitStation = this.getClosestSuitStation();
+      if(!suitStation && this.entity.getArmorItem()) {
+        if(this.sentSuitMessage) return;
+        this.sector.game.server.socketUtil.broadcast(this.sector.getSocketIds(), "ErrorMessage", {message: "A visitor wants to take off their suit."})
+        this.sentSuitMessage = true;
+        return;
       }
-    }) 
 
+      if(!suitStation) return;
+
+      success = this.perform("SeekSuitStation", {
+        targetEntity: suitStation, 
+        onComplete: () => {
+          this.perform("ChangeSuit", {
+            suitStation: suitStation,
+            takeOff: true
+          }); 
+        }
+      }) 
+    } else {
+      if(this.suitStation) {
+        success = this.perform("SeekSuitStation", {
+          targetEntity: this.suitStation,
+          onComplete: () => {
+            this.perform("ChangeSuit", {
+              suitStation:suitStation,
+              takeOff:true
+            })
+         }
+        })
+      }
+    }
+   
     return success;
  }
 

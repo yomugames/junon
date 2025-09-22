@@ -1,0 +1,365 @@
+[33ma5add91[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mselective-pr[m[33m, [m[1;31morigin/selective-pr[m[33m)[m Add only selected changes for PR
+[33ma342224[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m Merge branch 'yomugames:master' into master
+[33m1ad0e9d[m (Somewhat unfinished, i'm tired) Attempt to add ice meteor shower event, along with ice asteroroid texture and renewed files. Small changes on files event.js, constants.json and enum.proto
+[33mebd647d[m Adds spanish translation to junon. Creates new variable in server.js called "spanishTranslationMap".
+[33m6d17bfe[m v0.6.0
+[33maa07bca[m Merge pull request #54 from chickemeeple/master
+[33mf165891[m Fix xss in role menu
+[33m06ee882[m Merge pull request #10 from yomugames/master
+[33m27bc2a3[m Fix pocket trader not able to trade
+[33mc5c7e10[m Merge pull request #45 from chickemeeple/master
+[33m2635bf1[m edit name
+[33m0e3be69[m Add scrooge mode badge
+[33m06f4b51[m Merge branch 'yomugames:master' into master
+[33mafa623e[m add clickable badge button
+[33m952b430[m fix xss for sidebar menu
+[33m6e522ca[m Merge pull request #43 from JoeBufonidae/master
+[33mc0deb43[m if there is no respawn position, dont position the player
+[33mac8c59c[m make sure storage exist before checking for item existence
+[33ma1f4769[m Merge pull request #44 from chickemeeple/master
+[33m2770f72[m fix error when sell
+[33ma6aad55[m Merge branch 'master' of https://github.com/chickemeeple/junon-io
+[33m38b67d2[m fix trader unable to sell bug
+[33md4a9296[m Update remote_event_handler.js
+[33mbbcd003[m Update constants.json
+[33mbbcfd3f[m Merge pull request #41 from chickemeeple/master
+[33m69b8cc8[m Fix trade_order vulnerability allowing buying any item
+[33m4a07e65[m add setting change restrictions (people can turn off oxygen in hardcore)
+[33m68c4340[m remove unnecessary console.logs
+[33m57548be[m Merge branch 'master' of https://github.com/chickemeeple/junon-io
+[33m4d57e9a[m add trycatch
+[33mb18ea6f[m Merge pull request #9 from yomugames/master
+[33m85f2fce[m remove email in code
+[33mab9e5fa[m remove email from database
+[33md9d43d7[m prevent breaking if signed in as guest
+[33mfe1d0ed[m shows lock icon now, if not qualified for badge
+[33m82600ba[m badges update :)
+[33m7eeb1d8[m Merge pull request #8 from yomugames/master
+[33mca9afa9[m fix unable to type % in chat
+[33m9f2b412[m add game promo
+[33mbf3eee8[m Revert "fix gravity bugs"
+[33mc856abf[m Merge pull request #40 from chickemeeple/master
+[33me37f68b[m Stop people spamming sector join
+[33m62c91c1[m Merge pull request #38 from chickemeeple/master
+[33m1649f0f[m Merge pull request #7 from yomugames/master
+[33m93cd2ac[m set $word to undefined if invalid /getnthword call
+[33md4f629b[m crlf -> lf change
+[33m1dd5ea0[m ssl only if production mode
+[33m4759ff2[m remove format diffs
+[33m70a6e73[m Merge pull request #6 from chickemeeple/gravity-bugfix
+[33mab3d27a[m Merge branch 'master' into gravity-bugfix
+[33m56e90d9[m Merge branch 'yomugames:master' into gravity-bugfix
+[33m7922a2d[m fix gravity bugs
+[33mbadadfe[m uws set ssl cert config
+[33m9ff369b[m matchmaker port 443 for production
+[33m2908b07[m add npm command for running matchmaker and server separately
+[33mbd839ce[m remove unused code
+[33m847468f[m Merge
+[33mef95a36[m fix unnatural gravity bug
+[33m01034b0[m Update speed.js
+[33me471d57[m bump to 0.5.10
+[33mb4292b5[m use constants for better naming instead of magic numbers
+[33m067fce7[m Merge pull request #36 from githubb-userr/master
+[33m8d1971f[m add miasma gate - removes miasma
+[33meb6ee5c[m Multiplayer command blocks (tested and working)
+[33m4dcb940[m Revert command block code (completely broken and messy)
+[33m0f6461f[m Merge branch 'master' of https://github.com/githubb-userr/junon-io
+[33m866e056[m command block stuff (not working yet)
+[33mb155dab[m escape html to prevent xss
+[33m6dfd117[m New Game as main action in homepage Change thumbnail of default world
+[33m394c850[m allow chat even when no login
+[33md55b06c[m remove homepage ad
+[33m6b90f32[m gallery default view
+[33m6f3a3e7[m changelog credit
+[33m95b8e87[m fix typo
+[33maa5417d[m bump to v0.5.9
+[33me68ea3e[m Merge pull request #30 from githubb-userr/master
+[33meb54bd8[m fixed a switched break statement
+[33m4101faa[m Merge branch 'yomugames-master' resolve conflicts
+[33mdd12b57[m Merge branch 'master' of https://github.com/yomugames/junon into yomugames-master
+[33me8121d0[m add in changes kuroro made
+[33mc9c2ff1[m bunch of stuff
+[33m4da45c4[m some changes I forgot
+[33m7eeb265[m Add unbreakable wall, keypad update, bug fix.
+[33mc1fbd1d[m v0.5.8.alpha
+[33m8d06742[m keyCodes should be a map instead of array to allow easy add/search/remove use innerText as much as possible instead of innerHTML
+[33meff7e17[m Merge pull request #29 from githubb-userr/master
+[33mcd8be87[m Merge pull request #4 from yomugames/master
+[33md91a762[m Add keypad door
+[33mf1da758[m check for db user for world ban
+[33md395c87[m re-enable ads to cover server costs
+[33m7e21c11[m disable time command
+[33m10a525b[m I hate git :/
+[33m149c68e[m Merge branch 'master' of https://github.com/githubb-userr/junon-io
+[33m2ab50f2[m Add in deconstructor along with projectile, add more functions, and fix firefox bug
+[33m4fd3669[m remove unecessary description
+[33m842c3a9[m v0.5.7 alpha
+[33m818f874[m Merge pull request #28 from Deovu/master
+[33m5067027[m ignore moderator flags at beginning for ban button render
+[33mba814a9[m allow moderators to see ban button
+[33m2b3e40b[m fix bug
+[33m17d997e[m simplify ban check logic
+[33mf37c4a1[m add ability for mods to ban world
+[33m76380cc[m new armor, pumpkin pie and plasma gun debuff
+[33m5faa892[m food
+[33m298b7c2[m Merge branch 'master' of githubsimpleyuji:yomugames/junon
+[33mddef34a[m Merge pull request #26 from githubb-userr/master
+[33med6ad89[m add superaaron as mod
+[33m9c62550[m Edit out a previous commit containing code that wouldn't work
+[33m055a6b7[m FIX GRIEFING OF WORLDS ASAP
+[33ma4cf75e[m FIX MAX GRIEFING OF WORLDS DUE TO TRADER ASAP
+[33m74aec0b[m Revert "Add minor fixes to sell vulnerabilities"
+[33m298452f[m Add minor fixes to sell vulnerabilities
+[33m574cfb4[m Merge pull request #25 from githubb-userr/master
+[33me4b7ea3[m fix null sector name bug
+[33mf8268b3[m This reverts commit a943856d8e6deb849b7ec396429d9ebe6f926310.
+[33ma943856[m Add tons of features to the /fill command
+[33mb51ff07[m Manually fix xss
+[33ma10dbcb[m Fix sql error when you create a sector name too long
+[33md75e22d[m purged a couple more things I forgot
+[33mb9c7504[m Remove unnecessary text
+[33m0204a19[m Remove accidental random text
+[33mc04bee4[m Revert xss gate
+[33m84ce3f3[m Revert xss gate
+[33m8c9c0af[m Merge pull request #3 from yomugames/master
+[33m8ed0fef[m fix protobufjs toJSON bug https://github.com/protobufjs/protobuf.js/issues/1531#issuecomment-885819540
+[33mff40034[m bump to v0.5.6
+[33m9b4e074[m Merge pull request #19 from Wahlee1/minor-updates
+[33m4ad3c23[m bring back time command, only sandbox only so no biggie
+[33mdfa66e1[m Merge pull request #22 from githubb-userr/master
+[33mf321b24[m remove from pull request
+[33md1978d2[m Add basic smelter/alloy code
+[33mad89d64[m Depricate /time
+[33meea28cc[m Merge branch 'master' of https://github.com/githubb-userr/junon-io
+[33m39873da[m Add xss gateway in remote_event_handler
+[33mf258387[m Fix but in /setting command
+[33mf875f49[m Merge pull request #2 from yomugames/master
+[33m3987479[m add floor textures to tempAssets list
+[33mb3539ed[m Merge branch 'yomugames:master' into minor-updates
+[33m3fc9001[m 0.5.5.alpha
+[33mbdcab2c[m changelog
+[33m332b5b6[m Merge pull request #15 from KanicoTheCrab/patch-4
+[33md8993fa[m Added more floor textures & colors
+[33m6f3b719[m add more floor textures
+[33m5c361a3[m fixes
+[33m9de9bfa[m Merge pull request #14 from KanicoTheCrab/patch-1
+[33mdf695d8[m Merge pull request #16 from JoeBufonidae/eventcmmd
+[33mc0cef5d[m [33m1ad0e9d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mselective-pr[m[33m)[m (Somewhat unfinished, i'm tired) Attempt to add ice meteor shower event, along with ice asteroroid texture and renewed files. Small changes on files event.js, constants.json and enum.proto
+[33mebd647d[m Adds spanish translation to junon. Creates new variable in server.js called "spanishTranslationMap".
+[33m01034b0[m Update speed.js
+[33me471d57[m bump to 0.5.10
+[33mb4292b5[m use constants for better naming instead of magic numbers
+[33m067fce7[m Merge pull request #36 from githubb-userr/master
+[33m8d1971f[m add miasma gate - removes miasma
+[33meb6ee5c[m Multiplayer command blocks (tested and working)
+[33m4dcb940[m Revert command block code (completely broken and messy)
+[33m0f6461f[m Merge branch 'master' of https://github.com/githubb-userr/junon-io
+[33m866e056[m command block stuff (not working yet)
+[33mb155dab[m escape html to prevent xss
+[33m6dfd117[m New Game as main action in homepage Change thumbnail of default world
+[33m394c850[m allow chat even when no login
+[33md55b06c[m remove homepage ad
+[33m6b90f32[m gallery default view
+[33m6f3a3e7[m changelog credit
+[33m95b8e87[m fix typo
+[33maa5417d[m bump to v0.5.9
+[33me68ea3e[m Merge pull request #30 from githubb-userr/master
+[33meb54bd8[m fixed a switched break statement
+[33m4101faa[m Merge branch 'yomugames-master' resolve conflicts
+[33mdd12b57[m Merge branch 'master' of https://github.com/yomugames/junon into yomugames-master
+[33me8121d0[m add in changes kuroro made
+[33mc9c2ff1[m bunch of stuff
+[33m4da45c4[m some changes I forgot
+[33m7eeb265[m Add unbreakable wall, keypad update, bug fix.
+[33mc1fbd1d[m v0.5.8.alpha
+[33m8d06742[m keyCodes should be a map instead of array to allow easy add/search/remove use innerText as much as possible instead of innerHTML
+[33meff7e17[m Merge pull request #29 from githubb-userr/master
+[33mcd8be87[m Merge pull request #4 from yomugames/master
+[33md91a762[m Add keypad door
+[33mf1da758[m check for db user for world ban
+[33md395c87[m re-enable ads to cover server costs
+[33m7e21c11[m disable time command
+[33m10a525b[m I hate git :/
+[33m149c68e[m Merge branch 'master' of https://github.com/githubb-userr/junon-io
+[33m2ab50f2[m Add in deconstructor along with projectile, add more functions, and fix firefox bug
+[33m4fd3669[m remove unecessary description
+[33m842c3a9[m v0.5.7 alpha
+[33m818f874[m Merge pull request #28 from Deovu/master
+[33m5067027[m ignore moderator flags at beginning for ban button render
+[33mba814a9[m allow moderators to see ban button
+[33m2b3e40b[m fix bug
+[33m17d997e[m simplify ban check logic
+[33mf37c4a1[m add ability for mods to ban world
+[33m76380cc[m new armor, pumpkin pie and plasma gun debuff
+[33m5faa892[m food
+[33m298b7c2[m Merge branch 'master' of githubsimpleyuji:yomugames/junon
+[33mddef34a[m Merge pull request #26 from githubb-userr/master
+[33med6ad89[m add superaaron as mod
+[33m9c62550[m Edit out a previous commit containing code that wouldn't work
+[33m055a6b7[m FIX GRIEFING OF WORLDS ASAP
+[33ma4cf75e[m FIX MAX GRIEFING OF WORLDS DUE TO TRADER ASAP
+[33m74aec0b[m Revert "Add minor fixes to sell vulnerabilities"
+[33m298452f[m Add minor fixes to sell vulnerabilities
+[33m574cfb4[m Merge pull request #25 from githubb-userr/master
+[33me4b7ea3[m fix null sector name bug
+[33mf8268b3[m This reverts commit a943856d8e6deb849b7ec396429d9ebe6f926310.
+[33ma943856[m Add tons of features to the /fill command
+[33mb51ff07[m Manually fix xss
+[33ma10dbcb[m Fix sql error when you create a sector name too long
+[33md75e22d[m purged a couple more things I forgot
+[33mb9c7504[m Remove unnecessary text
+[33m0204a19[m Remove accidental random text
+[33mc04bee4[m Revert xss gate
+[33m84ce3f3[m Revert xss gate
+[33m8c9c0af[m Merge pull request #3 from yomugames/master
+[33m8ed0fef[m fix protobufjs toJSON bug https://github.com/protobufjs/protobuf.js/issues/1531#issuecomment-885819540
+[33mff40034[m bump to v0.5.6
+[33m9b4e074[m Merge pull request #19 from Wahlee1/minor-updates
+[33m4ad3c23[m bring back time command, only sandbox only so no biggie
+[33mdfa66e1[m Merge pull request #22 from githubb-userr/master
+[33mf321b24[m remove from pull request
+[33md1978d2[m Add basic smelter/alloy code
+[33mad89d64[m Depricate /time
+[33meea28cc[m Merge branch 'master' of https://github.com/githubb-userr/junon-io
+[33m39873da[m Add xss gateway in remote_event_handler
+[33mf258387[m Fix but in /setting command
+[33mf875f49[m Merge pull request #2 from yomugames/master
+[33m3987479[m add floor textures to tempAssets list
+[33mb3539ed[m Merge branch 'yomugames:master' into minor-updates
+[33m3fc9001[m 0.5.5.alpha
+[33mbdcab2c[m changelog
+[33m332b5b6[m Merge pull request #15 from KanicoTheCrab/patch-4
+[33md8993fa[m Added more floor textures & colors
+[33m6f3b719[m add more floor textures
+[33m5c361a3[m fixes
+[33m9de9bfa[m Merge pull request #14 from KanicoTheCrab/patch-1
+[33mdf695d8[m Merge pull request #16 from JoeBufonidae/eventcmmd
+[33mc0cef5d[m Merge pull request #17 from JoeBufonidae/interacthelpupdate
+[33m46cc108[m Merge pull request #18 from githubb-userr/master
+[33mc7b25a2[m Add colors to chat menu
+[33m506b5f6[m Merge pull request #1 from yomugames/master
+[33mc9951e8[m Add extra colors to chat
+[33m5009669[m Update v0.5.5.alpha
+[33m0775c7e[m removed /limit
+[33m4c5c551[m /event [text]
+[33m3ac7f2c[m /interact get usage update
+[33m169c83f[m Merge pull request #11 from githubb-userr/master
+[33me06b766[m Create v0.5.5.alpha
+[33m4fdf4a6[m Update help.js
+[33mf65553f[m Fix typo in blood.js command
+[33m95c4120[m nth letter help
+[33m6cb73e2[m getnthletter index
+[33mec1468a[m Merge pull request #10 from JoeBufonidae/master
+[33m9b47f06[m getnthletter
+[33m35e9fc2[m Merge pull request #6 from githubb-userr/master
+[33m7a428c2[m Add filling 1x1 buildings, and allowing to choose what color to fill
+[33mb025e70[m Make $word undefined if index > number of words in message
+[33m5df7ab6[m remove aiptag
+[33mb1acbbe[m fix syntax error in dirt.js
+[33m0761af9[m Merge branch 'master' of https://github.com/githubb-userr/junon-io
+[33m01ead85[m add blood command
+[33mdcb2e52[m Remove irrelevant comment
+[33md2f69ef[m Merge remote-tracking branch 'upstream/master'
+[33mbcb5555[m Add dirt command
+[33m44aa4a9[m fix changelog
+[33m2fb4c69[m bump to v0.5.4.alpha
+[33m59d8cec[m car on traders list
+[33m316ff81[m Merge branch 'master' of githubsimpleyuji:yomugames/junon
+[33m99dfb86[m Merge pull request #4 from githubb-userr/master
+[33m0f4a820[m Rename rover to car
+[33mfa24e46[m Rename rover
+[33m1e01fe4[m Add new car image
+[33m3cf90d0[m Delete old car image
+[33m60f9859[m Make constants more like car
+[33mc3bb6a8[m Add code for car and edit car.png
+[33m29037f4[m delete white around car image
+[33mfbeedae[m hide ai avatars promo
+[33m8696461[m add car image
+[33me59ccbd[m fix bugs
+[33mcc8a1cb[m promo
+[33mb5f90ac[m Merge branch 'master' of githubsimpleyuji:yomugames/junon
+[33m887af7f[m Merge pull request #3 from Wahlee1/master
+[33maaecb7e[m Changed cost and stats of starberries
+[33m94fbfa2[m Changed stats of starberries
+[33m1e80147[m Added starberries to trader shop
+[33m5e39829[m Added starberries to tempAssets list
+[33m663c9dc[m Included starberries into the list of foods
+[33mcd6e3cc[m Added starberries javascript file
+[33md132b4d[m Created starberries javascript file
+[33m7d263ad[m Added starberries into list
+[33m959a290[m Added starberries image
+[33mad3d515[m Added starberries
+[33m01c2929[m hmm
+[33m4f73719[m add polymorf ad
+[33m6cb652b[m ad revenue too slow. remove ads
+[33m1a4659b[m make getnthword command appear in help + make it work in chat
+[33maed6659[m minor wording
+[33m17502a6[m Merge pull request #1 from githubb-userr/master
+[33mac6b483[m Edit command name
+[33m6b3f880[m Update and rename getsubstring.js to getnthword.js
+[33m69df561[m Add getsubstring command
+[33m580d826[m Add getsubstring command
+[33m8206cfc[m hide archerfall
+[33m43f516a[m hide minigames
+[33me984e7f[m Merge branch 'master' of githubsimpleyuji:yomugames/junon
+[33m4366a05[m remove debug
+[33m8e7dac7[m create new colony when zero games
+[33m7564e57[m Create junon-io@.service
+[33meb23cf0[m env
+[33m35856a1[m Merge branch 'master' of githubsimpleyuji:yomugames/junon
+[33md333e29[m Merge pull request #10 from githubb-userr/More-informative-functions
+[33m06ace9f[m More informative descriptions to game functions
+[33m69d3274[m update ads.txt
+[33m6f7624c[m fix bug where player leave team event getting triggered when rejoining same team
+[33mdecf509[m fix bug where stove contains invalid food target
+[33m7efd6cc[m getDay/getHour
+[33m53745e4[m Merge pull request #6 from simpleyujitest/add-raven-mob
+[33m16c693b[m Merge pull request #7 from simpleyujitest/add-command-block-funcions
+[33m0b86cad[m add $getBuildingType function
+[33m081eb3c[m add Potato as mod
+[33ma062abe[m re-enable mob spawning
+[33mf80c2b5[m fix bug with floodfill on buildings placed on edge
+[33mc1ceaa0[m works perfectly
+[33m780d83f[m Add Raven mob [partially working]
+[33m9af84a6[m fix eating potato hanging server
+[33mca6bb63[m Merge pull request #5 from simpleyujitest/master
+[33m52fa5d2[m fix bug
+[33m2f3968b[m dont rely on revision.txt file. production will be deployed via git
+[33m895800e[m remove unecessary package-lock.json
+[33m92769d9[m cat command should account for spaces in directory names surround pathname with apostrophe
+[33me45f71d[m Add plasma blade weapon by PX
+[33mc72df24[m modifying constants.json should recompile javascript files fix bug width constants sprite definition
+[33mc3e7b66[m Merge pull request #4 from simpleyujitest/master
+[33m8ed00bb[m Merge branch 'master' into master
+[33m77392ba[m correct japanese translation
+[33m2152f44[m add japanese translation to events.alarm
+[33m87e0393[m package lock changes
+[33m8de3c51[m update tutorial.sav.gz
+[33m7354abb[m Merge branch 'master' of githubsimpleyuji:yomugames/junon
+[33m13b5b6d[m use custom nipplejs repository for windows compatibility
+[33m88d4536[m rate limit some api request
+[33mc509c53[m allow color codes in command block
+[33m746a10b[m remove invalid characters from command block data
+[33mcac7092[m fix undefined SocketUtil
+[33m808fe11[m Merge pull request #1 from Ruichka/patch-1
+[33m2b86804[m add contribution guide
+[33m212f243[m Update ru.json
+[33m1741c5b[m dont use dev.junon.io
+[33m46b6bfd[m gitignore
+[33mae59df9[m Update ru.json
+[33mac0394a[m simplify url for matchmaker during development mode add build command for junon client
+[33mbbe4890[m Merge pull request #3 from Ryu051/master
+[33mb8a84b6[m create dist folder if missing
+[33m2a3ea45[m Update ru.json
+[33mff3d35f[m Update ja.json
+[33m15b92ea[m dont send to firebase for dev mode
+[33m44b8056[m Update ru.json
+[33mf39642f[m Update ru.json
+[33m21d7faf[m Merge branch 'master' of githubsimpleyuji:yomugames/junon
+[33m5fb7212[m fix bug where server wont run properly if NODE_ENV not defined
+[33m1eb1ea0[m readme styling
+[33mca78688[m update readme
+[33md9b052c[m no need for minio
+[33m4130af5[m add node version via nvmrc
+[33m5119120[m refactor
+[33m772d2c0[m initial

@@ -3,6 +3,11 @@ const Protocol = require('../../../common/util/protocol')
 const BaseBuilding = require("./base_building")
 
 class SuitStation extends BaseBuilding {
+  constructor(data, container) {
+    super(data, container)
+
+    if(data.visitorId) this.visitorId = data.visitorId;
+  }
 
   unregister() {
     super.unregister()
@@ -60,7 +65,7 @@ class SuitStation extends BaseBuilding {
   }
 
   canBeInteracted(player) {
-    if (this.visitorId) return false; //has visitor associated with it. Team won't change for a visitor
+    if (this.visitorId && this.game.getEntity(this.visitorId)) return false; //has visitor associated with it. Team won't change for a visitor, so use this.visitorId.
     if (!this.owner) return true
 
     if (this.owner.isPlayer() || this.owner.isPlayerData()) {

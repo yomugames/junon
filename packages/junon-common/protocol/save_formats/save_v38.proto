@@ -168,6 +168,7 @@ message Building {
   uint32 colorIndex = 25;
   uint32 textureIndex = 26;
   string name = 27;
+  uint32 visitorId = 28;
 }
 
 message RaidRef {

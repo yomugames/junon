@@ -1,0 +1,6 @@
+[33ma342224[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'yomugames:master' into master
+[33m1ad0e9d[m (Somewhat unfinished, i'm tired) Attempt to add ice meteor shower event, along with ice asteroroid texture and renewed files. Small changes on files event.js, constants.json and enum.proto
+[33mebd647d[m Adds spanish translation to junon. Creates new variable in server.js called "spanishTranslationMap".
+[33m6d17bfe[m v0.6.0
+[33maa07bca[m Merge pull request #54 from chickemeeple/master
+[33mf165891[m Fix xss in role menu

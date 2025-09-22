@@ -11,6 +11,7 @@ class ChangeSuit extends BaseAction {
             this.planner.entity.armorType = Protocol.definition().BuildingType.None
             this.planner.entity.Happiness.changeHappinessForEvent("takeOffSuit")
             this.planner.suitStation = options.suitStation
+            this.planner.entity.suitStationId = options.suitStation.id
         } else {
             if(!Object.keys(options.suitStation.storage)) return
 

@@ -240,6 +240,7 @@ message Mob {
   uint32 status = 23;
   repeated string attackables = 24;
   Happiness Happiness = 25;
+  uint32 suitStationId = 26;
 }
 
 message Happiness {

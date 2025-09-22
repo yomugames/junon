@@ -907,17 +907,20 @@ class Planner {
         }
       }) 
     } else {
+      if(!this.suitStation && this.entity.suitStationId) {
+        this.suitStation = this.game.getEntity(this.entity.suitStationId)
+      }
       if(this.suitStation) {
         success = this.perform("SeekSuitStation", {
           targetEntity: this.suitStation,
           onComplete: () => {
             this.perform("ChangeSuit", {
-              suitStation:suitStation,
+              suitStation:this.suitStation,
               takeOff:true
             })
          }
         })
-      }
+      } 
     }
    
     return success;

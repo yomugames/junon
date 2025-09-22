@@ -23,6 +23,7 @@ class Visitor extends LandMob {
     this.sector.visitors.push(this)
     this.setOwner(this.sector.getCreatorTeam()) 
     this.planner = new Planner(this)
+    this.suitStationId = data.suitStationId;
   }
 
     

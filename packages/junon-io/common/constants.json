@@ -5361,6 +5361,26 @@
       },
       "description": "Christmas tree"
     },
+    "BarTable": {
+      "width": 32,
+      "height": 64,
+      "cost": {
+        "gold": 900
+      },
+      "categories": {"bar_table": true},
+      "requirements": {
+        "IronBar": 50
+      },
+      "stats": {
+        "health": 150,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "visitors drink beers at this table"
+    },
     "Table": {
       "width": 32,
       "height": 64,

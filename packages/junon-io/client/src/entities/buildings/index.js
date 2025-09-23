@@ -84,6 +84,7 @@ Buildings.Furnitures.Bed = require("./bed")
 Buildings.Furnitures.Sign = require("./sign")
 
 Buildings.Furnitures.Table = require("./table")
+Buildings.Furnitures.BarTable = require("./bar_table")
 Buildings.Furnitures.LargeTable = require("./large_table")
 Buildings.Furnitures.WoodTable = require("./wood_table")
 Buildings.Furnitures.TradingTable = require("./trading_table")

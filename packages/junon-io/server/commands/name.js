@@ -16,6 +16,10 @@ class Name extends BaseCommand {
     ]
   }
   
+  isNonSandboxCommand() {
+    return true
+  }
+
   allowOwnerOnly() {
     return true
   }

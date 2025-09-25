@@ -119,6 +119,56 @@ class Planner {
     return stove
   }
 
+  getClosestBarTable() {
+    let result
+    this.sector.findOneChunkRegionUntil(this.entity.getChunkRegion(), {
+      breakCondition: (chunkRegion) => {
+        let table = chunkRegion.getBarTable(this.entity.owner)
+        if(table) result = table
+        return table
+      },
+      neighborStopCondition: () => { return false }
+    })
+
+    return result;
+  }
+
+  handleBarTable() {
+    let success
+    if(this.entity.getHandItem()?.type === Protocol.definition().BuildingType.Beer) {
+      let barTable = this.getClosestBarTable()
+      if(!barTable) return;
+      success = this.perform("SeekBarTable", {
+        targetEntity: barTable,
+        onComplete: () => {
+          this.perform("Drink", {})
+        }
+      })
+      return;
+    } else {
+      let missingIngredients = this.getMissingIngredients({Beer: 1})
+      let storages = this.getStoragesWithIngredient(this.entity.getChunkRegion(), missingIngredients)
+      if(!Object.keys(storages).length) return;
+      let storage = storages[Object.keys(storages)[0]].storage
+      
+            
+      success = this.returnCurrentItemUnless("food_ingredient", () => {
+        return this.perform("SeekIngredient", {
+          targetEntity: storage,
+          onComplete: (storage) => {
+            this.perform("Pickup", {
+              storage: storage,
+              itemType: Protocol.definition().BuildingType.Beer,
+              count: 1
+            })
+          }
+        })
+      })
+    }
+
+    return success
+  }
+
   getClosestMiner(options = {}) {
     let miner
 
@@ -412,6 +462,7 @@ class Planner {
   }
 
   execute() {
+    // if(this.entity.type == Protocol.definition().MobType["Visitor"]) return //visitors dont plan like slaves do
     if (this.isPlanning) return
 
     this.isPlanning = true
@@ -425,6 +476,7 @@ class Planner {
   }
 
   executeAsync() {
+    let isVisitor = this.entity.constructor.name === "Visitor"
     this.isPlanning = false
     let success
 
@@ -445,19 +497,19 @@ class Planner {
       }
     }
 
-    if (this.isHungry()) {
+    if (this.isHungry() && !isVisitor) {
       success = this.handleHunger()
       if (success) return
     }
 
-    if (this.isSleepy()) {
+    if (this.isSleepy() && !isVisitor) {
       success = this.handleSleep()
       if (success) return
     }
 
     let canWork = this.entity.hunger > 0 && this.entity.stamina > 0
 
-    if (canWork) {
+    if (canWork && !isVisitor) {
       let tasks = this.getTasks()
       for (var i = 0; i < this.taskOrder.length; i++) {
         let order = this.taskOrder[i]
@@ -472,7 +524,7 @@ class Planner {
     if (success) return
 
     // nothing to do, return anything u have on hand
-    success = this.returnCurrentItemUnless(null, () => {})
+    success = !isVisitor && this.returnCurrentItemUnless(null, () => {})
 
     return success
   }
@@ -965,6 +1017,7 @@ class Planner {
   }
 
   perform(actionName, options = {}) {
+    // if(!this.currentAction || !this.currentAction.isCompleted) return;
     let actionKlass = Actions[actionName]
     if (!actionKlass) {
       this.game.captureException(new Error("Invalid actionName: " + actionName))

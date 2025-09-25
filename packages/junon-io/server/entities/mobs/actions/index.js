@@ -32,5 +32,7 @@ Actions.Cook = require("./cook")
 Actions.SeekMiner = require("./seek_miner")
 Actions.SeekSuitStation = require("./seek_suit_station")
 Actions.ChangeSuit = require('./change_suit')
+Actions.SeekBarTable = require('./seek_bar_table')
+Actions.Drink = require('./drink')
 
 module.exports = Actions

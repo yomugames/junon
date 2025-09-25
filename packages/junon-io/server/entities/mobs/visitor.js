@@ -59,6 +59,9 @@ class Visitor extends LandMob {
     this.setStamina(this.stamina - 1)
   }
   
+  setExtraItem(item) {
+    this.equipments.storeAt(Protocol.definition().EquipmentRole.Extra, item)
+  }
 
   feed(player, item) {
     if (this.nextFeedTimestamp) {
@@ -104,6 +107,9 @@ class Visitor extends LandMob {
       } else if(!this.getRoom().checkIsOxygenated() && !this.armorType) {
         this.Happiness.changeHappinessForEvent("noOxygen")
         this.planner.handleOxygen(false);
+      }
+      if((this.sector.barTableCount && this.Happiness.eventDefinitions.drinkBeer) || Protocol.definition().BuildingType[this.getHandItem()?.type] == "Beer") {
+        this.planner.handleBarTable()
       }
     }
     if (this.Happiness) {
@@ -211,7 +217,8 @@ class Happiness {
       stepOnDirt: -5,
       stepOnCarpet: 5,
       takeOffSuit: 35,
-      noOxygen: -5
+      noOxygen: -5,
+      drinkBeer: 20
     }
   }
 

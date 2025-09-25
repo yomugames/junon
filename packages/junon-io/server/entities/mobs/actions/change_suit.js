@@ -4,7 +4,8 @@ const Protocol = require('../../../../common/util/protocol')
 
 class ChangeSuit extends BaseAction {
     perform(options) {
-        if(options.takeOff && !Object.keys(options.suitStation.storage).length) {
+        if(options.takeOff) {
+            if(Object.keys(options.suitStation.storage).length) return;
             let armor = this.planner.entity.retrieveArmorItem() //station should be empty.
             options.suitStation.store(armor)
             options.suitStation.visitorId = this.planner.entity.id

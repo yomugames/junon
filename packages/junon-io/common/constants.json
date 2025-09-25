@@ -2643,6 +2643,7 @@
     "Beer": {
       "width": 24,
       "height": 24,
+      "isIngredient": true,
       "sprite": {
         "path": "beer"
       },

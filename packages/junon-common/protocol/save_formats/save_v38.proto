@@ -48,6 +48,7 @@ message Entities {
   int32 RP = 27;
   int32 visitorHappiness = 28;
   repeated string unlockedItems = 29;
+  uint32 barTableCount = 30;
 }
 
 message KeyCode {

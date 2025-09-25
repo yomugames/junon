@@ -249,6 +249,18 @@ class ChunkRegion {
     return result
   }
 
+  getBarTable(owner) {
+    let result;
+
+    this.forEachStructureUntil((structure) => {
+      if(Protocol.definition().BuildingType["BarTable"] === structure.type) {
+        result = structure;
+        return true;
+      }
+    })
+    return result;
+  }
+
   getSuitStation(owner) {
     let result
 

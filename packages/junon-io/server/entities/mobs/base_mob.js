@@ -399,6 +399,10 @@ class BaseMob extends BaseEntity {
     return new Item(this, type, options)
   }
 
+  setThirst() {
+    return;
+  }
+
   setStatus(status) {
     if (this.status !== status) {
       this.onPreStatusChanged()

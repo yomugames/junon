@@ -165,7 +165,7 @@ class Sector {
     this.initBuildLimits(entities)
     this.initKeyCodes(entities)
     this.initRP(entities)
-
+    this.barTableCount = entities.barTableCount;
     this.initObjectives()
 
     this.applyBlueprint(metadata.blueprintData)

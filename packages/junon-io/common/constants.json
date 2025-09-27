@@ -2750,6 +2750,7 @@
     "AlienMeat": {
       "width": 24,
       "height": 24,
+      "isIngredient": true,
       "cost": {
         "gold": 5
       },
@@ -2831,6 +2832,7 @@
     "Bread": {
       "width": 24,
       "height": 24,
+      "isIngredient": true,
       "sprite": {
         "position": {
           "x": 32,
@@ -2918,6 +2920,7 @@
     "Potato": {
       "width": 24,
       "height": 24,
+      "isIngredient": true,
       "cost": {
         "gold": 150
       },
@@ -3044,6 +3047,7 @@
     "Pumpkin": {
       "width": 24,
       "height": 24,
+      "isIngredient": true,
       "cost": {
         "gold": 80
       },
@@ -3211,6 +3215,7 @@
       "cost": {
         "gold": 200
       },
+      "isIngredient": true,
       "sprite": {
         "anchor": 0.5
       },
@@ -3422,6 +3427,7 @@
       "isStackable": true,
       "shouldShowUsage": false,
       "isUnbreakable": true,
+      "isIngredient": true,
       "cost": {
         "gold": 100
       },

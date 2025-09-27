@@ -1587,7 +1587,10 @@ class MatchmakerServer {
             pendingSector.onCreateSuccess({ success: true, host: data.host, sectorId: data.sectorId, profile: profile, sector: data.sector, isGameReady: data.isGameReady })
           }
         } else {
-          this.socketUtil.emit(playerSocket, eventName, { success: true, host: data.host, sectorId: data.sectorId, profile: profile, sector: data.sector, isGameReady: data.isGameReady })
+          //clean up data.sector (contains player ip addresses). Possibly other sensitive data depending on the context, but should be fine.
+          let copy = { ...data.sector }
+          copy.creatorIp = null
+          this.socketUtil.emit(playerSocket, eventName, { success: true, host: data.host, sectorId: data.sectorId, profile: profile, sector: copy, isGameReady: data.isGameReady })
         }
       } else {
         if (data.isMiniGame) {

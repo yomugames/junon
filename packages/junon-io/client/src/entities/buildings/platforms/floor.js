@@ -18,7 +18,7 @@ class Floor extends BaseFloor {
   }
 
   getBuildingSprite(x, y) {
-    if(this.getTextureSpritePath() === "floormap.png") {
+    if(this.getTextureSpritePath() === "simplex_texture.png") {
       let sprite = new PIXI.Container()
 
       this.baseSprite = new PIXI.Sprite(PIXI.utils.TextureCache["solid_texture.png"])

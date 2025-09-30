@@ -3,7 +3,7 @@ const Constants = require("./../../../../common/constants.json")
 const Protocol = require("./../../../../common/util/protocol")
 const BaseWall = require("./base_wall")
 
-class Wall extends BaseWall {
+class Wall3d extends BaseWall {
 
   getType() {
     return Protocol.definition().BuildingType.Wall3d
@@ -14,9 +14,10 @@ class Wall extends BaseWall {
   }
 
   getWallColor() {
-    return 0x2a2a2a  
+    return 0x2a2a2a
   }
 
 }
 
-module.exports = Wall
+module.exports = Wall3d
+

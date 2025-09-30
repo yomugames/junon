@@ -4609,6 +4609,15 @@
       },
       "description": "Airtight structure for sealing a room"
     },
+    "Wall3d": {
+      "parent": "Walls.BaseWall",
+      "sprite": {
+        "path": "wall",
+        "basepath": "wall_0",
+        "color": "#2a2a2a"
+      },
+      "description": "Airtight structure for sealing a room"
+    },
     "BlueWall": {
       "parent": "Walls.BaseWall",
       "description": "blue wall",

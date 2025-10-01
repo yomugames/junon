@@ -6,11 +6,11 @@ const BaseWall = require("./base_wall")
 class Wall extends BaseWall {
 
   getType() {
-    return Protocol.definition().BuildingType.Wall3d
+    return Protocol.definition().BuildingType.Wall
   }
 
   getConstantsTable() {
-    return "Walls.Wall3d"
+    return "Walls.Wall"
   }
 
   getWallColor() {

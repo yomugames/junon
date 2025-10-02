@@ -1,5 +1,5 @@
 const BaseAction = require("./base_action")
-
+const Protocol = require('../../../../common/util/protocol')
 class Eat extends BaseAction {
 
   static setup(planner) {
@@ -26,6 +26,7 @@ class Eat extends BaseAction {
   }
 
   onEatingFinished(food, entity) {
+    if(entity.constructor.name === "Visitor" && Protocol.definition().BuildingType[food.type] === "SlimyMeatPizza") entity.Happiness.changeHappinessForEvent("eatSlimyMeatPizza")
     food.use(entity)
     entity.setDormant(false)
     this.complete()

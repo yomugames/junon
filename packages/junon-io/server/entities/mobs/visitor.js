@@ -102,7 +102,7 @@ class Visitor extends LandMob {
       if(this.planner.isSleepy()) {
         this.planner.handleSleep();
       }
-      if(this.getRoom().checkIsOxygenated() && this.armorType) {
+      if(this.getRoom()?.checkIsOxygenated() && this.armorType) {
         this.planner.handleOxygen(true);
       } else if(!this.getRoom().checkIsOxygenated() && !this.armorType) {
         this.Happiness.changeHappinessForEvent("noOxygen")
@@ -218,7 +218,8 @@ class Happiness {
       stepOnCarpet: 5,
       takeOffSuit: 35,
       noOxygen: -5,
-      drinkBeer: 20
+      drinkBeer: 20,
+      eatSlimyMeatPizza: 10,
     }
   }
 

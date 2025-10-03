@@ -70,6 +70,7 @@ const PositionSearchRequest = require("./position_search_request")
 const Foods = require("./foods/index")
 const RP = require("./RP")
 const Game = require("./game")
+const WorldSerializer = require('../../../junon-common/world_serializer')
 
 class Sector {
 
@@ -165,7 +166,7 @@ class Sector {
     this.initBuildLimits(entities)
     this.initKeyCodes(entities)
     this.initRP(entities)
-    this.barTableCount = entities?.barTableCount || 0;
+    this.initBuildingCounts(entities)
     this.initObjectives()
 
     this.applyBlueprint(metadata.blueprintData)
@@ -182,6 +183,21 @@ class Sector {
 
   getSocketUtil() {
     return this.game.server.socketUtil
+  }
+
+  initBuildingCounts(entities) {
+    this.buildingCounts = {}
+    if(entities?.buildingCounts) {
+      this.buildingCounts = entities.buildingCounts
+      return;
+    }
+
+    let protocol = WorldSerializer.getCurrentProtocol();
+
+    for(let fieldName of Object.keys(protocol.BuildingCounts.fields)) {
+     this.buildingCounts[fieldName] = 0;
+    }
+    console.log(this.buildingCounts)
   }
 
   initRP(entities) {

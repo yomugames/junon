@@ -108,7 +108,7 @@ class Visitor extends LandMob {
         this.Happiness.changeHappinessForEvent("noOxygen")
         this.planner.handleOxygen(false);
       }
-      if((this.sector.barTableCount && this.Happiness.eventDefinitions.drinkBeer) || Protocol.definition().BuildingType[this.getHandItem()?.type] == "Beer") {
+      if((this.sector.buildingCounts.barTableCount && this.Happiness.eventDefinitions.drinkBeer) || Protocol.definition().BuildingType[this.getHandItem()?.type] == "Beer") {
         this.planner.handleBarTable()
       }
     }

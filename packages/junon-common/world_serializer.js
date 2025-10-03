@@ -457,7 +457,7 @@ class WorldSerializer {
     entities["RP"] = sector.RP.level
     entities["visitorHappiness"] = sector.visitorHappiness
     entities["unlockedItems"] = sector.unlockedItems;
-    entities["barTableCount"] = sector.barTableCount;
+    entities["buildingCounts"] = sector.buildingCounts;
 
     let encoded = this.getCurrentProtocol()["SaveState"].encode(json)
     let buffer = encoded.finish()

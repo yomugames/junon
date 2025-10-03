@@ -6,7 +6,7 @@ class BarTable extends BaseBuilding {
   constructor(data, container) {
     super(data, container);
 
-    this.sector.barTableCount += 1;
+    this.sector.buildingCounts.barTableCount += 1;
   }
 
   getConstantsTable() {
@@ -20,7 +20,7 @@ class BarTable extends BaseBuilding {
   remove() {
     super.remove();
 
-    this.sector.barTableCount -= 1;
+    this.sector.buildingCounts.barTableCount -= 1;
   }
 }
 

@@ -23,7 +23,7 @@ Tilable.prototype = {
    * @param {Object} targetSprite Sprite of wall to be changed
    */
   layoutTile(tiles = this.getSides(), targetSprite = this.getTileSprite()) {
-    if(this.constructor.name === "Wall3d") {
+    if(this.constructor.name.includes("Wall")) {
       return this.layoutTileWall3d(tiles, targetSprite)
     }
 
@@ -95,7 +95,7 @@ Tilable.prototype = {
       texture = "wall8"
     }
 
-    targetSprite.texture = this.getTextures()[texture]
+    targetSprite.texture = require('../../client/src/entities/buildings/wall3d').prototype.getTextures()[texture]
     targetSprite.rotation = 0
   },
 

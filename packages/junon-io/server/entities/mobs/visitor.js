@@ -111,6 +111,9 @@ class Visitor extends LandMob {
       if((this.sector.buildingCounts.barTableCount && this.Happiness.eventDefinitions.drinkBeer) || Protocol.definition().BuildingType[this.getHandItem()?.type] == "Beer") {
         this.planner.handleBarTable()
       }
+      if((this.sector.buildingCounts.terminalCount && this.Happiness.eventDefinitions.useTerminal)) {
+        this.planner.handleUseTerminal()
+      }
     }
     if (this.Happiness) {
       this.updateHappiness()
@@ -220,6 +223,7 @@ class Happiness {
       noOxygen: -5,
       drinkBeer: 20,
       eatSlimyMeatPizza: 10,
+      useTerminal: 10
     }
   }
 

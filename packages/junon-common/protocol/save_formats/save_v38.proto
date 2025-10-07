@@ -48,14 +48,12 @@ message Entities {
   int32 RP = 27;
   int32 visitorHappiness = 28;
   repeated string unlockedItems = 29;
-  BuildingCounts buildingCounts = 30;
 }
 
 message BuildingCounts {
   uint32 barTableCount = 1;
   uint32 terminalCount = 2;
 }
-
 message KeyCode {
   string keyCode = 2;
 }

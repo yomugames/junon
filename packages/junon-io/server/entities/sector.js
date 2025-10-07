@@ -166,7 +166,7 @@ class Sector {
     this.initBuildLimits(entities)
     this.initKeyCodes(entities)
     this.initRP(entities)
-    this.initBuildingCounts(entities)
+    this.initBuildingCounts()
     this.initObjectives()
 
     this.applyBlueprint(metadata.blueprintData)
@@ -187,17 +187,11 @@ class Sector {
 
   initBuildingCounts(entities) {
     this.buildingCounts = {}
-    if(entities?.buildingCounts) {
-      this.buildingCounts = entities.buildingCounts
-      return;
-    }
-
     let protocol = WorldSerializer.getCurrentProtocol();
 
     for(let fieldName of Object.keys(protocol.BuildingCounts.fields)) {
      this.buildingCounts[fieldName] = 0;
     }
-    console.log(this.buildingCounts)
   }
 
   initRP(entities) {

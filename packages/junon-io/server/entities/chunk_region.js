@@ -249,6 +249,18 @@ class ChunkRegion {
     return result
   }
 
+  getBuildingType(owner, buildingType) {
+    let result;
+
+    this.forEachStructureUntil((structure) => {
+      if(buildingType === structure.type) {
+        result = structure;
+        return true;
+      }
+    })
+    return result;
+  }
+
   getBarTable(owner) {
     let result;
 

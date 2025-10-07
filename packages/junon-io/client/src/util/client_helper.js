@@ -60,13 +60,7 @@ module.exports = {
   },
 
   toHex(number) {
-    let hex = number.toString(16)
-
-    if (hex.length % 2) {
-      hex = '0' + hex
-    }
-
-    return "#" + hex
+    return "#" + (number + 0x1000000).toString(16).substring(1)
   },
 
   hexToInt(hex) {

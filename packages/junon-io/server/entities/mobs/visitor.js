@@ -223,7 +223,8 @@ class Happiness {
       noOxygen: -5,
       drinkBeer: 20,
       eatSlimyMeatPizza: 10,
-      useTerminal: 10
+      useTerminal: 10,
+      noTable: -5
     }
   }
 

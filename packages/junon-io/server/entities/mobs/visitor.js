@@ -104,7 +104,7 @@ class Visitor extends LandMob {
       }
       if(this.getRoom()?.checkIsOxygenated() && this.armorType) {
         this.planner.handleOxygen(true);
-      } else if(!this.getRoom().checkIsOxygenated() && !this.armorType) {
+      } else if(!this.getRoom()?.checkIsOxygenated() && !this.armorType) {
         this.Happiness.changeHappinessForEvent("noOxygen")
         this.planner.handleOxygen(false);
       }
@@ -127,10 +127,10 @@ class Visitor extends LandMob {
   updateHappiness() {
     this.checkForPlants();
     this.checkForLights();
-    this.checkForDirtAndCarpet();
+    this.checkForDirtBloodAndCarpet();
   }
 
-  checkForDirtAndCarpet() {
+  checkForDirtBloodAndCarpet() {
     let tile = this.getTile();
     if(!tile) return;
     if(tile.hasDirt()) {
@@ -138,6 +138,9 @@ class Visitor extends LandMob {
     }
     if(tile.constructor.name === "CarpetFloor") {
       this.Happiness.changeHappinessForEvent("stepOnCarpet")
+    }
+    if(tile.hasBlood()) {
+      this.Happiness.changeHappinessForEvent("stepOnBlood")
     }
   }
 
@@ -218,6 +221,7 @@ class Happiness {
       damaged: -25,
       killed: -80,
       stepOnDirt: -5,
+      stepOnBlood: -5,
       stepOnCarpet: 5,
       takeOffSuit: 35,
       noOxygen: -5,

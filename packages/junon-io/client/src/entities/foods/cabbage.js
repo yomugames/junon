@@ -5,7 +5,7 @@ const Protocol = require("./../../../../common/util/protocol")
 class Cabbage extends BaseFood {
 
   getSpritePath() {
-    return 'cabbage_plant.png'
+    return 'cabbage.png'
   }
 
   getType() {

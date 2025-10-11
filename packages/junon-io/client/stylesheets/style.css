@@ -1140,7 +1140,7 @@ body {
     position: absolute;
     right: 180px;
     top: 8px;
-    width: 150px;
+    width: fit-content;
     text-align: right;
     padding: 5px;
 }
@@ -1157,6 +1157,24 @@ body {
     display: inline-block;
     background-size: contain;
     vertical-align: top;
+}
+
+.gold.resource_count {
+    display: inline;
+}
+
+.RP_stats {
+    display: inline
+}
+
+#gold_count {
+    display: inline
+}
+
+.RP_stats_value {
+    color: white;
+    display: inline;
+    margin-right:50px;
 }
 
 .resource_count {

@@ -1581,6 +1581,8 @@ class Game {
   onRPUpdated(data) {
     if(data.RP) this.sector.RPLevel = data.RP
     if(data.visitorHappiness) this.sector.visitorHappiness = data.visitorHappiness
+    document.querySelector("#RP_value").innerText = data.RP
+    document.querySelector("#happiness_value").innerText = data.visitorHappiness;
   }
 
   onBadgeEquipped(data) {
@@ -3992,6 +3994,8 @@ class Game {
     data.sector.RP = data.RP
     data.sector.visitorHappiness = data.visitorHappiness
     data.sector.unlockedItems = data.unlockedItems
+    document.querySelector("#RP_value").innerText = data.RP
+    document.querySelector("#happiness_value").innerText = data.visitorHappiness
     
     document.body.style.overflow = 'hidden'
     this.joinGameTime = Date.now()

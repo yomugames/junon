@@ -26,6 +26,10 @@ class Visitor extends LandMob {
     this.suitStationId = data.suitStationId;
   }
 
+  addMiasma() {
+    this.setEffectLevel("miasma", 1);
+    this.Happiness.changeHappinessForEvent("miasma");
+  }
     
 
   preApplyData() {
@@ -228,7 +232,8 @@ class Happiness {
       drinkBeer: 20,
       eatSlimyMeatPizza: 10,
       useTerminal: 10,
-      noTable: -5
+      noTable: -5,
+      miasma: -10
     }
   }
 

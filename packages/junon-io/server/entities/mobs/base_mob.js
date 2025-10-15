@@ -2835,7 +2835,7 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
     return this.canDamage(target)
   },
   canDamage(target, checkTrap = true, allowWall = false) {
-    if (target.isMob() && target.status === Protocol.definition().MobStatus.Neutral) return false
+    if (target.isMob() && target.status === Protocol.definition().MobStatus.Neutral && Protocol.definition().MobType[target.type] !== "Visitor") return false
     if (this.isFriendlyUnit(target)) return false
     if (target.hasCategory("ghost")) return false
 

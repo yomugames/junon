@@ -253,7 +253,6 @@ class Game {
     this.commandBlockPicker = new Menus.CommandBlockPicker(this, document.querySelector("#command_block_picker"))
     this.friendRequestMenu = new Menus.FriendRequestMenu(this, document.querySelector("#friend_request_menu"))
     this.badgeMenu = new Menus.BadgeMenu(this, document.querySelector("#badge_menu"))
-    this.RPMenu = new Menus.RPMenu(this, document.querySelector("#RP_menu"))
 
     this.visitColonyMenu = this.main.gameExplorer
 
@@ -2683,11 +2682,7 @@ class Game {
 
     this.visitColonyMenu.toggle()
   }
-
-  toggleRPMenu() {
-    this.RPMenu.isOpen() ? this.RPMenu.close() : this.RPMenu.open()
-  }
-
+  
   toggleCommandBlockMenu() {
     if (this.isSandbox()) {
       this.commandBlockMenu.toggle()
@@ -5132,7 +5127,6 @@ class Game {
       "camera mode": 117,         // f6
       "stats view": 116,         // f5
       "view badges": 66,          // b
-      "open RP menu":72,          // h
     }
 
     if (navigator.userAgent.search("Firefox") !== -1) {

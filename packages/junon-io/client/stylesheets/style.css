@@ -178,11 +178,6 @@ html[lang='ja'] div {
     top: calc(50vh - (200px / 2));
 }
 
-.RP_menu_container {
-    text-align: left;
-    font-size: 15px;
-}
-
 .RP_items_menu {
     margin:10px;
 }

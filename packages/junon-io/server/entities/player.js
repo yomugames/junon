@@ -1964,7 +1964,7 @@ class Player extends BaseEntity {
     }
 
     let klass = Item.getKlassByName(Protocol.definition().BuildingType[data.type])
-    if(klass.prototype.isRPItem() && this.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[data.type]) === -1) {
+    if(klass.prototype?.isRPItem() && this.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[data.type]) === -1) {
       this.showError("Don't have enough RP.")
       return
     } 

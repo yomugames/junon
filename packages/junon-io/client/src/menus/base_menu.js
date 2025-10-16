@@ -398,8 +398,7 @@ class BaseMenu {
     this.showRequirements(type)
   }
 
-  isBuildingAllowedInGame(type) {
-    if (this.game.isPvP()) {
+  isBuildingAllowedInGame(type) { if (this.game.isPvP()) {
       let notAllowedList = ["Atm", "RailStop", "RailTrack", "Beacon"]
       notAllowedList = notAllowedList.map((name) => {
         return Protocol.definition().BuildingType[name]
@@ -428,6 +427,7 @@ class BaseMenu {
   }
 
   showRequirements(type) {
+    let itemKlass = Item.getKlass(type)
     this.clearRequirements()
 
     const requirements = Item.getCraftRequirements(type, this.game.player)
@@ -437,18 +437,41 @@ class BaseMenu {
     })
 
     let isSandboxModeAndOwner = this.isSandboxMode() && this.game.player.isSectorOwner()
-    if (this.isDisabled || (this.hasMissingRequirements(requirements) && !isSandboxModeAndOwner)) {
+    if (this.isDisabled || (this.hasMissingRequirements(requirements, itemKlass) /*&& !isSandboxModeAndOwner*/)) {
       this.el.querySelector(".craft_btn").dataset.disabled = true
     } else {
       this.el.querySelector(".craft_btn").dataset.disabled = ""
     }
   }
 
-  hasMissingRequirements(requirements) {
-    return requirements.find((requirement) => {
+  renderRP(itemKlass) {
+    let productUnavailableEl = this.el.querySelector(".product_unavailable_notice");
+    let craftBtnEl = this.el.querySelector(".craft_btn");
+    if(!itemKlass) return;
+
+    craftBtnEl.innerText = "Unlock";
+
+    if(itemKlass.prototype.getRequiredRP() > this.game.sector.RPLevel) {
+      productUnavailableEl.style.display = "block";
+      productUnavailableEl.innerText = "Not enough RP (reputation points)";
+    } else {
+      productUnavailableEl.style.display = "none";
+    }
+  }
+
+  hasMissingRequirements(requirements, itemKlass) {
+    if(itemKlass && itemKlass.prototype.isRPItem()) {
+        this.renderRP(itemKlass)
+        if(this.game.sector.RPLevel < itemKlass.prototype.getRequiredRP()) {
+          return true
+        }
+      }
+      return requirements.find((requirement) => {
       let count = requirement.count
       let buildSpeed =  this.game.sector.buildSpeed
       count = Math.ceil(count / buildSpeed)
+      
+      
       return requirement.supply < count
     })
   }

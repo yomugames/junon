@@ -6302,6 +6302,8 @@ html[lang='ja'] .game_tooltip {
     color: #777;
     padding: 10px;
     margin-top: 15px;
+    border: 1px solid #000;
+    border-radius:5px;
 }
 
 .modes_container {

@@ -27,6 +27,7 @@ class Visitor extends LandMob {
   }
 
   addMiasma() {
+    if(!this.Happiness) return; //seems to be causing errors when visitor is dead.
     this.setEffectLevel("miasma", 1);
     this.Happiness.changeHappinessForEvent("miasma");
   }

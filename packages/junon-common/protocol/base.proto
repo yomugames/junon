@@ -175,7 +175,12 @@ message MessageWrapper {
     BadgeEquipped BadgeEquipped = 182;
     RPUpdated RPUpdated = 183;
     UnlockItem UnlockItem = 184;
+    ItemUnlocked ItemUnlocked = 185;
   }
+}
+
+message ItemUnlocked {
+  string itemname = 1;
 }
 
 message UnlockItem {

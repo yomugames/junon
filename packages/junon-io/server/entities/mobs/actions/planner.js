@@ -994,7 +994,7 @@ class Planner {
           onComplete: () => {
             this.perform("ChangeSuit", {
               suitStation:this.suitStation,
-              takeOff:true
+              takeOff:false
             })
          }
         })

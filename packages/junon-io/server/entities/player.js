@@ -1925,7 +1925,7 @@ class Player extends BaseEntity {
       this.showError("Not enough RP")
       return;
     }
-    if(this.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[type] != -1)) {
+    if(this.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[type]) != -1) {
       this.showError("Already unlocked")
       return
     }

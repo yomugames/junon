@@ -1576,6 +1576,12 @@ class Game {
     SocketUtil.on("BadgesData", this.onBadgesData.bind(this))
     SocketUtil.on("BadgeEquipped", this.onBadgeEquipped.bind(this))
     SocketUtil.on("RPUpdated", this.onRPUpdated.bind(this))
+    SocketUtil.on("ItemUnlocked", this.onItemUnlocked.bind(this))
+  }
+
+  onItemUnlocked(data) {
+    this.sector.unlockedItems.push(data.itemname)
+    this.blueprintMenu.showProductInfo(this.blueprintMenu.craftType)
   }
 
   onRPUpdated(data) {

@@ -204,6 +204,7 @@ class Sector {
 
   unlockItem(itemname) {
     this.unlockedItems.push(itemname)
+    this.game.getSocketUtil().broadcast(this.getSocketIds(), "ItemUnlocked", {itemname: itemname})
   }
 
   initObjectives() {

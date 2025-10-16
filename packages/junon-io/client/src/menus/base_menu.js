@@ -338,6 +338,12 @@ class BaseMenu {
 
     this.isCraftBtnHeld = true
 
+    if(this.el.querySelector('.craft_btn').innerText == "Unlock") { // RP
+      SocketUtil.emit("UnlockItem", {type: this.craftType})
+
+      return;
+    }
+
     let craftCount = parseInt(this.el.querySelector(".craft_count").value)
     if (isNaN(craftCount)) craftCount = 1
     this.craftItem(craftCount)
@@ -449,6 +455,8 @@ class BaseMenu {
     let craftBtnEl = this.el.querySelector(".craft_btn");
     if(!itemKlass) return;
 
+    if (this.game.sector.unlockedItems.indexOf(itemKlass.prototype.constructor.name) !== -1) return;
+
     craftBtnEl.innerText = "Unlock";
 
     if(itemKlass.prototype.getRequiredRP() > this.game.sector.RPLevel) {
@@ -461,14 +469,21 @@ class BaseMenu {
 
   hasMissingRequirements(requirements, itemKlass) {
     if(itemKlass && itemKlass.prototype.isRPItem()) {
-        this.renderRP(itemKlass)
-        if(this.game.sector.RPLevel < itemKlass.prototype.getRequiredRP()) {
-          return true
+        if(this.game.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[itemKlass.prototype.getType()]) === -1) {
+        this.renderRP(itemKlass);
+        if (this.game.sector.RPLevel < itemKlass.prototype.getRequiredRP()) {
+          return true;
+        } else {
+          return false;
         }
+      } else {
+        let craftBtnEl = this.el.querySelector(".craft_btn");
+        craftBtnEl.innerText = i18n.t("Craft");
       }
-      return requirements.find((requirement) => {
-      let count = requirement.count
-      let buildSpeed =  this.game.sector.buildSpeed
+
+    } return requirements.find((requirement) => {
+      let count = requirement.count;
+      let buildSpeed = this.game.sector.buildSpeed;
       count = Math.ceil(count / buildSpeed)
       
       

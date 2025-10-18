@@ -858,35 +858,64 @@
       "shouldShowNeeds": true,
       "isNPC": true,
       "hat": {
-        "bluehat": {
-          "x":-15,
-          "y":40,
-          "size": 40
+        "armorOn": {
+          "bluehat": {
+            "x":-15,
+            "y":40,
+            "size": 40
+          },
+          "bowlhat": {
+            "x":-20,
+            "y":40,
+            "size": 40
+          },
+          "tophat": {
+            "x":-20,
+            "y":40,
+            "size":40
+          },
+          "redhat": {
+            "x":-15,
+            "y":40,
+            "size":40
+          },
+          "mask": {
+            "x":5,
+            "y":40,
+            "size":40
+          }
         },
-        "bowlhat": {
-          "x":-20,
-          "y":40,
-          "size": 40
-        },
-        "tophat": {
-          "x":-20,
-          "y":40,
-          "size":40
-        },
-        "redhat": {
-          "x":-15,
-          "y":40,
-          "size":40
-        },
-        "mask": {
-          "x":5,
-          "y":40,
-          "size":40
-        },
-        "x":0,
-        "y":0
+        "armorOff": {
+          "bluehat": {
+            "x": -5,
+            "y": 36,
+            "size": 32
+          },
+          "bowlhat": {
+           "x": -12,
+            "y": 41,
+            "size": 42
+         },
+          "tophat": {
+            "x": -13,
+            "y": 38,
+            "size": 35  
+          },
+          "redhat": {
+            "x": -5,
+            "y": 36,
+            "size": 32
+          },
+          "mask": {
+            "x": 6,
+            "y": 39,
+            "size": 37
+          }
       },
-      "cost": {
+      "x": 0,
+      "y": 0
+    },
+    "cost": {
         "gold": 20000
       },
       "dizzySprite": {

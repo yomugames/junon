@@ -104,13 +104,14 @@ Equipper.prototype = {
     sprite.addChild(this.armorEquipContainer)
 
     // hat
+    // piece of code is used only with visitors. If you add functionality with players, you'll need to change this
     if(!this.getConstants().hat) return sprite;
 
     this.hatSpritePath = this.selectRandomHatSpritePath()
     this.hat = new PIXI.Sprite(PIXI.utils.TextureCache[this.hatSpritePath])
     this.hat.name = "Hat"
     this.hat.rotation = -90 * (Math.PI / 180)
-    let constants = this.getConstants().hat[this.hatSpritePath.replace(".png", "")]
+    let constants = this.getConstants().hat.armorOn[this.hatSpritePath.replace(".png", "")]
     if(constants) {
       this.hat.x = constants.x 
       this.hat.y = constants.y

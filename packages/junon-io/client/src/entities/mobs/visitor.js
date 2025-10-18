@@ -16,7 +16,20 @@ class Visitor extends LandMob {
         this.attackTween = this.getMeleeChargeTween(targetPosition)
         this.attackTween.start()
     }
-   
+
+    setArmorType(armorType) {
+        super.setArmorType(armorType);
+        this.updateHatAccordingToArmor(armorType);
+    }
+
+    updateHatAccordingToArmor(armorType) {
+        let armor = armorType ? "armorOn" : "armorOff";
+        let constants = this.getConstants().hat[armor][this.hatSpritePath.replace(".png", "")];
+        this.hat.x = constants.x;
+        this.hat.y = constants.y;
+        this.hat.width = this.hat.height = constants.size;
+    }
+
     getBaseRotationOffset() {
         return 0 * PIXI.DEG_TO_RAD
     }

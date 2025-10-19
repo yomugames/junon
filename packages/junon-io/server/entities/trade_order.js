@@ -196,7 +196,10 @@ class TradeOrder {
 
   executeSell() {
     let typeName = this.getPurchaseTypeName()
-    if (typeName === "Gold") return
+    if (typeName === "Gold") {
+      this.customer.showError("Leave and rejoin to sell gold")
+      return;
+    }
 
     if (!this.hasSellPrivilege(this.customer)) {
       this.customer.showError("You dont have permission to sell", { isWarning: true })
@@ -206,6 +209,7 @@ class TradeOrder {
     if (this.entityId) {
       let entity = this.game.getEntity(this.entityId)
       if (!entity) return
+      if(entity.type != this.type) return;
 
       if(!entity.isMob() && !entity.isItem()) {
         this.customer.showError("Invalid sell item")

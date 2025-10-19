@@ -71,27 +71,20 @@ class TradeOrder {
       if(this.sector.sellables[this.klass.prototype.getTypeName()] && this.customer.gold >= this.getTotalPurchaseCost()) {
         return true;
       }
-    }
-
-    if(this.isSoldBySlaveTrader()) {
-      return this.customer.gold >= this.getTotalPurchaseCost()
-    }
-
-    if(!entity) {
-      return false
-    }
-
-    //for vending machines. ensure the item is stored, to prevent buying an item that doesn't exist
-    if (entity.storage) {
+    } else if (this.isSoldBySlaveTrader()) {
+      return this.customer.gold >= this.getTotalPurchaseCost();
+    } else if (entity.storage) {
+      //for vending machines. ensure the item is stored, to prevent buying an item that doesn't exist
       const itemExistsOnStorage = entity.storage[this.index].type === this.type
       if (!itemExistsOnStorage) return false
+      return this.customer.gold >= this.getTotalPurchaseCost()
     }
-
-    return this.customer.gold >= this.getTotalPurchaseCost()
+    return false
   }
 
   isSoldBySlaveTrader() {
-    return this.klass.prototype.getTypeName().includes("Slave")
+    //can't use include, because slave trader would be included
+    return this.klass.prototype.getTypeName().slice(-5) === "Slave"
   }
 
   canSell() {

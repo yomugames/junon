@@ -13,7 +13,7 @@ class Event extends BaseBadge {
     }
 
     getImageUrl() {
-        return 'badges/og_badge.png'
+        return 'badges/event_badge.png'
     }
 
     getDescription() {

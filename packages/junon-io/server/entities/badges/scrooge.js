@@ -1,6 +1,9 @@
 const BaseBadge = require('./base_badge')
 
 class Scrooge extends BaseBadge {
+    getId() {
+        return 'scr'
+    }
     getName() {
         return 'Scrooge'
     }

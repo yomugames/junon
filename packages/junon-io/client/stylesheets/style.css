@@ -7631,6 +7631,10 @@ body.minigame #map_menu_frame {
     padding-top: 5px;
 }
 
+#badge_submit {
+    margin-top: 10px;
+}
+
 .open_ban_list_btn {
     display: none;
     margin-top: 20px;

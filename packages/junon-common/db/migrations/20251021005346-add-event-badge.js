@@ -8,7 +8,7 @@ module.exports = {
           'users',
           'badges',
           {
-            type: Sequelize.DataTypes.STRING, //this sucks. change it to its own table, or any alternative later if we have more than around 60 badges
+            type: Sequelize.DataTypes.TEXT, //this sucks. change it to its own table, or any alternative later if we have more than around 60 badges
             allowNull: true
           },
           { transaction }

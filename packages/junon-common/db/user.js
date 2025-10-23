@@ -86,7 +86,8 @@ User.init({
     type: Sequelize.BOOLEAN,
     defaultValue: true
   },
-  ip: Sequelize.STRING
+  ip: Sequelize.STRING,
+  badges: Sequelize.STRING
 },{
   sequelize,
   modelName: 'User',

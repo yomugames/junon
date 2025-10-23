@@ -1,6 +1,9 @@
 const BaseBadge = require("./base_badge");
 
 class None extends BaseBadge {
+    getId() {
+        return 'no'
+    }
     getName() {
         return "None"
     }

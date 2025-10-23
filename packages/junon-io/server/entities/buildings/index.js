@@ -130,6 +130,7 @@ Buildings.PotatoSeed = require("./crops/potato_seed")
 Buildings.CoffeeSeed = require("./crops/coffee_seed")
 Buildings.PumpkinSeed = require("./crops/pumpkin_seed")
 Buildings.RiceSeed = require("./crops/rice_seed")
+Buildings.CabbageSeed = require("./crops/cabbage_seed")
 
 Buildings.Fighter = require("./units/fighter")
 

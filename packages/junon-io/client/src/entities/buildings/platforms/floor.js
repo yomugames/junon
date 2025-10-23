@@ -52,6 +52,12 @@ class Floor extends BaseFloor {
       let sprite = new PIXI.Container()
       this.baseSprite = new PIXI.Sprite(PIXI.utils.TextureCache[this.getTextureSpritePath()])
       this.baseSprite.anchor.set(0.5)
+
+      if (this.data.hasOwnProperty("colorIndex")) {
+        let color = this.game.colors[this.data.colorIndex]
+        this.baseSprite.tint = color.value
+      }
+      
       sprite.addChild(this.baseSprite)
       return sprite;
   }

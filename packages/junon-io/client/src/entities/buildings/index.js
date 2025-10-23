@@ -70,6 +70,7 @@ Buildings.Atmospherics.GasPipe = require("./gas_pipe")
 // Buildings.Furnitures.Fridge = require("./fridge")
 // dynamically create klasses
 Buildings.Furnitures.Wall = require("./wall")
+// Buildings.Furnitures.Wall3d = require("./wall3d.js")
 
 for (let name in Constants.Walls) {
   if (!Buildings.Furnitures[name]) {

@@ -59,9 +59,7 @@ enum BuildingType {
   NitroPowder = 54;
   Wheat = 55;
   AmmoPrinter = 56;
-  MiniTurret = 57;
-  Table = 58;
-  Chair = 59;
+  MiniTurret = 57; Table = 58; Chair = 59;
   SteelFloor = 60;
   ResearchTable = 61;
   FlameThrower = 62;
@@ -266,6 +264,8 @@ enum BuildingType {
   UnbreakableWall = 270;
   Dynamite = 271;
   MiasmaGate = 272;
+  CabbageSeed = 273;
+  Cabbage = 274;
 }
 
 enum TerrainType {

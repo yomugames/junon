@@ -1805,6 +1805,14 @@
       "yield": "PlantFiber",
       "description": "Plant on soil to grow fiber"
     },
+    "CabbageSeed": {
+      "parent": "Crops.BaseSeed",
+      "cost": {
+        "gold": 30
+      },
+      "yield": "Cabbage",
+      "description": "Plant on soil to grow cabbage"
+    },
     "PotatoSeed": {
       "parent": "Crops.BaseSeed",
       "cost": {
@@ -2917,6 +2925,28 @@
       "upgrade": {},
       "description": "Cooked Human meat"
     },
+    "Cabbage": {
+      "width": 24,
+      "height": 24,
+      "isIngredient": true,
+      "cost": {
+        "gold": 150
+      },
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "width":32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food":45
+      },
+      "upgrade": {},
+      "description": "A nice plump cabbage. A miracle it was able to grow here."
+    },
     "Potato": {
       "width": 24,
       "height": 24,
@@ -2935,7 +2965,7 @@
         "food": 40
       },
       "upgrade": {},
-      "description": "Staple food for Survival."
+      "description": "Staple food for survival."
     },
     "Wheat": {
       "width": 24,

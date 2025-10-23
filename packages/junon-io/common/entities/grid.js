@@ -1,8 +1,5 @@
 const Constants = require('./../constants.json')
-const Helper = require('./../helper')
-const Protocol = require("../util/protocol")
-const Item = require('../../client/src/entities/item')
-//item is a client file, so only use this class for common functionalities
+  const Helper = require('./../helper')
 
 class Grid {
   constructor(name, container, rowCount, colCount, emptyValue = 0) {
@@ -115,21 +112,13 @@ class Grid {
 
       let mapdata = this.mapData[position.row][position.col]
       if(!includeWalls && mapdata) {
-        if (typeof mapdata == "number") {
-          if (Item.getKlass(mapdata).prototype.hasCategory("wall"))
-            isTileFilled = false;
+        if (mapData && mapdata.hasCategory && mapdata.hasCategory("wall")) {
+          isTileFilled = false;
         }
-        else if (typeof this.mapData[position.row][position.col].constructor) {
-          if (mapdata.hasCategory && mapdata.hasCategory("wall")) {
-            isTileFilled = false;
-          }
-        }
-
-        }
-        return isTileFilled;
       }
       
-     else {
+      return isTileFilled;
+    } else {
       const box = {
         pos: {
           x: x - width / 2,

@@ -209,7 +209,7 @@ class TradeOrder {
     if (this.entityId) {
       let entity = this.game.getEntity(this.entityId)
       if (!entity) return
-      if(entity.type != this.type) return;
+      if (entity.type != this.type) return;
 
       if(!entity.isMob() && !entity.isItem()) {
         this.customer.showError("Invalid sell item")
@@ -240,6 +240,11 @@ class TradeOrder {
       } else {
         let item = this.customer.getSellStorage()[this.index]
         if (!item) return
+
+        if(item.type !== this.type) {
+          this.customer.showError("Something went wrong.")
+          return
+        }
 
         if (item.count < this.count) {
           this.customer.showError("Not enough items available", { isWarning: true })

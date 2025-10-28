@@ -154,44 +154,42 @@ Object.assign(BaseWall.prototype, Tilable.prototype, {
     return this.baseSprite
   },
   layoutTile(tiles = this.getSides(), targetSprite = this.getTileSprite()) {
-    let down = tiles.down;
-    let up = tiles.up;
-    let left = tiles.left;
-    let right = tiles.right;
-    //there are 16 cases of up/down/right/left walls. Unfortunately a switch won't work here, and am not sure of a better way.
+    let left = tiles.left
+    let right = tiles.right
+    let up = tiles.up 
+    let down = tiles.down
+    let topleft = tiles.topleft
+    let topright = tiles.topright
+    let bottomleft = tiles.bottomleft
+    let bottomright = tiles.bottomright
+    
     let texture = '';
-    if (!down && !up && !right && !left) {
-      texture = "wall0";
-    } else if (!left && !down && !right) {
-      texture = "wall0";
-    } else if (!up && !left && !down) {
-      texture = "wall1";
-    } else if (!left && !down) {
-      texture = "wall1";
-    } else if (!left && !up && !right) {
-      texture = "wall2";
-    } else if (!left && up && !right && down) {
-      texture = "wall2";
-    } else if (!left && !up && right && down) {
-      texture = "wall3";
-    } else if (!left && up && right && down) {
-      texture = "wall3";
-    } else if (!up && !right && !down) {
-      texture = "wall4";
-    } else if (!right && !down && left && up) {
-      texture = "wall4";
-    } else if (left && !up && right && !down) {
-      texture = "wall5";
-    } else if (left && up && right && !down) {
-      texture = "wall5";
-    } else if (left && !up && !right && down) {
-      texture = "wall6";
-    } else if (up && !right && down && left) {
-      texture = "wall6";
-    } else if (!up && right && down && left) {
-      texture = "wall7";
-    } else {
-      texture = "wall8";
+    if(!left && !right && !down) {
+      texture = "wall0"
+    } else if(!left && !down && right) {
+      texture = "wall1"
+    } else if(!left && !right && down) {
+      texture = "wall2"
+    } else if(!bottomright && right && down && !left) {
+      texture = "wall3"
+    } else if(!down && !right && left) {
+      texture = "wall4"
+    } else if(!down && right && left) {
+      texture = "wall5"
+    } else if(!right && left && down && !bottomleft) {
+      texture = "wall6"
+    } else if(right && left && down && !bottomleft && !bottomright) {
+      texture = "wall7" //wall8 looks the exact same.
+    } else if(right && left && down && bottomleft && bottomright) {
+      texture = "wall9"
+    } else if (!left && right && down && bottomright) {
+      texture = "wall10"
+    } else if (!right && down && left && bottomleft) {
+      texture = "wall11"
+    } else if (right && !bottomleft && down && left) {
+      texture = "wall12"
+    } else if (left && down && right && !bottomright) {
+      texture = "wall13"
     }
 
     targetSprite.texture = require('./wall3d').prototype.getTextures()[texture];
@@ -199,4 +197,4 @@ Object.assign(BaseWall.prototype, Tilable.prototype, {
   }
 });
 
-module.exports  =BaseWall;
+module.exports = BaseWall;

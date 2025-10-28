@@ -29,6 +29,11 @@ class Wall3d extends BaseWall {
         wall6: PIXI.utils.TextureCache["3dwall-6.png"],
         wall7: PIXI.utils.TextureCache["3dwall-7.png"],
         wall8: PIXI.utils.TextureCache["3dwall-8.png"],
+        wall9: PIXI.utils.TextureCache["3dwall-9.png"],
+        wall10: PIXI.utils.TextureCache["3dwall-10.png"],
+        wall11: PIXI.utils.TextureCache["3dwall-11.png"],
+        wall12: PIXI.utils.TextureCache["3dwall-12.png"],
+        wall13: PIXI.utils.TextureCache["3dwall-13.png"],
       }
     } 
 

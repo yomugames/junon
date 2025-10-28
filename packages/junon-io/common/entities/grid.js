@@ -675,17 +675,19 @@ class Grid {
     })
   }
 
-  getNeighborsAllowEmpty(row, col) {
-    return [
-      this.rowColHitTest(row    , col - 1), // left
-      this.rowColHitTest(row - 1, col    ), // top
-      this.rowColHitTest(row    , col + 1), // right
-      this.rowColHitTest(row + 1, col    ), // down
-      this.rowColHitTest(row - 1, col - 1), // top left
-      this.rowColHitTest(row - 1, col + 1), // top right
-      this.rowColHitTest(row + 1, col - 1), // bottom left
-      this.rowColHitTest(row + 1, col + 1)  // bottom right
-    ]
+  getNeighborsAllowEmpty(row, col, walls = false) {
+    let retValue = []
+    retValue.push(this.rowColHitTest(row, col - 1)); // left
+    retValue.push(this.rowColHitTest(row - 1, col)); // top
+    retValue.push(this.rowColHitTest(row, col + 1)); // right
+    retValue.push(this.rowColHitTest(row + 1, col)); // down
+    if (walls) {
+      retValue.push(this.rowColHitTest(row - 1, col - 1)); // top left
+      retValue.push(this.rowColHitTest(row - 1, col + 1)); // top right
+      retValue.push(this.rowColHitTest(row + 1, col - 1)); // bottom left
+      retValue.push(this.rowColHitTest(row + 1, col + 1));  // bottom right
+    }
+    return retValue;
   }
 
   raycast(x1, y1, x2, y2, maxLength, entityToIgnore) {

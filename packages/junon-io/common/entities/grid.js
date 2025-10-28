@@ -680,7 +680,11 @@ class Grid {
       this.rowColHitTest(row    , col - 1), // left
       this.rowColHitTest(row - 1, col    ), // top
       this.rowColHitTest(row    , col + 1), // right
-      this.rowColHitTest(row + 1, col    )  // down
+      this.rowColHitTest(row + 1, col    ), // down
+      this.rowColHitTest(row - 1, col - 1), // top left
+      this.rowColHitTest(row - 1, col + 1), // top right
+      this.rowColHitTest(row + 1, col - 1), // bottom left
+      this.rowColHitTest(row + 1, col + 1)  // bottom right
     ]
   }
 

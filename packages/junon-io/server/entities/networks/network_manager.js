@@ -209,6 +209,26 @@ class NetworkManager {
       result.push(this.getTileHit(row + rowCount, col + i))
     }
 
+    //topleft
+    for(var i = 0; i < colCount ; i++) {
+      result.push(this.getTileHit(row-1, col-1))
+    }
+
+    //topright
+    for(var i = 0; i < colCount; i++) {
+      result.push(this.getTileHit(row-1, col+colCount))
+    }
+
+    //bottomleft
+    for(var i = 0; i < colCount; i++) {
+      result.push(this.getTileHit(row+rowCount, col-1))
+    }
+
+    //bottomright
+    for(var i = 0; i < colCount; i++) {
+      result.push(this.getTileHit(row+rowCount, col+colCount))
+    }
+
     return result
   }
 

@@ -105,13 +105,22 @@ class BaseBuilding extends BaseEntity {
   }
 
   setNeighbors(neighbors) {
-    let left  = !!neighbors[0].entity ? 1 : 0
-    let top   = !!neighbors[1].entity ? 1 : 0
-    let right = !!neighbors[2].entity ? 1 : 0
-    let down  = !!neighbors[3].entity ? 1 : 0
+    let left        = !!neighbors[0].entity ? 1 : 0
+    let top         = !!neighbors[1].entity ? 1 : 0
+    let right       = !!neighbors[2].entity ? 1 : 0
+    let down        = !!neighbors[3].entity ? 1 : 0
+    let topleft     = !!neighbors[4]?.entity ? 1 : 0
+    let topright    = !!neighbors[5]?.entity ? 1 : 0
+    let bottomleft  = !!neighbors[6]?.entity ? 1 : 0
+    let bottomright = !!neighbors[7]?.entity ? 1 : 0
 
     // or operation against bit index
     this.neighbors = 0
+
+    this.neighbors = this.neighbors | (bottomright  << 7)
+    this.neighbors = this.neighbors | (bottomleft  << 6)
+    this.neighbors = this.neighbors | (topright  << 5)
+    this.neighbors = this.neighbors | (topleft  << 4)
     this.neighbors = this.neighbors | (left  << 3)
     this.neighbors = this.neighbors | (top   << 2)
     this.neighbors = this.neighbors | (right << 1)
@@ -1299,10 +1308,14 @@ class BaseBuilding extends BaseEntity {
   }
 
   getShiftValueByDirection(direction) {
-    if (direction === "left")  return 3
-    if (direction === "up")    return 2
-    if (direction === "right") return 1
-    if (direction === "down")  return 0
+    if (direction === "bottomright") return 7
+    if (direction === "bottomleft")  return 6
+    if (direction === "topright")    return 5
+    if (direction === "topleft")     return 4
+    if (direction === "left")        return 3
+    if (direction === "up")          return 2
+    if (direction === "right")       return 1
+    if (direction === "down")        return 0
   }
 
   getOppositeNeighborDirection(index) {
@@ -1310,6 +1323,10 @@ class BaseBuilding extends BaseEntity {
     if (index === 1) return "down"
     if (index === 2) return "left"
     if (index === 3) return "up"
+    if (index === 4) return "bottomright"
+    if (index === 5) return "bottomleft"
+    if (index === 6) return "topright"
+    if (index === 7) return "topleft"
   }
 
   addToRoomNetwork() {

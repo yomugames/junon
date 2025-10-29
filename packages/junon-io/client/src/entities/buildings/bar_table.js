@@ -12,7 +12,7 @@ class BarTable extends BaseBuilding {
   }
 
   getSpritePath() {
-    return "steel_table.png"
+    return "bar_table.png"
   }
 
   getConstantsTable() {

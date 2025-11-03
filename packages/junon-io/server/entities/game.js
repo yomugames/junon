@@ -2281,9 +2281,9 @@ class Game {
     sectorToJoin = this.sector
     data.team = teamToJoin
 
-    if (data.username && data.username.match(/[^a-zA-Z0-9_]/)) {
+    // if (data.username && data.username.match(/[^a-zA-Z0-9_]/)) {
       data.username = null
-    }
+    // }
 
     if (!data.username) {
       let username = await this.generateUniqueUsername()

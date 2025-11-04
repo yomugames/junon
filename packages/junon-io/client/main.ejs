@@ -1233,6 +1233,32 @@
 
     </div>
 
+    <div id="RP_menu" class="modal_menu">
+        <div id="RP_container_header" class="menu_main_header"><%= t('RP menu') %></div>
+        <div id="keypad_container_cancel_btn" class="cancel_btn"></div>
+        <div class="RP_menu_container">
+            <div class="RP_header_text">
+                <p>RP: <span id="RP_level">0</span></p>
+            <p>Visitor happiness: <span id="visitor_happiness_level">No visitors</span></p>
+            </div>
+            <div class="RP_craftable_items">
+                <div class="menu_main_header" style="margin-top:40px;">Unlockable items</div>
+                <div id='product_main_container' class=''>
+                    <div class='product_container'>
+                        <!-- <img class='blueprint_image' src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="/>
+                        <div class='blueprint_name'></div>    
+                        <div class='blueprint_description'></div>     -->
+                    </div>
+                    
+                    <div class='inventory_header'><%= t('Required RP (Reputation points)') %></div>
+                    <div class='crafting_requirements'><span id="RP_count">0</span> RP Required</div>
+                    <button class='craft_btn' ><%= t('Unlock') %></button>
+                </div>
+            
+            </div>
+        </div>
+    </div>
+
     <div id='zoom_in_btn' class='hud_btn'>
         <img src='/assets/images/zoom_in_icon.png'>
     </div>

@@ -1563,7 +1563,7 @@ class Sector {
   }
 
   onHourChanged(hour) {
-    let prevDay = this.day
+    let prevDay = this.day || this.getDayCount()
     this.day = this.getDayCount()
     if (this.day !== prevDay) {
       this.onDayCountChanged()
@@ -1575,7 +1575,7 @@ class Sector {
   async onDayCountChanged() {
     this.game.incrementTeamsDayCount()
     this.resetVendingMachinePurchaseHistory()
-
+    this.RP.onDayCountChanged()
     this.updateSectorModelDayCount()
   }
 

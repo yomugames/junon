@@ -192,6 +192,11 @@ message RPUpdated {
   int32 visitorHappiness = 2;
 }
 
+message RPUpdated {
+  uint32 RP = 1;
+  uint32 visitorHappiness = 2;
+}
+
 message BadgeEquipped {
   Badge badge = 1;
   uint32 playerId = 2;

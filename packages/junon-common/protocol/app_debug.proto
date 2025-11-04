@@ -76,12 +76,16 @@ message Mob {
   uint32 oxygen = 26;
   bool isSleeping = 27;
   uint32 tasks = 28;
-  uint32 happiness = 29;
+  Happiness happiness = 29;
   string content = 30;
   BuildingType armorType = 31;
   uint32 raycastX = 51;
   uint32 raycastY = 52;
   Goal goals = 53;
+}
+
+message Happiness {
+  uint32 level = 1;
 }
 
 message Network {

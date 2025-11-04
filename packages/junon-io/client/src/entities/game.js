@@ -5135,6 +5135,7 @@ class Game {
       "camera mode": 117,         // f6
       "stats view": 116,         // f5
       "view badges": 66,          // b
+      "open RP menu":72,          // h
     }
 
     if (navigator.userAgent.search("Firefox") !== -1) {

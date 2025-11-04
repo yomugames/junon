@@ -2253,14 +2253,14 @@ class Game {
         data.isAuthenticated = true
       }
     } else if (data.username) {
-      let isTaken = false
-      isTaken = await User.isUsernameTaken(data.username)
-      let isTakenInServer = this.isUsernameTakenInServer(data.username)
-      if (isTaken || isTakenInServer) {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
-        return
-      }
-
+      data.username = '';
+      // let isTaken = false
+      // isTaken = await User.isUsernameTaken(data.username)
+      // let isTakenInServer = this.isUsernameTakenInServer(data.username)
+      // if (isTaken || isTakenInServer) {
+      //   this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
+      //   return
+      // }
     }
 
     let sectorToJoin
@@ -2281,9 +2281,9 @@ class Game {
     sectorToJoin = this.sector
     data.team = teamToJoin
 
-    // if (data.username && data.username.match(/[^a-zA-Z0-9_]/)) {
+    if (data.username && data.username.match(/[^a-zA-Z0-9_]/)) {
       data.username = null
-    // }
+    }
 
     if (!data.username) {
       let username = await this.generateUniqueUsername()

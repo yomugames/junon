@@ -18,48 +18,35 @@ class Floor extends BaseFloor {
   }
 
   getBuildingSprite(x, y) {
-    if(this.getTextureSpritePath() === "simplex_texture.png") {
-      let sprite = new PIXI.Container()
+    let sprite = new PIXI.Container()
 
-      this.baseSprite = new PIXI.Sprite(PIXI.utils.TextureCache["solid_texture.png"])
-      this.baseSprite.anchor.set(0.5)
+    this.baseSprite = new PIXI.Sprite(PIXI.utils.TextureCache["solid_texture.png"])
+    this.baseSprite.anchor.set(0.5)
 
-      // this.texture = new PIXI.Sprite(PIXI.utils.TextureCache["noiseTexture" + String(Math.floor(Math.random() * 6)) + ".png"])
-      const baseTexture = PIXI.utils.TextureCache[this.getTextureSpritePath()]
+    // this.texture = new PIXI.Sprite(PIXI.utils.TextureCache["noiseTexture" + String(Math.floor(Math.random() * 6)) + ".png"])
+    const baseTexture = PIXI.utils.TextureCache[this.getTextureSpritePath()]
 
 
-      if (this.getTextureSpritePath() === "simplex_texture.png") {
-        const chunk = new PIXI.Rectangle(x % (31 * 32), y % (31 * 32), 32, 32)
-        const texture = new PIXI.Texture(baseTexture, chunk)
-        this.texture = new PIXI.Sprite(texture)
-        this.texture.alpha = 0.2
-      } else {
-        this.texture = new PIXI.Sprite(baseTexture)
-      }
-
-      if (this.data.hasOwnProperty("colorIndex")) {
-        let color = this.game.colors[this.data.colorIndex]
-        this.baseSprite.tint = color.value
-        this.texture.tint = color.value
-      }
-
-      this.texture.anchor.set(0.5) 
-      this.baseSprite.addChild(this.texture)
-      sprite.addChild(this.baseSprite)
-      return sprite;
+    if (this.getTextureSpritePath() === "floormap.png") {
+      const chunk = new PIXI.Rectangle(x % (31 * 32), y % (31 * 32), 32, 32)
+      const texture = new PIXI.Texture(baseTexture, chunk)
+      this.texture = new PIXI.Sprite(texture)
+      this.texture.alpha = 0.2
+    } else {
+      this.texture = new PIXI.Sprite(baseTexture)
     }
-      
-      let sprite = new PIXI.Container()
-      this.baseSprite = new PIXI.Sprite(PIXI.utils.TextureCache[this.getTextureSpritePath()])
-      this.baseSprite.anchor.set(0.5)
 
-      if (this.data.hasOwnProperty("colorIndex")) {
-        let color = this.game.colors[this.data.colorIndex]
-        this.baseSprite.tint = color.value
-      }
-      
-      sprite.addChild(this.baseSprite)
-      return sprite;
+    if (this.data.hasOwnProperty("colorIndex")) {
+      let color = this.game.colors[this.data.colorIndex]
+      this.baseSprite.tint = color.value
+      this.texture.tint = color.value
+    }
+
+    this.texture.anchor.set(0.5)
+    
+    this.baseSprite.addChild(this.texture)
+    sprite.addChild(this.baseSprite)
+    return sprite;
   }
 
 

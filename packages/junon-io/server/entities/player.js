@@ -99,7 +99,6 @@ class Player extends BaseEntity {
     this.register()
 
     this.replacePhysicalGoldWithVirtual()
-    this.checkForBadges()
   }
 
   /**
@@ -109,50 +108,14 @@ class Player extends BaseEntity {
   async getUserCreatedAt() {
     if(!this.isLoggedIn()) return new Date()
     let user = await User.findOne({where: {uid: this.uid}})
-    if(!user) return
     return new Date(user.dataValues.createdAt)
-  }
-  
-  async checkForBadges() {
-    let user = await User.findOne({where: {uid: this.uid}})
-    if(!user) return;
-
-    if(!user.badges) user.badges = "no";
-    await user.save()
-
-    for(let i in Badges.badges) {
-      let badgeInstance = new Badges.badges[i]
-      let isQualified = await badgeInstance.isQualified(this)
-      if(isQualified) {
-        let isAlreadyInDB = await this.userHasBadge(badgeInstance.getId())
-        isAlreadyInDB || this.addUserBadgeToDB(badgeInstance.getId())
-      }
-    }
   }
   
   async getUserGold() {
     if(!this.isLoggedIn()) return 0;
     let user = await User.findOne({where: {uid: this.uid}});
-    if(!user) return;
     return user.dataValues.gold;
   }
-
-  async addUserBadgeToDB(badgeId) {
-    let user = await User.findOne({where: {uid: this.uid}})
-    if(!user) return
-    user.badges += "," + badgeId
-    await user.save();
-  }
-
-  async userHasBadge(badgeId) {
-    let user = await User.findOne({where: {uid: this.uid}})
-    if(!user || !user.badges) return
-
-    let badges = user.badges.split(",");
-
-    return badges.indexOf(badgeId) !== -1
-  }
-
 
   /**
    * Use await with this function!!!!
@@ -167,50 +130,25 @@ class Player extends BaseEntity {
 
     return diffDays > 730
   }
-
-  getBadgeKlass(id) {
-    return Badges.badges[map.get(id)]
-  }
-  /**
-   * get badge ids. 
-   * @returns {String|null} will be in format like "og,no,scr" or null
-   */
   async getBadges() {
     let badges = []
-    
-    for(let i in Badges.badges) {
-      let badgeInstance = new Badges.badges[i]
+     for(let badge in Badges) {
+      let badgeInstance = new Badges[badge]()
       badges.push({
         name: badgeInstance.getName(),
         description: badgeInstance.getDescription(),
         imageUrl: badgeInstance.getImageUrl(),
-        isQualified: await this.userHasBadge(badgeInstance.getId()),
+        isQualified: await badgeInstance.isQualified(this),
         color: badgeInstance.getColor()
       })
-    }
-
+     }
     return badges;
-
-    // let badges = []
-    //  for(let badge in Badges) {
-    //   let badgeInstance = new Badges[badge]()
-    //   badges.push({
-    //     name: badgeInstance.getName(),
-    //     description: badgeInstance.getDescription(),
-    //     imageUrl: badgeInstance.getImageUrl(),
-    //     isQualified: await badgeInstance.isQualified(this),
-    //     color: badgeInstance.getColor()
-    //   })
-    //  }
-    // return badges;
-
-    
   }
 
   async equipBadge(badgeName) {
     try {
-      let badge = new Badges.badges[badgeName]()
-      if(!await this.userHasBadge(badge.getId())) {
+      let badge = new Badges[badgeName]()
+      if(await badge.isQualified(this) === false) {
         return
       }
       this.badge = badge

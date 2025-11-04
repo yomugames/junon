@@ -70,7 +70,6 @@ Buildings.Atmospherics.GasPipe = require("./gas_pipe")
 // Buildings.Furnitures.Fridge = require("./fridge")
 // dynamically create klasses
 Buildings.Furnitures.Wall = require("./wall")
-// Buildings.Furnitures.Wall3d = require("./wall3d.js")
 
 for (let name in Constants.Walls) {
   if (!Buildings.Furnitures[name]) {
@@ -179,7 +178,6 @@ Buildings.Crops.CoffeeSeed = require("./crops/coffee_seed")
 Buildings.Crops.FiberSeed = require("./crops/fiber_seed")
 Buildings.Crops.PumpkinSeed = require("./crops/pumpkin_seed.js")
 Buildings.Crops.RiceSeed = require("./crops/rice_seed")
-Buildings.Crops.CabbageSeed = require("./crops/cabbage_seed.js")
 
 // dynamically create klasses
 for (let name in Constants.Crops) {

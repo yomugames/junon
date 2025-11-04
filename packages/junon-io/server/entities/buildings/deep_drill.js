@@ -21,6 +21,13 @@ class DeepDrill extends BaseProcessor {
     return isBuildingValid && isOnOil && isNotOnEmptyTile
   }
 
+  isRPItem() {
+    return true;
+  }
+
+  getRequiredRP() {
+    return 20;
+  }
 
   getConstantsTable() {
     return "Buildings.DeepDrill"

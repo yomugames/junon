@@ -76,7 +76,7 @@ class ColorPickerMenu extends BaseMenu {
       if (this.textureIndex) {
         building.setTextureIndex(this.textureIndex)
         let value = this.game.floorTextures[this.textureIndex]
-        if(value !== 'simplex_texture.png') building.baseSprite.texture = PIXI.utils.TextureCache[value]
+        if(value !== 'floormap.png') building.baseSprite.texture = PIXI.utils.TextureCache[value]
       }
     }
   }

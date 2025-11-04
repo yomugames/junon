@@ -71,20 +71,27 @@ class TradeOrder {
       if(this.sector.sellables[this.klass.prototype.getTypeName()] && this.customer.gold >= this.getTotalPurchaseCost()) {
         return true;
       }
-    } else if (this.isSoldBySlaveTrader()) {
-      return this.customer.gold >= this.getTotalPurchaseCost();
-    } else if (entity.storage) {
-      //for vending machines. ensure the item is stored, to prevent buying an item that doesn't exist
-      const itemExistsOnStorage = entity.storage[this.index].type === this.type
-      if (!itemExistsOnStorage) return false
+    }
+
+    if(this.isSoldBySlaveTrader()) {
       return this.customer.gold >= this.getTotalPurchaseCost()
     }
-    return false
+
+    if(!entity) {
+      return false
+    }
+
+    //for vending machines. ensure the item is stored, to prevent buying an item that doesn't exist
+    if (entity.storage) {
+      const itemExistsOnStorage = entity.storage[this.index].type === this.type
+      if (!itemExistsOnStorage) return false
+    }
+
+    return this.customer.gold >= this.getTotalPurchaseCost()
   }
 
   isSoldBySlaveTrader() {
-    //can't use include, because slave trader would be included
-    return this.klass.prototype.getTypeName().slice(-5) === "Slave"
+    return this.klass.prototype.getTypeName().includes("Slave")
   }
 
   canSell() {
@@ -196,10 +203,7 @@ class TradeOrder {
 
   executeSell() {
     let typeName = this.getPurchaseTypeName()
-    if (typeName === "Gold") {
-      this.customer.showError("Leave and rejoin to sell gold")
-      return;
-    }
+    if (typeName === "Gold") return
 
     if (!this.hasSellPrivilege(this.customer)) {
       this.customer.showError("You dont have permission to sell", { isWarning: true })
@@ -209,7 +213,6 @@ class TradeOrder {
     if (this.entityId) {
       let entity = this.game.getEntity(this.entityId)
       if (!entity) return
-      if (entity.type != this.type) return;
 
       if(!entity.isMob() && !entity.isItem()) {
         this.customer.showError("Invalid sell item")
@@ -240,11 +243,6 @@ class TradeOrder {
       } else {
         let item = this.customer.getSellStorage()[this.index]
         if (!item) return
-
-        if(item.type !== this.type) {
-          this.customer.showError("Something went wrong.")
-          return
-        }
 
         if (item.count < this.count) {
           this.customer.showError("Not enough items available", { isWarning: true })

@@ -569,69 +569,6 @@ class MatchmakerServer {
       res.end()
     })
 
-    app.options('/give_badge', (res, req) => {
-      res.writeHeader('Access-Control-Allow-Origin','*')
-      res.writeHeader('Access-Control-Allow-Methods','POST, GET, OPTIONS, DELETE')
-      res.writeHeader('Access-Control-Allow-Headers','Origin, X-Requested-With, Content-Type, Accept')
-      res.end()
-    })
-
-    app.post('/give_badge', (res, req) => {
-      res.writeHeader('Access-Control-Allow-Origin','*')
-      this.readJson(res).then(async (body) => {
-        try {
-          if(!body.idToken) {
-            let data = { error: "Missing idToken. Make sure you are properly logged in." }
-            res.end(JSON.stringify(data));
-            return
-          }
-
-          let isMod = await this.isMod(body.idToken) 
-          if (!isMod) {
-            let data = {error: "Invalid credentials." }
-            res.end(JSON.stringify(data))
-            return
-          }
-
-          if(!body.username) {
-            let data = { error: "Missing username of event winner."}
-            res.end(JSON.stringify(data))
-            return
-          }
-
-          let user = await User.findOne({
-            where: {username: body.username}
-          })
-
-          if(!user) {
-            let data = {error: "That username doesn't exist"}
-            res.end(JSON.stringify(data))
-            return;
-          }
-
-          if(!user.badges) {
-            user.badges = "ev"
-            res.end(JSON.stringify({success: body.username + " was given event badge."}))
-            return
-          }
-          if(user.badges.split(',').indexOf("ev") != -1) {
-            res.end(JSON.stringify({success: body.username + " already has the event badge"}))
-            return
-          }
-
-          user.badges += ",ev"
-          user.save();
-
-          res.end(JSON.stringify({success: body.username + " was given the event badge."}))
-        }
-        catch(e) {
-          ExceptionReporter.captureException(e)
-          let data = { error: "Error giving badge."}
-          res.end(JSON.stringify(data))
-        }
-      })
-    })
-    
     app.post('/create_ban', async (res, req) => {
       res.writeHeader('Access-Control-Allow-Origin','*')
 
@@ -1650,10 +1587,7 @@ class MatchmakerServer {
             pendingSector.onCreateSuccess({ success: true, host: data.host, sectorId: data.sectorId, profile: profile, sector: data.sector, isGameReady: data.isGameReady })
           }
         } else {
-          //clean up data.sector (contains player ip addresses). Possibly other sensitive data depending on the context, but should be fine.
-          let copy = { ...data.sector }
-          copy.creatorIp = null
-          this.socketUtil.emit(playerSocket, eventName, { success: true, host: data.host, sectorId: data.sectorId, profile: profile, sector: copy, isGameReady: data.isGameReady })
+          this.socketUtil.emit(playerSocket, eventName, { success: true, host: data.host, sectorId: data.sectorId, profile: profile, sector: data.sector, isGameReady: data.isGameReady })
         }
       } else {
         if (data.isMiniGame) {
@@ -1760,22 +1694,6 @@ class MatchmakerServer {
     LOG.info("server " + socket.host + " removing sector: " + data.sectorId)
 
     server.removeSector(data.sectorId)  
-  }
-
-  async addBadgeToUser(uid, badgeId) {
-    let user = await User.findOne({where: {uid: uid}})
-    if(!user) return
-    user.badges += badgeId + ","
-    await user.save();
-  }
-
-  async userHasBadge(uid, badgeId) {
-    let user = await User.findOne({where: {uid: uid}})
-    if(!user || !user.badges) return
-
-    let badges = user.badges.split(",");
-
-    return badges.indexOf(badgeId) !== -1
   }
 
   onRoundStarted(data, socket) {

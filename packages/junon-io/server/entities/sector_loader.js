@@ -123,7 +123,7 @@ class SectorLoader {
   updateWallNeighbors() {
     for (var i = 0; i < this.walls.length; i++) {
       let wall = this.walls[i]
-      let neighbors = this.sector.armorMap.getNeighborsAllowEmpty(wall.getRow(), wall.getCol(), true)
+      let neighbors = this.sector.armorMap.getNeighborsAllowEmpty(wall.getRow(), wall.getCol())
       wall.setNeighbors(neighbors)
     }
   }

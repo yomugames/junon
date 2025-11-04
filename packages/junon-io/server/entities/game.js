@@ -2260,14 +2260,14 @@ class Game {
         data.isAuthenticated = true
       }
     } else if (data.username) {
-      data.username = '';
-      // let isTaken = false
-      // isTaken = await User.isUsernameTaken(data.username)
-      // let isTakenInServer = this.isUsernameTakenInServer(data.username)
-      // if (isTaken || isTakenInServer) {
-      //   this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
-      //   return
-      // }
+      let isTaken = false
+      isTaken = await User.isUsernameTaken(data.username)
+      let isTakenInServer = this.isUsernameTakenInServer(data.username)
+      if (isTaken || isTakenInServer) {
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
+        return
+      }
+
     }
 
     let sectorToJoin

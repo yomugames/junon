@@ -36,8 +36,7 @@ class RailTrack extends BaseBuilding {
   redrawSprite() {
     let tiles = this.convertNeighborsToSideHits(this.neighbors)
     for (let direction in tiles) {
-      let dontInclude = ["topright", "topleft", "bottomright", "bottomleft"]
-      if (!tiles[direction] || dontInclude.indexOf(direction) !== -1) {
+      if (!tiles[direction]) {
         delete tiles[direction]
       }
     }

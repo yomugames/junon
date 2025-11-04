@@ -894,10 +894,7 @@ class Server {
       })
     }
 
-    let game = junonServer.games[data.sectorUid]
-    if(game) {
-      game.deleteForever()
-    }
+    player.game.deleteForever()
   }
 
   async onKickPlayer(data) {

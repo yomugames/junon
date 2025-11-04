@@ -10,7 +10,6 @@ Foods.Raw.HumanMeat = require("./human_meat")
 Foods.Raw.AnimalMeat = require("./animal_meat")
 Foods.Raw.Wheat = require("./wheat")
 Foods.Raw.Rice = require("./rice")
-Foods.Raw.Cabbage = require("./cabbage")
 
 Foods.Cooked = {}
 Foods.Cooked.Potato = require("./potato")

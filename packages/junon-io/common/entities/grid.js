@@ -1,5 +1,5 @@
 const Constants = require('./../constants.json')
-  const Helper = require('./../helper')
+const Helper = require('./../helper')
 
 class Grid {
   constructor(name, container, rowCount, colCount, emptyValue = 0) {
@@ -101,23 +101,15 @@ class Grid {
     return this.isOccupied(x, y, width, height, checkFull)
   }
 
-  isOccupied(x, y, width, height, checkFull = false, includeWalls = (this.name === "wall")) {
+  isOccupied(x, y, width, height, checkFull = false) {
     let isOneBlock = (width === this.tileSize && height === this.tileSize)
 
     if (isOneBlock) {
       const position = this.getTilePosition(x, y)
       if (this.isOutOfBounds(position.row, position.col)) return true
 
-      let isTileFilled = this.mapData[position.row][position.col] !== this.EMPTY_VALUE
-
-      let mapdata = this.mapData[position.row][position.col]
-      if(!includeWalls && mapdata) {
-        if (mapdata && mapdata.hasCategory && mapdata.hasCategory("wall")) {
-          isTileFilled = false;
-        }
-      }
-      
-      return isTileFilled;
+      const isTileFilled = this.mapData[position.row][position.col] !== this.EMPTY_VALUE
+      return isTileFilled
     } else {
       const box = {
         pos: {
@@ -128,7 +120,7 @@ class Grid {
         h: height
       }
 
-      return checkFull ? this.isBoxFullyOccupied(box, includeWalls) : this.isBoxOccupied(box, includeWalls)
+      return checkFull ? this.isBoxFullyOccupied(box) : this.isBoxOccupied(box)
     }
   }
 
@@ -439,17 +431,14 @@ class Grid {
     return coord
   }
 
-  isBoxOccupied(box, includeWalls) {
-    return this.getOccupancy(box, includeWalls).occupied.length > 0
+  isBoxOccupied(box) {
+    return this.getOccupancy(box).occupied.length > 0
   }
 
-  getOccupancy(box, includeWalls) {
+  getOccupancy(box) {
     const hits = this.hitTestTile(box)
     const occupied = hits.filter((hit) => {
-      let noEntityPresent = hit.entity === this.EMPTY_VALUE
-      if(!noEntityPresent && !includeWalls && hit.entity.constructor.name.includes("Wall")) {
-        noEntityPresent = true;
-      }
+      const noEntityPresent = hit.entity === this.EMPTY_VALUE
       const outOfBoundsIndicator = hit.entity === null
 
       if (noEntityPresent) {
@@ -468,8 +457,8 @@ class Grid {
     }
   }
 
-  isBoxFullyOccupied(box, includeWalls) {
-    const occupancy = this.getOccupancy(box, includeWalls)
+  isBoxFullyOccupied(box) {
+    const occupancy = this.getOccupancy(box)
     const boxTileCount = box.w/Constants.tileSize * box.h/Constants.tileSize
 
     return occupancy.occupied.length > 0 && occupancy.occupied.length === boxTileCount
@@ -675,19 +664,13 @@ class Grid {
     })
   }
 
-  getNeighborsAllowEmpty(row, col, walls = false) {
-    let retValue = []
-    retValue.push(this.rowColHitTest(row, col - 1)); // left
-    retValue.push(this.rowColHitTest(row - 1, col)); // top
-    retValue.push(this.rowColHitTest(row, col + 1)); // right
-    retValue.push(this.rowColHitTest(row + 1, col)); // down
-    if (walls) {
-      retValue.push(this.rowColHitTest(row - 1, col - 1)); // top left
-      retValue.push(this.rowColHitTest(row - 1, col + 1)); // top right
-      retValue.push(this.rowColHitTest(row + 1, col - 1)); // bottom left
-      retValue.push(this.rowColHitTest(row + 1, col + 1));  // bottom right
-    }
-    return retValue;
+  getNeighborsAllowEmpty(row, col) {
+    return [
+      this.rowColHitTest(row    , col - 1), // left
+      this.rowColHitTest(row - 1, col    ), // top
+      this.rowColHitTest(row    , col + 1), // right
+      this.rowColHitTest(row + 1, col    )  // down
+    ]
   }
 
   raycast(x1, y1, x2, y2, maxLength, entityToIgnore) {

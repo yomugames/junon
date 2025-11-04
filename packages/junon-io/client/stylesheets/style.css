@@ -5785,6 +5785,22 @@ html[lang='ja'] .mobile_authentication_container .btn {
     vertical-align: bottom;
 }
 
+.item_selection {
+    background-color: #222;
+    border:1px solid #000;
+    padding:5px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width:fit-content;
+}
+.item_selection:hover {
+    background-color: #333;
+}
+.item_selection.selected {
+    background-color: #333;
+}
+
 #soil_menu .menu_main_header {
     font-family: 'cc';
     font-size: 24px;
@@ -7648,10 +7664,6 @@ body.minigame #map_menu_frame {
     background-color: #111;
     padding-left: 5px;
     padding-top: 5px;
-}
-
-#badge_submit {
-    margin-top: 10px;
 }
 
 .open_ban_list_btn {

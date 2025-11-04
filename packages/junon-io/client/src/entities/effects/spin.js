@@ -18,7 +18,7 @@ class Spin extends BaseEffect {
     const tween = new TWEEN.Tween(rotation)
         .to({ rotation: 360 * PIXI.DEG_TO_RAD }, 1500)
         .onUpdate(() => {
-          if (this.affectedEntity.getEffectableSprite && this.affectedEntity.getEffectableSprite()) {
+          if (this.affectedEntity.getEffectableSprite()) {
             this.affectedEntity.getEffectableSprite().rotation = rotation.rotation
           }
         })

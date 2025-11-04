@@ -1,17 +1,8 @@
-const Player = require("../player");
-
 class BaseBadge {
-    getId() {
-        throw new Error('Must implement getId()')
-    }
     getName() {
         throw new Error('Must implement getName()')
     }
 
-    /**
-     * Will be automatically executed by Player.constructor, return false if you don't want this.
-     * @param {Player} player 
-     */
     isQualified(player) {
         throw new Error('Must implement isQualified()')
     }

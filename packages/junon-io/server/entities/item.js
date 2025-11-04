@@ -496,6 +496,9 @@ class Item extends BaseTransientEntity {
 
     this.clientMustDelete = true
 
+    if(this.getSector().entityCustomStats[this.id]) {
+      delete this.getSector().entityCustomStats[this.id]
+    }
     // this.setOwner(this.getSector())
 
     if (this.instance) {

@@ -15,7 +15,6 @@ Mobs.Trooper = require("./trooper")
 Mobs.Chemist = require("./chemist")
 Mobs.Prisoner = require("./prisoner")
 
-Mobs.Visitor = require("./visitor")
 Mobs.Pirate = require("./pirate")
 Mobs.Mutant = require("./mutant")
 Mobs.Trader = require("./trader")

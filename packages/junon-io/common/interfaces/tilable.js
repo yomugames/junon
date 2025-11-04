@@ -16,8 +16,13 @@ Tilable.prototype = {
     throw new Error("must implement Tilable#getTextures")
   },
 
+  /**
+   * Function to change the sprite of a wall.
+   * Runs every time a wall sprite has to be changed. If a wall is placed, not only the wall being placed will call but the walls around will call this.
+   * @param {Object} tiles Tiles that the wall that is being changed touches. Example: {up: true, down: true, left: true, right: true}
+   * @param {Object} targetSprite Sprite of wall to be changed
+   */
   layoutTile(tiles = this.getSides(), targetSprite = this.getTileSprite()) {
-
     const numOfTiles = Object.keys(tiles).length
 
     switch(numOfTiles) {
@@ -43,7 +48,7 @@ Tilable.prototype = {
     }
 
   },
-
+  
   isStraightLine(tiles) {
     return (tiles["left"] && tiles["right"]) || (tiles["up"] && tiles["down"])
   },

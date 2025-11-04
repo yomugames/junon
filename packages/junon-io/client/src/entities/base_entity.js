@@ -49,17 +49,6 @@ class BaseEntity {
     }
   }
 
-  isRPItem() {
-    return false;
-  }
-
-  getRequiredRP() {
-    if(!this.getConstants().requiredRP) {
-      throw new Error("Must implement getRequiredRP, or add a requiredRP field in constants.json")
-    }
-    return this.getConstants().requiredRP
-  }
-
   canMenuBeOpened() {
     return true
   }

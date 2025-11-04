@@ -39,7 +39,8 @@ class CarpetFloor extends BaseFloor {
   redrawSprite() {
     let tiles = this.convertNeighborsToSideHits(this.neighbors)
     for (let direction in tiles) {
-      if (!tiles[direction]) {
+      let dontInclude = ["topright", "topleft", "bottomright", "bottomleft"]
+      if (!tiles[direction] || dontInclude.indexOf(direction) !== -1) {
         delete tiles[direction]
       }
     }

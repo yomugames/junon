@@ -21,13 +21,6 @@ class DeepDrill extends BaseBuilding {
     return isBuildingValid && isOnOil && isNotOnEmptyTile
   }
 
-  isRPItem() {
-    return true;
-  }
-
-  getRequiredRP() {
-    return 20
-  }
 
  onBuildingConstructed() {
     super.onBuildingConstructed()

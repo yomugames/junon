@@ -8,7 +8,7 @@ function Drainable(usage, capacity, entity, resource) {
 Drainable.prototype = {
   initDrainable(initialUsage) {
     this.setContent(null)
-    this.usage = initialUsage || 0
+    this.usage = initialUsage
     this.prevUsage = null
   },
 

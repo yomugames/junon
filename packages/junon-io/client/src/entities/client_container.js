@@ -198,6 +198,10 @@ ClientContainer.prototype = {
   createEntity(data, group) {
     data.container = this
     let entity = this.game.createEntity(group, data)
+    if(entity.getChunk && this.chunks[entity.getChunk().id][group]) {
+      this.chunks[entity.getChunk().id][group][entity.id] = entity
+      //chunk.register() isn't always called, and removeStale() which is the primary removing function, wil not be called. Since sector[group] seems to be always populated, we will just add it to the chunk so that projectiles will always be removed.
+    }
     this[group][entity.id] = entity
 
     return entity

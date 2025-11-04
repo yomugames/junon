@@ -81,13 +81,15 @@ class Airlock extends BaseBuilding {
     let armorHits = container.armorMap.hitTestTile(this.prototype.getBox(x, y, w, h))
     const isEnemyArmor = armorHits.find((hit) => { return hit.entity && !hit.entity.isOwnedBy(player) })
     if (isEnemyArmor) return false
-    if (armorHits.length === 2) return true
 
+
+
+    //used armorhits.length > 2 to bypass container.structureMap.isOccupied. Need to fix this
     return  this.isOnValidPlatform(container, x, y, w, h, angle, player) &&
                              !this.isOnHangar(container, x, y, w, h) &&
                              !this.hasRailNeighbor(container, x, y, w, h) &&
                              !container.railMap.isOccupied(x, y, w, h) &&
-                             !container.structureMap.isOccupied(x, y, w, h)
+                             !container.structureMap.isOccupied(x, y, w, h) //false is for ignoring walls, like we used to when they weren't classified as structures. 
   }
 
   interact(user) {

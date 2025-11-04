@@ -17,7 +17,8 @@ const ClientHelper = require("./../../util/client_helper")
 const SpriteEventHandler = require("./../../util/sprite_event_handler")
 const BaseBuildingCommon = require("./../../../../common/entities/base_building_common")
 const NetworkSprite = require("./../network_sprite")
-const BitmapText = require("../../util/bitmap_text")
+const BitmapText = require("../../util/bitmap_text");
+const Grid = require("../../../../common/entities/grid");
 
 let attributeHandlers = {}
 
@@ -1589,6 +1590,12 @@ class BaseBuilding extends BaseEntity {
     return hit.row === otherHit.row && hit.col === otherHit.col
   }
 
+  static getSurroundingTiles(tilemap, box) {
+    let hits = tilemap.hitTestTile(box)
+    hits.splice(4,1)
+    return hits;
+  }
+
   static getSideTiles(tilemap, relativeBox) {
     const paddedRelativeBox = this.getPaddedRelativeBox(relativeBox)
     let checkFull = false
@@ -1610,11 +1617,18 @@ class BaseBuilding extends BaseEntity {
     })
   }
 
+  getSurroundingTiles(tilemap=this.getSideHitTileMaps()[0], box=this.getPaddedBox()) {
+    return this.constructor.getSurroundingTiles(tilemap, box)
+  }
+ 
   getSideTiles(tilemap) {
     let relativeBox = this.getRelativeBox()
     return this.constructor.getSideTiles(tilemap, relativeBox)
   }
 
+  /**
+   * @returns {Array<Grid>}
+   */
   getSideHitTileMaps() {
     let tileMaps = [this.getMap()]
 
@@ -1683,6 +1697,21 @@ class BaseBuilding extends BaseEntity {
   getCoreHits() {
     return this.getMap().hitTestTile(this.getRelativeBox())
   }
+  // for loop that detects if hit.entity == 
+ getSurroundingHitsFor(tilemap = this.getSideHitTileMaps()[0]) {
+   const directions = ["topleft", "up", "topright", "left", "right", "bottomleft", "down", "bottomright"];
+
+  const result = { topleft: false, up: false, topright: false, left: false, right: false, bottomleft: false, down: false, bottomright: false };
+
+  const surroundingTiles = this.getSurroundingTiles();
+
+  for (let i = 0; i < surroundingTiles.length; i++) {
+    const hit = surroundingTiles[i];
+    result[directions[i]] = !!hit.entity;
+  }
+
+  return result;
+} 
 
   getSideHitsFor(tilemap) {
     const result = { left: [], up: [], right: [], down: [] }
@@ -1776,10 +1805,14 @@ class BaseBuilding extends BaseEntity {
   convertNeighborsToSideHits() {
     let neighbors = this.neighbors
     return {
-      "left":  !!((neighbors >> 3) & 1),
-      "up":    !!((neighbors >> 2) & 1),
-      "right": !!((neighbors >> 1) & 1),
-      "down":  !!((neighbors >> 0) & 1)
+      "bottomright": !!((neighbors >> 7) & 1),
+      "bottomleft":  !!((neighbors >> 6) & 1),
+      "topright":    !!((neighbors >> 5) & 1),
+      "topleft":     !!((neighbors >> 4) & 1),
+      "left":        !!((neighbors >> 3) & 1),
+      "up":          !!((neighbors >> 2) & 1),
+      "right":       !!((neighbors >> 1) & 1),
+      "down":        !!((neighbors >> 0) & 1)
     }
   }
 

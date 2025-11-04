@@ -688,7 +688,7 @@
     "xchecker_texture":    { "index": 9 },
     "x_texture":           { "index": 10 },
     "noise_texture":       { "index": 11 },
-    "floormap":            { "index": 12 }
+    "simplex_texture":     { "index": 12 }
   },
   "SuitColors": {
     "gray":   { "index": 1 , "value": "#999999" },
@@ -1897,6 +1897,14 @@
       "yield": "PlantFiber",
       "description": "Plant on soil to grow fiber"
     },
+    "CabbageSeed": {
+      "parent": "Crops.BaseSeed",
+      "cost": {
+        "gold": 30
+      },
+      "yield": "Cabbage",
+      "description": "Plant on soil to grow cabbage"
+    },
     "PotatoSeed": {
       "parent": "Crops.BaseSeed",
       "cost": {
@@ -2843,6 +2851,7 @@
     "AlienMeat": {
       "width": 24,
       "height": 24,
+      "isIngredient": true,
       "cost": {
         "gold": 5
       },
@@ -2924,6 +2933,7 @@
     "Bread": {
       "width": 24,
       "height": 24,
+      "isIngredient": true,
       "sprite": {
         "position": {
           "x": 32,
@@ -3008,9 +3018,32 @@
       "upgrade": {},
       "description": "Cooked Human meat"
     },
+    "Cabbage": {
+      "width": 24,
+      "height": 24,
+      "isIngredient": true,
+      "cost": {
+        "gold": 150
+      },
+      "sprite": {
+        "position": {
+          "x": 32,
+          "y": 0
+        },
+        "width":32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food":45
+      },
+      "upgrade": {},
+      "description": "A nice plump cabbage. A miracle it was able to grow here."
+    },
     "Potato": {
       "width": 24,
       "height": 24,
+      "isIngredient": true,
       "cost": {
         "gold": 150
       },
@@ -3025,7 +3058,7 @@
         "food": 40
       },
       "upgrade": {},
-      "description": "Staple food for Survival."
+      "description": "Staple food for survival."
     },
     "Wheat": {
       "width": 24,
@@ -3137,6 +3170,7 @@
     "Pumpkin": {
       "width": 24,
       "height": 24,
+      "isIngredient": true,
       "cost": {
         "gold": 80
       },
@@ -3304,6 +3338,7 @@
       "cost": {
         "gold": 200
       },
+      "isIngredient": true,
       "sprite": {
         "anchor": 0.5
       },
@@ -3515,6 +3550,7 @@
       "isStackable": true,
       "shouldShowUsage": false,
       "isUnbreakable": true,
+      "isIngredient": true,
       "cost": {
         "gold": 100
       },

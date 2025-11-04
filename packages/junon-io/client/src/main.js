@@ -10,6 +10,7 @@ const PvPExplorer = require("./components/pvp_explorer")
 const SettingsMenu = require("./components/settings_menu")
 const MiniGameDetailsMenu = require("./components/minigame_details_menu")
 const BanManager = require("./components/ban_manager")
+const EventBadgeManager = require("./components/event_badge_manager")
 const GameConnection = require("./components/game_connection")
 const ExceptionReporter = require("./util/exception_reporter")
 const ClientHelper = require("./util/client_helper")
@@ -860,6 +861,7 @@ class Main {
 
   initBanManagerMenu() {
     this.banManager = new BanManager(this)
+    this.eventBadgeManager = new EventBadgeManager(this)
   }
 
   getCookieInstance() {
@@ -1509,6 +1511,7 @@ class Main {
     document.querySelector(".imposter_game_mode_entry").addEventListener("click", this.onImposterGameModeClick.bind(this), true)
     document.querySelector(".invite_link_copy_btn").addEventListener("click", this.onCopyInviteLinkBtnCLick.bind(this), true)
     document.querySelector(".open_ban_list_btn").addEventListener("click", this.onOpenBanListClick.bind(this), true)
+    document.querySelector(".open_event_badges_btn").addEventListener("click", this.onOpenEventBadgesMenu.bind(this), true)
 
     // disable right click because it causes some keyup event listener not firing bug (that causes player to move indefinitely)
     document.addEventListener("contextmenu", function(e){
@@ -1562,6 +1565,10 @@ class Main {
 
   onOpenBanListClick() {
     this.banManager.open()
+  }
+
+  onOpenEventBadgesMenu() {
+    this.eventBadgeManager.open()
   }
 
   onCopyInviteLinkBtnCLick() {
@@ -2110,6 +2117,7 @@ class Main {
 
     if (isMod) {
       document.querySelector(".open_ban_list_btn").style.display = 'block'
+      document.querySelector(".open_event_badges_btn").style.display = 'block'
     }
 
     this.isUserAuthenticated = true

@@ -26,7 +26,7 @@ class DeepDrill extends BaseProcessor {
   }
 
   getRequiredRP() {
-    return 20;
+    return 80;
   }
 
   getConstantsTable() {

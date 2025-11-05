@@ -11,7 +11,7 @@ class RP {
         if(this.sector.isPeaceful()) return;
 
         let daycount = this.sector.getDayCount()
-        if (daycount < 2/*10*/) return;
+        if (daycount < 10) return;
 
         if (this.sector.visitors) {
             let totalHappiness = 0;

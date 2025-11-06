@@ -8,9 +8,26 @@ const Equipper = require('../../../../common/interfaces/equipper')
 class Visitor extends LandMob {
     constructor(game, data) {
         super(game, data)
-
+        this.happiness = data.Happiness.level || 0;
         this.initEquipper();
     }
+    
+    syncWithServer(data) {
+        super.syncWithServer(data)
+        this.setHappiness(data.Happiness);
+    }
+
+    setHappiness(happiness) {
+        if(happiness.level == this.happiness) return
+        if(happiness.level > this.happiness) {
+            this.animateHappy(true)
+        }
+        if(happiness.level < this.happiness) {
+            this.animateHappy(false)
+        } 
+        this.happiness = happiness.level;
+    }
+
     animateEquipment() {
         let targetPosition = this.getMeleeTarget()
         this.attackTween = this.getMeleeChargeTween(targetPosition)

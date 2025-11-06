@@ -76,7 +76,7 @@ message Mob {
   uint32 oxygen = 26;
   bool isSleeping = 27;
   uint32 tasks = 28;
-  Happiness happiness = 29;
+  Happiness Happiness = 29;
   string content = 30;
   BuildingType armorType = 31;
   uint32 raycastX = 51;

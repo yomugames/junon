@@ -330,6 +330,11 @@ class BaseMenu {
     this.isCraftBtnHeld = false
   }
 
+  onItemUnlocked() {
+    this.showProductInfo(this.craftType)
+    this.animateUnlockSuccess({name: Protocol.definition().BuildingType[this.craftType], x: this.el.querySelector(".craft_btn").getBoundingClientRect().x, y: this.el.querySelector(".craft_btn").getBoundingClientRect().y})
+  }
+
   onCraftBtnHold() {
     if (this.isDisabled) return
     if (!this.craftType) return
@@ -338,7 +343,7 @@ class BaseMenu {
 
     this.isCraftBtnHeld = true
 
-    if(this.el.querySelector('.craft_btn').innerText == "Unlock") { // RP
+    if(this.el.querySelector('.craft_btn').innerText.includes("Unlock")) { // RP
       SocketUtil.emit("UnlockItem", {type: this.craftType})
 
       return;
@@ -457,7 +462,7 @@ class BaseMenu {
 
     if (this.game.sector.unlockedItems.indexOf(itemKlass.prototype.constructor.name) !== -1) return;
 
-    craftBtnEl.innerText = "Unlock";
+    craftBtnEl.innerText = `Unlock (${itemKlass.prototype.getRequiredRP()} RP)`;
 
     if(itemKlass.prototype.getRequiredRP() > this.game.sector.RPLevel) {
       productUnavailableEl.style.display = "block";

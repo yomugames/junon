@@ -18,6 +18,32 @@ class CraftMenu extends BaseMenu {
     this.showProductInfo(this.craftType)    
   }
 
+  animateUnlockSuccess(data) {
+    const itemName = data.name;
+    const friendlyItemName = itemName.replace(/([A-Z])/g, ' $1').trim();
+    const label = "Unlocked " + i18n.t(friendlyItemName);
+
+    const style = { fontFamily: 'PixelForce', fontSize: 28, fill: 0x00ff00, align: 'center', stroke: "#000000", strokeThickness: 5, miterLimit: 3 };
+    let text = document.createElement("span");
+    text.className = "craft_success_label";
+    text.innerText = label;
+    document.body.appendChild(text);
+
+    text.style.top = data.y + "px";
+    text.style.left = data.x + "px";
+
+    let position = { y: data.y };
+    var tween = new TWEEN.Tween(position)
+      .to({ y: data.y - 150 }, 1500)
+      .onUpdate(() => {
+        text.style.top = position.y + "px";
+      })
+      .onComplete(() => {
+        document.body.removeChild(text);
+      })
+      .start();
+  }
+
   getStorage() {
     return document.querySelector("#player_inventory")
   }

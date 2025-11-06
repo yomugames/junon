@@ -1582,7 +1582,7 @@ class Game {
 
   onItemUnlocked(data) {
     this.sector.unlockedItems.push(data.itemname)
-    this.blueprintMenu.showProductInfo(this.blueprintMenu.craftType)
+    this.blueprintMenu.onItemUnlocked()
   }
 
   onRPUpdated(data) {

@@ -21,7 +21,7 @@ class BaseTransientEntity {
   }
 
   isRPItem() {
-    return false;
+    return this.getConstants().isRPItem || false;
   }
   
   hasMetRPRequirements() {

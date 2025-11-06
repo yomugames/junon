@@ -50,7 +50,7 @@ class BaseEntity {
   }
 
   isRPItem() {
-    return false;
+    return this.getConstants().isRPItem || false;
   }
 
   getRequiredRP() {

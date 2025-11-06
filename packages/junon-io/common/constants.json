@@ -3679,6 +3679,8 @@
       "description": "Spread shot weapon. Each Deals Damage 12"
     },
     "PlasmaGun": {
+      "isRPItem": true,
+      "requiredRP": 50,
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
       "isFireArm": true,
@@ -3774,6 +3776,8 @@
       "description": "Shoots flames"
     },
     "SquidStaff": {
+      "isRPItem": true,
+      "requiredRP": 40,
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
       "isFireArm": true,
@@ -4112,6 +4116,8 @@
       "description": "Can slice through 3 enemies at a time. Damage 15."
     },
     "BlueEnergySword": {
+      "isRPItem": true,
+      "requiredRP": 40,
       "parent": "Equipments.MeleeEquipment",
       "isWeapon": true,
       "cost": {
@@ -6516,6 +6522,8 @@
       "description": "Platform for Rail Tram to travel on"
     },
     "RailStop": {
+      "isRPItem": true,
+      "requiredRP": 120,
       "width": 96,
       "height": 128,
       "cost": {

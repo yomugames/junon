@@ -469,7 +469,7 @@ class BaseMenu {
 
   hasMissingRequirements(requirements, itemKlass) {
     if(itemKlass && itemKlass.prototype.isRPItem()) {
-        if(this.game.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[itemKlass.prototype.getType()]) === -1) {
+        if(this.game.sector.gameMode != 'peaceful' && this.game.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[itemKlass.prototype.getType()]) === -1) {
         this.renderRP(itemKlass);
         if (this.game.sector.RPLevel < itemKlass.prototype.getRequiredRP()) {
           return true;

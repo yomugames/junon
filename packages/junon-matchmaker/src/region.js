@@ -12,10 +12,7 @@ class Region {
     this.name = name
 
     this.nodes = {}
-    this.cloudPvPSectors = {}
-    this.pvpBootStarted = {}
     this.rebootCount = {}
-    this.disconnectedPvPSectors = {}
 
     this.sectorsCreatedByIp = {}
     this.sectorsCreatedByPlayerUid = {}
@@ -27,23 +24,6 @@ class Region {
 
     this.chatHistory = []
 
-    if (!global.isOffline) {
-      FirebaseAdminHelper.listenToPvPSectors(this.name, this.onPvPSectors.bind(this))
-    }
-  }
-
-  isPvPEnabled() {
-    return this.name !== 'sgp1' && this.name !== 'fra1'
-  }
-
-  onPvPSectors(sectorUid, options = {}) {
-    if (options.isRemoved) {
-      delete this.cloudPvPSectors[sectorUid]
-    } else {
-      this.cloudPvPSectors[sectorUid] = true
-    }
-
-    this.detectDisconnectedPvPSectors()
   }
 
   incrementRebootCount(uid) {
@@ -53,69 +33,6 @@ class Region {
 
   getRebootCount(uid) {
     return this.rebootCount[uid] || 0
-  }
-
-  getRebootableDisconnectedPvPSectors() {
-    let result = {}
-
-    for (let uid in this.disconnectedPvPSectors) {
-      if (this.getRebootCount(uid) && this.getRebootCount(uid) >= 3) {
-        // dont include. unable to reboot
-      } else {
-        result[uid] = this.disconnectedPvPSectors[uid]
-      }
-    }
-
-    return result
-  }
-
-  detectDisconnectedPvPSectors() {
-    // if the list on firebase is not same as list here
-    let sectors = this.getCurrentPvPSectors()
-    let cloudSectors = this.getCloudPvPSectors()
-
-    for (let uid in this.disconnectedPvPSectors) {
-      if (!cloudSectors[uid]) {
-        // no longer registered in firebase, delete disconnected. we dont want to reboot it
-        LOG.info("sector " + uid + " is no longer in firebase. removing from disconnectedPvPSectors")
-        delete this.disconnectedPvPSectors[uid]
-        delete this.pvpBootStarted[uid]
-        delete this.rebootCount[uid]
-      }
-    }
-
-    for (let uid in cloudSectors) {
-      if (!sectors[uid] && !this.disconnectedPvPSectors[uid]) {
-        LOG.info("sector " + uid + " is missing. adding to disconnectedPvPSectors")
-        this.disconnectedPvPSectors[uid] = Date.now()
-      } else if (sectors[uid] && this.disconnectedPvPSectors[uid]) {
-        LOG.info("sector " + uid + " is present. removing from disconnectedPvPSectors")
-        delete this.disconnectedPvPSectors[uid]
-        delete this.rebootCount[uid]
-        delete this.pvpBootStarted[uid]
-      }
-    }
-  }
-
-
-  getCloudPvPSectors() {
-    return this.cloudPvPSectors
-  }
-
-  getCurrentPvPSectors() {
-    let sectors = {}
-
-    for (let nodeName in this.nodes) {
-      let node = this.nodes[nodeName]
-      node.forEachServer((server) => {
-        let sector = server.getPvPSector()
-        if (sector) {
-          sectors[sector.getUid()] = true
-        }
-      })
-    }
-
-    return sectors
   }
 
   hasExistingPlayerSession(uid) {

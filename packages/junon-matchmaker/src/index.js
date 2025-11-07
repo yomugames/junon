@@ -94,7 +94,6 @@ class MatchmakerServer {
      // this.topColonies = JSON.parse(require("fs").readFileSync('top_sectors.json', 'utf8'))
     this.periodicallyFetchTopSectors()
     this.periodicallyScaleNodes()
-    this.periodicallyCheckRegions()
     this.reportCrashedServers()
     this.initServerForPlayers()
     this.initWebsocketServerForGames()
@@ -111,16 +110,6 @@ class MatchmakerServer {
 
     let fifteenMinutes = 1000 * 60 * 15
     setTimeout(this.periodicallyScaleNodes.bind(this), fifteenMinutes)
-  }
-
-  periodicallyCheckRegions() {
-    let environment = this.getEnvironment()
-    environment.forEachRegion((region) => {
-      region.detectDisconnectedPvPSectors()
-    })
-
-    let tenSeconds = 1000 * 10
-    setTimeout(this.periodicallyCheckRegions.bind(this), tenSeconds)
   }
 
   async periodicallyFetchTopSectors() {

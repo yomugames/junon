@@ -6,6 +6,14 @@ module.exports = {
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
+  "staging": {
+    "username": process.env['JUNON_DB_USER'],
+    "password": process.env['JUNON_DB_PASS'],
+    "database": "junon_staging",
+    "host": process.env['JUNON_DB_HOST'],
+    "dialect": "mysql",
+    "logging": false
+  },
   "production": {
     "username": process.env['JUNON_DB_USER'],
     "password": process.env['JUNON_DB_PASS'],

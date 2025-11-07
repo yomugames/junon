@@ -3,6 +3,11 @@ const Protocol = require('../../../common/util/protocol')
 const BaseBuilding = require("./base_building")
 
 class Terminal extends BaseBuilding {
+  constructor(data, container) {
+    super(data, container)
+
+    this.sector.buildingCounts.terminalCount += 1;
+  }
 
   interact(user, action, content) {
     if (action === 'chat') {

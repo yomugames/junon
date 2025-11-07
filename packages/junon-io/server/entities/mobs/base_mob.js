@@ -18,6 +18,7 @@ const Corpse = require("./../corpse")
 const EventBus = require('eventbusjs')
 const ExceptionReporter = require('junon-common/exception_reporter')
 const Item = require("../item")
+const Room = require("../networks/room.js")
 
 const p2 = require("p2")
 const vec2 = p2.vec2
@@ -396,6 +397,10 @@ class BaseMob extends BaseEntity {
 
   createItem(type, options = {}) {
     return new Item(this, type, options)
+  }
+
+  setThirst() {
+    return;
   }
 
   setStatus(status) {
@@ -1217,17 +1222,36 @@ class BaseMob extends BaseEntity {
       this.weaponType = Protocol.definition().BuildingType.None
     }
 
+
+    if(this.getArmorItem() && !this.getArmorItem().isBuilding()) {
+      this.armorType = this.getArmorItem().getType()
+    } else {
+      this.armorType = Protocol.definition().BuildingType.None
+    }
+    
     // ensure owned by mob
     if (item && item.getOwner() !== this) {
       item.setOwner(this)
     }
 
-
     this.onStateChanged("weaponType")
+    this.onStateChanged("armorType")
   }
 
   getHandItem() {
     return this.equipments.get(Protocol.definition().EquipmentRole.Hand)
+  }
+
+  getArmorItem() {
+    return this.equipments.get(Protocol.definition().EquipmentRole.Armor)
+  }
+
+  retrieveHandItem() {
+    return this.equipments.retrieve(Protocol.definition().EquipmentRole.Hand)
+  }
+
+  retrieveArmorItem() {
+    return this.equipments.retrieve(Protocol.definition().EquipmentRole.Armor)
   }
 
   canReachGoal(goal) {
@@ -1942,6 +1966,10 @@ class BaseMob extends BaseEntity {
     return platform.getRoom()
   }
 
+  /**
+   * 
+   * @returns {Room}
+   */
   getRoom() {
     return this.getOccupiedRoom()
   }
@@ -2807,7 +2835,7 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
     return this.canDamage(target)
   },
   canDamage(target, checkTrap = true, allowWall = false) {
-    if (target.isMob() && target.status === Protocol.definition().MobStatus.Neutral) return false
+    if (target.isMob() && target.status === Protocol.definition().MobStatus.Neutral && Protocol.definition().MobType[target.type] !== "Visitor") return false
     if (this.isFriendlyUnit(target)) return false
     if (target.hasCategory("ghost")) return false
 

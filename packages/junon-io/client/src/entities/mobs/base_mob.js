@@ -263,6 +263,10 @@ class BaseMob extends BaseEntity {
     if (data.hasOwnProperty('weaponType')) {
       this.setWeaponType(data.weaponType)
     }
+    
+    if(data.hasOwnProperty('armorType')) {
+      this.setArmorType(data.armorType)
+    }
 
     if (data.hasOwnProperty("behavior")) {
       this.setBehavior(data.behavior)
@@ -302,8 +306,35 @@ class BaseMob extends BaseEntity {
     }
   }
 
+  setArmorType(armorType) {
+    if(!this.isEquipper()) return;
+    
+    if(this.armorType !== armorType) {
+      if(this.getArmorEquipment()) {
+        this.getArmorEquipment().remove()
+      }
+      
+      this.armorType = armorType;
+      if(armorType) {
+        this.initArmor(armorType);
+      }
+    }
+  }
+
   isEquipper() {
     return this.equipments
+  }
+
+  initArmor(armorType) {
+    let data = {
+      x: 0,
+      y: 0,
+      user: this,
+      instance: {}
+    }
+
+    let item = Item.getKlass(armorType).build(this.game, data)
+    this.setArmorEquipment(item)
   }
 
   initWeapon(weaponType) {
@@ -640,8 +671,7 @@ class BaseMob extends BaseEntity {
     this.game.sector.effectsContainer.addChild(sprite)
 
     let position = { y: this.getY() }
-
-    var tween = new TWEEN.Tween(position)
+var tween = new TWEEN.Tween(position)
         .to({ y: this.getY() - (Constants.tileSize * 1) }, 1000)
         .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
         .onUpdate(() => {
@@ -651,6 +681,32 @@ class BaseMob extends BaseEntity {
           this.game.sector.effectsContainer.removeChild(sprite)
         })
         .start()
+  }
+
+  animateHappy(happy=true) {
+    let sprite;
+    if(happy) {
+      sprite = new PIXI.Sprite(PIXI.utils.TextureCache["happiness_status.png"]);
+    } else {
+      sprite = new PIXI.Sprite(PIXI.utils.TextureCache["sadness_status.png"]);
+    }
+    sprite.anchor.set(0.5);
+    sprite.position.x = this.getX();
+    sprite.position.y = this.getY();
+    this.game.sector.effectsContainer.addChild(sprite);
+    let position = { y: this.getY() };
+
+    var tween = new TWEEN.Tween(position)
+      .to({ y: this.getY() - (Constants.tileSize * 1) }, 1000)
+      .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
+      .onUpdate(() => {
+        sprite.position.y = position.y;
+      })
+      .onComplete(() => {
+        this.game.sector.effectsContainer.removeChild(sprite);
+      })
+      .start();
+
   }
 
   onClick() {

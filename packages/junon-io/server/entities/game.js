@@ -40,8 +40,15 @@ const Commands = require("../commands/index")
 const Sidebar = require("./sidebar")
 const xss = require("xss")
 const IpBan = require("junon-common/db/ip_ban")
+const Server = require('../server')
 
 class Game {
+
+  /**
+   * 
+   * @param {Server} server 
+   * @param {Object} sectorData 
+   */
   constructor(server, sectorData = {}) {
     this.server = server
     this.gameStartTime = Date.now()
@@ -2253,14 +2260,14 @@ class Game {
         data.isAuthenticated = true
       }
     } else if (data.username) {
-      let isTaken = false
-      isTaken = await User.isUsernameTaken(data.username)
-      let isTakenInServer = this.isUsernameTakenInServer(data.username)
-      if (isTaken || isTakenInServer) {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
-        return
-      }
-
+      data.username = '';
+      // let isTaken = false
+      // isTaken = await User.isUsernameTaken(data.username)
+      // let isTakenInServer = this.isUsernameTakenInServer(data.username)
+      // if (isTaken || isTakenInServer) {
+      //   this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
+      //   return
+      // }
     }
 
     let sectorToJoin
@@ -2394,7 +2401,10 @@ class Game {
       isMiniGame: this.isMiniGame(),
       sidebar: this.sidebars[player.getId()],
       objectives: player.objectives,
-      dialogueMap: this.dialogueMap
+      dialogueMap: this.dialogueMap,
+      RP: player.sector.RP.level,
+      visitorHappiness: player.sector.visitorHappiness,
+      unlockedItems: player.sector.unlockedItems
     }
 
     if (this.serverRestartTimestamp) {

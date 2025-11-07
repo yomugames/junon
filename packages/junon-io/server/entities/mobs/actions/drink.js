@@ -1,20 +1,20 @@
 const BaseAction = require("./base_action")
-const Protocol = require('../../../../common/util/protocol')
+
 class Eat extends BaseAction {
 
   static setup(planner) {
     let item = planner.entity.getHandItem()
     if (!item) return false
-    if (!item.isFood()) return false
+    if (!item.isDrink()) return false
 
-    return { food: item }
+    return { drink: item }
   }
 
   perform(options) {
     this.planner.sector.registerEating({
       entity: this.planner.entity, 
-      food: options.food, 
-      finished: this.onEatingFinished.bind(this),
+      food: options.drink, 
+      finished: this.onDrinkingFinished.bind(this),
       progress: 0
     })
 
@@ -22,13 +22,13 @@ class Eat extends BaseAction {
   }
 
   getBehaviorName() {
-    return "Eat"
+    return "Drink"
   }
 
-  onEatingFinished(food, entity) {
-    if(entity.constructor.name === "Visitor" && Protocol.definition().BuildingType[food.type] === "SlimyMeatPizza") entity.Happiness.changeHappinessForEvent("eatSlimyMeatPizza")
-    food.use(entity)
+  onDrinkingFinished(drink, entity) {
+    drink.use(entity)
     entity.setDormant(false)
+    entity.Happiness.changeHappinessForEvent("drinkBeer")
     this.complete()
   }
 

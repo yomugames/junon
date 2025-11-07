@@ -24,7 +24,9 @@ class RemoteEventHandler {
     }
 
   }
-
+  onUnlockItem(player, data, socket) {
+    player.unlockItem(data.type)
+  }
   onPing(player, data, socket) {
     this.getSocketUtil().emit(socket, "Pong", {})
   }

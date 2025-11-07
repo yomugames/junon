@@ -3,7 +3,7 @@ const Upgradable = () => {
 
 Upgradable.prototype = {
   getConstantsTable() {
-    throw new Error("must implement getConstantsTable")
+    throw new Error(this.constructor.name + " must implement getConstantsTable")
   },
 
   hasArithmeticProgressionUpgrades() {

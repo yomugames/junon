@@ -330,6 +330,37 @@ class BaseMenu {
     this.isCraftBtnHeld = false
   }
 
+  onItemUnlocked() {
+    this.showProductInfo(this.craftType)
+    this.animateUnlockSuccess({name: Protocol.definition().BuildingType[this.craftType], x: this.el.querySelector(".craft_btn").getBoundingClientRect().x, y: this.el.querySelector(".craft_btn").getBoundingClientRect().y})
+  }
+
+  animateUnlockSuccess(data) {
+    const itemName = data.name;
+    const friendlyItemName = itemName.replace(/([A-Z])/g, ' $1').trim();
+    const label = "Unlocked " + i18n.t(friendlyItemName);
+
+    const style = { fontFamily: 'PixelForce', fontSize: 28, fill: 0x00ff00, align: 'center', stroke: "#000000", strokeThickness: 5, miterLimit: 3 };
+    let text = document.createElement("span");
+    text.className = "craft_success_label";
+    text.innerText = label;
+    document.body.appendChild(text);
+
+    text.style.top = data.y + "px";
+    text.style.left = data.x + "px";
+
+    let position = { y: data.y };
+    var tween = new TWEEN.Tween(position)
+      .to({ y: data.y - 150 }, 1500)
+      .onUpdate(() => {
+        text.style.top = position.y + "px";
+      })
+      .onComplete(() => {
+        document.body.removeChild(text);
+      })
+      .start();
+  }
+
   onCraftBtnHold() {
     if (this.isDisabled) return
     if (!this.craftType) return
@@ -337,6 +368,12 @@ class BaseMenu {
     if (this.el.querySelector(".craft_btn").dataset.disabled === "true") return
 
     this.isCraftBtnHeld = true
+
+    if(this.el.querySelector('.craft_btn').innerText.includes("Unlock")) { // RP
+      SocketUtil.emit("UnlockItem", {type: this.craftType})
+
+      return;
+    }
 
     let craftCount = parseInt(this.el.querySelector(".craft_count").value)
     if (isNaN(craftCount)) craftCount = 1
@@ -398,8 +435,7 @@ class BaseMenu {
     this.showRequirements(type)
   }
 
-  isBuildingAllowedInGame(type) {
-    if (this.game.isPvP()) {
+  isBuildingAllowedInGame(type) { if (this.game.isPvP()) {
       let notAllowedList = ["Atm", "RailStop", "RailTrack", "Beacon"]
       notAllowedList = notAllowedList.map((name) => {
         return Protocol.definition().BuildingType[name]
@@ -428,6 +464,7 @@ class BaseMenu {
   }
 
   showRequirements(type) {
+    let itemKlass = Item.getKlass(type)
     this.clearRequirements()
 
     const requirements = Item.getCraftRequirements(type, this.game.player)
@@ -437,18 +474,50 @@ class BaseMenu {
     })
 
     let isSandboxModeAndOwner = this.isSandboxMode() && this.game.player.isSectorOwner()
-    if (this.isDisabled || (this.hasMissingRequirements(requirements) && !isSandboxModeAndOwner)) {
+    if (this.isDisabled || (this.hasMissingRequirements(requirements, itemKlass) /*&& !isSandboxModeAndOwner*/)) {
       this.el.querySelector(".craft_btn").dataset.disabled = true
     } else {
       this.el.querySelector(".craft_btn").dataset.disabled = ""
     }
   }
 
-  hasMissingRequirements(requirements) {
-    return requirements.find((requirement) => {
-      let count = requirement.count
-      let buildSpeed =  this.game.sector.buildSpeed
+  renderRP(itemKlass) {
+    let productUnavailableEl = this.el.querySelector(".product_unavailable_notice");
+    let craftBtnEl = this.el.querySelector(".craft_btn");
+    if(!itemKlass) return;
+
+    if (this.game.sector.unlockedItems.indexOf(itemKlass.prototype.constructor.name) !== -1) return;
+
+    craftBtnEl.innerText = `Unlock (${itemKlass.prototype.getRequiredRP()} RP)`;
+
+    if(itemKlass.prototype.getRequiredRP() > this.game.sector.RPLevel) {
+      productUnavailableEl.style.display = "block";
+      productUnavailableEl.innerText = "Not enough RP (reputation points)";
+    } else {
+      productUnavailableEl.style.display = "none";
+    }
+  }
+
+  hasMissingRequirements(requirements, itemKlass) {
+    if(itemKlass && itemKlass.prototype.isRPItem()) {
+        if(this.game.sector.gameMode != 'peaceful' && this.game.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[itemKlass.prototype.getType()]) === -1) {
+        this.renderRP(itemKlass);
+        if (this.game.sector.RPLevel < itemKlass.prototype.getRequiredRP()) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        let craftBtnEl = this.el.querySelector(".craft_btn");
+        craftBtnEl.innerText = i18n.t("Craft");
+      }
+
+    } return requirements.find((requirement) => {
+      let count = requirement.count;
+      let buildSpeed = this.game.sector.buildSpeed;
       count = Math.ceil(count / buildSpeed)
+      
+      
       return requirement.supply < count
     })
   }

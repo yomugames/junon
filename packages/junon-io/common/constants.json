@@ -849,6 +849,98 @@
         "damage": "+5"
       }
     },
+    "Visitor": {
+      "parent": "Mobs.BaseMob",
+      "drop": "HumanMeat",
+      "isNonHostile": true,
+      "isTamable":false,
+      "attackGroups": ["mobs"],
+      "shouldShowNeeds": true,
+      "isNPC": true,
+      "hat": {
+        "armorOn": {
+          "bluehat": {
+            "x":-15,
+            "y":40,
+            "size": 40
+          },
+          "bowlhat": {
+            "x":-20,
+            "y":40,
+            "size": 40
+          },
+          "tophat": {
+            "x":-20,
+            "y":40,
+            "size":40
+          },
+          "redhat": {
+            "x":-15,
+            "y":40,
+            "size":40
+          },
+          "mask": {
+            "x":5,
+            "y":40,
+            "size":40
+          }
+        },
+        "armorOff": {
+          "bluehat": {
+            "x": -5,
+            "y": 36,
+            "size": 32
+          },
+          "bowlhat": {
+           "x": -12,
+            "y": 41,
+            "size": 42
+         },
+          "tophat": {
+            "x": -13,
+            "y": 38,
+            "size": 35  
+          },
+          "redhat": {
+            "x": -5,
+            "y": 36,
+            "size": 32
+          },
+          "mask": {
+            "x": 6,
+            "y": 39,
+            "size": 37
+          }
+      },
+      "x": 0,
+      "y": 0
+    },
+    "cost": {
+        "gold": 20000
+      },
+      "dizzySprite": {
+        "position": {
+          "x":0,
+          "y":-10,
+          "rotation":90
+        },
+        "width":20,
+        "height":5,
+        "tint":"#000000"
+      },
+      "sprite": {
+        "width":40,
+        "height":40
+      },
+      "stats": {
+        "speed": 3,
+        "reload":2000,
+        "health": 20,
+        "damage":10,
+        "range":32,
+        "los":128
+      }
+    },
     "Slime": {
       "parent": "Mobs.BaseMob",
       "drop": "Gel",
@@ -2588,6 +2680,7 @@
     "Beer": {
       "width": 24,
       "height": 24,
+      "isIngredient": true,
       "sprite": {
         "path": "beer"
       },
@@ -3586,6 +3679,8 @@
       "description": "Spread shot weapon. Each Deals Damage 12"
     },
     "PlasmaGun": {
+      "isRPItem": true,
+      "requiredRP": 50,
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
       "isFireArm": true,
@@ -3681,6 +3776,8 @@
       "description": "Shoots flames"
     },
     "SquidStaff": {
+      "isRPItem": true,
+      "requiredRP": 40,
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
       "isFireArm": true,
@@ -4019,6 +4116,8 @@
       "description": "Can slice through 3 enemies at a time. Damage 15."
     },
     "BlueEnergySword": {
+      "isRPItem": true,
+      "requiredRP": 40,
       "parent": "Equipments.MeleeEquipment",
       "isWeapon": true,
       "cost": {
@@ -5334,6 +5433,26 @@
       },
       "description": "Christmas tree"
     },
+    "BarTable": {
+      "width": 32,
+      "height": 64,
+      "cost": {
+        "gold": 900
+      },
+      "categories": {"bar_table": true},
+      "requirements": {
+        "IronBar": 50
+      },
+      "stats": {
+        "health": 150,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "visitors drink beers at this table"
+    },
     "Table": {
       "width": 32,
       "height": 64,
@@ -6403,6 +6522,8 @@
       "description": "Platform for Rail Tram to travel on"
     },
     "RailStop": {
+      "isRPItem": true,
+      "requiredRP": 120,
       "width": 96,
       "height": 128,
       "cost": {

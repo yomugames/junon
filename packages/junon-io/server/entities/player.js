@@ -48,9 +48,17 @@ const Dragger = require('./../interfaces/dragger')
 const WalkthroughManager = require("./walkthrough_manager")
 const xss = require("xss")
 const Badges = require('./badges/index')
+const Sector = require("./sector")
+const helper = require("../../common/helper")
 
 class Player extends BaseEntity {
 
+  /**
+   * 
+   * @param {*} socket 
+   * @param {*} data 
+   * @param {Sector} sector 
+   */
   constructor(socket, data, sector) {
     super(sector, { id: data.id, x: data.x, y: data.y, w: Constants.Player.width, h: Constants.Player.height })
 
@@ -1965,6 +1973,29 @@ class Player extends BaseEntity {
     }
   }
 
+  unlockItem(type) {
+    if(this.sector.isPeaceful()) return;
+    let klass = Item.getKlassByName(Protocol.definition().BuildingType[type])
+    if(!klass.prototype.isRPItem()) return;
+    
+    let requirements = klass.prototype.getConstants().requiredRP || klass.prototype.getRequiredRP()
+    if(!requirements) {
+      this.showError("Item has no requirements", {warning: true})
+      return;
+    }
+
+    if(requirements > this.sector.RP.level) {
+      this.showError("Not enough RP")
+      return;
+    }
+    if(this.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[type]) != -1) {
+      this.showError("Already unlocked")
+      return
+    }
+
+    this.sector.unlockItem(Protocol.definition().BuildingType[type])
+  }
+
   craft(data) {
     const storage = this.getStorage(data.storageId)
     if (storage.hasCategory("power_consumer") && !storage.isPowered) return
@@ -1994,6 +2025,14 @@ class Player extends BaseEntity {
       // item without requirements other than terrains cant be crafted
       return
     }
+
+    let klass = Item.getKlassByName(Protocol.definition().BuildingType[data.type])
+    if(!this.sector.isPeaceful()
+      && klass.prototype?.isRPItem()
+      && this.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[data.type]) === -1) {
+      this.showError("Don't have enough RP.")
+      return
+    } 
 
     const isSuccess = storage.craft(item, this.inventory.storage)
     if (!isSuccess) return

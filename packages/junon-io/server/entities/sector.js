@@ -68,9 +68,18 @@ const Domination = require("./minigames/domination")
 const CommandBlock = require("../command_blocks/command_block")
 const PositionSearchRequest = require("./position_search_request")
 const Foods = require("./foods/index")
+const RP = require("./RP")
+const Game = require("./game")
+const WorldSerializer = require('../../../junon-common/world_serializer')
 
 class Sector {
 
+  /**
+   * @param {Game} game 
+   * @param {Object} metadata
+   * @param {Object} entities
+   * @returns 
+   */
   constructor(game, metadata, entities) {
     this.game  = game
 
@@ -156,7 +165,8 @@ class Sector {
     this.initCommandBlock(entities)
     this.initBuildLimits(entities)
     this.initKeyCodes(entities)
-
+    this.initRP(entities)
+    this.initBuildingCounts()
     this.initObjectives()
 
     this.applyBlueprint(metadata.blueprintData)
@@ -173,6 +183,28 @@ class Sector {
 
   getSocketUtil() {
     return this.game.server.socketUtil
+  }
+
+  initBuildingCounts(entities) {
+    this.buildingCounts = {}
+    let protocol = WorldSerializer.getCurrentProtocol();
+
+    for(let fieldName of Object.keys(protocol.BuildingCounts.fields)) {
+     this.buildingCounts[fieldName] = 0;
+    }
+  }
+
+  initRP(entities) {
+    let RPLevel = entities?.RP || 0
+    this.RP = new RP(this, RPLevel)
+    this.visitors = [];
+    this.visitorHappiness = entities?.visitorHappiness || 0;
+    this.unlockedItems = entities?.unlockedItems || []
+  }
+
+  unlockItem(itemname) {
+    this.unlockedItems.push(itemname)
+    this.game.getSocketUtil().broadcast(this.getSocketIds(), "ItemUnlocked", {itemname: itemname})
   }
 
   initObjectives() {
@@ -1531,7 +1563,7 @@ class Sector {
   }
 
   onHourChanged(hour) {
-    let prevDay = this.day
+    let prevDay = this.day || this.getDayCount()
     this.day = this.getDayCount()
     if (this.day !== prevDay) {
       this.onDayCountChanged()
@@ -1543,7 +1575,7 @@ class Sector {
   async onDayCountChanged() {
     this.game.incrementTeamsDayCount()
     this.resetVendingMachinePurchaseHistory()
-
+    this.RP.onDayCountChanged()
     this.updateSectorModelDayCount()
   }
 
@@ -2871,7 +2903,7 @@ class Sector {
   }
 
   insertEntityToTreeByName(entity, groupName) {
-    if(entity.isRemoved && entity.isRemoved()) return
+    if(entity.isRemoved) return
     let tree = this.getTreeFromEntityType(groupName, entity.getContainer())
     entity.updateRbushCoords()
     entity.onWorldPostStep()

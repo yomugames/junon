@@ -249,6 +249,42 @@ class ChunkRegion {
     return result
   }
 
+  getBuildingType(owner, buildingType) {
+    let result;
+
+    this.forEachStructureUntil((structure) => {
+      if(buildingType === structure.type) {
+        result = structure;
+        return true;
+      }
+    })
+    return result;
+  }
+
+  getBarTable(owner) {
+    let result;
+
+    this.forEachStructureUntil((structure) => {
+      if(Protocol.definition().BuildingType["BarTable"] === structure.type) {
+        result = structure;
+        return true;
+      }
+    })
+    return result;
+  }
+
+  getSuitStation(owner) {
+    let result
+
+    this.forEachStructureUntil((structure) => {
+      if(Protocol.definition().BuildingType["SuitStation"] === structure.type && !Object.keys(structure.storage).length){
+        result = structure
+        return true
+      }
+    })
+
+    return result
+  }
   getWaterSource(owner) {
     let result 
 

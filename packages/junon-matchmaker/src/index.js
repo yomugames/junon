@@ -56,7 +56,7 @@ class MatchmakerServer {
     if (debugMode) {
       this.APP_SERVER_PORT = 3000
     } else {
-      this.APP_SERVER_PORT = process.env.MATCHMAKER_PORT || 443
+      this.APP_SERVER_PORT = parseInt(process.env.MATCHMAKER_PORT) || 443
     }
     this.GAME_WEBSOCKET_SERVER_PORT = 2095
 

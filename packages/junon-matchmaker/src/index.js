@@ -9,7 +9,7 @@ global.SCALE_DOWN_USAGE_THRESHOLD = 0.5
 global.SCALE_UP_INTERVAL = 15 * 60 * 1000 // 15 minutes
 
 
-const bucketName = "junon"
+const bucketName = process.env.S3_BUCKET_NAME || "junon"
 
 const fs = require("fs")
 const http = require("http")
@@ -53,7 +53,11 @@ function toArrayBuffer(buffer) {
 class MatchmakerServer {
   constructor() {
     this.bootTime = Date.now()
-    this.APP_SERVER_PORT = debugMode ? 3000 : 443
+    if (debugMode) {
+      this.APP_SERVER_PORT = 3000
+    } else {
+      this.APP_SERVER_PORT = parseInt(process.env.MATCHMAKER_PORT) || 443
+    }
     this.GAME_WEBSOCKET_SERVER_PORT = 2095
 
     this.ENVIRONMENT_LIST = ["vm", "development", "staging", "production"]
@@ -94,7 +98,6 @@ class MatchmakerServer {
      // this.topColonies = JSON.parse(require("fs").readFileSync('top_sectors.json', 'utf8'))
     this.periodicallyFetchTopSectors()
     this.periodicallyScaleNodes()
-    this.periodicallyCheckRegions()
     this.reportCrashedServers()
     this.initServerForPlayers()
     this.initWebsocketServerForGames()
@@ -111,16 +114,6 @@ class MatchmakerServer {
 
     let fifteenMinutes = 1000 * 60 * 15
     setTimeout(this.periodicallyScaleNodes.bind(this), fifteenMinutes)
-  }
-
-  periodicallyCheckRegions() {
-    let environment = this.getEnvironment()
-    environment.forEachRegion((region) => {
-      region.detectDisconnectedPvPSectors()
-    })
-
-    let tenSeconds = 1000 * 10
-    setTimeout(this.periodicallyCheckRegions.bind(this), tenSeconds)
   }
 
   async periodicallyFetchTopSectors() {

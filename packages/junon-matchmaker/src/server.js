@@ -230,6 +230,8 @@ class Server {
 
   isOldRevision() {
     if (debugMode) return false
+    if (process.env.NODE_ENV === 'staging') return false
+
     return this.revision !== this.node.revision
   }
 

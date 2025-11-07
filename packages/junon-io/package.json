@@ -9,7 +9,7 @@
     "inspect": "nodemon --inspect server/server.js",
     "client": "gulp",
     "client:build": "gulp build",
-    "staging:client:build": "gulp build && rsync -av --delete /root/junon/packages/junon-io/dist /var/www/junon-io"
+    "staging:client:build": "gulp build && rsync -av --delete /root/junon/packages/junon-io/dist/ /var/www/junon-io/"
   },
   "author": "",
   "license": "ISC",

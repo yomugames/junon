@@ -53,7 +53,11 @@ function toArrayBuffer(buffer) {
 class MatchmakerServer {
   constructor() {
     this.bootTime = Date.now()
-    this.APP_SERVER_PORT = debugMode ? 3000 : 443
+    if (debugMode) {
+      this.APP_SERVER_PORT = 3000
+    } else {
+      this.APP_SERVER_PORT = process.env.MATCHMAKER_PORT || 443
+    }
     this.GAME_WEBSOCKET_SERVER_PORT = 2095
 
     this.ENVIRONMENT_LIST = ["vm", "development", "staging", "production"]

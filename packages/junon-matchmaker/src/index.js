@@ -9,7 +9,7 @@ global.SCALE_DOWN_USAGE_THRESHOLD = 0.5
 global.SCALE_UP_INTERVAL = 15 * 60 * 1000 // 15 minutes
 
 
-const bucketName = "junon"
+const bucketName = process.env.S3_BUCKET_NAME || "junon"
 
 const fs = require("fs")
 const http = require("http")

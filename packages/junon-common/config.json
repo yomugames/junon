@@ -15,6 +15,21 @@
       "appId": "1:497331755585:web:241453fe17be5b31"
     }
   },
+  "staging": {
+    "googleAnalyticsId": "UA-53143804-3",
+    "matchmakerUrl": "https://matchmaker-staging.junon.io:3000/",
+    "matchmakerWebsocketUrl": "wss://matchmaker-staging.junon.io:3000/",
+    "matchmakerGameServerWebsocketUrl": "ws://matchmaker-staging.junon.io:2095/",
+    "firebase": {
+      "apiKey": "AIzaSyAbpgpktZ9s42LxAlsSsXvRXtQnLLFH1Eo",
+      "authDomain": "junon-io.firebaseapp.com",
+      "databaseURL": "https://junon-io.firebaseio.com",
+      "projectId": "junon-io",
+      "storageBucket": "junon-io.appspot.com",
+      "messagingSenderId": "753451258380",
+      "appId": "1:753451258380:web:6534c35fb40a95a3"
+    }
+  },
   "production": {
     "googleAnalyticsId": "UA-53143804-3",
     "matchmakerUrl": "https://matchmaker.junon.io/",

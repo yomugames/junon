@@ -5,7 +5,7 @@ s3 = new AWS.S3({
   endpoint: spacesEndpoint
 })
 
-const bucketName = "junon"
+const bucketName = process.env.S3_BUCKET_NAME || "junon"
 
 const listEntries = (cb) => {
   const params = {

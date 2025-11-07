@@ -8,7 +8,7 @@ const Config = require("./config")
 const os = require('os')
 const SectorModel = require("./db/sector")
 
-const bucketName = "junon"
+const bucketName = process.env.S3_BUCKET_NAME || "junon"
 
 class WorldSerializer {
 

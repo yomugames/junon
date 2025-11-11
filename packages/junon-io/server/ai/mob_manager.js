@@ -130,12 +130,10 @@ getAllRoomTilesSet() {
     let spawnPos = this.findSpawnPos(player, condition)
     if (!spawnPos) return
 
-    // checks if the tile is in a room
-    const roomTilesSet = this.getAllRoomTilesSet()
-    if (roomTilesSet.has(`${spawnPos.row}-${spawnPos.col}`)) {
-     // abort if the coordinate is in a room
-     return
-  }
+    const room = this.sector.roomManager.getRoomAt(spawnPos.row, spawnPos.col)
+    if (room && room.isOxygenated) {
+      return
+    }
 
     let quadrant = this.getQuadrantForRowCol(spawnPos.row, spawnPos.col)
     if (this.hasReachedAreaSpawnLimit(quadrant, mobTypeName)) {

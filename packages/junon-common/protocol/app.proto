@@ -75,3 +75,6 @@ message Mob {
   BuildingType armorType = 31;
 }
 
+message Happiness {
+  uint32 level = 1;
+}

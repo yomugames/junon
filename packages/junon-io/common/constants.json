@@ -6812,7 +6812,7 @@
       "stats": {
         "reload": 2000,
         "damage": 75,
-        "health": 300,
+        "health": 400,
         "range": 320,
         "powerConsumption": 200
       },

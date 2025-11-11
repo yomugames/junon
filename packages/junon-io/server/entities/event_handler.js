@@ -179,6 +179,18 @@ class EventHandler {
     return Math.pow(numValue, 1 / numDegree)
   }
 
+  sin(value) {
+    return Math.sin(this._safeNumber(value))
+  }
+
+  cos(value) {
+    return Math.cos(this._safeNumber(value))
+  }
+
+  tan(value) {
+    return Math.tan(this._safeNumber(value))
+  }
+
   abs(value) {
     return Math.abs(this._safeNumber(value))
   }
@@ -1197,6 +1209,9 @@ class EventHandler {
       "$modulo": true,
       "$pow": true,
       "$root": true,
+      "$sin": true,
+      "$cos": true,
+      "$tan": true,
       "$abs": true,
       "$log": true,
       "$min": true,

@@ -507,12 +507,13 @@ class BaseMenu {
         } else {
           return false;
         }
-      } else {
-        let craftBtnEl = this.el.querySelector(".craft_btn");
-        craftBtnEl.innerText = i18n.t("Craft");
-      }
+      } 
+    } else {
+      let craftBtnEl = this.el.querySelector(".craft_btn");
+      craftBtnEl.innerText = i18n.t("Craft");
+    }
 
-    } return requirements.find((requirement) => {
+    return requirements.find((requirement) => {
       let count = requirement.count;
       let buildSpeed = this.game.sector.buildSpeed;
       count = Math.ceil(count / buildSpeed)

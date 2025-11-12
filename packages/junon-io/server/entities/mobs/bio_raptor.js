@@ -7,7 +7,6 @@ const Mountable = require('../../interfaces/mountable')
 class BioRaptor extends BaseMob {
   constructor(sector, data) {
     super(sector, data)
-
     this.initMountable()
   }
 
@@ -63,14 +62,27 @@ class BioRaptor extends BaseMob {
 
   moveEntity(targetEntityToMove, deltaTime) {
     if (this.passenger) {
+      // if mounted, let the rider control movement
     } else {
       super.moveEntity(targetEntityToMove, deltaTime)
+
+      // === BioRaptor getting stuck solution ===
+      if (!this.lastPosition) this.lastPosition = this.getPosition().clone()
+
+      // if BioRaptor barely moved, nudge it a little forward
+      const distanceMoved = this.lastPosition.distanceTo(this.getPosition())
+      if (distanceMoved < 0.1) {
+        const nudge = this.getForceFromAngle(this.angle || 0)
+        targetEntityToMove.applyForce(nudge)
+      }
+
+      // save last position for next frame
+      this.lastPosition = this.getPosition().clone()
     }
   }
 
   canDamage(target) {
     if (target.isOnLand()) return false
-
     return super.canDamage(target)
   }
 
@@ -85,10 +97,8 @@ class BioRaptor extends BaseMob {
   getConstantsTable() {
     return "Mobs.BioRaptor"
   }
-
 }
 
-Object.assign(BioRaptor.prototype, Mountable.prototype, {
-})
+Object.assign(BioRaptor.prototype, Mountable.prototype, {})
 
 module.exports = BioRaptor

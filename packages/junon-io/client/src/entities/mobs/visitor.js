@@ -10,8 +10,13 @@ class Visitor extends LandMob {
         super(game, data)
         this.happiness = data.Happiness.level || 0;
         this.initEquipper();
+        this.eventDefinitions = {}
     }
     
+    shouldShowHappiness() {
+        return true;
+    }
+
     syncWithServer(data) {
         super.syncWithServer(data)
         this.setHappiness(data.Happiness);
@@ -26,6 +31,8 @@ class Visitor extends LandMob {
             this.animateHappy(false)
         } 
         this.happiness = happiness.level;
+        
+        this.eventDefinitions = happiness.eventDefinitions
     }
 
     animateEquipment() {

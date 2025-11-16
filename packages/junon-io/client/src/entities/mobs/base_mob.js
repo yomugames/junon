@@ -924,7 +924,40 @@ var tween = new TWEEN.Tween(position)
       stats += goals
     }
 
+
+    if(this.shouldShowHappiness()) {
+      if(!this.eventDefinitions) return;
+      if(!this.positiveHappiness) {
+        this.positiveHappiness = {};
+        this.negativeHappiness = {};
+
+        for (let event in Constants.visitorEvents) {
+          if (Constants.visitorEvents[event] > 0) this.positiveHappiness[event] = Constants.visitorEvents[event];
+          else this.negativeHappiness[event] = Constants.visitorEvents[event];
+          
+        }
+      }
+
+      let html = 
+      `<div class='entity_stats_entry'>
+          <div class='positive_happiness_events'>
+            <b>Positive happiness:</b>
+            ${JSON.stringify(this.positiveHappiness).replaceAll(/["}{]/g, "").replaceAll(",", "\n")}
+          </div>
+          <div class='negative_happiness_events'>
+            <b>Negative happiness:</b>
+            ${JSON.stringify(this.negativeHappiness).replaceAll(/["}{]/g, "").replaceAll(",", "\n")}
+          </div>
+       </div>
+      `
+      stats += html
+    }
+
     entityMenu.querySelector(".entity_stats").innerHTML = stats
+  }
+
+  shouldShowHappiness() {
+    return false;
   }
 
   shouldShowOwner() {

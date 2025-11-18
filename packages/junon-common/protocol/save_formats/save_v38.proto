@@ -255,6 +255,18 @@ message Happiness {
 message EventDefinitions {
   uint32 findColoredLights = 1;
   uint32 findPottedPlants = 2;
+  uint32 eatSlimyMeatPizza = 3;
+  uint32 useTerminal = 4;
+  uint32 drinkBeer = 5;
+  uint32 stepOnCarpet = 6;
+  uint32 takeOffSuit = 7;
+  int32  damaged = 8;
+  int32  killed = 9;
+  int32  stepOnDirt = 10;
+  int32  stepOnBlood = 11;
+  int32  noOxygen = 12;
+  int32  noTable = 13;
+  int32  miasma = 14;
 }
 
 message MasterRef {

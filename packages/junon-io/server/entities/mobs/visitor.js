@@ -220,22 +220,7 @@ class Happiness {
   constructor(visitor, eventDefinitions, level) {
     this.level = level || 0;
     this.visitor = visitor
-    this.eventDefinitions = eventDefinitions || {
-      findColoredLights: 10,
-      findPottedPlants: 10,
-      damaged: -25,
-      killed: -80,
-      stepOnDirt: -5,
-      stepOnBlood: -5,
-      stepOnCarpet: 5,
-      takeOffSuit: 35,
-      noOxygen: -5,
-      drinkBeer: 20,
-      eatSlimyMeatPizza: 10,
-      useTerminal: 10,
-      noTable: -5,
-      miasma: -10
-    }
+    this.eventDefinitions = eventDefinitions || Constants.visitorEvents
   }
 
   changeHappinessForEvent(event) {

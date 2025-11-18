@@ -870,7 +870,48 @@ var tween = new TWEEN.Tween(position)
     if (this.isLivestock) {
       stats += this.getLivestockStat()
     }
-    
+
+    if(this.shouldShowHappiness()) {
+      if(!this.eventDefinitions) return;
+      if(!this.positiveHappiness) {
+        this.positiveHappiness = {};
+        this.negativeHappiness = {};
+
+        for (let event in Constants.visitorEvents) {
+          if (Constants.visitorEvents[event] > 0) this.positiveHappiness[event] = Constants.visitorEvents[event];
+          else this.negativeHappiness[event] = Constants.visitorEvents[event];
+          
+        }
+      }
+
+
+      let positiveHappinessHtml = ""
+      for(let happinessEvent in this.positiveHappiness) {
+        let shouldShowColor = ''
+        if(!this.eventDefinitions[happinessEvent]) shouldShowColor = "style=\"color:green\""
+        positiveHappinessHtml += `<span ${shouldShowColor} "id="${happinessEvent}">${happinessEvent}: ${this.positiveHappiness[happinessEvent]}\n</span><br/>`
+      }
+      let negativeHappinessHtml = ""
+      for (let happinessEvent in this.negativeHappiness) {
+        let shouldShowColor = ''
+        if(!this.eventDefinitions[happinessEvent]) shouldShowColor = "style=\"color:red\""
+        negativeHappinessHtml += `<span ${shouldShowColor} id="${happinessEvent}">${happinessEvent}: ${this.negativeHappiness[happinessEvent]}</span><br/>`
+      }
+      let html = 
+      `<div class='entity_stats_entry'>
+          <div class='positive_happiness_events'>
+            <b>Positive happiness:</b>
+            ${positiveHappinessHtml}
+          </div>
+          <div class='negative_happiness_events'>
+            <b>Negative happiness:</b>
+            ${negativeHappinessHtml}
+          </div>
+       </div>
+      `
+
+      stats += html
+    } 
     if (this.getConstants().shouldShowNeeds) {
       let barWidthPercent = Math.floor(this.hunger / this.getMaxHunger() * 100)
 
@@ -924,7 +965,14 @@ var tween = new TWEEN.Tween(position)
       stats += goals
     }
 
+
+    
+
     entityMenu.querySelector(".entity_stats").innerHTML = stats
+  }
+
+  shouldShowHappiness() {
+    return false;
   }
 
   shouldShowOwner() {

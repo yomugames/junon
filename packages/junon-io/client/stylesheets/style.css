@@ -1376,7 +1376,7 @@ body {
 .entity_stats_entry {
     color: #999;
     text-align: left;
-    display: table-row;
+    /* display: table-row; */
     font-family: 'cc';
     font-size: 18px;
 }

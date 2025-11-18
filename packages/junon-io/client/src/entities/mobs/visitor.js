@@ -10,20 +10,26 @@ class Visitor extends LandMob {
         super(game, data)
         this.happiness = data.Happiness.level || 0;
         this.initEquipper();
+        this.eventDefinitions = {};
     }
     
+    shouldShowHappiness() {
+        return true;
+    }
+
     syncWithServer(data) {
         super.syncWithServer(data)
         this.setHappiness(data.Happiness);
     }
 
     setHappiness(happiness) {
+        this.eventDefinitions = happiness.eventDefinitions
         if(happiness.level == this.happiness) return
-        if(happiness.level > this.happiness) {
-            this.animateHappy(true)
+        if(happiness.level > this.happiness) { //this seems like it would show the opposite happiness icon for an event, but somehow it works
+            this.animateHappy(false)
         }
         if(happiness.level < this.happiness) {
-            this.animateHappy(false)
+            this.animateHappy(true) 
         } 
         this.happiness = happiness.level;
     }

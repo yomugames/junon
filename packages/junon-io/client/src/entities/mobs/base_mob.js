@@ -884,18 +884,32 @@ var tween = new TWEEN.Tween(position)
         }
       }
 
+
+      let positiveHappinessHtml = ""
+      for(let happinessEvent in this.positiveHappiness) {
+        let shouldShowColor = ''
+        if(!this.eventDefinitions[happinessEvent]) shouldShowColor = "style=\"color:green\""
+        positiveHappinessHtml += `<span ${shouldShowColor} "id="${happinessEvent}">${happinessEvent}: ${this.positiveHappiness[happinessEvent]}\n</span><br/>`
+      }
+      let negativeHappinessHtml = ""
+      for (let happinessEvent in this.negativeHappiness) {
+        let shouldShowColor = ''
+        if(!this.eventDefinitions[happinessEvent]) shouldShowColor = "style=\"color:red\""
+        negativeHappinessHtml += `<span ${shouldShowColor} id="${happinessEvent}">${happinessEvent}: ${this.negativeHappiness[happinessEvent]}</span><br/>`
+      }
       let html = 
       `<div class='entity_stats_entry'>
           <div class='positive_happiness_events'>
             <b>Positive happiness:</b>
-            ${JSON.stringify(this.positiveHappiness).replaceAll(/["}{]/g, "").replaceAll(",", "\n")}
+            ${positiveHappinessHtml}
           </div>
           <div class='negative_happiness_events'>
             <b>Negative happiness:</b>
-            ${JSON.stringify(this.negativeHappiness).replaceAll(/["}{]/g, "").replaceAll(",", "\n")}
+            ${negativeHappinessHtml}
           </div>
        </div>
       `
+
       stats += html
     } 
     if (this.getConstants().shouldShowNeeds) {

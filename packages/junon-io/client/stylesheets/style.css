@@ -1386,6 +1386,9 @@ body {
     opacity: 0.9;
 }
 
+.happiness_header {
+    margin-bottom:0;
+}
 
 #building_menu_tooltip {
     z-index: 12;

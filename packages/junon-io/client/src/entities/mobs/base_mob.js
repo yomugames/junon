@@ -892,7 +892,6 @@ var tween = new TWEEN.Tween(position)
           return c[0] + " " + c[1]
         })
         pretty = helper.capitalizeWords(pretty);
-        console.log(pretty)
         let shouldShowColor = ''
         if(!this.eventDefinitions[happinessEvent]) shouldShowColor = "style=\"color:green\""
         positiveHappinessHtml += `<span ${shouldShowColor} "id="${happinessEvent}">${pretty}: ${this.positiveHappiness[happinessEvent]}\n</span><br/>`

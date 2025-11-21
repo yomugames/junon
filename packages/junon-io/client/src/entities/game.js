@@ -1578,6 +1578,16 @@ class Game {
     SocketUtil.on("BadgeEquipped", this.onBadgeEquipped.bind(this))
     SocketUtil.on("RPUpdated", this.onRPUpdated.bind(this))
     SocketUtil.on("ItemUnlocked", this.onItemUnlocked.bind(this))
+    SocketUtil.on("ShowChatBubble", this.onShowChatBubble.bind(this))
+  }
+
+  onShowChatBubble(data) {
+    if(!data.message || !data.entityId) return
+
+    let entity = this.sector.getEntity(data.entityId);
+    if(!entity) return;
+
+    entity.createChatBubble(data.message)
   }
 
   onItemUnlocked(data) {

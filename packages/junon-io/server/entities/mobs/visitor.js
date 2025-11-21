@@ -220,7 +220,7 @@ class Happiness {
   constructor(visitor, eventDefinitions, level) {
     this.level = level || 0;
     this.visitor = visitor
-    this.eventDefinitions = eventDefinitions || Constants.visitorEvents
+    this.eventDefinitions = eventDefinitions ||{...Constants.visitorEvents}
   }
 
   changeHappinessForEvent(event) {
@@ -228,8 +228,16 @@ class Happiness {
     if (!value) return;
     delete this.eventDefinitions[event] //ensure doesn't trigger again.
     this.changeHappinessBy(value)
+    this.showDialogueForEvent(event)
   }
 
+  showDialogueForEvent(event) {
+    let dialogue = Constants.visitorDialogues[event]
+    if(!dialogue) return;
+
+    this.visitor.getSocketUtil().broadcast(this.visitor.game.getSocketIds(), "ShowChatBubble", {entityId: this.visitor.id, message: dialogue})
+  }
+  
   changeHappinessBy(value) {
     this.level += value;
     this.visitor.sector.visitorHappiness += value;

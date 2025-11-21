@@ -25,11 +25,11 @@ class Visitor extends LandMob {
     setHappiness(happiness) {
         this.eventDefinitions = happiness.eventDefinitions
         if(happiness.level == this.happiness) return
-        if(happiness.level > this.happiness) { //this seems like it would show the opposite happiness icon for an event, but somehow it works
-            this.animateHappy(false)
+        if(happiness.level > this.happiness) {
+            this.animateHappy(true)
         }
         if(happiness.level < this.happiness) {
-            this.animateHappy(true) 
+            this.animateHappy(false) 
         } 
         this.happiness = happiness.level;
     }

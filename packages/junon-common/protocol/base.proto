@@ -176,7 +176,13 @@ message MessageWrapper {
     RPUpdated RPUpdated = 183;
     UnlockItem UnlockItem = 184;
     ItemUnlocked ItemUnlocked = 185;
+    ShowChatBubble ShowChatBubble = 186;
   }
+}
+
+message ShowChatBubble {
+  uint32 entityId = 1;
+  string message = 2;
 }
 
 message ItemUnlocked {

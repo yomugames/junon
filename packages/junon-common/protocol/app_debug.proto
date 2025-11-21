@@ -85,7 +85,7 @@ message Mob {
 }
 
 message Happiness {
-  uint32 level = 1;
+  int32 level = 1;
   EventDefinitions eventDefinitions = 2;
 }
 

@@ -952,10 +952,10 @@
       },
       "dizzySprite": {
         "position": {
-          "x":0,
-          "y":-10,
-          "rotation":90
+          "x":30,
+          "y":20
         },
+        "rotation": 90,
         "width":20,
         "height":5,
         "tint":"#000000"

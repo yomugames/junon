@@ -37,10 +37,10 @@ class FirebaseClientHelper {
       provider = this.googleProvider
     }
 
-    if (main.isMobile || this.isElectron()) {
-      firebase.auth().signInWithRedirect(provider)
-      return
-    }
+    // if (main.isMobile || this.isElectron()) {
+    //   firebase.auth().signInWithRedirect(provider)
+    //   return
+    // }
 
     firebase.auth().signInWithPopup(provider).then((result) => {
       let token = result.credential.accessToken

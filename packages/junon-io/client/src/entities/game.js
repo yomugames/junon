@@ -259,7 +259,7 @@ class Game {
 
     if (this.isMobile()) {
       this.createMobileBuildActionMenu()
-      document.querySelector("#base_hud .resources").style.display = 'none'
+      document.querySelector("#base_hud").style.display = 'none'
     }
   }
 

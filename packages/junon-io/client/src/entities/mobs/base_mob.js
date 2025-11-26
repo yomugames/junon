@@ -892,8 +892,8 @@ var tween = new TWEEN.Tween(position)
           return c[0] + " " + c[1]
         })
         pretty = helper.capitalizeWords(pretty);
-        let shouldShowColor = ''
-        if(!this.eventDefinitions[happinessEvent]) shouldShowColor = "style=\"color:green\""
+        let shouldShowColor = 'style="color:#444"'
+        if(this.eventDefinitions[happinessEvent]) shouldShowColor = 'style="color:#78c1a3"'
         positiveHappinessHtml += `<span ${shouldShowColor} "id="${happinessEvent}">${pretty}: ${this.positiveHappiness[happinessEvent]}\n</span><br/>`
       }
       let negativeHappinessHtml = ""
@@ -902,8 +902,8 @@ var tween = new TWEEN.Tween(position)
           return c[0] + " " + c[1]
         });
         pretty = helper.capitalizeWords(pretty);
-        let shouldShowColor = ''
-        if(!this.eventDefinitions[happinessEvent]) shouldShowColor = "style=\"color:red\""
+        let shouldShowColor = 'style="color:#444"'
+        if(this.eventDefinitions[happinessEvent]) shouldShowColor = "style=\"color:#f38989\""
         negativeHappinessHtml += `<span ${shouldShowColor} id="${happinessEvent}">${pretty}: ${this.negativeHappiness[happinessEvent]}</span><br/>`
       }
       let html = 

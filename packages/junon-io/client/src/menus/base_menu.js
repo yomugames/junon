@@ -474,7 +474,7 @@ class BaseMenu {
     })
 
     let isSandboxModeAndOwner = this.isSandboxMode() && this.game.player.isSectorOwner()
-    if (this.isDisabled || (this.hasMissingRequirements(requirements, itemKlass) /*&& !isSandboxModeAndOwner*/)) {
+    if ((this.hasMissingRequirements(requirements, itemKlass) || this.isDisabled /*&& !isSandboxModeAndOwner*/)) {
       this.el.querySelector(".craft_btn").dataset.disabled = true
     } else {
       this.el.querySelector(".craft_btn").dataset.disabled = ""
@@ -500,14 +500,17 @@ class BaseMenu {
 
   hasMissingRequirements(requirements, itemKlass) {
     if(itemKlass && itemKlass.prototype.isRPItem()) {
-        if(this.game.sector.gameMode != 'peaceful' && this.game.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[itemKlass.prototype.getType()]) === -1) {
         this.renderRP(itemKlass);
+        if(this.game.sector.gameMode != 'peaceful' && this.game.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[itemKlass.prototype.getType()]) === -1) {
         if (this.game.sector.RPLevel < itemKlass.prototype.getRequiredRP()) {
           return true;
         } else {
           return false;
         }
-      } 
+      } else {
+          let craftBtnEl = this.el.querySelector(".craft_btn");
+          craftBtnEl.innerText = i18n.t("Craft");
+        }
     } else {
       let craftBtnEl = this.el.querySelector(".craft_btn");
       craftBtnEl.innerText = i18n.t("Craft");

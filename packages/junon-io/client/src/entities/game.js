@@ -1592,7 +1592,7 @@ class Game {
 
   onItemUnlocked(data) {
     this.sector.unlockedItems.push(data.itemname)
-    this.blueprintMenu.onItemUnlocked()
+    this.getOpenNonEntityMenus()[this.getOpenNonEntityMenus().length-1].onItemUnlocked()
   }
 
   onRPUpdated(data) {

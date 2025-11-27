@@ -153,6 +153,8 @@ class Sector {
   initRP(data) {
     this.RPLevel = data.RP || 0;
     if(this.gameMode == 'peaceful') document.querySelector(".RP_stats").style.display = 'none'
+    document.querySelector(".RP_icons_tooltip_image").addEventListener("mouseover", this.game.onRPTooltipMousein.bind(this))
+    document.querySelector(".RP_icons_tooltip_image").addEventListener("mouseout", this.game.onRPTooltipMouseout.bind(this))
   }
 
   setMobCustomStats(type, stats) {

@@ -574,11 +574,34 @@
         </div>
     </div>
     
-    <div class="resources stat_container">
-        <div class="RP_stats">
-            <p class="RP_stats_value">RP: <span id="RP_value">0</span>, Visitor Happiness: <span id="happiness_value">0</span></p>
+    <div id='RP_tooltip' class='tooltip top'>
+        <div id="RP_explainer">
+            <p><span class="rp_icon"></span>: RP (Reputation Points). Use to unlock items.</p>
+            <p><span class="happiness_icon"></span>: Total visitor happiness. Converted into RP, when all visitors leave</p>
+            <p><span class="gold_resource_icon"></span>: Gold. Use this to buy items from the trader</p>
         </div>
-    <div id="gold_count">
+        <!-- <div class='event_name'></div>
+        <div class='event_description'></div>
+        <h3>Variables: </h3>
+        <div class='variables'></div> -->
+    </div>
+
+    
+    <div class="resources stat_container">
+        <div id="RP_icons_tooltip">
+                <span class="RP_icons_tooltip_image resource_icon"></span>
+        </div>
+        <div class="RP_stats">
+            <div id="RP_count">
+                <span class="rp_icon resource_icon"></span>
+                <span id="RP_value"></span>
+            </div>
+            <div id="total_happiness">
+                <span class="happiness_icon resource_icon"></span>
+                <span id="happiness_value"></span>
+            </div>
+                    </div>
+           <div id="gold_count">
             <span class='gold_resource_icon resource_icon'></span>
             <span class='gold resource_count'>0</span>
         </div>

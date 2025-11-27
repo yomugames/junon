@@ -1159,12 +1159,43 @@ body {
     vertical-align: top;
 }
 
+#RP_icons_tooltip {
+    display: inline;
+    margin-right: 20px;
+}
+
+.rp_icon {
+    background-image: url(./../assets/images/RP_icon.png);
+    background-repeat: no-repeat;
+    width:18px;
+    height: 18px;
+    display:inline-block;
+    background-size:contain;
+    vertical-align:top;
+    margin-right: 10px;
+}
+
+.happiness_icon {
+    background-image: url(./../assets/images/visitor_happiness.png);
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    background-size: contain;
+    vertical-align: top;
+    margin-right: 10px;
+}
+
 .gold.resource_count {
     display: inline;
 }
 
 .RP_stats {
     display: inline;
+}
+#RP_count, #total_happiness  {
+    display:inline;
+    margin-right: 20px;
 }
 
 #gold_count {
@@ -1175,6 +1206,16 @@ body {
     color: white;
     display: inline;
     margin-right:50px;
+}
+
+.RP_icons_tooltip_image {
+    background-image: url(./../assets/images/help_icon.png);
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    background-size: contain;
+    vertical-align: top;
 }
 
 .resource_count {
@@ -1309,7 +1350,8 @@ body {
 #entity_menu,
 #chat_player_tooltip,
 #command_block_tooltip,
-#building_menu_tooltip {
+#building_menu_tooltip,
+#RP_tooltip {
     display: none;
     position: absolute;
     width: 200px;
@@ -1321,6 +1363,12 @@ body {
     top: 20px;
     border: solid 2px black;
 }
+
+#RP_tooltip {
+    font-size: 10px;
+    z-index: 16;
+}
+
 
 #map_terrain_canvas,
 #map_entity_canvas {

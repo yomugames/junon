@@ -490,12 +490,12 @@ class BaseMenu {
 
     craftBtnEl.innerText = `Unlock (${itemKlass.prototype.getRequiredRP()} RP)`;
 
-    if(itemKlass.prototype.getRequiredRP() > this.game.sector.RPLevel) {
-      productUnavailableEl.style.display = "block";
-      productUnavailableEl.innerText = "Not enough RP (reputation points)";
-    } else {
-      productUnavailableEl.style.display = "none";
-    }
+    // if(itemKlass.prototype.getRequiredRP() > this.game.sector.RPLevel) {
+    //   productUnavailableEl.style.display = "block";
+    //   productUnavailableEl.innerText = "Not enough RP (reputation points)";
+    // } else {
+    //   productUnavailableEl.style.display = "none";
+    // }
   }
 
   hasMissingRequirements(requirements, itemKlass) {

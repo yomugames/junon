@@ -2702,7 +2702,7 @@ html[lang='ja'] #death_screen_content_message {
 
 #blueprint_menu {
     width: 515px;
-    height: 420px;
+    min-height: 420px;
     left: calc(50vw - (550px / 2));
     top: calc(50vh - (450px / 2));
 }

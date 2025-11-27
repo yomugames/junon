@@ -135,6 +135,10 @@ class Item {
       requirements.push({ name: klass.getTypeName(), klass: klass, count: count, supply: supply })
     }
 
+    if(klass.prototype.isRPItem()) {
+      requirements.push({ name: "RP", klass: null, count: klass.prototype.getRequiredRP(), supply: game.sector.RPLevel })
+    }
+
     return requirements
   }
 

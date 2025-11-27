@@ -3626,6 +3626,8 @@
       "description": "Used for mining, and salvaging objects. Damage 2"
     },
     "Drill": {
+      "isRPItem": true,
+      "requiredRP": 50,
       "parent": "Equipments.MeleeEquipment",
       "isAnimatable": true,
       "isWeapon": true,
@@ -3712,7 +3714,7 @@
     },
     "PlasmaGun": {
       "isRPItem": true,
-      "requiredRP": 50,
+      "requiredRP": 70,
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
       "isFireArm": true,
@@ -3770,6 +3772,8 @@
       "description": "Burst Weapon that shoots fast projectiles"
     },
     "RocketLauncher": {
+      "isRPItem": true,
+      "requiredRP": 150,
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
       "isFireArm": true,
@@ -4063,6 +4067,8 @@
       "description": "Basic Melee weapon. Damage 7"
     },
     "PlasmaBlade": {
+      "isRPItem": true,
+      "requiredRP": 70,
       "parent": "Equipments.MeleeEquipment",
       "isWeapon": true,
       "sprite": {
@@ -5466,6 +5472,8 @@
       "description": "Christmas tree"
     },
     "BarTable": {
+      "isRPItem": true,
+      "requiredRP": 10,
       "width": 32,
       "height": 64,
       "cost": {
@@ -6923,6 +6931,8 @@
       "description": "Shoots a continuous beam of focused energy. [Requires Energy]"
     },
     "TeslaCoil": {
+      "isRPItem": true,
+      "requiredRP": 40,
       "width": 64,
       "height": 64,
       "cost": {

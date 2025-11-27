@@ -474,7 +474,7 @@ class BaseMenu {
     })
 
     let isSandboxModeAndOwner = this.isSandboxMode() && this.game.player.isSectorOwner()
-    if (this.isDisabled || (this.hasMissingRequirements(requirements, itemKlass) /*&& !isSandboxModeAndOwner*/)) {
+    if ((this.hasMissingRequirements(requirements, itemKlass) || this.isDisabled /*&& !isSandboxModeAndOwner*/)) {
       this.el.querySelector(".craft_btn").dataset.disabled = true
     } else {
       this.el.querySelector(".craft_btn").dataset.disabled = ""
@@ -490,24 +490,27 @@ class BaseMenu {
 
     craftBtnEl.innerText = `Unlock (${itemKlass.prototype.getRequiredRP()} RP)`;
 
-    if(itemKlass.prototype.getRequiredRP() > this.game.sector.RPLevel) {
-      productUnavailableEl.style.display = "block";
-      productUnavailableEl.innerText = "Not enough RP (reputation points)";
-    } else {
-      productUnavailableEl.style.display = "none";
-    }
+    // if(itemKlass.prototype.getRequiredRP() > this.game.sector.RPLevel) {
+    //   productUnavailableEl.style.display = "block";
+    //   productUnavailableEl.innerText = "Not enough RP (reputation points)";
+    // } else {
+    //   productUnavailableEl.style.display = "none";
+    // }
   }
 
   hasMissingRequirements(requirements, itemKlass) {
     if(itemKlass && itemKlass.prototype.isRPItem()) {
-        if(this.game.sector.gameMode != 'peaceful' && this.game.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[itemKlass.prototype.getType()]) === -1) {
         this.renderRP(itemKlass);
+        if(this.game.sector.gameMode != 'peaceful' && this.game.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[itemKlass.prototype.getType()]) === -1) {
         if (this.game.sector.RPLevel < itemKlass.prototype.getRequiredRP()) {
           return true;
         } else {
           return false;
         }
-      } 
+      } else {
+          let craftBtnEl = this.el.querySelector(".craft_btn");
+          craftBtnEl.innerText = i18n.t("Craft");
+        }
     } else {
       let craftBtnEl = this.el.querySelector(".craft_btn");
       craftBtnEl.innerText = i18n.t("Craft");
@@ -524,6 +527,21 @@ class BaseMenu {
   }
 
   createRequirementRow(requirement) {
+    if(requirement.name == "RP") {
+      if(this.game.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[this.craftType]) != -1) return ""
+      let hasInsufficientSupply = requirement.supply < requirement.count
+      let supplyClassName = hasInsufficientSupply ? "unmet" : ""
+      let el = "<div class='requirement_row'>" +
+                  "<img src='/assets/images/RP_icon.png'>" +
+                  "<div class='requirement_name'>RP</div>" +
+                  "<div class='requirement_supply " + supplyClassName + "'>" +
+                  "<span class='supply_count'>" + requirement.supply + "</span>" +
+                  "/" +
+                  "<span class='requirement_count'>" + requirement.count + "</span>" +
+                "</div>" +
+              "</div>"
+      return el
+    }
     let type = requirement.klass.getType()
     let imgSrc = this.game.getImageSrcForItemType(type)
 

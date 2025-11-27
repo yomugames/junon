@@ -527,6 +527,21 @@ class BaseMenu {
   }
 
   createRequirementRow(requirement) {
+    if(requirement.name == "RP") {
+      if(this.game.sector.unlockedItems.indexOf(Protocol.definition().BuildingType[this.craftType]) != -1) return ""
+      let hasInsufficientSupply = requirement.supply < requirement.count
+      let supplyClassName = hasInsufficientSupply ? "unmet" : ""
+      let el = "<div class='requirement_row'>" +
+                  "<img src='/assets/images/RP_icon.png'>" +
+                  "<div class='requirement_name'>RP</div>" +
+                  "<div class='requirement_supply " + supplyClassName + "'>" +
+                  "<span class='supply_count'>" + requirement.supply + "</span>" +
+                  "/" +
+                  "<span class='requirement_count'>" + requirement.count + "</span>" +
+                "</div>" +
+              "</div>"
+      return el
+    }
     let type = requirement.klass.getType()
     let imgSrc = this.game.getImageSrcForItemType(type)
 

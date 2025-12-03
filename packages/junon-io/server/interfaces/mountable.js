@@ -9,7 +9,7 @@ Mountable.prototype = {
   mount(user) {
     if (this.passenger) return
 
-    if (this.game.distanceBetween(this, user) >= this.getInteractDistance()) {
+    if (isTooFar(user)) {
       if (user.isPlayer()) {
         user.showError("Too far", { isWarning: true })
       }
@@ -32,8 +32,20 @@ Mountable.prototype = {
 
   shouldUpdatePosition() {
     return true
+  },
+
+  isMountable(user) {
+    if (this.passenger) return false
+    if (!isTooFar(user)) return false
+    
+    return true
   }
 
+  isTooFar(user) {
+    if (this.game.distanceBetween(this, user) >= this.getInteractDistance()) {
+      return true
+    }
+  }
 }
 
 module.exports = Mountable

@@ -39,7 +39,7 @@ Mountable.prototype = {
     if (!isTooFar(user)) return false
     
     return true
-  }
+  },
 
   isTooFar(user) {
     if (this.game.distanceBetween(this, user) >= this.getInteractDistance()) {

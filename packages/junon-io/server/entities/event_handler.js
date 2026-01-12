@@ -20,6 +20,7 @@ class EventHandler {
     this.BREAK_EXPRESSION = "debug" + "ger" // avoid git hook from detecting
     this.isRoundStarted = false
     this.isRoundStarting = false
+    this.processingEvents = new Set() // Track events currently being processed to prevent infinite loops
   }
 
   getSocketUtil() {
@@ -964,6 +965,17 @@ class EventHandler {
     let trigger = this.triggers[eventName]
     if (!trigger) return
 
+    let eventKey = this.getEventKey(eventName, params)
+
+
+    // Prevent infinite loops by checking if this event is already being processed
+    if (this.processingEvents.has(eventKey)) {
+      return
+    }
+
+    // Mark this event as being processed
+    this.processingEvents.add(eventKey)
+
     let paramsJson = JSON.stringify(params)
     this.queueLog({ type: 'event', message: eventName })
     this.queueLog({ type: 'params', message: paramsJson })
@@ -998,7 +1010,22 @@ class EventHandler {
     } catch(e) {
       this.game.captureException(e)
       this.queueLog({ type: 'error', message: 'unknown error' })
+    } finally {
     }
+  }
+
+  getEventKey(eventName, params) {
+    let key = eventName
+
+    if (params.entityId) {
+      key += `:${params.entityId}`
+    }
+
+    return key
+  }
+
+  resetProcessingEvents() {
+    this.processingEvents.clear()
   }
 
   updateTaskCompleted() {

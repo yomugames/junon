@@ -3027,6 +3027,8 @@ class Sector {
   }
 
   executeTurn() {
+    this.eventHandler.resetProcessingEvents()
+
     for (let entityId in this.flames) {
       let entity = this.flames[entityId]
       if(!entity.effects.fire || entity.isRemoved) {

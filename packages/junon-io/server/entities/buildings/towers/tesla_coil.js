@@ -59,7 +59,9 @@ class TeslaCoil extends BaseTower {
       if(attackTarget.getType() == Protocol.definition().MobType.Sapper) {
         attackTarget.setHealth(attackTarget.health + 5)
       } else {
-        attackTarget.damage(this.getDamage(), projectile)
+        if (projectile) {
+          attackTarget.damage(this.getDamage(), projectile)
+        }
         alreadyDamagedEntities[target.getId()] = true
       }
     }

@@ -8,6 +8,7 @@
   },
   "globalSpeedMultiplier": 2,
   "maxStackCount": 99,
+  "maxProjectilesPerSector": 2500,
   "holdItemIndex": 9999,
   "chunkRowCount": 16,
   "chunkColCount": 16,

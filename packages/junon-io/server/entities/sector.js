@@ -1433,6 +1433,10 @@ class Sector {
     return Projectiles[type].build(options)
   }
 
+  hasReachedProjectileLimit() {
+    return Object.keys(this.projectiles).length >= Constants.maxProjectilesPerSector
+  }
+
   addFire(row, col) {
     const entity = this.platformMap.get(row, col)
     if (entity) {

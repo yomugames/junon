@@ -14,7 +14,7 @@ class Cannon extends BaseTower {
   }
 
   performAttack(attackTarget) {
-    const projectile = new Projectiles.CannonBall({
+    const projectile = Projectiles.CannonBall.build({
       weapon: this,
       destinationEntity:  attackTarget,
       source:      { x: this.getX(),         y: this.getY() },

@@ -29,7 +29,7 @@ class MolotovCocktail extends HandEquipment {
       destination = user.getShootTarget(this)
     }
 
-    const projectile = new Projectiles.MolotovCocktail({
+    const projectile = Projectiles.MolotovCocktail.build({
       weapon:        this,
       source:      { x: sourcePoint[0],         y: sourcePoint[1] },
       destination: destination

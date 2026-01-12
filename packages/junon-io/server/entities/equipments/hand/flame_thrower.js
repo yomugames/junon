@@ -37,7 +37,7 @@ class FlameThrower extends HandEquipment {
       let width = Math.min(maxWidth, minWidth + (i * 6))
 
       if (!this.isObstructed(player, point)) {
-        new Projectiles.Flame({
+        Projectiles.Flame.build({
           weapon: this,
           source:      { x: point[0], y: point[1] },
           destination: { x: point[0], y: point[1] },

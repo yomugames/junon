@@ -33,7 +33,7 @@ class MissileTurret extends BaseTower {
       this.notifyViewSubscribers()
     }
 
-    const projectile = new Projectiles.Missile({
+    const projectile = Projectiles.Missile.build({
       weapon:  this,
       destinationEntity:  attackTarget,
       source:      { x: this.getX(),         y: this.getY() },

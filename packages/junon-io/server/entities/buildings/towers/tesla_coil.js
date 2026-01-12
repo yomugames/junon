@@ -51,7 +51,7 @@ class TeslaCoil extends BaseTower {
     let projectile
 
     if (this.canDamage(attackTarget)) {
-      projectile = new Projectiles.TeslaLaser({
+      projectile = Projectiles.TeslaLaser.build({
         weapon: this,
         source:      { x: this.getX(),     y: this.getY() },
         destination: { x: attackTarget.getX(), y: attackTarget.getY() }
@@ -67,7 +67,7 @@ class TeslaCoil extends BaseTower {
     for (var i = 0; i <= chainCount; i++) {
       let nextTarget = this.getChainTarget(target, alreadyDamagedEntities)
       if (nextTarget) {
-        projectile = new Projectiles.TeslaLaser({
+        projectile = Projectiles.TeslaLaser.build({
           weapon: this,
           source:      { x: target.getX(),     y: target.getY() },
           destination: { x: nextTarget.getX(), y: nextTarget.getY() }

@@ -1430,7 +1430,7 @@ class Sector {
     if (!options.weapon && !options.owner) {
       options.owner = this
     }
-    return new Projectiles[type](options)
+    return Projectiles[type].build(options)
   }
 
   addFire(row, col) {

@@ -13,7 +13,7 @@ class SquidStaff extends HandEquipment {
     let angles = [-30, -15, 0, 15, 30]
     angles.forEach((angle) => {
       let angleInRad = user.getRadAngle() + (angle * Math.PI / 180)
-      const projectile = new Projectiles.Bubble({
+      const projectile = Projectiles.Bubble.build({
         weapon:        this,
         source:      { x: user.getX(),         y: user.getY() },
         destination: user.getShootTarget(this, angleInRad)

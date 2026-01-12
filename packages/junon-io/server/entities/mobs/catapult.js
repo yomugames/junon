@@ -13,7 +13,7 @@ class Catapult extends BaseMob {
   }
 
   performAttack(attackTarget) {
-    const projectile = new Projectiles.Rock({
+    const projectile = Projectiles.Rock.build({
       weapon:        this,
       source:      { x: this.getX(),         y: this.getY() },
       destination: this.calculateDestination(attackTarget)

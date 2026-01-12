@@ -87,7 +87,7 @@ class AssaultRifle extends HandEquipment {
     let angleRandomizer = 2 - Math.floor(Math.random() * 5)
     angleInRad = angleInRad + (angleRandomizer * Math.PI / 180)
 
-    new Projectiles.RifleBullet({
+    Projectiles.RifleBullet.build({
       weapon:        this,
       source:      { x: user.getX(),         y: user.getY() },
       destination: user.getShootTarget(this, angleInRad)

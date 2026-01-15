@@ -242,8 +242,8 @@ class ChunkRegion {
   }
 
   getChunk() {
-    let row = this.chunkId.split("-")[0]
-    let col = this.chunkId.split("-")[1]
+    let row = this.id.split("-")[0]
+    let col = this.id.split("-")[1]
     
     return this.sector.getChunk(row, col)
   }

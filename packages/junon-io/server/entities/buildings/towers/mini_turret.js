@@ -47,7 +47,7 @@ class MiniTurret extends BaseTower {
 
     let sourcePoint = this.game.pointFromDistance(this.getX(), this.getY(), Constants.tileSize, this.getAbsoluteRadAngle())
 
-    const projectile = new Projectiles.BasicLaser({
+    const projectile = Projectiles.BasicLaser.build({
       weapon:        this,
       source:      { x: sourcePoint[0],         y: sourcePoint[1] },
       destination: this.getShootTarget(this),

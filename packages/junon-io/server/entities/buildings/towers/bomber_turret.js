@@ -27,7 +27,7 @@ class BomberTurret extends BaseTower {
       this.notifyViewSubscribers()
     }
 
-    const projectile = new Projectiles.Grenade({
+    const projectile = Projectiles.Grenade.build({
       weapon:  this,
       destinationEntity:  attackTarget,
       source:      { x: this.getX(),         y: this.getY() },

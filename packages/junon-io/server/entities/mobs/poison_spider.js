@@ -14,7 +14,7 @@ class PoisonSpider extends Spider {
   }
 
   performAttack(attackTarget) {
-    const projectile = new Projectiles.AcidSpit({
+    const projectile = Projectiles.AcidSpit.build({
       weapon:        this,
       source:      { x: this.getX(),         y: this.getY() },
       destination: this.calculateDestination(attackTarget)

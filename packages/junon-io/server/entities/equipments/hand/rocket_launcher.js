@@ -23,7 +23,7 @@ class RocketLauncher extends HandEquipment {
 
     let sourcePoint = user.game.pointFromDistance(user.getX(), user.getY(), Constants.tileSize, user.getRadAngle())
 
-    const projectile = new Projectiles.Missile({
+    const projectile = Projectiles.Missile.build({
       weapon:        this,
       source:      { x: sourcePoint[0],         y: sourcePoint[1] },
       destination: user.getShootTarget(this),

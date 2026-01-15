@@ -28,7 +28,7 @@ class Dynamite extends HandEquipment {
     }
 
     const projectileKlass = this.getProjectileKlass()
-    const projectile = new projectileKlass({
+    const projectile = projectileKlass.build({
       weapon:        weapon,
       source:      { x: sourcePoint[0],         y: sourcePoint[1] },
       destination: destination

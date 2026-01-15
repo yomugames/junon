@@ -51,7 +51,7 @@ class Miner extends BaseTower {
 
 
   spawnProjectile(attackTarget) {
-    this.projectile = new Projectiles.MiningBeam({
+    this.projectile = Projectiles.MiningBeam.build({
       weapon:       this,
       destinationEntity:  attackTarget,
       source:      { x: this.getX(),         y: this.getY() },

@@ -47,12 +47,22 @@ class SurvivalSector extends Sector {
   }
 
   findChunkFromStructure(team, player) {
+    let searchLimitMilliSeconds = 500
+    let totalSearchDuration = 0
+
     // find farthest chunkRegion from a structure
     for (let structureId in team.ownerships.structures) {
       let structure = team.ownerships.structures[structureId]
       let chunkRegion = structure.getChunkRegion()
       if (chunkRegion) {
+        let startTime = Date.now()
         let spawnGround = this.pathFinder.findSpawnGround(chunkRegion)
+        let endTime = Date.now()
+        let duration = endTime - startTime
+        totalSearchDuration += duration
+        if (totalSearchDuration > searchLimitMilliSeconds) {
+          break
+        }
         if (spawnGround) {
           player.repositionTo(spawnGround.getX(), spawnGround.getY())
           player.setPositionFound(true)

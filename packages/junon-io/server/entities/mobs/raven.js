@@ -34,7 +34,7 @@ class Raven extends HoverMob {
     let points = [firstSourcePoint, secondSourcePoint]
 
     points.forEach((sourcePoint) => {
-        new Projectiles.Missile({
+        Projectiles.Missile.build({
             weapon:        this,
             destinationEntity:  attackTarget,
             source:      { x: sourcePoint[0],         y: sourcePoint[1] },

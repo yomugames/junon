@@ -16,7 +16,7 @@ class Turret extends BaseTower {
   performAttack(attackTarget) {
     super.performAttack(attackTarget)
 
-    const projectile = new Projectiles.BasicLaser({
+    const projectile = Projectiles.BasicLaser.build({
       weapon:       this,
       destinationEntity:  attackTarget,
       source:      { x: this.getX(),         y: this.getY() },

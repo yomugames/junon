@@ -16,6 +16,22 @@ class MobManager {
     this.nightSpawnCountByArea = {}
   }
 
+  // Returns a set of all room tiles as "row-col" strings for fast checking
+getAllRoomTilesSet() {
+  let roomTiles = new Set()
+  
+  if (!this.sector.roomManager) return roomTiles
+
+  Object.values(this.sector.roomManager.rooms).forEach(room => {
+    Object.values(room.tiles).forEach(tile => {
+      roomTiles.add(`${tile.row}-${tile.col}`)
+    })
+  })
+
+  return roomTiles
+}
+
+
   onHourChanged() {
     this.hourlySpawn()  
   }
@@ -113,6 +129,11 @@ class MobManager {
   spawnAreaMob(player, mobTypeName, condition) {
     let spawnPos = this.findSpawnPos(player, condition)
     if (!spawnPos) return
+
+    const room = this.sector.roomManager.getRoomAt(spawnPos.row, spawnPos.col)
+    if (room && room.isOxygenated) {
+      return
+    }
 
     let quadrant = this.getQuadrantForRowCol(spawnPos.row, spawnPos.col)
     if (this.hasReachedAreaSpawnLimit(quadrant, mobTypeName)) {

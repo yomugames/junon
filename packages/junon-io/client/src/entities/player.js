@@ -1838,6 +1838,8 @@ class Player extends BaseEntity {
   }
 
   displayLowStatusWarning(stat) {
+    const settingKey = "is" + stat[0].toUpperCase() + stat.slice(1) + "Enabled";
+    if (!this.sector.settings[settingKey]) return;
     switch(stat) {
       case "oxygen":
         this.game.displayError("You are running out of oxygen")

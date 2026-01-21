@@ -7,7 +7,7 @@ class FuelTank extends BaseBuilding {
   interact(user) {
     let handEquipment = user.getHandEquipment()
 
-    let refueableEquipments = [Protocol.definition().BuildingType.Lighter, Protocol.definition().BuildingType.FlameThrower]
+    let refueableEquipments = [Protocol.definition().BuildingType.Lighter, Protocol.definition().BuildingType.FlameThrower, Protocol.definition().BuildingType.SprayGun]
 
     if (handEquipment && refueableEquipments.indexOf(handEquipment.getType()) !== -1) {
       let amountDrained = this.consumeResource("fuel", handEquipment.getResourceConsumption("fuel"))

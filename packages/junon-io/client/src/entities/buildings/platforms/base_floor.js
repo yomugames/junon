@@ -2,6 +2,7 @@ const BaseBuilding = require("./../base_building")
 const Constants = require("./../../../../../common/constants.json")
 const SocketUtil = require("./../../../util/socket_util")
 const SpritePoolInstance = require("../../sprite_pool_instance")
+const Protocol = require("./../../../../../common/util/protocol")
 
 class BaseFloor extends BaseBuilding {
 
@@ -45,10 +46,17 @@ class BaseFloor extends BaseBuilding {
     if (!platformEntity) return true
     if (platformEntity.getType() !== type) return true
     // if (!currentBuilding) return true
-
+    
     if (currentBuilding) {
       if (platformEntity.colorIndex !== currentBuilding.colorIndex) return true
       if (platformEntity.textureIndex !== currentBuilding.textureIndex) return true
+      
+      if (platformEntity.colorIndex === 999 && currentBuilding.colorIndex === 999) {
+        if (platformEntity.customHex === currentBuilding.customHex) {
+          return false
+        }
+        return true
+      }
     }
 
     return false

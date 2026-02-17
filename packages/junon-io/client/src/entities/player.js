@@ -1618,7 +1618,13 @@ class Player extends BaseEntity {
       angle: this.building.getAngle(),
       x: gridCoord.x,
       y: gridCoord.y,
-      containerId: buildContainer.id
+      containerId: buildContainer.id,
+      colorIndex: this.building.colorIndex,
+      textureIndex: this.building.textureIndex
+    }
+
+    if (this.building.customHex) {
+      buildingRequestData.customHex = this.building.customHex
     }
 
     if (this.isSameBuildingRequest(buildingRequestData)) return

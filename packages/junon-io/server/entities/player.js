@@ -4182,7 +4182,7 @@ class Player extends BaseEntity {
       }
     }
 
-    if (buildingKlass.isPositionValid(buildContainer, data.x, data.y, w, h, data.angle, this, data.type, this.colorIndex, this.textureIndex)) {
+    if (buildingKlass.isPositionValid(buildContainer, data.x, data.y, w, h, data.angle, this, data.type, data.colorIndex, data.textureIndex, data.customHex)) {
       data.owner = this.getBuildOwner()
       data.placer = this
       data.buildProgress = 0

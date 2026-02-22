@@ -1017,7 +1017,7 @@ class EventHandler {
   getEventKey(eventName, params) {
     let key = eventName
 
-    if (params.entityId) {
+    if (params && params.entityId) {
       key += `:${params.entityId}`
     }
 

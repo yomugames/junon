@@ -738,7 +738,8 @@
     "pink_1":   { "index": 34, "value": "#d784de" },
     "pink_2":   { "index": 35, "value": "#ff51b1" },
     "pink_3":   { "index": 36, "value": "#ef6990" },
-    "pink_4":   { "index": 37, "value": "#ff54c9" }
+    "pink_4":   { "index": 37, "value": "#ff54c9" },
+    "custom_color": { "index": 999, "value": "#000000" }
   },
   "Deeds": {
     "taxes_not_paid": {

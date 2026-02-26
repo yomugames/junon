@@ -1809,7 +1809,7 @@
     "CabbageSeed": {
       "parent": "Crops.BaseSeed",
       "cost": {
-        "gold": 30
+        "gold": 150
       },
       "yield": "Cabbage",
       "description": "Plant on soil to grow cabbage"
@@ -2065,6 +2065,15 @@
       "damage": 10,
       "speed": 0,
       "categories": {"elemental":true,"fire":true}
+    },
+    "WaterCloud": {
+      "width": 32,
+      "height": 32,
+      "minWidth": 32,
+      "maxWidth": 64,
+      "maxRadialExpansion": 16,
+      "damage": 2,
+      "speed": 0
     },
     "IonBeam": {
       "width": 512,
@@ -3680,6 +3689,28 @@
         "CopperBar": 30
       },
       "description": "Shoots flames"
+    },
+    "SprayGun": {
+      "parent": "Equipments.BaseEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "shouldNotRemoveOnBreak": true,
+      "cost": {
+        "gold": 450
+      },
+      "stats": {
+        "range": 200,
+        "damage": 2,
+        "usageCapacity": 30,
+        "fuelConsumption": 80,
+        "reload": 200
+      },
+      "requirements": {
+        "CopperBar": 30,
+        "IronBar": 30,
+        "WaterBottle": 1
+      },
+      "description": "Uses combustion to water crops efficiently. Can also put out crops on fires."
     },
     "SquidStaff": {
       "parent": "Equipments.BaseEquipment",

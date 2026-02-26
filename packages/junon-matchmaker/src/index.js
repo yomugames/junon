@@ -2489,7 +2489,10 @@ class MatchmakerServer {
     } catch(e) {
       delete this.currentImports[sectorUid]
       ExceptionReporter.captureException(e)
-      res.end(JSON.stringify({ error: "Unable to import sector" }))
+      // log to server console for debugging
+      console.error(`Import failed for sector ${sectorUid}:`, e)
+      // include the error message in the JSON so it appears in the browser's console
+      res.end(JSON.stringify({ error: "Unable to import sector", detail: e.message }))
     }
   }
 

@@ -387,6 +387,20 @@ class EventHandler {
     return this.getAlivePlayerCountForRole(roleName)
   }
 
+  getTeamMemberNames(teamName) {
+    let team = this.game.getTeamByName(teamName)
+    if (!team) return
+
+    return team.getMemberNamesJson();
+  }
+  
+  getRegionPlayerNames(regionName) {
+    let region = this.sector.getRegion(regionName)
+    if (!region) return 0
+
+    return region.getMemberNamesJson()
+  }
+  
   getHunger(playerId) {
     let player = this.getPlayer(playerId)
     if (!player) return 0
@@ -1243,7 +1257,9 @@ class EventHandler {
       "$getTotalMobCount": true,
       "$getAngle": true,
       "$getUsage": true,
-      "$getCapacity": true
+      "$getCapacity": true,
+      "$getRegionMemberNames": true,
+      "$getTeamMemberNames": true
     }
   }
 

@@ -969,9 +969,10 @@ class EventHandler {
 
 
     // Prevent infinite loops by checking if this event is already being processed
-    if (this.processingEvents.has(eventKey)) {
-      return
-    }
+    // disable for now. need to fix to handle nested events
+    // if (this.processingEvents.has(eventKey)) {
+    //   return
+    // }
 
     // Mark this event as being processed
     this.processingEvents.add(eventKey)

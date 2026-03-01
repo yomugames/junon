@@ -40,7 +40,7 @@ class Help extends BaseCommand {
         player.showChatSuccess("/trader    - customize trader item list")
         player.showChatSuccess("/region    - manage regions")
         player.showChatSuccess("/force     - apply directional force to entity")
-        // player.showChatSuccess("/fill      - fill terrain on specified area")
+        player.showChatSuccess("/fill      - fill terrain on specified area")
         player.showChatSuccess("/spawnmob  - spawn mob")
         player.showChatSuccess("/sethealth - set health of entity")
         player.showChatSuccess("/dialogue  - assign dialogue on mob")

@@ -9,6 +9,9 @@ class ColorPickerMenu extends BaseMenu {
     this.el.querySelector(".picker_color_value").innerText = "white_1"
     this.colors = {}
 
+    this.customColorActive = false
+    this.customColorHex = Constants.FloorColors && Constants.FloorColors.custom_color ? Constants.FloorColors.custom_color.value : "#000000"
+
     if (this.el.querySelector(".picker_texture_value")) {
       this.el.querySelector(".picker_texture_value").innerText = "solid_texture"
     }
@@ -65,6 +68,11 @@ class ColorPickerMenu extends BaseMenu {
         building.setColorIndex(this.colorIndex)
         let value = this.game.colors[this.colorIndex].value
         building.baseSprite.tint = value
+        if (this.colorIndex == 999) {
+          building.customHex = this.customColorHex
+        } else {
+          building.customHex = null
+        }
       }
     }
   }
@@ -90,6 +98,16 @@ class ColorPickerMenu extends BaseMenu {
     }
     
     this.el.querySelector(".color_picker_tab_container").addEventListener("click", this.onTabClick.bind(this))
+
+    let panel = this.el.querySelector('.more_colors_panel')
+    if (panel) {
+      let applyBtn = panel.querySelector('.more_colors_apply_btn')
+      if (applyBtn) {
+        applyBtn.addEventListener('click', (ev) => {
+          panel.style.display = 'none'
+        })
+      }
+    }
   }
 
   open(options = {}) {
@@ -97,6 +115,13 @@ class ColorPickerMenu extends BaseMenu {
 
     this.colors = options.colors
     this.entityId = options.entityId
+
+    this.customColorHex = (Constants.FloorColors && Constants.FloorColors.custom_color && Constants.FloorColors.custom_color.value) || this.customColorHex
+    try {
+      Constants.FloorColors.custom_color.value = this.customColorHex
+    } catch (e) {}
+
+
 
     this.render()
   }
@@ -123,10 +148,50 @@ class ColorPickerMenu extends BaseMenu {
   }
 
   onColorPickerGridClick(e) {
+    let more = e.target.closest(".more_colors_cell")
+    if (more) {
+      let tab = this.el.querySelector(".tab-pane.selected")
+      if (!tab) return
+      let panel = tab.querySelector(".more_colors_panel")
+      if (!panel) return
+
+      if (panel.style.display === 'none' || panel.style.display === '') {
+        panel.style.display = 'block'
+        let input = panel.querySelector('.more_colors_input')
+        if (input) {
+          input.value = this.customColorHex || '#000000'
+          input.oninput = (ev) => {
+            let hex = ev.target.value
+            this.customColorHex = hex
+            try { Constants.FloorColors.custom_color.value = hex } catch (e) {}
+            if (this.game && this.game.colors) {
+              let intVal = parseInt(hex.replace('#',''), 16)
+              this.game.colors[999] = { index: 999, value: intVal, label: 'custom_color' }
+            }
+            this.colorIndex = 999
+            this.customColorActive = true
+            this.el.querySelector('.picker_color_value').innerText = hex
+            if (this.game.player.building) {
+              this.applyBuildingTint(this.game.player.building)
+            }
+            SocketUtil.emit('EditTexture', { colorIndex: 999, entityId: this.entityId })
+          }
+        }
+      } else {
+        panel.style.display = 'none'
+      }
+
+      return
+    }
+
     let cell = e.target.closest(".color_cell")
     if (cell) {
       let colorIndex = cell.dataset.index
-      SocketUtil.emit("EditTexture", { colorIndex: colorIndex, entityId: this.entityId  })
+      if (colorIndex) {
+        this.setColorIndex(colorIndex)
+        this.customColorActive = false
+        SocketUtil.emit("EditTexture", { colorIndex: colorIndex, entityId: this.entityId })
+      }
     }
   }
 
@@ -145,6 +210,8 @@ class ColorPickerMenu extends BaseMenu {
       let color = this.colors[index]
       el += this.createColorCellEl(index, color)
     }
+
+    el += `<div class='color_cell more_colors_cell'>+</div>`
 
     return el
   }

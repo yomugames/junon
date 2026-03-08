@@ -824,12 +824,14 @@ class BaseMob extends BaseEntity {
   }
 
   mobMount(user) {
-    this.game.triggerEvent("MobMount", {
-      entityId: this.getId(),
-      entityType: this.getTypeName(),
-      playerId: user.getId(),
-      player: user.getName()
-    })
+    if (this.isMountable(user)) {
+      this.game.triggerEvent("MobMount", {
+        entityId: this.getId(),
+        entityType: this.getTypeName(),
+        playerId: user.getId(),
+        player: user.getName()
+      })
+    }
     this.mount(user)
 
     if (user.isPlayer()) {

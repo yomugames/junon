@@ -266,6 +266,7 @@ enum BuildingType {
   MiasmaGate = 272;
   CabbageSeed = 273;
   Cabbage = 274;
+  SprayGun = 275;
 }
 
 enum TerrainType {
@@ -316,6 +317,7 @@ enum ProjectileType {
   BlueLaser = 26;
   Dynamite = 27;
   MiningExplosion = 28;
+  WaterCloud = 29;
 }
 
 enum MobStatus {

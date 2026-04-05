@@ -2,6 +2,14 @@ const SocketUtil = require("./../util/socket_util")
 const BaseMenu = require("./base_menu")
 const Helper = require("../../../common/helper")
 const Protocol = require("../../../common/util/protocol")
+const ClientHelper = require("./../util/client_helper")
+
+function formatHex(val) {
+  if (val === null || typeof val === 'undefined') return ''
+  if (typeof val === 'string') return val.indexOf('#') === 0 ? val : ('#' + val)
+  if (typeof val === 'number') return ClientHelper.toHex(val)
+  return ''
+}
 
 class EntityMenu extends BaseMenu {
 
@@ -410,6 +418,25 @@ class EntityMenu extends BaseMenu {
       this.el.querySelector(".entity_light_color").innerText = ""
     } else {
       this.el.querySelector(".debug_container").style.display = 'none'
+    }
+
+    // show hex color for floor, wall, or custom-colored entities (always visible)
+    if (typeof entity.getRow === "function") {
+      const isFloorOrWall = entity.hasCategory && (entity.hasCategory('platform') || entity.hasCategory('wall') || entity.hasCategory('custom_colors'))
+      let colorHex = ''
+
+      if (isFloorOrWall) {
+        if (entity.data && entity.data.colorIndex != null) {
+          const c = this.game.colors[entity.data.colorIndex]
+          colorHex = c && (typeof c.value === 'string' ? c.value : ClientHelper.toHex(c.value)) || ''
+        } else if (entity.getConstants && entity.getConstants().sprite && entity.getConstants().sprite.color) {
+          colorHex = formatHex(entity.getConstants().sprite.color)
+        } else if (entity.getDefaultSpriteColor && typeof entity.getDefaultSpriteColor === 'function') {
+          colorHex = formatHex(entity.getDefaultSpriteColor())
+        }
+      }
+
+      this.el.querySelector('.entity_color').innerText = colorHex ? ('color: ' + colorHex) : ''
     }
 
     if (entity.hasCategory("editable_permissions") &&

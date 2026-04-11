@@ -1,20 +1,28 @@
 const BaseBuilding = require("./../base_building")
 const Constants = require("../../../../common/constants.json")
+const Protocol = require("../../../../common/util/protocol")
 
 class BaseFloor extends BaseBuilding {
 
-  static isDifferentPlatform(platformEntity, type, colorIndex, textureIndex) {
+  static isDifferentPlatform(platformEntity, type, colorIndex, textureIndex, customHex) {
     if (platformEntity === 0) return true
     if (!platformEntity) return true
     if (platformEntity.getType() !== type) return true
 
     if (platformEntity.colorIndex !== colorIndex) return true
     if (platformEntity.textureIndex !== textureIndex) return true
+    
+    if (colorIndex === 999 && platformEntity.colorIndex === 999) {
+      if (platformEntity.customHex === customHex) {
+        return false
+      }
+      return true
+    }
 
     return false
   }
 
-  static isPositionValid(container, x, y, w, h, angle, player, type, colorIndex, textureIndex) {
+  static isPositionValid(container, x, y, w, h, angle, player, type, colorIndex, textureIndex, customHex) {
     if (this.isPlacingOnSomeoneElsePlatform(container, x, y, w, h, angle, player)) return false
 
     let box = this.getBox(x, y, w, h)
@@ -33,7 +41,7 @@ class BaseFloor extends BaseBuilding {
     let row = Math.floor(y / Constants.tileSize)
     let col = Math.floor(x / Constants.tileSize)
     let platformEntity = container.platformMap.get(row, col)
-    let isDifferentPlatform = this.isDifferentPlatform(platformEntity, type, colorIndex, textureIndex)
+    let isDifferentPlatform = this.isDifferentPlatform(platformEntity, type, colorIndex, textureIndex, customHex)
 
     let isTrap = platformEntity && platformEntity.hasCategory("trap")
 

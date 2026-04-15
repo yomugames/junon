@@ -11,7 +11,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/start_server"
+            "program": "${workspaceFolder}/start_server",
+            "runtimeVersion": "16.15.0"
         }
     ]
 }

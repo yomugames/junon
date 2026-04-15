@@ -423,20 +423,10 @@ class EntityMenu extends BaseMenu {
     // show hex color for floor, wall, or custom-colored entities (always visible)
     if (typeof entity.getRow === "function") {
       const isFloorOrWall = entity.hasCategory && (entity.hasCategory('platform') || entity.hasCategory('wall') || entity.hasCategory('custom_colors'))
-      let colorHex = ''
 
-      if (isFloorOrWall) {
-        if (entity.data && entity.data.colorIndex != null) {
-          const c = this.game.colors[entity.data.colorIndex]
-          colorHex = c && (typeof c.value === 'string' ? c.value : ClientHelper.toHex(c.value)) || ''
-        } else if (entity.getConstants && entity.getConstants().sprite && entity.getConstants().sprite.color) {
-          colorHex = formatHex(entity.getConstants().sprite.color)
-        } else if (entity.getDefaultSpriteColor && typeof entity.getDefaultSpriteColor === 'function') {
-          colorHex = formatHex(entity.getDefaultSpriteColor())
-        }
+      if (isFloorOrWall && entity.data && entity.data.colorIndex > 37) {
+        this.el.querySelector('.entity_color').innerText = ClientHelper.toHex(entity.data.colorIndex - 38)
       }
-
-      this.el.querySelector('.entity_color').innerText = colorHex ? ('color: ' + colorHex) : ''
     }
 
     if (entity.hasCategory("editable_permissions") &&

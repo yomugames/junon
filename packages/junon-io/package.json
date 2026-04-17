@@ -37,7 +37,7 @@
     "protobufjs": "^6.10.2",
     "rbush": "^2.0.1",
     "sat": "^0.7.1",
-    "sharp": "0.28.0",
+    "sharp": "0.34.5",
     "url-search-params-polyfill": "^8.1.0",
     "uuid": "^3.3.2",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.10.0",

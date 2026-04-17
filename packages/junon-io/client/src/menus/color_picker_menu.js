@@ -10,7 +10,7 @@ class ColorPickerMenu extends BaseMenu {
     this.colors = {}
 
     this.customColorActive = false
-    this.customColorHex = Constants.FloorColors && Constants.FloorColors.custom_color ? Constants.FloorColors.custom_color.value : "#000000"
+    this.customColorHex = "#000000" //it'll always open as #000000 unless we implement a custom color value in a new save file revision, which would be an unnecessary headache.
 
     if (this.el.querySelector(".picker_texture_value")) {
       this.el.querySelector(".picker_texture_value").innerText = "solid_texture"
@@ -68,8 +68,9 @@ class ColorPickerMenu extends BaseMenu {
         building.setColorIndex(this.colorIndex)
         let value = this.game.colors[this.colorIndex].value
         building.baseSprite.tint = value
-        if (this.colorIndex == 999) {
-          building.customHex = this.customColorHex
+        if (this.colorIndex > 37) {
+          let toHex = ClientHelper.toHex(this.colorIndex + 38)
+          building.customHex = toHex
         } else {
           building.customHex = null
         }
@@ -99,15 +100,40 @@ class ColorPickerMenu extends BaseMenu {
     
     this.el.querySelector(".color_picker_tab_container").addEventListener("click", this.onTabClick.bind(this))
 
-    let panel = this.el.querySelector('.more_colors_panel')
-    if (panel) {
-      let applyBtn = panel.querySelector('.more_colors_apply_btn')
-      if (applyBtn) {
-        applyBtn.addEventListener('click', (ev) => {
-          panel.style.display = 'none'
-        })
-      }
+    let panel = this.el.querySelector('.more_colors_panel');
+    if(panel) {
+      let applyBtn = panel.querySelector('.more_colors_apply_btn');
+      applyBtn.addEventListener('click', this.onApplyButtonClick.bind(this))
     }
+
+  }
+
+  onApplyButtonClick() {
+    let panel = this.el.querySelector('.more_colors_panel');
+
+    panel.style.display = 'none';
+
+    let colorInput = panel.querySelector(".more_colors_input");
+    let hex = colorInput.value;
+    this.customColorHex = hex;
+    let intVal;
+
+    if (this.game && this.game.colors) {
+      intVal = parseInt(hex.replace('#', ''), 16);
+      this.game.colors[intVal + 38] = { index: intVal + 38, value: intVal, label: hex };
+    }
+
+    this.colorIndex = intVal ? intVal + 38 : 1;
+    this.customColorActive = true;
+    this.el.querySelector('.picker_color_value').innerText = hex;
+
+    if (this.game.player.building) {
+      this.applyBuildingTint(this.game.player.building);
+    }
+
+    SocketUtil.emit('EditTexture', { colorIndex: intVal + 38, entityId: this.entityId });
+
+    this.render();
   }
 
   open(options = {}) {
@@ -115,13 +141,6 @@ class ColorPickerMenu extends BaseMenu {
 
     this.colors = options.colors
     this.entityId = options.entityId
-
-    this.customColorHex = (Constants.FloorColors && Constants.FloorColors.custom_color && Constants.FloorColors.custom_color.value) || this.customColorHex
-    try {
-      Constants.FloorColors.custom_color.value = this.customColorHex
-    } catch (e) {}
-
-
 
     this.render()
   }
@@ -160,22 +179,6 @@ class ColorPickerMenu extends BaseMenu {
         let input = panel.querySelector('.more_colors_input')
         if (input) {
           input.value = this.customColorHex || '#000000'
-          input.oninput = (ev) => {
-            let hex = ev.target.value
-            this.customColorHex = hex
-            try { Constants.FloorColors.custom_color.value = hex } catch (e) {}
-            if (this.game && this.game.colors) {
-              let intVal = parseInt(hex.replace('#',''), 16)
-              this.game.colors[999] = { index: 999, value: intVal, label: 'custom_color' }
-            }
-            this.colorIndex = 999
-            this.customColorActive = true
-            this.el.querySelector('.picker_color_value').innerText = hex
-            if (this.game.player.building) {
-              this.applyBuildingTint(this.game.player.building)
-            }
-            SocketUtil.emit('EditTexture', { colorIndex: 999, entityId: this.entityId })
-          }
         }
       } else {
         panel.style.display = 'none'

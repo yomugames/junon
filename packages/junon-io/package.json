@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sentry/node": "^5.3.0",
     "@dagrejs/graphlib": "^2.1.4",
     "@fingerprintjs/fingerprintjs": "^3.0.1",
     "aws-sdk": "^2.562.0",
@@ -40,7 +41,7 @@
     "sharp": "0.34.5",
     "url-search-params-polyfill": "^8.1.0",
     "uuid": "^3.3.2",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.10.0",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.64.0",
     "winston": "^2.3.1",
     "winston-daily-rotate-file": "^1.4.6",
     "ws": "^7.1.1",

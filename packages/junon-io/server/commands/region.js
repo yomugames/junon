@@ -19,6 +19,10 @@ class RegionCommand extends BaseCommand {
     ]
   }
 
+  isNonSandboxCommand() {
+    return true
+  }
+
   getAllowedFlags() {
     return ["build", "pvp", "map_label", "restrict", "priority"]
   }

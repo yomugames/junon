@@ -45,7 +45,7 @@ class SpikeTrap extends BaseFloor {
   }
 
   spawnProjectile() {
-    const projectile = new Projectiles.Spike({
+    const projectile = Projectiles.Spike.build({
       weapon:        this,
       source:      { x: this.getX(), y: this.getY() },
       destination: { x: this.getX(), y: this.getY() }

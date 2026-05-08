@@ -1430,7 +1430,11 @@ class Sector {
     if (!options.weapon && !options.owner) {
       options.owner = this
     }
-    return new Projectiles[type](options)
+    return Projectiles[type].build(options)
+  }
+
+  hasReachedProjectileLimit() {
+    return Object.keys(this.projectiles).length >= Constants.maxProjectilesPerSector
   }
 
   addFire(row, col) {
@@ -3027,6 +3031,8 @@ class Sector {
   }
 
   executeTurn() {
+    this.eventHandler.resetProcessingEvents()
+
     for (let entityId in this.flames) {
       let entity = this.flames[entityId]
       if(!entity.effects.fire || entity.isRemoved) {

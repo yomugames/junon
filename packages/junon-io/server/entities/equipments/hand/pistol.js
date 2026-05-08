@@ -23,7 +23,7 @@ class Pistol extends HandEquipment {
 
     let sourcePoint = user.game.pointFromDistance(user.getX(), user.getY(), 48, user.getRadAngle())
 
-    const projectile = new Projectiles.Bullet({
+    const projectile = Projectiles.Bullet.build({
       weapon:        this,
       source:      { x: sourcePoint[0],         y: sourcePoint[1] },
       destination: user.getShootTarget(this)

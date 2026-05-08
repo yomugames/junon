@@ -29,7 +29,7 @@ class Drone extends HoverMob {
 
     let sourcePoint = this.game.pointFromDistance(this.getX(), this.getY(), Constants.tileSize, this.getAbsoluteRadAngle())
 
-    const projectile = new Projectiles.LightLaser({
+    const projectile = Projectiles.LightLaser.build({
       weapon:        this,
       source:      { x: sourcePoint[0],         y: sourcePoint[1] },
       destination: this.getShootTarget(this),

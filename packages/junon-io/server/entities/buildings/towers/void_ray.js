@@ -25,7 +25,7 @@ class VoidRay extends BaseTower {
   }
 
   spawnProjectile(attackTarget) {
-    this.projectile = new Projectiles.VoidRayLight({
+    this.projectile = Projectiles.VoidRayLight.build({
       weapon: this,
       destinationEntity:  attackTarget,
       source:      { x: this.getX(),         y: this.getY() },

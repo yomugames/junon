@@ -16,7 +16,7 @@ class IonCannon extends BaseTower {
   getRangeCollider() {
     let destination = this.findNewPoint(this.getX(), this.getY(), this.getRotatedRadAngle(), this.getAttackRange())
 
-    return new Projectiles.IonBeam({
+    return Projectiles.IonBeam.build({
       weapon:  this,
       source:      { x: this.getX(),         y: this.getY() },
       destination: destination
@@ -131,7 +131,7 @@ class IonCannon extends BaseTower {
   }
 
   spawnProjectile(attackTarget) {
-    this.projectile = new Projectiles.IonBeam({
+    this.projectile = Projectiles.IonBeam.build({
       weapon:  this,
       destinationEntity:  attackTarget,
       source:      { x: this.getX(),         y: this.getY() },

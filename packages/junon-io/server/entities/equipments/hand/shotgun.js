@@ -25,7 +25,7 @@ class Shotgun extends HandEquipment {
     angles.forEach((angle) => {
       let angleInRad = user.getRadAngle() + (angle * Math.PI / 180)
 
-      new Projectiles.ShotgunBullet({
+      Projectiles.ShotgunBullet.build({
         weapon:        this,
         source:      { x: user.getX(),         y: user.getY() },
         destination: user.getShootTarget(this, angleInRad)

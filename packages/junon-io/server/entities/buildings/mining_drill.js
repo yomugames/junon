@@ -147,9 +147,9 @@ class MiningDrill extends BaseProcessor {
     }
   }
 
-  canStore(item) {
-      return false;
-  } 
+  canStore(index, item) {
+    return !item
+  }
 
 }
 

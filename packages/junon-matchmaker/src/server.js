@@ -232,7 +232,7 @@ class Server {
     if (debugMode) return false
     if (process.env.NODE_ENV === 'staging') return false
 
-    return this.revision !== this.node.revision
+    return parseInt(this.revision) !== parseInt(this.node.revision)
   }
 
   getHostName() {

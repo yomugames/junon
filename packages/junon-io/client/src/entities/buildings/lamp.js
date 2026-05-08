@@ -149,6 +149,7 @@ class Lamp extends BaseBuilding {
     }
 
     let defaultColor = this.content ? this.getLightColor() : '#000000'
+    defaultColor = ClientHelper.escapeHTML(defaultColor)
 
     let customColor = "<div class='lamp_color_picker_container'>" + 
                         "<span>Custom</span>" + 

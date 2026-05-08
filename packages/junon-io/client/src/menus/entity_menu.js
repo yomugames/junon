@@ -2,6 +2,14 @@ const SocketUtil = require("./../util/socket_util")
 const BaseMenu = require("./base_menu")
 const Helper = require("../../../common/helper")
 const Protocol = require("../../../common/util/protocol")
+const ClientHelper = require("./../util/client_helper")
+
+function formatHex(val) {
+  if (val === null || typeof val === 'undefined') return ''
+  if (typeof val === 'string') return val.indexOf('#') === 0 ? val : ('#' + val)
+  if (typeof val === 'number') return ClientHelper.toHex(val)
+  return ''
+}
 
 class EntityMenu extends BaseMenu {
 
@@ -410,6 +418,15 @@ class EntityMenu extends BaseMenu {
       this.el.querySelector(".entity_light_color").innerText = ""
     } else {
       this.el.querySelector(".debug_container").style.display = 'none'
+    }
+
+    // show hex color for floor, wall, or custom-colored entities (always visible)
+    if (typeof entity.getRow === "function") {
+      const isFloorOrWall = entity.hasCategory && (entity.hasCategory('platform') || entity.hasCategory('wall') || entity.hasCategory('custom_colors'))
+
+      if (isFloorOrWall && entity.data && entity.data.colorIndex > 37) {
+        this.el.querySelector('.entity_color').innerText = ClientHelper.toHex(entity.data.colorIndex - 38)
+      }
     }
 
     if (entity.hasCategory("editable_permissions") &&

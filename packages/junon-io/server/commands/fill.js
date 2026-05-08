@@ -9,7 +9,7 @@ class Fill extends BaseCommand {
   getUsage() {
     return [
       "/fill [start_row] [start_col] [end_row] [end_col] [terrain_type] [color]",
-      "/fill building [start_row] [start_col] [end_row] [end_col] [1x1 building] [color]"
+      // "/fill building [start_row] [start_col] [end_row] [end_col] [1x1 building] [color]"
     ]
   }
   
@@ -19,7 +19,7 @@ class Fill extends BaseCommand {
 
   perform(player, args) {
 
-    if(args[0] == 'building') {
+    if(false) {
       let startRow = parseInt(args[1])
       let startCol = parseInt(args[2])
       let endRow   = parseInt(args[3])

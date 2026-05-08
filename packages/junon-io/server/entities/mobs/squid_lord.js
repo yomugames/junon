@@ -67,7 +67,7 @@ class SquidLord extends HoverMob {
 
     let sourcePoint = this.game.pointFromDistance(this.getX(), this.getY(), Constants.tileSize, angleInRad)
 
-    const projectile = new Projectiles.Bubble({
+    const projectile = Projectiles.Bubble.build({
       weapon:        this,
       source:      { x: sourcePoint[0],         y: sourcePoint[1] },
       destination: this.getShootTarget(this, this.getRadAngle(), Constants.tileSize * 20),

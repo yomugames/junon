@@ -6785,6 +6785,16 @@ html[lang='ja'] .game_mode_description {
     cursor: pointer;
 }
 
+/* center the plus sign inside the More (+) color cell */
+.color_cell.more_colors_cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #ddd;
+    background: transparent;
+}
+
 #color_picker_menu .picker_tab {
     display: inline-block;
     border: solid 1px #555;

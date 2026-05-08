@@ -29,7 +29,7 @@ class Sapper extends Guard {
 
     let sourcePoint = [this.getX(), this.getY()]
 
-    const projectile = new Projectiles.BlueLaser({
+    const projectile = Projectiles.BlueLaser.build({
       weapon:        this,
       source:      { x: sourcePoint[0],         y: sourcePoint[1] },
       destination: this.getShootTarget(this),

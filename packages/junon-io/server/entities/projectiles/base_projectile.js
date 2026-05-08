@@ -7,6 +7,11 @@ const BaseEntity = require('../base_entity')
 
 class BaseProjectile extends BaseEntity {
   static build(data) {
+    let sector = data.weapon ? data.weapon.sector : data.owner.sector
+    if (sector.hasReachedProjectileLimit()) {
+      return null
+    }
+
     return new this(data)
   }
 

@@ -38,9 +38,17 @@ class Floor extends BaseFloor {
       }
 
       if (this.data.hasOwnProperty("colorIndex")) {
-        let color = this.game.colors[this.data.colorIndex]
-        this.baseSprite.tint = color.value
-        this.texture.tint = color.value
+        if (this.game.colors[this.data.colorIndex]) {
+          let color = this.game.colors[this.data.colorIndex];
+          this.baseSprite.tint = color.value;
+          this.texture.tint = color.value;
+        }
+
+        else { //it's a custom tint
+          let color = this.data.colorIndex;
+          this.baseSprite.tint = color - 38;
+          this.texture.tint = color - 38;
+        }
       }
 
       this.texture.anchor.set(0.5) 
@@ -54,8 +62,14 @@ class Floor extends BaseFloor {
       this.baseSprite.anchor.set(0.5)
 
       if (this.data.hasOwnProperty("colorIndex")) {
-        let color = this.game.colors[this.data.colorIndex]
-        this.baseSprite.tint = color.value
+        if(this.game.colors[this.data.colorIndex]) {
+          let color = this.game.colors[this.data.colorIndex];
+          this.baseSprite.tint = color.value
+        }
+
+        else { // custom tint
+          this.baseSprite.tint = this.data.colorIndex - 38;
+        }
       }
       
       sprite.addChild(this.baseSprite)

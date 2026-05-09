@@ -29,7 +29,7 @@
     "firebase-admin": "^8.2.0",
     "get-port": "^5.0.0",
     "junon-common": "*",
-    "lodash": "^4.17.4",
+    "lodash": "^4.18.1",
     "minipass": "2.7.0",
     "mysql": "^2.18.1",
     "node-polyglot": "^2.4.0",

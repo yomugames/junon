@@ -19,7 +19,7 @@
     "@fingerprintjs/fingerprintjs": "^3.0.1",
     "aws-sdk": "^2.562.0",
     "base64id": "^1.0.0",
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.20.3",
     "chrome-remote-interface": "0.27.1",
     "cors": "^2.8.5",
     "eventbusjs": "^0.2.0",

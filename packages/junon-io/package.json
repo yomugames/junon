@@ -66,7 +66,7 @@
     "gulp-clean": "^0.4.0",
     "gulp-concat": "^2.6.1",
     "gulp-connect": "^2.2.0",
-    "gulp-ejs": "^3.3.0",
+    "gulp-ejs": "^5.1.0",
     "gulp-if": "^2.0.2",
     "gulp-jshint": "^1.9.0",
     "gulp-rename": "^1.2.2",

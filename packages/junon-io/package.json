@@ -57,7 +57,7 @@
     "@tweenjs/tween.js": "^17.2.0",
     "babel-core": "^7.0.0-bridge.0",
     "bowser": "^2.4.0",
-    "browserify": "^8.1.0",
+    "browserify": "^17.0.1",
     "ejs": "^3.1.10",
     "element-closest": "^3.0.1",
     "gemini-scrollbar": "^1.5.3",

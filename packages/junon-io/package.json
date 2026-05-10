@@ -88,7 +88,7 @@
     "perfect-scrollbar": "^1.4.0",
     "pixi.js": "^4.8.5",
     "pump": "^3.0.0",
-    "reload": "^1.1.5",
+    "reload": "^3.4.3",
     "terser": "^4.8.0",
     "through2": "^3.0.0",
     "tinycolor2": "^1.4.1",

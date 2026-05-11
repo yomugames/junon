@@ -6,7 +6,7 @@
     "db:setup": "sequelize db:create && sequelize db:migrate"
   },
   "dependencies": {
-    "@sentry/node": "^5.3.0",
+    "@sentry/node": "^5.30.0",
     "base64id": "^1.0.0",
     "js-yaml": "^3.14.2",
     "json-stream": "^1.0.0",

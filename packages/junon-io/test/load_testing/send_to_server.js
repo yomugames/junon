@@ -1,24 +1,23 @@
-const request = require('request')
+const axios = require('axios'); 
 
 const sendToServer = (message, queryOptions) => {
-  let payload = {
-    url: "http://localhost:8000/debug/" + message
-  }
+  let config = {
+    url: "http://localhost:8000/debug/" + message,
+    method: 'get'
+  };
 
   if (queryOptions) {
-    payload.qs = queryOptions
+    config.params = queryOptions;
   }
 
-  return new Promise((resolve, reject) => {
-    request.get(payload, (err, res, body) => {
-      if (err) { 
-        console.log(err) 
-        reject(err)
-      } else {
-        resolve(JSON.parse(body).result)
-      }
+  return axios(config)
+    .then((response) => {
+      return response.data.result;
     })
-  })
-}
-
-module.exports = sendToServer
+    .catch((err) => {
+      console.log(err);
+      throw err; 
+    });
+};
+//i am not too sure about how axios works 
+module.exports = sendToServer;

@@ -23,7 +23,7 @@
     "chrome-remote-interface": "0.27.1",
     "cors": "^2.8.5",
     "eventbusjs": "^0.2.0",
-    "express": "^4.11.1",
+    "express": "^4.22.1",
     "faker": "^4.1.0",
     "firebase": "^12.13.0",
     "firebase-admin": "^13.9.0",

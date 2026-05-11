@@ -51,7 +51,7 @@
     "@babel/cli": "^7.2.3",
     "@babel/plugin-transform-runtime": "^7.4.4",
     "@babel/preset-env": "^7.2.3",
-    "@sentry/browser": "^5.3.0",
+    "@sentry/browser": "^7.119.1",
     "@sentry/cli": "^1.41.2",
     "@shopify/draggable": "^1.0.0-beta.8",
     "@tweenjs/tween.js": "^17.2.0",

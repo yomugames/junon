@@ -15,7 +15,7 @@
     "@sentry/node": "^4.3.4",
     "aws-sdk": "^2.229.1",
     "cors": "^2.8.5",
-    "express": "^4.11.1",
+    "express": "^4.22.1",
     "firebase-admin": "^13.9.0",
     "js-yaml": "^3.12.2",
     "json-stream": "^1.0.0",

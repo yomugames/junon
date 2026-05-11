@@ -17,7 +17,7 @@
     "@sentry/node": "^5.3.0",
     "@dagrejs/graphlib": "^2.1.4",
     "@fingerprintjs/fingerprintjs": "^3.0.1",
-    "aws-sdk": "^2.562.0",
+    "aws-sdk": "^2.1693.0",
     "base64id": "^1.0.0",
     "body-parser": "^1.20.3",
     "chrome-remote-interface": "0.27.1",

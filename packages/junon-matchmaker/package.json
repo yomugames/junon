@@ -13,7 +13,7 @@
   "dependencies": {
     "junon-common": "*",
     "@sentry/node": "^4.3.4",
-    "aws-sdk": "^2.229.1",
+    "aws-sdk": "^2.1693.0",
     "cors": "^2.8.5",
     "express": "^4.22.1",
     "firebase-admin": "^13.9.0",

@@ -39,7 +39,7 @@ describe('when target structure is inside homearea room', () => {
     })
   })
 
-  test('7 neighbor rooms. none is unclaimed => {
+  test('7 neighbor rooms. none is unclaimed', () => {
     expect(true).toEqual(true)
   })
 

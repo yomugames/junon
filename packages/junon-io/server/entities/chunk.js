@@ -12,9 +12,9 @@ class Chunk {
     this.row = row
     this.col = col
     this.tileStartRow = row * Constants.chunkRowCount
-    this.tileStartCol = col * Constants.chunkRowCount
+    this.tileStartCol = col * Constants.chunkColCount
     this.tileEndRow = (row + 1) * Constants.chunkRowCount - 1
-    this.tileEndCol = (col + 1) * Constants.chunkRowCount - 1
+    this.tileEndCol = (col + 1) * Constants.chunkColCount - 1
 
     this.chunkRegions = {}
 
@@ -483,7 +483,7 @@ class Chunk {
       this.getSocketUtil().emit(player.getSocket(), "EntityUpdated", { transports: this.changedTransports })
     })
 
-    this.clearChangedCorpses()
+    this.clearChangedTransports()
   }
 
   sendChangedMobsToClients() {
@@ -706,7 +706,7 @@ class Chunk {
         x: boundingBox.minX,
         y: boundingBox.minY
       },
-      w: Constants.chunkRowCount * Constants.tileSize,
+      w: Constants.chunkColCount * Constants.tileSize,
       h: Constants.chunkRowCount * Constants.tileSize
     }
 

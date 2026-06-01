@@ -611,7 +611,7 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   getChunkCol() {
-    const chunkSize = Constants.chunkRowCount * Constants.tileSize
+    const chunkSize = Constants.chunkColCount * Constants.tileSize
     return Math.floor(this.getX() / chunkSize)
   }
 

@@ -16,7 +16,7 @@ class Chunk {
     this.col = col
 
     this.tileStartRow = row * Constants.chunkRowCount
-    this.tileStartCol = col * Constants.chunkRowCount
+    this.tileStartCol = col * Constants.chunkColCount
 
     this.spriteLayers = {}
     this.bitmapCacheTimeouts = {}
@@ -235,7 +235,7 @@ class Chunk {
     const lineStyle = this.getSelectionLineStyle()
 
     sprite.lineStyle(lineStyle.lineWidth, lineStyle.color)
-    sprite.drawRect(0, 0, Constants.chunkRowCount * Constants.tileSize, Constants.chunkRowCount * Constants.tileSize)
+    sprite.drawRect(0, 0, Constants.chunkColCount * Constants.tileSize, Constants.chunkRowCount * Constants.tileSize)
     sprite.endFill()
 
     return sprite
@@ -390,13 +390,13 @@ class Chunk {
     let sprite = new PIXI.Sprite()
     this.cachedChunks[group] = sprite
     this.cachedChunks[group].name = "CachedChunk-" + [this.row, this.col].join("-")
-    this.cachedChunks[group].width  = 16 * Constants.tileSize
-    this.cachedChunks[group].height = 16 * Constants.tileSize
+    this.cachedChunks[group].width  = Constants.chunkColCount * Constants.tileSize
+    this.cachedChunks[group].height = Constants.chunkRowCount * Constants.tileSize
     this.cachedChunks[group].visible = false
     // need to be positioned properly as well, as texture created is in relative local coord
 
-    this.cachedChunks[group].position.x = this.col * Constants.tileSize * 16
-    this.cachedChunks[group].position.y = this.row * Constants.tileSize * 16
+    this.cachedChunks[group].position.x = this.col * Constants.tileSize * Constants.chunkColCount
+    this.cachedChunks[group].position.y = this.row * Constants.tileSize * Constants.chunkRowCount
 
     this.sector.spriteLayers[group].addChild(sprite)
   }

@@ -614,10 +614,11 @@ class Sector {
 
   initChunks() {
     const numOfTilesInRow  = this.getColCount()
+    const numOfTilesInCol  = this.getRowCount()
 
     this.chunks = {}
-    this.NUM_CHUNKS_IN_ROW = numOfTilesInRow / Constants.chunkRowCount
-    this.NUM_CHUNKS_IN_COL = numOfTilesInRow / Constants.chunkRowCount
+    this.NUM_CHUNKS_IN_ROW = numOfTilesInRow / Constants.chunkColCount
+    this.NUM_CHUNKS_IN_COL = numOfTilesInCol / Constants.chunkRowCount
   }
 
   getChunkRegionById(id) {

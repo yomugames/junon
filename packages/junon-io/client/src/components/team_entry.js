@@ -77,12 +77,7 @@ class TeamEntry {
       return
     }
 
-    if (this.main.shouldShowVideoAd()) {
-      this.main.videoAdCompleteCallback = this.joinColony.bind(this)
-      this.main.displayVideoAd()
-    } else {
-      this.joinColony()
-    }
+    this.joinColony()
   }
 
   joinColony() {
@@ -92,12 +87,7 @@ class TeamEntry {
   }
 
   startBoot() {
-    if (this.main.shouldShowVideoAd()) {
-      this.main.videoAdCompleteCallback = this.performBoot.bind(this)
-      this.main.displayVideoAd()
-    } else {
-      this.performBoot()
-    }
+    this.performBoot()
   }
 
   performBoot() {

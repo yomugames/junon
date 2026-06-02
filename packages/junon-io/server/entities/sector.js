@@ -1257,10 +1257,12 @@ class Sector {
   }
 
   initChunks() {
-    const numOfTilesInRow  = this.getColCount()
-    const numOfChunksInRow = numOfTilesInRow / Constants.chunkRowCount
+    const numOfTileRows  = this.getRowCount()
+    const numOfTileCols  = this.getColCount()
+    const numOfChunkRows = numOfTileRows / Constants.chunkRowCount
+    const numOfChunkCols = numOfTileCols / Constants.chunkColCount
 
-    this.chunkMap = new ChunkGrid("chunk_map", this, numOfChunksInRow, numOfChunksInRow, this.initChunk.bind(this))
+    this.chunkMap = new ChunkGrid("chunk_map", this, numOfChunkRows, numOfChunkCols, this.initChunk.bind(this))
 
     this.chunkRegions = {}
 
@@ -1456,8 +1458,7 @@ class Sector {
       }
 
       if (!player.getChunk()) {
-        // player not in a chunk. invalid
-        delete this.fullChunkRequests[playerId]
+        // player not assigned to a chunk yet; keep pending chunk requests and retry next tick
         continue
       }
 
@@ -3603,7 +3604,7 @@ Object.assign(Sector.prototype, Container.prototype, {
     return [this.structureMap, this.armorMap, this.platformMap, this.groundMap]
   },
   getRowCount() {
-    return this.colCount
+    return this.rowCount
   },
   getColCount() {
     return this.colCount

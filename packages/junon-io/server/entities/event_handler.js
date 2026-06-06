@@ -184,6 +184,10 @@ class EventHandler {
     return Math.abs(this._safeNumber(value))
   }
 
+  exp(value)
+    return Math.exp(this._safeNumber(value))
+  }
+
   log(value, base = Math.E) {
     const numValue = this._safeNumber(value)
     const numBase = this._safeNumber(base)
@@ -225,6 +229,18 @@ class EventHandler {
   max(...values) {
     if (values.length === 0) return -Infinity
     return Math.max(...values.map(v => this._safeNumber(v)))
+  }
+
+  radian(value) {
+    return this._safeNumber(value) * (Math.PI / 180)
+  }
+
+  sin(value) {
+    return this.safeNumber(Math.sin(value))
+  }
+
+  cos(value) {
+    return this.safeNumber(Math.cos(value))
   }
 
   length(value) {
@@ -1226,11 +1242,15 @@ class EventHandler {
       "$pow": true,
       "$root": true,
       "$abs": true,
+      "$exp": true,
       "$log": true,
       "$min": true,
       "$max": true,
       "$floor": true,
       "$ceil": true,
+      "$radian": true,
+      "$sin": true,
+      "$cos": true,
       "$isLoggedIn": true,
       "$getEquipId": true,
       "$getBuildingType": true,

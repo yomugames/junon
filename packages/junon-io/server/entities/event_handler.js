@@ -236,11 +236,11 @@ class EventHandler {
   }
 
   sin(value) {
-    return this.safeNumber(Math.sin(value))
+    return Math.sin(this._safeNumber(value))
   }
 
   cos(value) {
-    return this.safeNumber(Math.cos(value))
+    return Math.cos(this._safeNumber(value))
   }
 
   length(value) {

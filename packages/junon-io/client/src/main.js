@@ -312,8 +312,6 @@ class Main {
 
           this.updateItchChangelogUrl()
           this.updateItchPrivacyUrl()
-          // this.displayHomePageAd()
-          this.initVideoAd()
 
           this.isClientUpToDate((isUpToDate) => {
             if (!isUpToDate) {
@@ -389,110 +387,12 @@ class Main {
     console.log("revision: " + window.revision)
   }
 
-  displayHomePageAd() {
-    if (debugMode) return
-    let threeMinutes = 1000 * 60 * 3
-    let shouldRefreshAd = !this.lastHomepageAdDisplay ||
-                          (this.lastHomepageAdDisplay && ((Date.now() - this.lastHomepageAdDisplay) > threeMinutes))
-    if (shouldRefreshAd) {
-      aiptag.cmd.display.push(() => {
-        aipDisplayTag.display('junon-io_300x250');
-      })
-
-      aiptag.cmd.display.push(() => {
-        aipDisplayTag.display('junon-io_300x250_2');
-      })
-      this.lastHomepageAdDisplay = Date.now()
-    }
-  }
-
-  initVideoAd() {
-    let padding = 100
-    let playerWidth = window.innerWidth - padding
-    let playerHeight = window.innerHeight - padding
-    playerWidth = Math.min(800, playerWidth)
-    playerHeight = Math.min(450, playerHeight)
-
-    document.querySelector("#preroll_container").style.width  = playerWidth  + "px"
-    document.querySelector("#preroll_container").style.height = playerHeight + "px"
-    document.querySelector("#preroll_container").style.marginLeft = -(playerWidth/2) + "px"
-    document.querySelector("#preroll_container").style.marginTop  = -(playerHeight/2) + "px"
-
-    aiptag.cmd.player.push(() => {
-      window.adplayer = new aipPlayer({
-        AD_WIDTH: playerWidth,
-        AD_HEIGHT: playerHeight,
-        AD_FULLSCREEN: false,
-        AD_CENTERPLAYER: false,
-        LOADING_TEXT: 'loading advertisement',
-        PREROLL_ELEM: () => {
-          return document.getElementById('preroll')
-        },
-        AIP_COMPLETE: () => {
-          document.querySelector("#preroll_container").style.display = 'none'
-          if (this.videoAdCompleteCallback) {
-            this.videoAdCompleteCallback()
-          }
-        },
-        AIP_REMOVE: () => {
-          document.querySelector("#preroll_container").style.display = 'none'
-        }
-      });
-    });
-  }
-
   recordColonyVisit() {
     if (!Cookies.get("colonyVisit")) {
       let day  = (new Date()).getDay()
       let time = Date.now()
       let colonyVisit = [day, time].join(":")
       Cookies.set("colonyVisit", colonyVisit)
-    }
-  }
-
-  shouldShowVideoAd() {
-    if (debugMode) return false
-
-    let colonyVisit = Cookies.get("colonyVisit")
-    if (!colonyVisit) return false
-
-    let day  = parseInt(colonyVisit.split(":")[0])
-    let time = parseInt(colonyVisit.split(":")[1])
-
-    let timeNow = Date.now()
-    let dateNow = new Date()
-
-    if (day !== dateNow.getDay()) {
-      Cookies.remove("colonyVisit")
-      return false
-    }
-
-    let durationSinceColonyVisit = timeNow - time
-    let threshold = env === 'staging' ? (1000 * 60 * 5) : (1000 * 60 * 60)
-    let awayThreshold = (1000 * 60 * 60 * 3)
-    if (durationSinceColonyVisit >= threshold) {
-      Cookies.remove("colonyVisit")
-      if (durationSinceColonyVisit >= awayThreshold) {
-        return false
-      } else {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  displayVideoAd() {
-    if (typeof adplayer !== 'undefined') {
-      aiptag.cmd.player.push(() => {
-        document.querySelector("#preroll_container").style.display = 'block'
-        adplayer.startPreRoll()
-      })
-    } else {
-      //Adlib didnt load this could be due to an adblocker, timeout etc.
-      if (this.videoAdCompleteCallback) {
-        this.videoAdCompleteCallback()
-      }
     }
   }
 

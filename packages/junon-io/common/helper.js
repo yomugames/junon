@@ -134,26 +134,36 @@ module.exports = {
   getChunkColFromCol(col) {
     return Math.floor(col / Constants.chunkColCount)
   },
-  normalizeChunkRowCol(sector, rowOrCol) {
+  normalizeChunkRow(sector, row) {
     const numOfChunksInRow = sector.getRowCount() / Constants.chunkRowCount
-    let maxRowOrCol = numOfChunksInRow - 1
+    let maxRow = numOfChunksInRow - 1
 
-    if (rowOrCol < 0) return 0
-    if (rowOrCol > maxRowOrCol) return maxRowOrCol
+    if (row < 0) return 0
+    if (row > maxRow) return maxRow
 
-    return rowOrCol
+    return row
+  },
+  normalizeChunkCol(sector, col) {
+    const numOfChunksInCol = sector.getColCount() / Constants.chunkColCount
+    let maxCol = numOfChunksInCol - 1
+
+    if (col < 0) return 0
+    if (col > maxCol) return maxCol
+
+    return col
   },
   getChunksFromBoundingBox(sector, boundingBox) {
-    const chunkSize = Constants.chunkRowCount * Constants.tileSize
+    const chunkRowSize = Constants.chunkRowCount * Constants.tileSize
+    const chunkColSize = Constants.chunkColCount * Constants.tileSize
 
     let chunkStart = {
-      row: this.normalizeChunkRowCol(sector, Math.floor(boundingBox.minY / chunkSize)),
-      col: this.normalizeChunkRowCol(sector, Math.floor(boundingBox.minX / chunkSize))
+      row: this.normalizeChunkRow(sector, Math.floor(boundingBox.minY / chunkRowSize)),
+      col: this.normalizeChunkCol(sector, Math.floor(boundingBox.minX / chunkColSize))
     }
 
     let chunkEnd = {
-      row: this.normalizeChunkRowCol(sector, Math.floor(boundingBox.maxY / chunkSize)),
-      col: this.normalizeChunkRowCol(sector, Math.floor(boundingBox.maxX / chunkSize))
+      row: this.normalizeChunkRow(sector, Math.floor(boundingBox.maxY / chunkRowSize)),
+      col: this.normalizeChunkCol(sector, Math.floor(boundingBox.maxX / chunkColSize))
     }
 
     // chunkStart = { row: Math.floor(this.getY() / chunkSize), col: Math.floor(this.getX() / chunkSize) }
@@ -164,6 +174,7 @@ module.exports = {
     for (var row = chunkStart.row; row <= chunkEnd.row; row++) {
       for (var col = chunkStart.col; col <= chunkEnd.col; col++) {
         let chunk = sector.getChunk(row, col)
+        if (!chunk) continue
 
         chunks[chunk.id] = chunk
       }

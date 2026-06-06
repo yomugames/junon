@@ -4361,20 +4361,6 @@ class Game {
 
     this.deathMessageTween.start()
 
-    this.displayDeathAd()
-  }
-
-  displayDeathAd() {
-    if (debugMode) return
-    let threeMinutes = 1000 * 60 * 3
-    let shouldRefreshAd = !this.lastDeathAdDisplay ||
-      (this.lastDeathAdDisplay && ((Date.now() - this.lastDeathAdDisplay) > threeMinutes))
-    if (shouldRefreshAd) {
-      aiptag.cmd.display.push(function () {
-        aipDisplayTag.display('junon-io_728x90');
-      })
-      this.lastDeathAdDisplay = Date.now()
-    }
   }
 
   showRestartCountdown(startTime, duration) {

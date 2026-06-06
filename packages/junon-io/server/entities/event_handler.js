@@ -1174,6 +1174,17 @@ class EventHandler {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
 
+  seedRandom(seed, min, max) {
+    seed = parseInt(seed)
+    min = parseInt(min)
+    max = parseInt(max)
+    if (isNaN(seed) || isNaN(min) || isNaN(max)) return 0
+    const a = 1664525
+    const c = 1013904223
+    const rand = ((a * seed + c) % 4294967296) / 4294967296
+    return Math.floor(min + rand * (max - min + 1))
+  }
+
   isVariableInvalid(key) {
     return key.match(/[^a-zA-Z0-9_$]/)
   }
@@ -1222,6 +1233,7 @@ class EventHandler {
       "$getMaxHunger": true,
       "$getOwner": true,
       "$random": true,
+      "$seedRandom": true,
       "$formatTime": true,
       "$getTeamMemberCount": true,
       "$getRoleMemberCount": true,

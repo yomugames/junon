@@ -7,7 +7,7 @@ class BaseDistribution extends BaseBuilding {
     return this.isOnValidPlatform(container, x, y, w, h, angle, player) &&
            this.isWithinInteractDistance(x, y, player) &&
            !this.isOnHangar(container, x, y, w, h) &&
-           !container.structureMap.isOccupied(x, y, w, h) &&
+           !container.structureMap.isOccupied(x, y, w, h, false, false) &&
            !container.distributionMap.isOccupied(x, y, w, h)
   }
 

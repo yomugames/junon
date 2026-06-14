@@ -18,7 +18,7 @@ class Ventilator extends BaseBuilding {
             this.isWithinInteractDistance(x, y, player) &&
                          !this.isOnHangar(container, x, y, w, h) &&
                          !container.unitMap.isOccupied(x, y, w, h) &&
-                         !container.structureMap.isOccupied(x, y, w, h)
+                         !container.structureMap.isOccupied(x, y, w, h, false, false)
   }
 
   getType() {

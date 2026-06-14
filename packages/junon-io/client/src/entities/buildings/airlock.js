@@ -35,7 +35,7 @@ class Airlock extends BaseBuilding {
                          !this.hasRailNeighbor(container, x, y, w, h) &&
                          !container.unitMap.isOccupied(x, y, w, h) &&
                          !container.railMap.isOccupied(x, y, w, h) &&
-                         !container.structureMap.isOccupied(x, y, w, h)
+                         !container.structureMap.isOccupied(x, y, w, h, false, false)
   }
 
 

@@ -7,7 +7,7 @@ class GasPipe extends Conduit {
   static isPositionValid(container, x, y, w, h, angle, player) {
     return !this.isOnHangar(container, x, y, w, h) &&
            this.isWithinInteractDistance(x, y, player) &&
-           !container.structureMap.isOccupied(x, y, w, h) &&
+           !container.structureMap.isOccupied(x, y, w, h, false, false) &&
            !container[this.prototype.getTileMapName()].isOccupied(x, y, w, h)
   }
 

@@ -15,6 +15,10 @@ class Limit extends BaseCommand {
     return true
   }
 
+  isNonSandboxCommand() {
+    return true
+  }
+
   perform(caller, args) {
     const subcommand = args[0]
     let buildingName = this.sector.klassifySnakeCase(args[1] || "")

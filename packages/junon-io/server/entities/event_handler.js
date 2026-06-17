@@ -184,7 +184,7 @@ class EventHandler {
     return Math.abs(this._safeNumber(value))
   }
 
-  exp(value)
+  exp(value) {
     return Math.exp(this._safeNumber(value))
   }
 

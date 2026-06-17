@@ -1004,7 +1004,7 @@
                         <tr>
                             <td class='function_name'>$getContent</td>
                             <td>$entityId</td>
-                            <td>Gives the content of a sign/beacon/lamp. Ex. /chat The sign says $getContent(191)</td>
+                            <td>Gives the content of a sign/beacon/lamp. Ex. /chat The sign with an id of 191 says $getContent(191)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getStructureByCoords</td>
@@ -1019,12 +1019,12 @@
                         <tr>
                             <td class='function_name'>$hasEffect</td>
                             <td>$entityId, effectName</td>
-                            <td>true if the entity, player, or building gets the specified effect. false if not.</td>
+                            <td>true if the entity/player/building has the specified effect. false if not. Ex. /chat @a Mob 892's has a miasma index of: $hasEffect(892, Miasma)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getTotalMobCount</td>
                             <td>None</td>
-                            <td>Returns the total count of all mobs in the game sector (hostile + neutral).</td>
+                            <td>Returns the total count of all mobs in the game sector (hostile + neutral). Ex. /chat @a Number of mobs in this sector: $getTotalMobCount()</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getAngle</td>
@@ -1034,12 +1034,22 @@
                         <tr>
                             <td class="function_name">$getUsage</td>
                             <td>$itemId</td>
-                            <td>Returns the usage level of an item</td>
+                            <td>Returns the usage level of an item. Ex. /chat @a The usage of kuroro's item 300 is $getUsage(300)</td>
                         </tr>
                         <tr>
                             <td class="function_name">$getCapacity</td>
                             <td>$itemId</td>
-                            <td>Returns the usage capacity of an item</td>
+                            <td>Returns the usage capacity of an item. Ex. /chat @a The capacity of kuroro's item with an id of 300 is $getCapacity(300)</td>
+                        </tr>
+                        <tr>
+                            <td class="function_name">$getRegionMemberNames</td>
+                            <td>$region</td>
+                            <td>Returns the member names of a region. Ex. /chat @a congrats to $getRegionMemberNames(arena) for winning our grand prize!</td>
+                        </tr>
+                        <tr>
+                            <td class="function_name">$getTeamMemberNames</td>
+                            <td>$teamName</td>
+                            <td>Returns the member names of a team. Ex. /chat @a congrats to $getTeamMemberNames($winningTeam) for winning our grand prize!</td>
                         </tr>
                     </table>
                 </div>
@@ -1058,7 +1068,12 @@
                     <p><span class='code'>/caption title $player has bought the rocket launcher!</span></p>  
                     <p>At the end of the timer 'healthreset', loop and reset everyone's health (Timer:healthreset:end):</p>
                     <p><span class='code'>/timer start healthreset 10</span></p>
-                    <p><span class='code'>/sethealth @a 100</span></p>      
+                    <p><span class='code'>/sethealth @a 100</span></p>
+                    <p>At the end of the timer 'arenatimer', start the intermission and congratulate them. (Timer:arenatimer:end)</p>
+                    <p><span class='code'>/chat @a Congrats to $getRegionMemberNames(arena) for winning the grand prize of a bajil-</span></p>
+                    <p><span class='code'>/give @a[region=arena] gold 100</span></p>
+                    <p><span class='code'>/tp @a[region=arena] (spawn coordinates)</span></p>
+                    <p><span class='code'>/timer start intermission 30</span></p>
                 </div>
             </div>
         </div>

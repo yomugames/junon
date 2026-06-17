@@ -224,6 +224,15 @@ class Region extends BaseTransientEntity {
     return players.length
   }
 
+  getMemberNamesJson() {
+    let players = this.sector.playerTree.search(this.getBoundingBox())
+    let playerNames = []
+
+    Object.values(players).forEach(player => playerNames.push(player.name));
+
+    return playerNames.join(' ')
+  }
+  
   getBuildings() {
     return this.sector.buildingTree.search(this.getBoundingBox())
   }

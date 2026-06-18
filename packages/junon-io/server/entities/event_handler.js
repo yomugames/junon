@@ -184,6 +184,10 @@ class EventHandler {
     return Math.abs(this._safeNumber(value))
   }
 
+  exp(value) {
+    return Math.exp(this._safeNumber(value))
+  }
+
   log(value, base = Math.E) {
     const numValue = this._safeNumber(value)
     const numBase = this._safeNumber(base)
@@ -225,6 +229,18 @@ class EventHandler {
   max(...values) {
     if (values.length === 0) return -Infinity
     return Math.max(...values.map(v => this._safeNumber(v)))
+  }
+
+  radian(value) {
+    return this._safeNumber(value) * (Math.PI / 180)
+  }
+
+  sin(value) {
+    return Math.sin(this._safeNumber(value))
+  }
+
+  cos(value) {
+    return Math.cos(this._safeNumber(value))
   }
 
   length(value) {
@@ -1158,6 +1174,17 @@ class EventHandler {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
 
+  seedRandom(seed, min, max) {
+    seed = parseInt(seed)
+    min = parseInt(min)
+    max = parseInt(max)
+    if (isNaN(seed) || isNaN(min) || isNaN(max)) return 0
+    const a = 1664525
+    const c = 1013904223
+    const rand = ((a * seed + c) % 4294967296) / 4294967296
+    return Math.floor(min + rand * (max - min + 1))
+  }
+
   isVariableInvalid(key) {
     return key.match(/[^a-zA-Z0-9_$]/)
   }
@@ -1206,6 +1233,7 @@ class EventHandler {
       "$getMaxHunger": true,
       "$getOwner": true,
       "$random": true,
+      "$seedRandom": true,
       "$formatTime": true,
       "$getTeamMemberCount": true,
       "$getRoleMemberCount": true,
@@ -1226,11 +1254,15 @@ class EventHandler {
       "$pow": true,
       "$root": true,
       "$abs": true,
+      "$exp": true,
       "$log": true,
       "$min": true,
       "$max": true,
       "$floor": true,
       "$ceil": true,
+      "$radian": true,
+      "$sin": true,
+      "$cos": true,
       "$isLoggedIn": true,
       "$getEquipId": true,
       "$getBuildingType": true,

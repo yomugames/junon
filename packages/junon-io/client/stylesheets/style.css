@@ -12,7 +12,11 @@ html {
 }
 
 .gm-scrollbar-container .gm-scroll-view {
-    overflow: hidden;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    -ms-touch-action: pan-y;
 }
 
 .gm-scrollbar.-horizontal {

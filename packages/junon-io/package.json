@@ -40,7 +40,7 @@
     "sat": "^0.7.1",
     "sharp": "0.34.5",
     "url-search-params-polyfill": "^8.1.0",
-    "uuid": "^3.3.2",
+    "uuid": "^14.0.0",
     "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.64.0",
     "winston": "^2.3.1",
     "winston-daily-rotate-file": "^1.4.6",

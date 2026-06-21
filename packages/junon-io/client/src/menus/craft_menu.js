@@ -247,6 +247,9 @@ class CraftMenu extends BaseMenu {
     let tabs = Array.from(this.el.querySelectorAll(".construction_tab"))
     if (tabs.length <= 1) return
 
+    // exclude terrain tab if not peaceful mode
+    if (!this.game.isPeaceful()) tabs.splice(0, 1)
+    
     let tabIndex = Array.prototype.indexOf.call(tabs, this.lastActiveTab)
     
     if (direction > 0) {

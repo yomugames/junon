@@ -1995,6 +1995,11 @@ class Player extends BaseEntity {
       return
     }
 
+    if(Protocol.definition().TerrainType[item.type] && !this.game.isPeaceful() && !this.game.isAdminMode){
+      // can't craft terrains outside of peaceful mode
+      return
+    }
+
     const isSuccess = storage.craft(item, this.inventory.storage)
     if (!isSuccess) return
 

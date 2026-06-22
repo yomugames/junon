@@ -1206,7 +1206,7 @@ class BaseBuilding extends BaseEntity {
   updateNeighbors(options = {}) {
     let neighbors = []
     if (this.isWall()) {
-      neighbors = this.container.roomManager.getNeighbors({ row: this.getRow(), col: this.getCol(), rowCount: 1, colCount: 1})
+      neighbors = this.container.roomManager.getNeighbors({ row: this.getRow(), col: this.getCol(), rowCount: 1, colCount: 1}, true)
       neighbors.forEach((neighbor) => {
         if (neighbor.entity && !neighbor.entity.isWall()) {
           neighbor.entity = null

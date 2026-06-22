@@ -3540,12 +3540,6 @@
         "Wire": 10,
         "CircuitBoard": 20
       },
-      "sprite": {
-        "position": {
-          "x": 67,
-          "y": 20
-        }
-      },
       "description": "An energy powered gun which easily destroys buildings"
     },
     "Pistol": {

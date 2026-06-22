@@ -35,7 +35,12 @@ class StoveMenu extends BaseMenu {
     let el = e.target.closest(".food_selection")
     if (!el) return
 
-    this.changeFoodSelection(el.dataset.type)
+    let itemName = Helper.getTypeNameById(el.dataset.type)
+    // can't cook non-stove items or items w/o requirements
+    if(Object.keys(Foods.Cooked).includes(itemName) && Foods.Cooked[itemName].prototype.hasRequirements())
+    {
+      this.changeFoodSelection(el.dataset.type)
+    }
   }
 
   selectFood(el) {

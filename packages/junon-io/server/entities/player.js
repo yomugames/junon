@@ -5995,6 +5995,11 @@ Object.assign(Player.prototype, Destroyable.prototype, {
       this.releaseDragTarget()
     }
 
+    if (this.hasPendingItem())
+    {
+      this.removePendingItem()
+    }
+
     this.getSocketUtil().broadcast(this.game.getSocketIds(), "PlayerDestroyed", { id: this.id, canRespawn: this.canRespawn(), restartCooldown: this.getRespawnCooldown()  })
     EventBus.dispatch(`${this.game.getId()}:entity:died:${this.getId()}`, this)
 

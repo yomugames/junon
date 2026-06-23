@@ -20,7 +20,9 @@ class LiquidTank extends BaseBuilding {
     return 50
   }
 
-  drainSample() {
+  drainSample(bottle) {
+    if (bottle.constructor.name === 'BloodBottle') return null
+    
     let liquidStorage = this.resourceStorages.liquid
     if (liquidStorage.getUsage() === 0) return null
 

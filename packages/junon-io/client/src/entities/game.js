@@ -1967,6 +1967,7 @@ class Game {
     this.hideGameCanvas()
     this.main.showHomeMenu()
     this.main.hideMainMenu()
+    this.hideDeathMessage()
 
     this.main.displayHomePageAd()
   }

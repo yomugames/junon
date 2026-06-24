@@ -3857,7 +3857,7 @@ class Player extends BaseEntity {
 
   setUserOxygen(oxygen) {
     const armor = this.getArmorEquip()
-    if (armor) {
+    if (armor && armor.hasOxygen()) {
       armor.setOxygen(oxygen, this)
     } else {
       this.setOxygen(oxygen)

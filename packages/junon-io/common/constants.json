@@ -6304,7 +6304,7 @@
       "showInteractTooltip": true,
       "hasFillBar": true,
       "hasMenu": true,
-      "categories": ["editable_permissions", "mining_drill"],
+      "categories": {"editable_permissions":true, "mining_drill":true},
       "menuDescription": "Generates ores over time",
       "requirements": {
         "IronBar": 200,

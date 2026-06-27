@@ -1256,8 +1256,18 @@ class Server {
 
       try {
         game.recordClock()
+        let startProcessTime = (new Date()).getTime()
         game.stepWorld()
         game.sendUpdates()
+        let endProcessTime = (new Date()).getTime()
+        // remove worlds that are likely too resource-intensive
+        if(endProcessTime - startProcessTime >= 300){
+          game.forEachPlayer((player) => {
+            if (player.socket) player.socket.close()
+            player.remove()
+          })
+          game.prepareRemove()
+        }
         game.shutdownOnZeroPlayers()
         game.removeOnForced()
       } catch (e) {

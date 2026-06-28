@@ -94,6 +94,12 @@ class InputController {
       document.addEventListener("mouseup", this.mouseUpHandler, true)
     }
 
+    if (isMobile.any) {
+      this.preventPinchHandler = this._preventPinch.bind(this)
+      document.addEventListener("touchstart", this.preventPinchHandler, { passive: false, capture: true })
+      document.addEventListener("touchmove", this.preventPinchHandler, { passive: false, capture: true })
+    }
+
     if (this.isMobile()) {
       this.mobilePrimaryActionTouchStartHandler = this.onMobilePrimaryActionTouchStart.bind(this)
       this.mobilePrimaryActionTouchEndHandler = this.onMobilePrimaryActionTouchEnd.bind(this)
@@ -128,6 +134,11 @@ class InputController {
     document.removeEventListener("touchend", this.mouseUpHandler, true)
     document.removeEventListener("mousemove", this.mouseMoveHandler, true)
 
+    if (isMobile.any && this.preventPinchHandler) {
+      document.removeEventListener("touchstart", this.preventPinchHandler, { passive: false, capture: true })
+      document.removeEventListener("touchmove", this.preventPinchHandler, { passive: false, capture: true })
+    }
+
     if (this.isMobile()) {
       document.querySelector("#mobile_primary_action_btn").removeEventListener("touchstart", this.mobilePrimaryActionTouchStartHandler, true)
       document.querySelector("#mobile_primary_action_btn").removeEventListener("touchend",   this.mobilePrimaryActionTouchEndHandler,   true)
@@ -138,6 +149,12 @@ class InputController {
       document.querySelector("#mobile_action_btn").removeEventListener("touchend",   this.mobileActionTouchEndHandler,   true)
       document.querySelector("#mobile_action_btn").removeEventListener("mousedown", this.mobileActionTouchStartHandler, true)
       document.querySelector("#mobile_action_btn").removeEventListener("mouseup",   this.mobileActionTouchEndHandler,   true)
+    }
+  }
+
+  _preventPinch(e) {
+    if (e.touches && e.touches.length > 1) {
+      e.preventDefault()
     }
   }
 

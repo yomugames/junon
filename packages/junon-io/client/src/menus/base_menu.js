@@ -1,6 +1,7 @@
 const Item = require("./../entities/item")
 const SocketUtil = require("./../util/socket_util")
 const Constants = require("./../../../common/constants.json")
+const Helper = require("./../../../common/helper")
 const Protocol = require("./../../../common/util/protocol")
 
 class BaseMenu {

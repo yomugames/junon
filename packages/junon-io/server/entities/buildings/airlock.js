@@ -89,7 +89,7 @@ class Airlock extends BaseBuilding {
                              !this.isOnHangar(container, x, y, w, h) &&
                              !this.hasRailNeighbor(container, x, y, w, h) &&
                              !container.railMap.isOccupied(x, y, w, h) &&
-                             !container.structureMap.isOccupied(x, y, w, h) //false is for ignoring walls, like we used to when they weren't classified as structures. 
+                             !container.structureMap.isOccupied(x, y, w, h, false, false) // false is for ignoring walls, like we used to when they weren't classified as structures. 
   }
 
   interact(user) {

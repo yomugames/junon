@@ -181,7 +181,7 @@ class NetworkManager {
     // console.log("networkCount: " + this.getNetworkCount())
   }
 
-  getSideHitsFor(options) {
+  getSideHitsFor(options, includeCorners = false) {
     const row = options.row
     const col = options.col
     const rowCount = options.rowCount
@@ -209,6 +209,8 @@ class NetworkManager {
       result.push(this.getTileHit(row + rowCount, col + i))
     }
 
+    if (!includeCorners) return result
+
     //topleft
     for(var i = 0; i < colCount ; i++) {
       result.push(this.getTileHit(row-1, col-1))
@@ -232,8 +234,8 @@ class NetworkManager {
     return result
   }
 
-  getNeighbors(options) {
-    return this.getSideHitsFor(options)
+  getNeighbors(options, includeCorners = false) {
+    return this.getSideHitsFor(options, includeCorners)
   }
 
   getNonEmptyNeighbors(options) {

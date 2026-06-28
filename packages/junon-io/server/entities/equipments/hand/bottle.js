@@ -99,7 +99,7 @@ class Bottle extends MeleeEquipment {
       return
     }
 
-    let sample = entity.drainSample()
+    let sample = entity.drainSample(this)
     if (sample) {
       if (!this.isSampleValid(sample)) return
 

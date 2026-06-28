@@ -161,6 +161,21 @@ class MiningDrill extends BaseBuilding {
     return sprite
   }
 
+  animateDamage() {
+    if (this.spriteRestoreTimeout) return
+
+    this.setTint(this.getTintableSprite(), 0xff6d6d)
+
+    this.spriteRestoreTimeout = setTimeout(() => {
+      // tint guards and base sprite separately
+      this.guardSpriteContainer.children.forEach( (child) =>{
+        child.tint = this.getDefaultSpriteColor()
+      })
+      this.baseSprite.tint = this.getOreOutput() === "copper" ? 0xffffff : 0x66ff66
+      this.spriteRestoreTimeout = null
+    }, 100)
+  }
+
 
   getOreOutput() {
     let index = this.getRow() * this.container.getRowCount() + this.getCol()

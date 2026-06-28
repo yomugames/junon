@@ -110,8 +110,14 @@ class BaseWall extends BaseFloor {
     this.baseSprite.tint = this.getWallColor()
 
     if (this.data.hasOwnProperty("colorIndex")) {
-      let color = this.game.colors[this.data.colorIndex]
-      this.baseSprite.tint = color.value
+      if (this.game.colors[this.data.colorIndex]) { // preset choices
+          let color = this.game.colors[this.data.colorIndex];
+          this.baseSprite.tint = color.value;
+        }
+      else { // custom colors
+          let color = this.data.colorIndex;
+          this.baseSprite.tint = color - 38;
+        }
     }
 
     return sprite

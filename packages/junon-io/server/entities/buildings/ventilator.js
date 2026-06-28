@@ -11,7 +11,7 @@ class Ventilator extends BaseBuilding {
 
     return  this.isOnValidPlatform(container, x, y, w, h, angle, player) &&
                              !this.isOnHangar(container, x, y, w, h) &&
-                             !container.structureMap.isOccupied(x, y, w, h)
+                             !container.structureMap.isOccupied(x, y, w, h, false, false)
   }
 
 

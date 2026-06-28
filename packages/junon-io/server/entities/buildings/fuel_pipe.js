@@ -6,7 +6,7 @@ class FuelPipe extends BaseDistribution {
 
   static isPositionValid(container, x, y, w, h, angle, player) {
     return !this.isOnHangar(container, x, y, w, h) &&
-           !container.structureMap.isOccupied(x, y, w, h) &&
+           !container.structureMap.isOccupied(x, y, w, h, false, false) &&
            !container[this.prototype.getTileMapName()].isOccupied(x, y, w, h)
   }
 

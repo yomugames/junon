@@ -334,6 +334,12 @@ class BaseMenu {
     if (this.isDisabled) return
     if (!this.craftType) return
 
+    // ban terrain craft outside of peaceful
+    if(!this.game.isPeaceful() && !this.game.isAdminMode()) {
+      const terrainList = Object.keys(Constants.Terrains)
+      if (terrainList.includes(Helper.getTerrainNameById(this.craftType))) return
+    }
+    
     if (this.el.querySelector(".craft_btn").dataset.disabled === "true") return
 
     this.isCraftBtnHeld = true

@@ -1995,6 +1995,11 @@ class Player extends BaseEntity {
       return
     }
 
+    if(Protocol.definition().TerrainType[item.type] && !this.game.isPeaceful() && !this.game.isAdminMode){
+      // can't craft terrains outside of peaceful mode
+      return
+    }
+
     const isSuccess = storage.craft(item, this.inventory.storage)
     if (!isSuccess) return
 
@@ -3852,7 +3857,7 @@ class Player extends BaseEntity {
 
   setUserOxygen(oxygen) {
     const armor = this.getArmorEquip()
-    if (armor) {
+    if (armor && armor.hasOxygen()) {
       armor.setOxygen(oxygen, this)
     } else {
       this.setOxygen(oxygen)
@@ -5988,6 +5993,11 @@ Object.assign(Player.prototype, Destroyable.prototype, {
 
     if (this.dragTarget) {
       this.releaseDragTarget()
+    }
+
+    if (this.hasPendingItem())
+    {
+      this.removePendingItem()
     }
 
     this.getSocketUtil().broadcast(this.game.getSocketIds(), "PlayerDestroyed", { id: this.id, canRespawn: this.canRespawn(), restartCooldown: this.getRespawnCooldown()  })

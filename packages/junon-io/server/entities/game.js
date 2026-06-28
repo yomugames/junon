@@ -2285,7 +2285,7 @@ class Game {
       data.username = null
     }
 
-    if (!data.username) {
+    if (!data.isAuthenticated) {
       let username = await this.generateUniqueUsername()
       data.username = username
     }

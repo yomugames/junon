@@ -4,6 +4,13 @@ const Protocol = require("../../../../../common/util/protocol")
 
 class Deconstructor extends RangeEquipment {
 
+  repositionSprite() {
+    super.repositionSprite()
+
+    this.sprite.position.x = 35
+    this.sprite.position.y = 10
+  }
+  
   getSpritePath() {
     return 'deconstructor.png'
   }

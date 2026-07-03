@@ -280,7 +280,7 @@ class ChatMenu extends BaseMenu {
     const playerId = data.playerId
     const username = data.username
     const message  = data.message
-
+    const prefixList = JSON.parse(data.prefixesList||"{}")
     const chatUser = this.game.sector.players[playerId]
 
     let messageObj = this.parseServerChat(message)
@@ -290,7 +290,7 @@ class ChatMenu extends BaseMenu {
     let chatGroup = data.isTeam ? "team" : "local"
 
     if (!this.isMuted(username)) {
-      this.createChatEntry(chatGroup, messageObj)
+      this.createChatEntry(chatGroup, messageObj, prefixList)
     }
 
     if (chatUser && !this.isMuted(chatUser.name)) {

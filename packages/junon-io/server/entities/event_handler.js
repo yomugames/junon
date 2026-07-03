@@ -503,6 +503,14 @@ class EventHandler {
           return vals[3]
         } else {return vals[4]}
       }
+      case "=~": {
+        if (val1.includes(val2)) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      default: {
+        return "undefined"
+      }
     }
   }
 

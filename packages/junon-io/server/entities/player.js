@@ -712,11 +712,27 @@ class Player extends BaseEntity {
     })
   }
 
-  toggleFly() {
-    this.isFlying = !this.isFlying
-    let message = this.isFlying ? "Flying mode enabled" : "Flying mode disabled"
+  toggleFly(currState) {
+    
+    let nextState = currState
+    let prevState = this.isFlying
 
-    this.showError(message, { isSuccess: true, fontSize: 36 })
+    if (nextState == null) {
+      nextState = !this.isFlying
+    } else {
+      if (nextState == "true") {
+        nextState = true
+      } else {
+        nextState = false
+      }
+    }
+
+    if (prevState !== nextState) {
+      this.isFlying = nextState
+      let message = this.isFlying ? "Flying mode enabled" : "Flying mode disabled"
+
+      this.showError(message, { isSuccess: true, fontSize: 36 })
+    }
   }
 
   onRoleAssigned() {
@@ -1992,11 +2008,6 @@ class Player extends BaseEntity {
     let requirements = item.getRequirements()
     if (Object.keys(requirements).length === 0 && !(Protocol.definition().TerrainType[item.type] && this.isSectorOwner())) {
       // item without requirements other than terrains cant be crafted
-      return
-    }
-
-    if(Protocol.definition().TerrainType[item.type] && !this.game.isPeaceful() && !this.game.isAdminMode){
-      // can't craft terrains outside of peaceful mode
       return
     }
 
@@ -3857,7 +3868,7 @@ class Player extends BaseEntity {
 
   setUserOxygen(oxygen) {
     const armor = this.getArmorEquip()
-    if (armor && armor.hasOxygen()) {
+    if (armor) {
       armor.setOxygen(oxygen, this)
     } else {
       this.setOxygen(oxygen)
@@ -4410,7 +4421,7 @@ class Player extends BaseEntity {
     message = i18n.t(this.locale, message)
     options.message = message
     this.getSocketUtil().emit(this.getSocket(), "ErrorMessage", options)
-  }
+  } 
 
   showChatError(message) {
     this.getSocketUtil().emit(this.getSocket(), "ServerChat", { message: "%error%" + message })
@@ -5529,14 +5540,15 @@ class Player extends BaseEntity {
 
       if (data.isGlobal) {
         LOG.info("globalchat> " + this.name + ": " + message)
-        let data = { username: this.name, message: message }
+        let data = { username: this.name, message: message, prefixesList:JSON.stringify(this.game.playerChatPrefixes||{})}
         if (this.isLoggedIn()) {
           data.uid = this.getUid()
         }
         this.game.sendToMatchmaker({ event: "GlobalClientChat", data: data })
       } else {
         LOG.info("[" + this.game.getSectorUid() + "] chat> " + this.name + ": " + message)
-        let data = { playerId: this.id, message: message, username: this.name, isTeam: isTeamChat }
+        console.log(this.game.playerChatPrefixes)
+        let data = { playerId: this.id, message: message, username: this.name, isTeam: isTeamChat,prefixesList:JSON.stringify(this.game.playerChatPrefixes||{})}
         if (this.isLoggedIn()) {
           data.uid = this.getUid()
         }
@@ -5993,11 +6005,6 @@ Object.assign(Player.prototype, Destroyable.prototype, {
 
     if (this.dragTarget) {
       this.releaseDragTarget()
-    }
-
-    if (this.hasPendingItem())
-    {
-      this.removePendingItem()
     }
 
     this.getSocketUtil().broadcast(this.game.getSocketIds(), "PlayerDestroyed", { id: this.id, canRespawn: this.canRespawn(), restartCooldown: this.getRespawnCooldown()  })

@@ -1,6 +1,7 @@
 const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
 const Protocol = require('../../common/util/protocol')
+const { setting } = require(".")
 
 class Spectate extends BaseCommand {
   getUsage() {
@@ -36,9 +37,11 @@ class Spectate extends BaseCommand {
         this.toggleSpectate(player)
       })
     } else {
+      if (this.game.sector.settings.isSpectateAllowed) {
       if (caller.isPlayer()) {
         this.toggleSpectate(caller)
       }
+    }
     }
     
   }

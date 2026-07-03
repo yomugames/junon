@@ -48,6 +48,9 @@ class TeamMenu extends BaseMenu {
     this.el.querySelector("#enable_fov").addEventListener("click", this.onEnableFovClick.bind(this), true)
     this.el.querySelector("#disable_fov").addEventListener("click", this.onDisableFovClick.bind(this), true)
 
+    this.el.querySelector("#enable_spectate").addEventListener("click", this.onAllowSpectateClick.bind(this), true)
+    this.el.querySelector("#disable_spectate").addEventListener("click", this.onDenySpectateClick.bind(this), true)
+
     this.el.querySelector("#enable_minimap").addEventListener("click", this.onEnableMinimapClick.bind(this), true)
     this.el.querySelector("#disable_minimap").addEventListener("click", this.onDisableMinimapClick.bind(this), true)
 
@@ -141,6 +144,15 @@ class TeamMenu extends BaseMenu {
           this.el.querySelector("#enable_fov").checked = true
         } else {
           this.el.querySelector("#disable_fov").checked = true
+        }
+      }
+      
+      if (name === 'isSpectateAllowed') {
+        let value = settings[name]
+        if (value) {
+          this.el.querySelector("#enable_spectate").checked = true
+        } else {
+          this.el.querySelector("#disable_spectate").checked = true
         }
       }
 
@@ -405,7 +417,6 @@ class TeamMenu extends BaseMenu {
       })
     }
   }
-
   onDisableFovClick(e) {
     e.preventDefault()
 
@@ -415,6 +426,33 @@ class TeamMenu extends BaseMenu {
         action: 'editSetting',
         sectorId: this.game.sector.uid,
         key: 'isFovMode',
+        value: 'false'
+      })
+    }
+  }
+
+  onAllowSpectateClick(e) {
+    e.preventDefault()
+
+    let value = e.target.value
+    if (value === 'yes') {
+      SocketUtil.emit("SectorAction", {
+        action: 'editSetting',
+        sectorId: this.game.sector.uid,
+        key: 'isSpectateAllowed',
+        value: 'true'
+      })
+    }
+  }
+  onDenySpectateClick(e) {
+    e.preventDefault()
+
+    let value = e.target.value
+    if (value === 'no') {
+      SocketUtil.emit("SectorAction", {
+        action: 'editSetting',
+        sectorId: this.game.sector.uid,
+        key: 'isSpectateAllowed',
         value: 'false'
       })
     }

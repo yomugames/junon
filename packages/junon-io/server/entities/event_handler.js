@@ -483,6 +483,90 @@ class EventHandler {
     return this.scoreIndexByPlayer[playerId]
   }
 
+  if(...vals) {
+    let condition = vals[1]
+    let val1 = vals[0]
+    let val2 = vals[2]
+
+    switch(condition) {
+      case "=": {
+        if (val1 === val2) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case "<": {
+        if (val1 < val2) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case ">": {
+        if (val1 > val2) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case "<=": {
+        if (val1 <= val2) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case ">=": {
+        if (val1 >= val2) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case "!=": {
+        if (!(val1 === val2)) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case "=~": {
+        if (val1.includes(val2)) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      default: {
+        return "undefined"
+      }
+    }
+  }
+
+  getNthWord(...values) {
+    if (values.length < 2) return ""
+    let index = parseInt(values[0])
+    let word = values.slice(1).join(" ")
+    let stringArray = word.split(" ")
+
+    if (isNaN(index) || index < 1) {
+      return ""
+    }
+    if (!word || typeof word !== "string") {
+      return ""
+    }
+    if(index > stringArray.length+1) {
+      return ""
+    }
+
+    let letter = stringArray[index - 1]
+    return letter
+  }
+
+  getNthLetter(...values) {
+    if (values.length === 0) return ""
+    let index = parseInt(values[0])
+    let word = values[1];
+    if (isNaN(index)) {
+      return ""
+    }
+    if (!word || typeof word !== "string") {
+      return ""
+    }
+    if (index < 1 || index > word.length) {
+      return ""
+    }
+    let letter = word[index - 1];
+    return letter
+  }
+
   setScoreIndex(playerId, index) {
     this.scoreIndexByPlayer[playerId] = index
   }
@@ -1246,6 +1330,7 @@ class EventHandler {
       "$getInventoryItemCount": true,
       "$getArmorEquip": true,
       "$add": true,
+      "$if": true,
       "$subtract": true,
       "$multiply": true,
       "$divide": true,
@@ -1275,7 +1360,9 @@ class EventHandler {
       "$getTotalMobCount": true,
       "$getAngle": true,
       "$getUsage": true,
-      "$getCapacity": true
+      "$getCapacity": true,
+      "$getNthLetter": true,
+      "$getNthWord": true,
     }
   }
 
@@ -1302,14 +1389,20 @@ class EventHandler {
     return this.getFunctionTable()[funcName]
   }
 
-  interpolateFunctions(result) {
+   interpolateFunctions(result) {
+    result = result.replace(/[\r\n]+/g, " ").trim();
     let chars = result.split("")
     let functionBuffer = ""
     let resultBuffer = ""
+    let padepth = 0
 
     for (var i = 0; i < chars.length; i++) {
       let char = chars[i]
       let isEndOfString = i === chars.length - 1
+
+      if (char === '(') padepth++
+      if (char === ')') padepth--
+
       if (isEndOfString) {
         if (functionBuffer.length > 0) {
           functionBuffer += char
@@ -1320,11 +1413,13 @@ class EventHandler {
           resultBuffer += char
         }
       } else if (char === " ") {
-        if (functionBuffer.length > 0) {
+        if (functionBuffer.length > 0 && padepth === 0) {
           let result = this.parseAndEvalExpression(functionBuffer)
           functionBuffer = ""
           resultBuffer += result
           resultBuffer += char
+        } else if (functionBuffer.length > 0 && padepth > 0) {
+          functionBuffer += char
         } else {
           resultBuffer += char
         }
@@ -1337,27 +1432,44 @@ class EventHandler {
 
     return resultBuffer
   }
-
   parseAndEvalExpression(expression) {
     let stack = []
     let characters = expression.split("")
     let keyword = ""
+    let parenthesisDepth = 0 
 
     for (var i = 0; i < characters.length; i++) {
       let character = characters[i]
+      
       if (character === '(') {
-        stack.push(keyword)
+        parenthesisDepth++ 
+        if (keyword.trim()) {
+          stack.push(keyword.trim())
+        }
         stack.push("(")
         keyword = ""
-        // end functionName
+      } else if (character === " ") {
+        if (parenthesisDepth > 0) {
+          if (keyword.trim()) {
+            stack.push(keyword.trim())
+            keyword = ""
+          }
+        } else {
+          if (keyword) {
+            stack.push(keyword)
+            keyword = ""
+          }
+          stack.push(" ")
+        }
       } else if (character === ",") {
-        if (keyword) {
-          stack.push(keyword)
+        if (keyword.trim()) {
+          stack.push(keyword.trim())
           keyword = ""
         }
       } else if (character === ")") {
-        if (keyword) {
-          stack.push(keyword)
+        parenthesisDepth-- 
+        if (keyword.trim()) {
+          stack.push(keyword.trim())
           keyword = ""
         }
 
@@ -1369,30 +1481,35 @@ class EventHandler {
 
           if (arg === "(") {
             isFuncFound = true
-            arg = stack.pop() // func name
+            arg = stack.pop() 
             args.unshift(arg)
           } else {
-            args.unshift(arg)
+            if (arg !== "" && arg !== " ") {
+              args.unshift(arg)
+            }
           }
-
         }
 
         if (isFuncFound) {
           let funcName = args.shift()
           if (this.hasFunction(funcName)) {
             let result = this.runFunction(funcName, args)
-            stack.push(result)
+            stack.push(typeof result === 'object' ? JSON.stringify(result) : String(result))
           } else {
             this.queueLog({ type: 'error', message: "Does not have function named: " + funcName })
           }
-        } else {
         }
       } else {
         keyword += character
       }
     }
 
-    return stack[0]
+    if (keyword) {
+      stack.push(keyword)
+    }
+
+    let finalResult = stack.map(item => typeof item === 'string' ? item : String(item)).join("")
+    return finalResult.trim()
   }
 
   interpolate(value, params, options = {}) {

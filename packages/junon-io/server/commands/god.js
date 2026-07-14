@@ -5,8 +5,10 @@ const Protocol = require('../../common/util/protocol')
 class God extends BaseCommand {
   getUsage() {
     return [
+      "Enables or disables god state for players.",
       "/god",
-      "/god [player]"
+      "/god [player]",
+      "/god [player] [true/false]"
     ]
   }
 
@@ -21,6 +23,12 @@ class God extends BaseCommand {
 
   perform(caller, args) {
     const selector = args[0]
+    let godPar = args[1]
+
+    if ((godPar !== "false") && (godPar !== "true") && (godPar !== null)) {
+      godPar = null
+    }
+
     if (selector) {
       if (!caller.isSectorOwner()) {
         caller.showChatError("permission denied")
@@ -34,21 +42,30 @@ class God extends BaseCommand {
       }
 
       targetPlayers.forEach((player) => {
-        this.toggleGod(player)
+          this.toggleGod(player,godPar)
       })
     } else {
-      if (caller.isPlayer()) {
-        this.toggleGod(caller)
+      if (caller.isPlayer()) { 
+          this.toggleGod(caller,godPar)
       }
     }
   }
 
-  toggleGod(player) {
-    player.godMode = !player.godMode
+  toggleGod(player,tostate) {
+
+    if (tostate) {
+      if (tostate == "true") {
+        player.godMode = true
+      } else {
+        player.godMode = false
+      }
+    } else { 
+      player.godMode = !player.godMode
+    }
+
     if (player.godMode) {
       player.setHealth(player.getMaxHealth())
     }
-
     player.showChatSuccess("god mode: " + (player.godMode ? "ON" : "OFF" ))
   }
 }

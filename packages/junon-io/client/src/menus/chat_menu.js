@@ -219,8 +219,7 @@ class ChatMenu extends BaseMenu {
     tooltip.style.top  = top  + "px"
   }
 
-
-  createChatEntry(chatGroup, messageObj) {
+  createChatEntry(chatGroup, messageObj,prefixList) {
     let chatMessage = document.createElement("div")
     chatMessage.className = "chat_message"
     chatMessage.dataset.username = messageObj.username
@@ -229,7 +228,11 @@ class ChatMenu extends BaseMenu {
     let chatUsername = document.createElement("span")
     chatUsername.className = "chat_user"
     if (messageObj.username) {
-      chatUsername.innerText = "[" + messageObj.username + "]"
+      if (prefixList && prefixList[messageObj.username]) {
+        chatUsername.innerHTML = "<span style='color:"+ prefixList[messageObj.username].color +";'>"+ prefixList[messageObj.username].styleA + prefixList[messageObj.username].prefix.slice(0, 16) + prefixList[messageObj.username].styleB + "</span> [" + messageObj.username + "]"
+      } else {
+        chatUsername.innerText = "[" + messageObj.username + "]"
+      }
       if (messageObj.uid) {
         chatUsername.dataset.uid = messageObj.uid
       }
@@ -261,6 +264,8 @@ class ChatMenu extends BaseMenu {
     }
   }
 
+
+
   setOpenDisplay() {
     this.el.style.display = 'inline-block'
   }
@@ -275,7 +280,7 @@ class ChatMenu extends BaseMenu {
     const playerId = data.playerId
     const username = data.username
     const message  = data.message
-
+    const prefixList = JSON.parse(data.prefixesList||"{}")
     const chatUser = this.game.sector.players[playerId]
 
     let messageObj = this.parseServerChat(message)
@@ -285,7 +290,7 @@ class ChatMenu extends BaseMenu {
     let chatGroup = data.isTeam ? "team" : "local"
 
     if (!this.isMuted(username)) {
-      this.createChatEntry(chatGroup, messageObj)
+      this.createChatEntry(chatGroup, messageObj, prefixList)
     }
 
     if (chatUser && !this.isMuted(chatUser.name)) {

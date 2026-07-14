@@ -5,8 +5,10 @@ class Fly extends BaseCommand {
 
   getUsage() {
     return [
+      "Enables or disables fly state for players.",
       "/fly",
-      "/fly [player]"
+      "/fly [player]",
+      "/fly [player] [true/false]"
     ]
   }
 
@@ -20,17 +22,22 @@ class Fly extends BaseCommand {
 
   perform(player, args) {
     const username = args[0]
+    let nextState = args[1]
+
+    if ((nextState !== "true") && (nextState !== "false") && (nextState !== null)) {
+      nextState = null
+    }
 
     let targetPlayers = this.getPlayersBySelector(username)
     if (targetPlayers.length === 0) {
       if (player.isPlayer()) {
-        player.toggleFly()
+        player.toggleFly(nextState)
       }
       return
     }
 
     targetPlayers.forEach((targetPlayer) => {
-      targetPlayer.toggleFly()
+      targetPlayer.toggleFly(nextState)
     })
   }
 

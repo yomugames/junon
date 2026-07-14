@@ -14,6 +14,10 @@ class Wait extends BaseCommand {
     return true
   }
 
+  isNonSandboxCommand() {
+    return true
+  }
+
   isDelayable() {
     return false
   }

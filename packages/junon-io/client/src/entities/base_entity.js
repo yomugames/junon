@@ -213,6 +213,13 @@ class BaseEntity {
     this.hands.texture = PIXI.utils.TextureCache["player_hands.png"]
   }
 
+  holdHands() {
+    this.hands.texture = PIXI.utils.TextureCache["player_hands_hold.png"]
+  }
+  holdHandsHeavy() {
+    this.hands.texture = PIXI.utils.TextureCache["player_hands_hold_heavy.png"]
+  }
+
   getOwnershipStat(options = {}) {
     let ownerName
     if (this.unowned || !this.owner) {

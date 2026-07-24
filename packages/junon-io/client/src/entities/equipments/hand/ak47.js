@@ -2,24 +2,25 @@ const RangeEquipment = require("./range_equipment")
 const Constants = require("./../../../../../common/constants.json")
 const Protocol = require("./../../../../../common/util/protocol")
 
-class Shotgun extends RangeEquipment {
+class Ak47 extends RangeEquipment {
   repositionSprite() {
     super.repositionSprite()
-    this.sprite.position.x = 23
+
+    this.sprite.position.x = 25
   }
 
   getSpritePath() {
-    return 'shotgun_reskin.png'
+    return 'ak47.png'
   }
 
   getType() {
-    return Protocol.definition().BuildingType.Shotgun
+    return Protocol.definition().BuildingType.Ak47
   }
 
   getConstantsTable() {
-    return "Equipments.Shotgun"
+    return "Equipments.Ak47"
   }
 
 }
 
-module.exports = Shotgun
+module.exports = Ak47

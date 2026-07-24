@@ -10,7 +10,6 @@ class MeleeEquipment extends HandEquipment {
       this.sprite.position.x = 50
     }
 
-
     this.user.openHands()
   }
 
@@ -23,6 +22,7 @@ class MeleeEquipment extends HandEquipment {
 
     const swing = new TWEEN.Tween(rotation)
         .to({ rotation: endRotation  }, 400)
+        .easing(TWEEN.Easing.Quadratic.InOut) 
         .onUpdate(() => {
           let progress = Math.abs(rotation.rotation - startRotation)
           if (progress > halfRotation) {

@@ -57,12 +57,15 @@ class Interpolator {
   }
 
   hasCoveredDistance() {
-    let margin = 1 // account for floating point inaccuracies (i.e x being 1.999 instead of 2)
-
-    let result = this.distanceCovered.x >= (Math.abs(this.distanceToCover.x) - margin) &&
-                 this.distanceCovered.y >= (Math.abs(this.distanceToCover.y) - margin)
-
-    return result
+    const margin = 1.5
+    
+    let remainingX = Math.abs(this.distanceToCover.x) - this.distanceCovered.x
+    let remainingY = Math.abs(this.distanceToCover.y) - this.distanceCovered.y
+    
+    if (remainingX === 0 && remainingY === 0) { return true }
+    
+    return remainingX <= margin && remainingY <= margin
+   
   }
 
   interpolate(lastFrameTime) {

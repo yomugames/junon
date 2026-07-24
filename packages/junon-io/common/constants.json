@@ -2112,13 +2112,13 @@
       "speed": 1
     },
     "Flame": {
-      "width": 32,
-      "height": 32,
-      "minWidth": 32,
-      "maxWidth": 64,
-      "maxRadialExpansion": 16,
-      "damage": 10,
-      "speed": 0,
+      "width": 16,
+      "height": 16,
+      "minWidth": 16,
+      "maxWidth": 32,
+      "maxRadialExpansion": 32,
+      "damage": 1,
+      "speed": 10,
       "categories": {"elemental":true,"fire":true}
     },
     "IonBeam": {
@@ -2139,7 +2139,7 @@
         "tint": "#ffff07"
       },
       "damage": 10,
-      "speed": 70,
+      "speed": 100,
       "categories": {"distance_dependent_width": true}
     },
     "ShotgunBullet": {
@@ -2151,18 +2151,18 @@
         "tint": "#777777"
       },
       "damage": 12,
-      "speed": 50,
+      "speed": 100,
       "categories": {"distance_dependent_width": true}
     },
     "RifleBullet": {
-      "width": 8,
-      "height": 8,
+      "width": 10,
+      "height": 12,
       "sprite": {
         "width": 32,
         "height": 5,
         "tint": "#666666"
       },
-      "speed": 70,
+      "speed": 100,
       "damage": 7,
       "categories": {"distance_dependent_width": true}
     },
@@ -2177,6 +2177,19 @@
       "isPiercing": true,
       "speed": 120,
       "damage": 40,
+      "categories": {"distance_dependent_width": true}
+    },
+    "MinigunBullet": {
+      "width": 10,
+      "height": 12,
+      "sprite": {
+        "width": 32,
+        "height": 5,
+        "tint": "#666666"
+      },
+      "isPiercing": true,
+      "damage": 10,
+      "speed": 100,
       "categories": {"distance_dependent_width": true}
     },
     "Missile": {
@@ -3429,6 +3442,18 @@
         "range": 32
       }
     },
+    "RangeEquipment": {
+      "parent": "Equipments.BaseEquipment",
+      "abstract": true,
+      "isAnimatable": true,
+      "projectileBiasByX": 0,
+      "projectileBiasByY": 0,
+      "projectileBarrelLength": 1,
+      "stats": {
+        "range": 32,
+        "spreadAngle": 0
+      }
+    },
     "Syringe": {
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
@@ -3598,99 +3623,214 @@
       "description": "An energy powered gun which easily destroys buildings"
     },
     "Pistol": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 250
       },
+      "projectileBarrelLength": 2,
       "stats": {
-        "range": 960,
-        "damage": 10,
+        "range": 1024,
+        "damage": 20,
+        "usageCapacity": 175,
         "health": 300,
-        "reload": 500
+        "reload": 500,
+        "spreadAngle": 2.5
       },
       "requirements": {
         "IronBar": 10,
         "CopperBar": 10
       },
-      "description": "Range weapon. Damage 10"
+      "description": "Range weapon. Damage 20"
+    },
+    "Uzi": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 250
+      },
+      "projectileBarrelLength": 2.75,
+      "stats": {
+        "range": 716,
+        "damage": 10,
+        "usageCapacity": 500,
+        "health": 300,
+        "reload": 100,
+        "burstCount": 2,
+        "burstTimeout": 100,
+        "spreadAngle": 3.5
+      },
+      "requirements": {
+        "IronBar": 40,
+        "CopperBar": 20
+      },
+      "description": "SMG Weapon. Damage 10"
     },
     "Shotgun": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 550
       },
+      "projectileBarrelLength": 2.5,
       "stats": {
-        "range": 256,
+        "range": 716,
         "damage": 12,
+        "usageCapacity": 750,
         "health": 300,
-        "reload": 1500
+        "reload": 950,
+        "spreadAngle": 10,
+        "burstCount": 8
       },
       "requirements": {
-        "IronBar": 20,
-        "CopperBar": 20
+        "IronBar": 80,
+        "CopperBar": 20,
+        "Wood": 10
       },
-      "description": "Spread shot weapon. Each Deals Damage 12"
+      "description": "Spread shot weapon. Each shell deals 12 damage."
     },
     "PlasmaGun": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 2000
       },
+      "projectileBarrelLength": 4,
       "stats": {
         "range": 1280,
-        "damage": 52,
+        "damage": 95,
+        "usageCapacity": 1000,
         "health": 300,
-        "reload": 1200
+        "reload": 2000,
+        "spreadAngle": 15
       },
       "requirements": {
-        "CopperBar": 20,
-        "Meteorite": 20
+        "CopperBar": 200,
+        "Meteorite": 50
       },
       "description": "Concentrated Energy Shot weapon"
     },
     "AssaultRifle": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 900
       },
+      "projectileBarrelLength": 2.5,
       "stats": {
         "range": 960,
-        "damage": 7,
+        "damage": 25,
+        "usageCapacity": 500,
         "health": 300,
-        "reload": 1000
+        "reload": 350,
+        "spreadAngle": 5
       },
       "requirements": {
-        "IronBar": 30,
+        "IronBar": 80,
         "CopperBar": 30
       },
       "description": "Burst Weapon that shoots fast projectiles"
     },
     "Scar17": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 700
       },
+      "projectileBarrelLength": 3.125,
       "stats": {
-        "range": 960,
-        "damage": 9,
+        "range": 1024,
+        "damage": 30,
+        "usageCapacity": 1000,
         "health": 300,
-        "reload": 1200
+        "reload": 500,
+        "burstCount": 20,
+        "burstTimeout": 125,
+        "spreadAngle": 1.5
       },
       "requirements": {
-        "IronBar": 70,
-        "CopperBar": 70
+        "IronBar": 250,
+        "CopperBar": 50
       },
       "description": "Burst Weapon that shoots fast projectiles"
+    },
+    "Ak47": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 700
+      },
+      "projectileBarrelLength": 2.5,
+      "stats": {
+        "range": 716,
+        "damage": 20,
+        "usageCapacity": 1000,
+        "health": 300,
+        "reload": 500,
+        "burstCount": 10,
+        "burstTimeout": 100,
+        "spreadAngle": 4.5
+      },
+      "requirements": {
+        "IronBar": 150,
+        "CopperBar": 20,
+        "Wood": 10
+      },
+      "description": "Kalashnikov's assault rifle. Burst Weapon that shoots fast projectiles on short and medium distances"
+    },
+    "BoltActionRifle": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 700
+      },
+      "projectileBarrelLength": 2.5,
+      "stats": {
+        "range": 2048,
+        "damage": 50,
+        "usageCapacity": 500,
+        "health": 300,
+        "reload": 500,
+        "spreadAngle": 1.25
+      },
+      "requirements": {
+        "IronBar": 150,
+        "CopperBar": 20
+      },
+      "description": "Accurate and powerful Weapon that shoots fast projectiles"
+    },
+    "Minigun": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 700
+      },
+      "projectileBiasByY": 7,
+      "projectileBarrelLength": 3.46875,
+      "stats": {
+        "range": 512,
+        "damage": 10,
+        "usageCapacity": 2500,
+        "health": 300,
+        "reload": 100,
+        "burstCount": 10,
+        "burstTimeout": 50,
+        "spreadAngle": 10
+      },
+      "requirements": {
+        "IronBar": 300,
+        "CopperBar": 20
+      },
+      "description": "Absolutely lethal power Weapon. Damage 10 per bullet"
     },
     "RocketLauncher": {
       "parent": "Equipments.BaseEquipment",
@@ -3712,18 +3852,23 @@
       "description": "Shoots missiles towards target enemy"
     },
     "FlameThrower": {
-      "parent": "Equipments.MeleeEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
+      "isFireArm": true,
       "cost": {
         "gold": 450
       },
-      "isFireArm": true,
       "shouldNotRemoveOnBreak": true,
+      "projectileBarrelLength": 2.5,
       "stats": {
-        "damage": 2,
-        "usageCapacity": 20,
-        "fuelConsumption": 80,
-        "range": 200
+        "damage": 1,
+        "reload": 100,
+        "usageCapacity": 200,
+        "fuelConsumption": 1,
+        "range": 300,
+        "burstCount": 5,
+        "burstTimeout": 25,
+        "spreadAngle": 10
       },
       "requirements": {
         "CopperBar": 30

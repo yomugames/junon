@@ -41,16 +41,6 @@ class Grenade extends HandEquipment {
     return true
   }
 
-  getEquipmentDamage() {
-    // if (this.game.isPvP()) {
-    if (false) {
-      return this.getConstants().stats.damage * 2
-    } else {
-      return this.getConstants().stats.damage
-    }
-  }
-
-
   static getProjectileKlass() {
     return Projectiles.Grenade
   }

@@ -1170,7 +1170,7 @@
         "height": 72
       },
       "stats": {
-        "health": 150,
+        "health": 200,
         "damage": 12,
         "range": 256,
         "los": 256
@@ -1215,7 +1215,7 @@
         "rotation": 90
       },
       "stats": {
-        "health": 90,
+        "health": 125,
         "damage": 1,
         "range": 256,
         "los": 256,
@@ -1226,8 +1226,8 @@
       "parent": "Mobs.BaseMob",
       "hasBlood": true,
       "drop": ["Flamethrower"],
-      "resistance": ["fire"],
-      "immunity": ["poison"],
+      "isFlamable": false,
+      "immunity": ["poison", "fire"],
       "canTargetTraps": true,
       "canFly": true,
       "cost": {
@@ -1252,8 +1252,8 @@
         "health": 150,
         "damage": 1,
         "range": 256,
-        "los": 256,
-        "reload": 8000
+        "los": 512,
+        "reload": 100
       }
     },
     "DummyPlayer": {
@@ -1707,12 +1707,12 @@
       "height": 256,
       "drop": "SquidLordHeart",
       "stats": {
-        "speed": 4,
-        "reload": 3000,
-        "health": 2000,
-        "damage": 10,
+        "speed": 6,
+        "reload": 300,
+        "health": 7500,
+        "damage": 25,
         "range": 256,
-        "los": 384
+        "los": 1024
       },
       "isFlamable": false,
       "categories": {"flying": true},
@@ -1734,12 +1734,12 @@
     "Drone": {
       "parent": "Mobs.BaseMob",
       "stats": {
-        "speed": 4,
-        "reload": 3000,
-        "health": 200,
-        "damage": 10,
-        "range": 256,
-        "los": 384
+        "speed": 12,
+        "reload": 500,
+        "health": 50,
+        "damage": 20,
+        "range": 512,
+        "los": 718
       },
       "isFlamable": false,
       "immunity": ["poison"],
@@ -1764,7 +1764,7 @@
       "stats": {
         "speed": 4,
         "reload": 250,
-        "health": 25000,
+        "health": 3500,
         "damage": 50,
         "range": 512,
         "los": 1024
@@ -2029,7 +2029,7 @@
     "Bubble": {
       "width": 32,
       "height": 32,
-      "speed": 12
+      "speed": 48
     },
     "BlasterLaser": {
       "width": 24,

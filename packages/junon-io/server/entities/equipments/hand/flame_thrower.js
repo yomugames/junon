@@ -6,6 +6,10 @@ const Projectiles = require("./../../projectiles/index")
 
 
 class FlameThrower extends RangeEquipment {
+  usesShellOrMagazine() {
+    return true
+  }
+  
   checkForAmmo(user) {
     if (this.isDepleted() && !user.hasInfiniteAmmo()) {
       let owner = this.getOwner()

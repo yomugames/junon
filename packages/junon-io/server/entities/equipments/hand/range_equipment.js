@@ -41,6 +41,14 @@ class RangeEquipment extends HandEquipment {
   getProjectileType() {
     throw new Error("must implement RangeEquipment.getProjectileType")
   }
+  
+  constructProjectileData(data) {
+    return {
+      weapon:        this,
+      source:      { x: data.sourcePoint[0],         y: data.sourcePoint[1] },
+      destination: data.destination
+    }
+  }
 
   getDestination(user) {
     const spreadAngle = this.getSpreadAngle()
@@ -68,17 +76,23 @@ class RangeEquipment extends HandEquipment {
     const biasY = this.getProjectileBiasByY()
     const barrelLength = this.getProjectileBiasBarrelLength()
     
-    const sourcePoint = user.game.pointFromDistance(user.getX() + biasX, user.getY() + biasY, Constants.tileSize * barrelLength, user.getRadAngle())
+    const angle = user.getRadAngle()
+    
+    const rotatedBiasX = biasX * Math.cos(angle) - biasY * Math.sin(angle)
+    const rotatedBiasY = biasX * Math.sin(angle) + biasY * Math.cos(angle)
+    
+    const sourcePoint = user.game.pointFromDistance(user.getX() + rotatedBiasX, user.getY() + rotatedBiasY, Constants.tileSize * barrelLength, user.getRadAngle())
 
     const projectile = this.getProjectileType()
     
     const destination = this.getDestination(user)
     
-    projectile.build({
-      weapon:        this,
-      source:      { x: sourcePoint[0],         y: sourcePoint[1] },
-      destination: destination
-    })
+    const data = {
+      destination: destination,
+      sourcePoint: sourcePoint
+    }
+    
+    projectile.build(this.constructProjectileData(data))
   }
   
   use(user, targetEntity) {

@@ -8,7 +8,7 @@ const Projectiles = require("./../../projectiles/index")
 class Grenade extends HandEquipment {
 
   static use(user, targetEntity, options = {}) {
-    let distanceFromUser = 0
+    let distanceFromUser = 48
     let sourcePoint = user.game.pointFromDistance(user.getX(), user.getY(), distanceFromUser, user.getRadAngle())
     let destination = { x: options.targetX, y: options.targetY }
     // if distance exceeds limit

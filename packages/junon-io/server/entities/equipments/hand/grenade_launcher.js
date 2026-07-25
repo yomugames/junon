@@ -5,16 +5,15 @@ const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
 
 
-class RocketLauncher extends RangeEquipment {
+class GrenadeLauncher extends RangeEquipment {
   getProjectileType() {
-    return Projectiles.Missile
+    return Projectiles.Grenade
   }
   
   constructProjectileData(data) {
-    let projectileData = super.constructProjectileData(data)
+    const projectileData = super.constructProjectileData(data)
     
-    projectileData.shouldCreateExplosion = true,
-    projectileData.shouldAttackBuildings = true
+    projectileData.countdown = 1.75
     
     return projectileData
   }
@@ -26,16 +25,16 @@ class RocketLauncher extends RangeEquipment {
   }
 
   getConstantsTable() {
-    return "Equipments.RocketLauncher"
+    return "Equipments.GrenadeLauncher"
   }
-
+  
   getAmmoType() {
-    return Protocol.definition().BuildingType.Missile
+    return Protocol.definition().BuildingType.Grenade
   }
 
   getType() {
-    return Protocol.definition().BuildingType.RocketLauncher
+    return Protocol.definition().BuildingType.GrenadeLauncher
   }
 }
 
-module.exports = RocketLauncher
+module.exports = GrenadeLauncher

@@ -1116,10 +1116,10 @@
         "rotation": 90
       },
       "stats": {
-        "health": 30,
+        "health": 100,
         "damage": 10,
         "range": 32,
-        "los": 256
+        "los": 512
       },
       "upgrade": {
         "health": "+10",
@@ -1763,11 +1763,11 @@
       "parent": "Mobs.BaseMob",
       "stats": {
         "speed": 4,
-        "reload": 3000,
-        "health": 800,
-        "damage": 5,
-        "range": 384,
-        "los": 512
+        "reload": 250,
+        "health": 25000,
+        "damage": 50,
+        "range": 512,
+        "los": 1024
       },
       "isFlamable": false,
       "immunity": ["poison"],
@@ -1991,13 +1991,14 @@
     "BlueLaser": {
       "width": 5,
       "height": 5,
-      "speed": 15,
+      "speed": 60,
       "damage": 75,
       "sprite": {
         "width": 32,
-        "height": 4
-      }
-
+        "height": 4,
+        "tint": "#0000ff"
+      },
+      "categories": {"distance_dependent_width": true}
     },
     "MiningBeam": {
       "width": 32,
@@ -2068,19 +2069,19 @@
       "canDamageWalls": true,
       "width": 16,
       "height": 16,
-      "speed": 8
+      "speed": 20
     },
     "Dynamite": {
       "canDamageWalls": true,
       "width": 16,
       "height": 16,
-      "speed": 8
+      "speed": 20
     },
     "MolotovCocktail": {
       "canDamageWalls": false,
       "width": 24,
       "height": 28,
-      "speed": 12
+      "speed": 20
     },
     "Meteor": {
       "width": 64,
@@ -2090,7 +2091,7 @@
     "PoisonGrenade": {
       "width": 16,
       "height": 16,
-      "speed": 8
+      "speed": 20
     },
     "TeslaLaser": {
       "width": 10,
@@ -3601,18 +3602,19 @@
       "description": "Mines Asteroids faster. Damage 5"
     },
     "Deconstructor": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "canDamageWalls": true,
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 2050
       },
+      "projectileBarrelLength": 1.84375,
       "stats": {
-        "range": 1500,
-        "damage": 100,
+        "range": 1024,
+        "damage": 20,
         "health": 20,
-        "reload": 2000
+        "reload": 500
       },
       "requirements": {
         "IronBar": 95,
@@ -3727,7 +3729,7 @@
         "damage": 25,
         "usageCapacity": 500,
         "health": 300,
-        "reload": 350,
+        "reload": 250,
         "spreadAngle": 5
       },
       "requirements": {
@@ -3769,7 +3771,7 @@
       },
       "projectileBarrelLength": 2.5,
       "stats": {
-        "range": 716,
+        "range": 1024,
         "damage": 20,
         "usageCapacity": 1000,
         "health": 300,
@@ -3832,20 +3834,47 @@
       },
       "description": "Absolutely lethal power Weapon. Damage 10 per bullet"
     },
+    "GrenadeLauncher": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 700
+      },
+      "projectileBarrelLength": 3.875,
+      "stats": {
+        "range": 716,
+        "damage": 50,
+        "usageCapacity": 1000,
+        "health": 300,
+        "reload": 1000,
+        "spreadAngle": 7.5
+      },
+      "requirements": {
+        "IronBar": 200,
+        "CopperBar": 50
+      },
+      "description": "Powerful Weapon that shoots grenades."
+    },
     "RocketLauncher": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 900
       },
+      "projectileBiasByY": 7.5,
+      "projectileBarrelLength": 0.71875,
       "stats": {
         "range": 960,
-        "damage": 25,
+        "damage": 100,
         "health": 300,
-        "reload": 1000
+        "reload": 1350,
+        "spreadAngle": 11.5
       },
       "requirements": {
+        "IronBar": 100,
+        "CopperBar": 150,
         "SulfurOre": 2,
         "CircuitBoard": 20
       },
@@ -3863,7 +3892,7 @@
       "stats": {
         "damage": 1,
         "reload": 100,
-        "usageCapacity": 200,
+        "usageCapacity": 500,
         "fuelConsumption": 1,
         "range": 300,
         "burstCount": 5,
@@ -3871,7 +3900,7 @@
         "spreadAngle": 10
       },
       "requirements": {
-        "CopperBar": 30
+        "CopperBar": 100
       },
       "description": "Shoots flames"
     },
@@ -6870,17 +6899,20 @@
       "categories": {"turret":true,"editable_targets":true},
       "stats": {
         "reload": 2000,
-        "damage": 10,
+        "damage": 2,
         "range": 288,
         "health": 200,
-        "fuelConsumption": 25,
-        "fuelCapacity": 100,
+        "fuelConsumption": 1,
+        "fuelCapacity": 500,
         "powerConsumption": 100,
-        "clientResource": "fuel"
+        "clientResource": "fuel",
+        "burstCount": 5,
+        "burstTimeout": 25,
+        "spreadAngle": 10
       },
       "requirements": {
-        "IronBar": 20,
-        "CopperBar": 40
+        "IronBar": 80,
+        "CopperBar": 175
       },
       "upgrade": {
         "damage": "+3",
@@ -6980,8 +7012,8 @@
         "powerConsumption": 750
       },
       "requirements": {
-        "IronBar": 50,
-        "Meteorite": 20,
+        "IronBar": 100,
+        "Meteorite": 30,
         "CircuitBoard": 20
       },
       "upgrade": {
@@ -7012,8 +7044,8 @@
         "powerConsumption": 200
       },
       "requirements": {
-        "IronBar": 50,
-        "SulfurOre": 30,
+        "IronBar": 200,
+        "SulfurOre": 15,
         "CircuitBoard": 15
       },
       "upgrade": {
@@ -7044,7 +7076,8 @@
         "powerConsumption": 250
       },
       "requirements": {
-        "IronBar": 50,
+        "IronBar": 200,
+        "CopperBar": 150,
         "SulfurOre": 10,
         "CircuitBoard": 20
       },

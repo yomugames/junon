@@ -1709,9 +1709,9 @@
       "stats": {
         "speed": 6,
         "reload": 300,
-        "health": 7500,
+        "health": 2000,
         "damage": 25,
-        "range": 256,
+        "range": 128,
         "los": 1024
       },
       "isFlamable": false,
@@ -1764,9 +1764,9 @@
       "stats": {
         "speed": 4,
         "reload": 250,
-        "health": 3500,
-        "damage": 50,
-        "range": 512,
+        "health": 1500,
+        "damage": 25,
+        "range": 128,
         "los": 1024
       },
       "isFlamable": false,

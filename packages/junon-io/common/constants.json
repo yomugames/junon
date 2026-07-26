@@ -5072,6 +5072,7 @@
     "Cage": {
       "width": 32,
       "height": 32,
+      "categories": {"custom_colors": true},
       "cost": {
         "gold": 50
       },

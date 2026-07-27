@@ -22,7 +22,8 @@
       "New hands holding weapon sprites",
       "New shoot animation for ranged weapons",
       "Melee attack and items on ground animations are smoother now",
-      "Bosses and some mobs are stronger now"
+      "Bosses and some mobs are stronger now",
+      "Only melee weapons get damage debuff when attacking walls"
     ]
   }
 }

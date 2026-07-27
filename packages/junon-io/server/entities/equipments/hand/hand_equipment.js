@@ -37,8 +37,9 @@ class HandEquipment extends BaseEquipment {
     let baseDamage = this.getEquipmentDamage()
     if (!this.game.isMiniGame() && 
          targetEntity && 
-         targetEntity.hasCategory("melee_resistant")) {
-      baseDamage = 2
+         targetEntity.hasCategory("melee_resistant") &&
+         this.isMeleeEquipment()) {
+      baseDamage = Math.min(2, baseDamage)
     }
 
     if (!this.owner) return baseDamage

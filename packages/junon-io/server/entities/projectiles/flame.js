@@ -81,7 +81,10 @@ class Flame extends CollidableProjectile {
   }
 
   onCollide(entity) {
-    // dont do anything
+    if (entity?.hasCategory("wall")) {
+      this.stopExpanding = true
+      this.onMoveComplete()
+    }
   }
 
 }

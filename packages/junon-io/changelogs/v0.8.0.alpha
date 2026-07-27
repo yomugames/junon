@@ -7,7 +7,8 @@
       "Fixed flamethrower wrongly consume fuel from fuel tank",
       "Partially fixed phantom projectiles bug",
       "Human isn't dormant now if spawned with command",
-      "Firebat no longer takes damage from fire"
+      "Firebat no longer takes damage from fire",
+      "Tangent function is now enabled"
     ],
     "features": [
       "Added server class for ranged weapons",

@@ -236,6 +236,13 @@ class RailStop extends BaseBuilding {
     let tracks = this.getConnectedTracks()
     if (tracks.length === 0) return
 
+    // release corpses so they don't go back to player / slave dragging it
+    this.game.forEachPlayer((player) =>{
+      if(Object.values(passengers).includes(player.dragTarget)) {
+        player.releaseDragTarget()
+      }
+    })
+
     let tramCenter = this.getTramCenter()
     let data = {
       x: tramCenter.x,

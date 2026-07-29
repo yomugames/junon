@@ -350,7 +350,7 @@ class Corpse extends BaseEntity {
   }
 
   onPositionChanged(options = {}) {
-    if (this.isOutOfBounds()) {
+    if (this.isOutOfBounds() && !this.isOnRailTram()) {
       this.remove()
       return
     }

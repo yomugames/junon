@@ -1328,6 +1328,7 @@ class EventHandler {
       "$radian": true,
       "$sin": true,
       "$cos": true,
+      "$tan": true,
       "$atan2": true,
       "$isLoggedIn": true,
       "$getEquipId": true,

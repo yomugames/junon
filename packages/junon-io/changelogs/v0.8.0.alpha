@@ -1,0 +1,30 @@
+{
+  "version": "v0.8.0.alpha",
+  "date": "July 25, 2026",
+  "title": "Combat update by KONTREVOLUCIA",
+  "content": {
+    "bugs": [
+      "Fixed flamethrower wrongly consume fuel from fuel tank",
+      "Partially fixed phantom projectiles bug",
+      "Human isn't dormant now if spawned with command",
+      "Firebat no longer takes damage from fire",
+      "Tangent function is now enabled"
+    ],
+    "features": [
+      "Added server class for ranged weapons",
+      "Grenades have physics now",
+      "Reworked and rebalanced all ranged weapons",
+      "Added AK-47",
+      "Added bolt action rifle",
+      "Added minigun weapon",
+      "Added uzi",
+      "Added grenade launcher",
+      "Projectiles now fly out of gun's barrel, not shooter's body",
+      "New hands holding weapon sprites",
+      "New shoot animation for ranged weapons",
+      "Melee attack and items on ground animations are smoother now",
+      "Bosses and some mobs are stronger now",
+      "Only melee weapons get damage debuff when attacking walls"
+    ]
+  }
+}

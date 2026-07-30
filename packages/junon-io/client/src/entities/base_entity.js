@@ -207,10 +207,27 @@ class BaseEntity {
 
   closeHands() {
     this.hands.texture = PIXI.utils.TextureCache["player_hands_closed.png"]
+    this.hands.x = 5
   }
 
   openHands() {
     this.hands.texture = PIXI.utils.TextureCache["player_hands.png"]
+    this.hands.x = 0
+  }
+
+  holdHands() {
+    this.hands.texture = PIXI.utils.TextureCache["player_hands_hold.png"]
+    this.hands.x = 5
+  }
+
+  holdHandsHeavy() {
+    this.hands.texture = PIXI.utils.TextureCache["player_hands_hold_heavy.png"]
+    this.hands.x = 5
+  }
+
+  holdHandsLauncher() {
+    this.hands.texture = PIXI.utils.TextureCache["player_hands_hold_launcher.png"]
+    this.hands.x = 8
   }
 
   getOwnershipStat(options = {}) {

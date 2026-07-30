@@ -3,9 +3,13 @@ const Constants = require("./../../../../../common/constants.json")
 const Protocol = require("./../../../../../common/util/protocol")
 
 class Shotgun extends RangeEquipment {
+  repositionSprite() {
+    super.repositionSprite()
+    this.sprite.position.x = 23
+  }
 
   getSpritePath() {
-    return 'shotgun.png'
+    return 'shotgun_reskin.png'
   }
 
   getType() {

@@ -13,10 +13,6 @@ class Human extends LandMob {
     return "Mobs.Human"
   }
 
-  onCommandSpawned() {
-    this.setDormant(true)
-  }
-
 }
 
 module.exports = Human

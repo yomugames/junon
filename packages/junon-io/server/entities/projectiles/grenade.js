@@ -1,8 +1,8 @@
-const BaseProjectile = require("./base_projectile")
+const CollidableProjectile = require("./collidable_projectile")
 const Protocol = require('../../../common/util/protocol')
 const Constants = require("./../../../common/constants.json")
 
-class Grenade extends BaseProjectile {
+class Grenade extends CollidableProjectile {
 
   constructor(data) {
     super(data)
@@ -64,6 +64,13 @@ class Grenade extends BaseProjectile {
       source:      { x: this.getX(),         y: this.getY() },
       destination: { x: this.getX(),         y: this.getY() }
     })
+  }
+
+  onCollide(entity) {
+    if (entity.getOwner() !== this.getOwner()) {
+      this.remove()
+      this.trigger()
+    }
   }
 
   remove() {

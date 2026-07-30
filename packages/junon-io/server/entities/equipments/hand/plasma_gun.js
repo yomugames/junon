@@ -1,33 +1,17 @@
-const HandEquipment = require("./hand_equipment")
+const RangeEquipment = require("./range_equipment")
 const Projectiles = require("./../../projectiles/index")
 
 const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
 
 
-class PlasmaGun extends HandEquipment {
+class PlasmaGun extends RangeEquipment {
+  getProjectileType() {
+    return Projectiles.PlasmaBullet
+  }
 
   use(user, targetEntity) {
-    if (!user.hasInfiniteAmmo()) {
-      const ammoType = this.getAmmoType()
-      const ammo = user.inventory.search(ammoType)
-      if (!ammo) {
-        user.showError("PlasmaCell Required")
-        return false
-      }
-
-      ammo.reduceCount(1)
-    }
-
     super.use(user, targetEntity)
-
-    let sourcePoint = user.game.pointFromDistance(user.getX(), user.getY(), Constants.tileSize * 4, user.getRadAngle())
-
-    const projectile = Projectiles.PlasmaBullet.build({
-      weapon:        this,
-      source:      { x: sourcePoint[0],         y: sourcePoint[1] },
-      destination: user.getShootTarget(this)
-    })
 
     return true
   }
@@ -35,7 +19,7 @@ class PlasmaGun extends HandEquipment {
   getConstantsTable() {
     return "Equipments.PlasmaGun"
   }
-
+  
   getAmmoType() {
     return Protocol.definition().BuildingType.PlasmaCell
   }

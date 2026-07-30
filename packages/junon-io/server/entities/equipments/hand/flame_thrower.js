@@ -1,52 +1,34 @@
-const HandEquipment = require("./hand_equipment")
+const RangeEquipment = require("./range_equipment")
 
 const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
 const Projectiles = require("./../../projectiles/index")
 
 
-class FlameThrower extends HandEquipment {
-  use(player, targetEntity) {
-    if (this.isDepleted() && !player.hasInfiniteAmmo()) {
+class FlameThrower extends RangeEquipment {
+  usesShellOrMagazine() {
+    return true
+  }
+  
+  checkForAmmo(user) {
+    if (this.isDepleted() && !user.hasInfiniteAmmo()) {
       let owner = this.getOwner()
       if (owner.isPlayer()) {
         owner.showError("Needs Fuel")
       }
 
-      return
+      return false
     }
+    return true
+  }
+
+  getProjectileType() {
+    return Projectiles.Flame
+  }
+
+  use(player, targetEntity) {
 
     super.use(player, targetEntity)
-
-    let distance = Constants.tileSize
-
-    let longestPoint = Math.floor(this.getRange() / Constants.tileSize) - 1
-    longestPoint = Math.max(1, longestPoint)
-    let distanceMultipliers = Array(longestPoint).fill().map((element, index) => index + 1)
-
-    // let distanceMultipliers = [2, 3, 4, 5]
-    let points = distanceMultipliers.map((multiplier) => {
-      return player.game.pointFromDistance(player.getX(), player.getY(), distance * multiplier, player.getRadAngle())
-    })
-
-    let minWidth = Constants.Projectiles.Flame.minWidth
-    let maxWidth = Constants.Projectiles.Flame.maxWidth
-
-    for (var i = 0; i < points.length; i++) {
-      let point = points[i]
-      let width = Math.min(maxWidth, minWidth + (i * 6))
-
-      if (!this.isObstructed(player, point)) {
-        Projectiles.Flame.build({
-          weapon: this,
-          source:      { x: point[0], y: point[1] },
-          destination: { x: point[0], y: point[1] },
-          w: width,
-          h: width
-        })
-      }
-    }
-
   }
 
   onEquipmentConstructed() {

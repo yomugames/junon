@@ -5,9 +5,13 @@ const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
 
 
-class Pistol extends RangeEquipment {
+class Minigun extends RangeEquipment {
+  getProjectileBiasByY() {
+    return super.getProjectileBiasByY() + super.getProjectileBiasByY() * (Math.random() - 0.5)
+  }
+  
   getProjectileType() {
-    return Projectiles.Bullet
+    return Projectiles.MinigunBullet
   }
 
   use(user, targetEntity) {
@@ -17,16 +21,16 @@ class Pistol extends RangeEquipment {
   }
 
   getConstantsTable() {
-    return "Equipments.Pistol"
+    return "Equipments.Minigun"
   }
   
   getAmmoType() {
-    return Protocol.definition().BuildingType.BulletAmmo
+    return Protocol.definition().BuildingType.RifleAmmo
   }
 
   getType() {
-    return Protocol.definition().BuildingType.Pistol
+    return Protocol.definition().BuildingType.Minigun
   }
 }
 
-module.exports = Pistol
+module.exports = Minigun

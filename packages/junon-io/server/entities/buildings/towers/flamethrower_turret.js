@@ -19,74 +19,89 @@ class FlamethrowerTurret extends BaseTower {
     return "Buildings.FlamethrowerTurret"
   }
 
+  getBurstCount() {
+    return this.getConstants().stats.burstCount || 1
+  }
+
+  getBurstTimeout() {
+    return this.getConstants().stats.burstTimeout || 0
+  }
+
+  getSpreadAngle() {
+    return this.getConstants().stats.spreadAngle || 0
+  }
+
   performAttack(attackTarget) {
     this.lastAttackTimestamp = this.game.timestamp
 
-    this.shootProjectile(attackTarget)
+    const burstCount = this.getBurstCount()
+    const burstTimeout = this.getBurstTimeout()
+    let bursts = 0
+
+    const fireNext = () => {
+      if (bursts >= burstCount) return
+
+      if (!this.hasAmmo() && !this.hasInfiniteAmmo()) {
+        bursts = burstCount
+        return
+      }
+
+      this.shootProjectile(attackTarget)
+      bursts++
+      if (bursts < burstCount) {
+        setTimeout(fireNext, burstTimeout)
+      }
+    }
+
+    fireNext()
   }
 
   hasAmmo() {
     return this.fuelNetwork.getTotalResourceStored() > this.getResourceConsumption('fuel')
   }
 
-  shootProjectile(attackTarget, options = {}) {
-    if (!options.ignoreAmmo) {
-      if (!this.hasAmmo() && !this.hasInfiniteAmmo()) return
-
-      if (this.getResourceStored('fuel') > this.getResourceConsumption('fuel')) {
-        this.consumeResource('fuel', this.getResourceConsumption('fuel'))
-      } else {
-        this.fuelNetwork.consumeResource(this)
-      }
+  shootProjectile(attackTarget) {
+    if (this.getResourceStored('fuel') > this.getResourceConsumption('fuel')) {
+      this.consumeResource('fuel', this.getResourceConsumption('fuel'))
+    } else {
+      this.fuelNetwork.consumeResource(this)
     }
 
-
-    if (!options.ignoreTarget) {
-      let absoluteAngleTowardsAttackTarget = Math.atan2(attackTarget.getY() - this.getY(), attackTarget.getX() - this.getX())
-      let absoluteDegTowardsAttackTarget = Math.floor(absoluteAngleTowardsAttackTarget * (180 / Math.PI))
-      if (this.getAngle() !== absoluteDegTowardsAttackTarget) {
-        return
-      }
+    let absoluteAngleTowardsAttackTarget = Math.atan2(attackTarget.getY() - this.getY(), attackTarget.getX() - this.getX())
+    let absoluteDegTowardsAttackTarget = Math.floor(absoluteAngleTowardsAttackTarget * (180 / Math.PI))
+    if (this.getAngle() !== absoluteDegTowardsAttackTarget) {
+      return
     }
 
-    let sourcePoint = this.game.pointFromDistance(this.getX(), this.getY(), Constants.tileSize, this.getAbsoluteRadAngle())
+    const spreadAngle = this.getSpreadAngle()
+    const randomOffset = (2 * Math.random() - 1) * spreadAngle
+    const angleInRad = absoluteAngleTowardsAttackTarget + (randomOffset * Math.PI / 180)
 
-    let distance = Constants.tileSize
+    const range = this.getAttackRange()
+    const destination = {
+      x: this.getX() + Math.cos(angleInRad) * range,
+      y: this.getY() + Math.sin(angleInRad) * range
+    }
 
-    let longestPoint = Math.floor(this.getAttackRange() / Constants.tileSize) - 1
-    let distanceMultipliers = Array(longestPoint).fill().map((element, index) => index + 1)
-    let points = distanceMultipliers.map((multiplier) => {
-      return this.game.pointFromDistance(sourcePoint[0], sourcePoint[1], distance * multiplier, this.getRadAngle())
+    let sourcePoint = this.game.pointFromDistance(this.getX(), this.getY(), Constants.tileSize, angleInRad)
+
+    Projectiles.Flame.build({
+      weapon: this,
+      source: { x: sourcePoint[0], y: sourcePoint[1] },
+      destination: destination,
+      w: Constants.Projectiles.Flame.minWidth,
+      h: Constants.Projectiles.Flame.minWidth
     })
-
-    let minWidth = Constants.Projectiles.Flame.minWidth
-    let maxWidth = Constants.Projectiles.Flame.maxWidth
-
-    for (var i = 0; i < points.length; i++) {
-      let point = points[i]
-      let width = Math.min(maxWidth, minWidth + (i * 6))
-
-      Projectiles.Flame.build({
-        weapon: this,
-        source:      { x: point[0], y: point[1] },
-        destination: { x: point[0], y: point[1] },
-        w: width,
-        h: width
-      })
-
-    }
   }
 
   onTurnExecuted() {
   }
 
   canStore(index, item) {
-    if (!item) return true // allow swap with blank space slot
-
+    if (!item) return true
     return item.isBulletAmmo()
   }
-
-
+  
 }
 
 module.exports = FlamethrowerTurret

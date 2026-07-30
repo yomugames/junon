@@ -1,37 +1,21 @@
-const HandEquipment = require("./hand_equipment")
+const RangeEquipment = require("./range_equipment")
 const Projectiles = require("./../../projectiles/index")
 
 const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
 
-
-class Shotgun extends HandEquipment {
+class Shotgun extends RangeEquipment {
+  usesShellOrMagazine() {
+    return true
+  }
+  
+  getProjectileType() {
+    return Projectiles.ShotgunBullet
+  }
 
   use(user, targetEntity) {
-    if (!user.hasInfiniteAmmo()) {
-      const ammoType = this.getAmmoType()
-      const ammo = user.inventory.search(ammoType)
-      if (!ammo) {
-        user.showError("Shotgun Shells Required")
-        return false
-      }
-
-      ammo.reduceCount(1)
-    }
-
     super.use(user, targetEntity)
-
-    let angles = [-7, -2, 3, 8]
-    angles.forEach((angle) => {
-      let angleInRad = user.getRadAngle() + (angle * Math.PI / 180)
-
-      Projectiles.ShotgunBullet.build({
-        weapon:        this,
-        source:      { x: user.getX(),         y: user.getY() },
-        destination: user.getShootTarget(this, angleInRad)
-      })
-    })
-
+    
     return true
   }
 

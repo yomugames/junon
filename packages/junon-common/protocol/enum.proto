@@ -266,7 +266,12 @@ enum BuildingType {
   MiasmaGate = 272;
   CabbageSeed = 273;
   Cabbage = 274;
-  SmallAirlock = 275;
+  Ak47 = 275;
+  BoltActionRifle = 276;
+  GrenadeLauncher = 277;
+  Minigun = 278;
+  Uzi = 279;
+  SmallAirlock = 280;
 }
 
 enum TerrainType {
@@ -317,6 +322,7 @@ enum ProjectileType {
   BlueLaser = 26;
   Dynamite = 27;
   MiningExplosion = 28;
+  MinigunBullet = 29;
 }
 
 enum MobStatus {

@@ -8,7 +8,7 @@ const Projectiles = require("./../../projectiles/index")
 class Grenade extends HandEquipment {
 
   static use(user, targetEntity, options = {}) {
-    let distanceFromUser = 0
+    let distanceFromUser = 48
     let sourcePoint = user.game.pointFromDistance(user.getX(), user.getY(), distanceFromUser, user.getRadAngle())
     let destination = { x: options.targetX, y: options.targetY }
     // if distance exceeds limit
@@ -40,16 +40,6 @@ class Grenade extends HandEquipment {
   isConsumable() {
     return true
   }
-
-  getEquipmentDamage() {
-    // if (this.game.isPvP()) {
-    if (false) {
-      return this.getConstants().stats.damage * 2
-    } else {
-      return this.getConstants().stats.damage
-    }
-  }
-
 
   static getProjectileKlass() {
     return Projectiles.Grenade

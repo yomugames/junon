@@ -5,7 +5,7 @@ const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
 
 
-class Pistol extends RangeEquipment {
+class Uzi extends RangeEquipment {
   getProjectileType() {
     return Projectiles.Bullet
   }
@@ -17,7 +17,7 @@ class Pistol extends RangeEquipment {
   }
 
   getConstantsTable() {
-    return "Equipments.Pistol"
+    return "Equipments.Uzi"
   }
   
   getAmmoType() {
@@ -25,8 +25,8 @@ class Pistol extends RangeEquipment {
   }
 
   getType() {
-    return Protocol.definition().BuildingType.Pistol
+    return Protocol.definition().BuildingType.Uzi
   }
 }
 
-module.exports = Pistol
+module.exports = Uzi

@@ -10,6 +10,8 @@ class CarbonGas extends BaseProjectile {
 
     this.radialExpansion = 0
     this.MAX_RADIAL_EXPANSION = this.getConstants().maxRadialExpansion
+    
+    this.w = data.w || this.getConstants().minWidth // for security
   }
 
   getType() {

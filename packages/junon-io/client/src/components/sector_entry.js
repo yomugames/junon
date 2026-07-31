@@ -12,6 +12,8 @@ class SectorEntry {
 
     this.setId(sector.sectorId)
     this.update(sector)
+    
+    delete this.data.creatorIp // not necessary to join server
   }
 
   join(options = {}) {

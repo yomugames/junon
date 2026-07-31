@@ -226,6 +226,10 @@ class Lamp extends BaseBuilding {
     }
   }
 
+  getDefaultSpriteColor() {
+    return ClientHelper.hexToInt(this.getLightColor())
+  }
+
   getType() {
     return Protocol.definition().BuildingType.Lamp
   }

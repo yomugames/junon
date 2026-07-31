@@ -2800,6 +2800,7 @@
     "Gelatin": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "cost": {
         "gold": 15
       },
@@ -2888,6 +2889,7 @@
     "HotDog": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "sprite": {
         "position": {
           "x": 60,
@@ -2910,6 +2912,7 @@
     "Bread": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "isIngredient": true,
       "sprite": {
         "position": {
@@ -2933,6 +2936,7 @@
     "VeganPizza": {
       "width": 40,
       "height": 40,
+      "isCooked": true,
       "sprite": {
         "position": {
           "x": 95,
@@ -2955,6 +2959,7 @@
     "SlimyMeatPizza": {
       "width": 40,
       "height": 40,
+      "isCooked": true,
       "cost": {
         "gold": 500
       },
@@ -2977,6 +2982,7 @@
     "LectersDinner": {
       "width": 40,
       "height": 40,
+      "isCooked": true,
       "cost": {
         "gold": 300
       },
@@ -3102,6 +3108,7 @@
     "Fries": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "cost": {
         "gold": 100
       },
@@ -3125,6 +3132,7 @@
     "Steak": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "cost": {
         "gold": 200
       },
@@ -3167,6 +3175,7 @@
     "PotatoSoup": {
       "width": 32,
       "height": 32,
+      "isCooked": true,
       "cost": {
         "gold": 200
       },
@@ -3187,6 +3196,7 @@
     "SlimeBroth": {
       "width": 32,
       "height": 32,
+      "isCooked": true,
       "cost": {
         "gold": 200
       },
@@ -3206,6 +3216,7 @@
     "MisoSoup": {
       "width": 32,
       "height": 32,
+      "isCooked": true,
       "cost": {
         "gold": 200
       },
@@ -3225,6 +3236,7 @@
     "Omelette": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "cost": {
         "gold": 200
       },
@@ -3247,6 +3259,7 @@
     "Nigiri": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "cost": {
         "gold": 400
       },
@@ -3271,6 +3284,7 @@
     "PumpkinPie": {
       "width": 32,
       "height": 32,
+      "isCooked": true,
       "cost": {
         "gold": 250
       },
@@ -5232,6 +5246,7 @@
     "Cage": {
       "width": 32,
       "height": 32,
+      "categories": {"custom_colors": true},
       "cost": {
         "gold": 50
       },
@@ -6264,19 +6279,33 @@
       "description": "Airtight door. No power required to operate"
     },
     "SmallAirlock": {
-      "width": 64,
+      "width": 32,
       "height": 32,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "isUpgradable": true,
+      "isAirtight": true,
+      "categories": {"door":true,"melee_resistant":true},
+      "minimapColor": "#3bceaa",
+      "requirements": {
+        "IronBar": 5
+      },
       "cost": {
         "gold": 50
+      },
+      "sprite":{
+        "width": 32,
+        "height": 32
       },
       "stats": {
         "health": 100,
         "count": 125
       },
       "upgrade": {
-        "health": "+25",
-        "count": "+25"
-      }
+        "health": "+15",
+        "count": "+15"
+      },
+      "description":"A smaller airtight door."
     },
     "ResearchTable": {
       "width": 32,

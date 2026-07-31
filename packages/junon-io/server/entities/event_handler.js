@@ -22,6 +22,8 @@ class EventHandler {
     this.isRoundStarted = false
     this.isRoundStarting = false
     this.processingEvents = new Set() // Track events currently being processed to prevent infinite loops
+    this.processingOverflow = 0
+    this.PROCESSING_LIMIT = 25
   }
 
   getSocketUtil() {
@@ -1015,9 +1017,9 @@ class EventHandler {
 
     // Prevent infinite loops by checking if this event is already being processed
     // disable for now. need to fix to handle nested events
-    // if (this.processingEvents.has(eventKey)) {
-    //   return
-    // }
+    if (this.processingEvents.has(eventKey)) {
+      this.processingOverflow++
+    }
 
     // Mark this event as being processed
     this.processingEvents.add(eventKey)
@@ -1072,6 +1074,7 @@ class EventHandler {
 
   resetProcessingEvents() {
     this.processingEvents.clear()
+    this.processingOverflow = 0
   }
 
   updateTaskCompleted() {
@@ -1118,7 +1121,11 @@ class EventHandler {
   }
 
   runAction(action, params) {
-    this.commandDelay = 0 // always reset command delay at beginning
+    if(this.processingOverflow > this.PROCESSING_LIMIT) {
+      this.commandDelay = 0.1 * (this.processingOverflow - this.PROCESSING_LIMIT) // offload if overwhelmed
+    } else {
+      this.commandDelay = 0 // always reset command delay at beginning
+    }
 
     if (action.timer) {
       if (action.timer.shouldRemove) {

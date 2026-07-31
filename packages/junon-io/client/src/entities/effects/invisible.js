@@ -16,11 +16,12 @@ class Invisible extends BaseEffect {
     let opacity = { opacity: 1 }
     let targetOpacity = 0
     if (this.affectedEntity.isPlayer() &&
-        this.affectedEntity.isMe()) {
+      (this.affectedEntity.isMe && this.affectedEntity.isMe())) {
       targetOpacity = 0.2
     }
 
-    if(this.affectedEntity.sector.settings.isFovMode && !this.affectedEntity.isMe()) {
+    if(this.affectedEntity.sector.settings.isFovMode &&
+      (this.affectedEntity.isMe && !this.affectedEntity.isMe())) {
       return new TWEEN.Tween(opacity)
       .to({ opacity: targetOpacity }, 0)
       .onUpdate(() => {

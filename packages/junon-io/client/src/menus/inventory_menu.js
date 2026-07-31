@@ -45,9 +45,10 @@ class InventoryMenu extends BaseMenu {
     let slot = e.target.closest(".player_inventory_slot")
     if (slot) {
       let type = parseInt(slot.dataset.type)
-      let isFloor = type === Protocol.definition().BuildingType.Floor 
+      let isFloor = type === Protocol.definition().BuildingType.Floor
+      let isCage = type === Protocol.definition().BuildingType.Cage 
       let isWall = type === Protocol.definition().BuildingType.Wall || type === Protocol.definition().BuildingType.Wall3d
-      if (isFloor || isWall) {
+      if (isFloor || isWall || isCage) {
         this.game.colorPickerMenu.open({ colors: this.game.colors, entityId: null })
       }
     }

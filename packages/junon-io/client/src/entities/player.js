@@ -1117,6 +1117,7 @@ class Player extends BaseEntity {
     this.registerToChunk()
 
     this.repositionOnUnitMap()
+    this.redrawVisionLightSprite()
 
     if (this.isMe()) {
       if (this.sector.isFovMode()) {
@@ -1125,7 +1126,6 @@ class Player extends BaseEntity {
       }
 
       this.highlightNearbyEntities()
-      this.redrawVisionLightSprite()
       this.updateSelectedEntity()
 
       if (options.isGridPositionChanged) {
@@ -1413,6 +1413,11 @@ class Player extends BaseEntity {
 
     if (this.usernameText) {
       this.usernameText.remove()
+    }
+
+    if (this.visionLightSprite){
+      this.visionLightSprite.destroy()
+      this.visionLightCanvas.remove()
     }
 
     this.getContainer().unregisterEntity("players", this)

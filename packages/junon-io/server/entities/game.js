@@ -255,6 +255,7 @@ class Game {
     const args = tokens.filter((token) => { return token.length > 0 })
     const command = this.commands[commandName]
     if (!command) return
+    if (!this.isGameReady) return
 
     if (delay > 0 && command.isDelayable()) {
       let timestampDelay = delay * Constants.physicsTimeStep
@@ -1037,7 +1038,19 @@ class Game {
 
   triggerEvent(eventName, params = {}) {
     if (!this.isGameReady) return
-    this.sector && this.sector.eventHandler.trigger(eventName, params)
+    try
+    {
+      this.sector && this.sector.eventHandler.trigger(eventName, params)
+    }
+    catch(e)
+    {
+      if(e.name === "RangeError"){
+        // disable processing more triggers
+        this.isGameReady = false
+        throw new Error("possible lag machine detected")
+      }
+
+    }
   }
 
   addTimer(timer) {

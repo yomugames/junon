@@ -1,5 +1,6 @@
 const Constants = require('../../../common/constants.json')
 const Protocol = require('../../../common/util/protocol')
+const Helper = require("./../../../common/helper")
 const BaseBuilding = require("./base_building")
 const Foods = require("./../foods/index")
 const ExceptionReporter = require('junon-common/exception_reporter')
@@ -98,6 +99,14 @@ class Stove extends BaseBuilding {
     }
   }
 
+  setBuildingContent(content) {
+    let foodType = parseInt(content)
+    let foodKlass = Foods.forType(foodType)
+    // prevent invalid items from being cooked
+    if (!foodKlass) return
+    if (foodKlass.prototype.getConstants().isCooked) super.setBuildingContent(content)
+  }
+
   getInteractDistance() {
     return Constants.tileSize * 2
   }
@@ -105,8 +114,9 @@ class Stove extends BaseBuilding {
   onFoodReady() {
     try {
       let item = this.getDesiredFoodItem()
-      
+
       this.activeUser.setIsWorking(false)
+      if(!item.isFoodCooked()) return
 
       let isSuccessful
       if (this.activeUser.isPlayer()) {
@@ -169,4 +179,3 @@ class Stove extends BaseBuilding {
 }
 
 module.exports = Stove
-

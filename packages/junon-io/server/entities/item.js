@@ -176,6 +176,12 @@ class Item extends BaseTransientEntity {
     return klass.prototype.getConstants().isIngredient
   }
 
+  isFoodCooked() {
+    let klass = this.getKlass(this.type)
+    if (!klass) return false
+    return klass.prototype.getConstants().isCooked
+  }
+
   isNameTag() {
     const klass = this.getKlass(this.type)
     if (!klass) return false

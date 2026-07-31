@@ -1,4 +1,6 @@
 const BaseCommand = require("./base_command")
+const Constants = require("../../common/constants")
+const Protocol = require('../../common/util/protocol')
 
 class Menu extends BaseCommand {
     getUsage() {
@@ -6,8 +8,27 @@ class Menu extends BaseCommand {
             "/menu close [menu name] [player name]",
             "/menu open [menu name] [player name]",
             "Available menu names:",
-            "keypadMenu, craftMenu, atmMenu, friendsMenu, commandBlockMenu, teamMenu, welcomeMenu, stoveMenu, tradeMenu, slaveTradeMenu, badgeMenu"
+            this.getAllowedMenus().join(", ")
         ]
+    }
+
+    getAllowedMenus()
+    {
+        return ["blueprintMenu",
+                "inventoryMenu",
+                "chatMenu",
+                "tradeMenu",
+                "slaveTradeMenu",
+                "welcomeMenu",
+                "mapMenu",
+                "miniMapMenu",
+                "atmMenu",
+                "sidebarMenu",
+                "commandBlockMenu",
+                "voteMenu",
+                "friendsMenu",
+                "badgeMenu",
+                "teamMenu"]
     }
 
     allowOwnerOnly() {
@@ -20,7 +41,6 @@ class Menu extends BaseCommand {
         let player = args[2]
         let multiplePlayers
         // if(!caller || !caller.isPlayer()) return
-        // Commented cuz of didn't work in command block and useless
 
         if(player) {
             player = this.getPlayersBySelector(player)
@@ -30,6 +50,16 @@ class Menu extends BaseCommand {
         }
 
         if(subcommand == "open") {
+            // only check allowed menus here
+            // since player shouldn't have entity-dependent menus open with this cmd
+            // but should be able to have them closed
+            let allowedMenus = this.getAllowedMenus()
+            if(allowedMenus.indexOf(menuName) === -1)
+            {
+                caller.showChatError("Menu invalid / unallowed: " + menuName)
+                return
+            }
+
             if(multiplePlayers) {
                 player.forEach((entity) => {
                     this.getSocketUtil().emit(entity.socket, "OpenMenu", {menuName: menuName})
@@ -42,7 +72,7 @@ class Menu extends BaseCommand {
         if(subcommand == "close") {
             if(multiplePlayers) {
                 player.forEach((entity) => {
-                    this.getSocketUtil().emit(entity.socket, "OpenMenu", {menuName: menuName})
+                    this.getSocketUtil().emit(entity.socket, "CloseMenu", {menuName: menuName})
                 })
                 return
             }

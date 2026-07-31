@@ -8542,6 +8542,30 @@ body.imposter_mode .minigame_poster {
     margin-bottom: 3px;
 }
 
+.repeat_times {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+
+.repeat_times_input {
+    width: 70px;
+    height: 22px;
+
+    background: #111;
+    color: #fff;
+
+    border: solid 1px #d38b22;
+
+    padding: 2px 4px;
+    box-sizing: border-box;
+
+    font: inherit;
+}
+
 .timer_name .label {
     width: 80px;
 }

@@ -1,11 +1,11 @@
 const ActionEntry = require("./action_entry")
 const ActionContainer = require("../action_container")
+const Constants = require("../../../common/constants.json")
 
 class Repeat extends ActionEntry {
 
   constructor(parent, data) {
     super(parent, data)
-    console.log("SERVER Repeat created", data)
   }
 
   static create(parent, data) {
@@ -18,9 +18,28 @@ class Repeat extends ActionEntry {
     return true
   }
 
+  static sanitizeTimes(times) {
+    let str = (times === undefined || times === null) ? "" : times.toString().trim()
+
+    if (str === "") return 1
+
+    if (/^-?\d+$/.test(str)) {
+      let num = parseInt(str)
+
+      if (isNaN(num) || num < 1) {
+        num = 1
+      } else if (num > Constants.maxRepeatTimes) {
+        num = Constants.maxRepeatTimes
+      }
+
+      return num
+    }
+
+    return str
+  }
+
   handleActionValues(data) {
-    /*this.times = data.times || 1*/
-    this.times = 5
+    this.times = Repeat.sanitizeTimes(data.times)
 
     this.initActionContainer(data)
   }
@@ -29,8 +48,24 @@ class Repeat extends ActionEntry {
 
   }
 
+  edit(value, player) {
+    let tokens = value.split(":")
+
+    if (tokens[0] !== "times")
+      return
+
+    this.times = Repeat.sanitizeTimes(tokens[1])
+
+    this.getSocketUtil().broadcast(this.game.getSocketIds(), "CommandBlockUpdated", {
+      id: this.id,
+      operation: "edit",
+      value: "times:" + this.times
+    })
+
+    this.commandBlock.onNodeChanged()
+  }
+
   toJson() {
-    console.log("Repeat.toJson()",this.times) //Temporary
     return {
       id: this.id,
       actionKey: this.actionKey,

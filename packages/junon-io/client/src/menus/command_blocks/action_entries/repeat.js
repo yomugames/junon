@@ -54,8 +54,8 @@ class Repeat extends ActionEntry {
 
     row.appendChild(deleteBtn)
     row.appendChild(actionKey)
-    row.appendChild(addActionBtn)
     row.appendChild(this.createTimesContainer())
+    row.appendChild(addActionBtn)
     row.appendChild(actionValue)
 
     this.parent.appendChildEl(row)
@@ -64,24 +64,46 @@ class Repeat extends ActionEntry {
   }
 
   createTimesContainer() {
-    let container = document.createElement("div")
-    container.classList.add("repeat_times")
+    let row = document.createElement("div")
+    row.classList.add("action_value_list_row")
+    row.classList.add("repeat_times")
 
+    let content = document.createElement("div")
+    content.classList.add("row_content")
+    content.innerText = this.times || ""
+
+    let input = this.createTimesInput(this.times)
+
+    let editBtn = document.createElement("img")
+    editBtn.classList.add("edit_action_value_btn")
+    editBtn.src = "/assets/images/edit_icon.png"
+
+    row.appendChild(content)
+    row.appendChild(input)
+    row.appendChild(editBtn)
+
+    return row
+  }
+
+  createTimesInput(value) {
+    value = value || ""
+    let width = value.length < 15 ? 15 : value.length
 
     let input = document.createElement("input")
-    input.classList.add("repeat_times_input")
-    input.value = this.times || ""
+    input.classList.add("black_input")
+    input.value = value
+    input.style.width = width + "ch"
 
     input.addEventListener("keyup", this.onTimesInputKeyup.bind(this), true)
+    input.addEventListener("input", this.onTimesInputChange.bind(this), true)
     input.addEventListener("blur", this.onTimesInputBlur.bind(this), true)
 
-    let label2 = document.createElement("span")
-    label2.innerText = " times"
+    return input
+  }
 
-    container.appendChild(input)
-    container.appendChild(label2)
-
-    return container
+  getTimesInputWidth(value) {
+    value = (value || "").toString()
+    return value.length < 15 ? 15 : value.length
   }
 
   onContainerClick(e) {
@@ -125,6 +147,10 @@ class Repeat extends ActionEntry {
     this.submitTimesChange(e.target.value)
   }
 
+  onTimesInputChange(e) {
+    e.target.style.width = this.getTimesInputWidth(e.target.value) + "ch"
+  }
+
   submitTimesChange(value) {
     value = (value || "").trim()
 
@@ -146,8 +172,14 @@ class Repeat extends ActionEntry {
 
     this.times = tokens[1]
 
-    let input = this.el.querySelector(".repeat_times input")
+    let row = this.el.querySelector(".repeat_times")
+    row.querySelector(".row_content").innerText = this.times || ""
+
+    let input = row.querySelector("input")
     input.value = this.times || ""
+    input.style.width = this.getTimesInputWidth(input.value) + "ch"
+
+    this.exitEditMode(row)
   }
 
   onAddActionBtnClick() {

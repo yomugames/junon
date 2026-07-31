@@ -639,7 +639,8 @@
     "repeat": {
       "description": "Loop that repeats a series of actions a number of times",
       "examples": [
-        "Repeat (5x): /give Dagmar mop $random(1,3)"
+        "Repeat 5: /give Dagmar mop $random(1,3)",
+        "Repeat $getGold($player): /spawnitem gold 1 !randomland"
       ]
     }
   },

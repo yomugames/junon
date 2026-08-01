@@ -1,0 +1,34 @@
+{
+  "version": "v0.8.1.alpha",
+  "date": "August 1, 2026",
+  "title": "Bug Fixes and Balancing by BigTforLife & Wahlee",
+  "content": {
+    "features": [
+      "Balanced ranged weapons (will continue to be adjusted as neccesary)",
+      "Added small airlock (1x1, functions like a manual airlock)",
+      "Can now use /interact open/close on lamps (toggles light) and power switches",
+      "Disabled underground vent crafting and usage in Survival and Hardcore"
+    ],
+    "bugs": [
+      "Fixed stove contents being set to invalid items",
+      "Fixed vision lights of other players staying in one place instead of following the player and not disappearing when they leave",
+      "Fixed suit stations storing invalid items, which could glitch the client's game when interacted with",
+      "Fixed meteor storm alerts persisting after leaving a colony before the storm arrived",
+      "Fixed fire effects not disappearing from buildings after using /clear",
+      "Fixed buildings not going invisible in FOV mode",
+      "Fixed /menu close not working",
+      "Fixed floor and wall color values not appearing in the entity menu outside of Peaceful mode",
+      "Fixed golems being shoved too far back when colliding with walls",
+      "Fixed lamp sprite color being reset after taking damage",
+      "Fixed corpses disappearing while on rail trams"
+    ],
+    "miscellaneous": [
+      "Made creatorIp accessible from sector entries",
+      "Can now open the custom color menu for cages (they were already colorable)",
+      "Increased lag throttle to better account for colonies with more entities",
+      "Re-enabled /fill building (less abusable due to throttle)",
+      "Added a cap to the number of trigger commands that can run simultaneously to prevent lag machines",
+      "Limited /menu open selection (menus that don't function properly can no longer be opened, though all menus can still be closed with the command)"
+    ]
+  }
+}

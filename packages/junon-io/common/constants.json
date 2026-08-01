@@ -1715,8 +1715,6 @@
         "los": 1024
       },
       "isFlamable": false,
-      "categories": {"flying": true},
-      "shouldAttackIgnoreObstacle": true,
       "isBuildingDestroyer": true,
       "attackGroups": ["players", "buildings", "mobs"],
       "sprite": {

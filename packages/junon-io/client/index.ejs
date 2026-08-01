@@ -36,7 +36,7 @@
     </script>
 
 </head>
-<body style='' class='<%= nodeEnv %>'>
+<body class='<%= nodeEnv %>'>
     <div class="wrapper">
         <% include ./main %>
     </div>
@@ -45,7 +45,28 @@
             document.querySelector("#game_caption").innerText = "IMPY.IO"    
             document.querySelector("#game_caption").style.fontFamily = "monospace"    
             document.querySelector("#parent_project").innerText = "made by junon.io"
-        }
+        };
+
+        onload = () => {
+            const img_src = [
+                'menubg1.png',
+                'menubg2.png',
+                'menubg3.png',
+                'menubg4.png',
+                'menubg5.png',
+                'menubg6.png',
+                'menubg7.png',
+                'menubg8.png',
+                'menubg9.png',
+                'menubg10.png',
+                'menubg11.png',
+                'menubg12.png',
+                'menubg13.png',
+                'menubg14.png',
+                'menubg15.png',
+            ];
+            document.getElementById('home_background_image').src = "/assets/images/background/" + img_src[Math.floor(Math.random() * img_src.length)];
+        };
     </script>
     <script src="/<%= assetPath('vendor.js') %>"></script>
     <script src="/<%= assetPath('app.js') %>"   ></script>

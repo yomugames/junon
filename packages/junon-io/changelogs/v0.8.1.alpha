@@ -23,7 +23,7 @@
       "Fixed corpses disappearing while on rail trams"
     ],
     "miscellaneous": [
-      "Made creatorIp accessible from sector entries",
+      "creatorIp no longer accessible from sector entries",
       "Can now open the custom color menu for cages (they were already colorable)",
       "Increased lag throttle to better account for colonies with more entities",
       "Re-enabled /fill building (less abusable due to throttle)",

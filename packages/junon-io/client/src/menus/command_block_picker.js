@@ -164,7 +164,7 @@ class CommandBlockPicker extends BaseMenu {
   displayActionsPicker() {
     this.el.querySelector(".menu_main_header").innerText = "Actions"
 
-    let actions = ["commands", "ifthenelse", "timer"]
+    let actions = ["commands", "ifthenelse", "timer", "repeat"]
     actions.forEach((name) => {
       let el = this.createActionEntry(name)
       this.el.querySelector(".left_content").appendChild(el)

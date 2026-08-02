@@ -1160,7 +1160,32 @@ class EventHandler {
       iterator.forEach((params) => {
         this.runActions(action.forEach.actions, params)
       })
+    } else if (action.repeat) {
+      let times = this.resolveRepeatTimes(action.repeat.times, params)
+      for (let i = 0; i < times; i++) {
+        this.runActions(action.repeat.actions, params)
+      }
+    } else if (action.actionKey === "repeat") {
+      let times = this.resolveRepeatTimes(action.times, params)
+      for (let i = 0; i < times; i++) {
+        this.runActions(action.actions, params)
+      }
     }
+  }
+
+  resolveRepeatTimes(rawTimes, params) {
+    let resolved = rawTimes
+
+    if (typeof rawTimes !== "number" && !/^-?\d+$/.test((rawTimes || "").toString().trim())) {
+      resolved = this.interpolate(rawTimes.toString(), params, { dontQuoteString: true })
+    }
+
+    let times = parseInt(resolved)
+
+    if (isNaN(times) || times < 0) times = 0
+    if (times > Constants.maxRepeatTimes) times = Constants.maxRepeatTimes
+
+    return times
   }
 
   queueLog(data) {

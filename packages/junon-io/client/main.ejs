@@ -802,6 +802,16 @@
                             <td>The id of current equip player is holding. Ex. /stat $getEquipId($player) damage:250</td>
                         </tr>
                         <tr>
+                            <td class='function_name'>$getY</td>
+                            <td>$player</td>
+                            <td>The y position of player. Ex. /tp @a[role=Admin] $getY($player) 64</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getX</td>
+                            <td>$player</td>
+                            <td>The x position of player. Ex. /tp @a[role=Admin] 64 $getX($player)</td>
+                        </tr>
+                        <tr>
                             <td class='function_name'>$getRow</td>
                             <td>$player</td>
                             <td>The row position of player. Ex. /tp @a[role=Admin] $getRow($player) 64</td>
@@ -875,6 +885,11 @@
                             <td class='function_name'>$seedRandom</td>
                             <td>seed, min, max</td>
                             <td>A random number between min and max, but uses seed. Ex. $random(42, 2,5)</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$simplex</td>
+                            <td>seed, x, y</td>
+                            <td>A simplex noise value at the given coordinates. Ex. $simplex(42, 0.5, 0.5)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$formatTime</td>

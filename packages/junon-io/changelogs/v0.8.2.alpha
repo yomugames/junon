@@ -8,7 +8,8 @@
       "Player now holds plasma gun and some other weapons properly",
       "Fixed molotov cocktail weren't stackable and couldn't burn platforms",
       "Fixed dynamite craft required iron ore instead of iron bars",
-      "Fixed underground vents didn't work in peaceful mode"
+      "Fixed underground vents didn't work in peaceful mode",
+      "Fixed $tanh function was disabled"
     ],
     "features": [
       "Slightly changed weapons balance",

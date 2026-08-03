@@ -1327,6 +1327,7 @@ class EventHandler {
       "$root": true,
       "$abs": true,
       "$exp": true,
+      "$tanh": true,
       "$log": true,
       "$min": true,
       "$max": true,

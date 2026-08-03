@@ -1711,7 +1711,7 @@
         "reload": 300,
         "health": 2000,
         "damage": 25,
-        "range": 128,
+        "range": 512,
         "los": 1024
       },
       "isFlamable": false,
@@ -1764,7 +1764,7 @@
         "reload": 250,
         "health": 1500,
         "damage": 25,
-        "range": 128,
+        "range": 512,
         "los": 1024
       },
       "isFlamable": false,
@@ -4218,14 +4218,14 @@
       "categories": {"melee_damage": true},
       "isAnimatable": true,
       "stats": {
-        "damage": 7,
+        "damage": 10,
         "range": 55,
         "meleeRange": 55
       },
       "requirements": {
         "IronOre": 10
       },
-      "description": "Basic Melee weapon. Damage 7"
+      "description": "Basic Melee weapon. Damage 10"
     },
     "PlasmaBlade": {
       "parent": "Equipments.MeleeEquipment",

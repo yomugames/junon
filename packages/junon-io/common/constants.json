@@ -7116,6 +7116,38 @@
       },
       "description": "Launches homing missile towards locked target."
     },
+    "Revitalizer": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 500
+      },
+      "shouldAttackIgnoreObstacle": true,
+      "categories": {"turret":true,"editable_targets":false},
+      "hasFillBar": true,
+      "stats": {
+        "reload": 500,
+        "damage": 5,
+        "health": 150,
+        "range": 480,
+        "powerConsumption": 500,
+        "fuelConsumption": 5,
+        "fuelCapacity": 100,
+        "clientResource": "fuel"
+      },
+      "requirements": {
+        "IronBar": 90,
+        "Meteorite": 40,
+        "CircuitBoard": 25,
+        "FuelPipe": 5
+      },
+      "upgrade": {
+        "damage": "+1",
+        "health": "+50",
+        "count": "+1"
+      },
+      "description": "Slowly repairs damaged structures. Requires fuel and power."
+    },
     "Cannon": {
       "width": 64,
       "height": 64,

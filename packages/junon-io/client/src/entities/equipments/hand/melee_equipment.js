@@ -2,13 +2,9 @@ const HandEquipment = require("./hand_equipment")
 
 class MeleeEquipment extends HandEquipment {
   repositionSprite() {
-    this.sprite.anchor.set(0)
+    super.repositionSprite()
 
     this.sprite.rotation = 90 * PIXI.DEG_TO_RAD
-
-    if (!this.getConstants().sprite) {
-      this.sprite.position.x = 50
-    }
 
     this.user.openHands()
   }

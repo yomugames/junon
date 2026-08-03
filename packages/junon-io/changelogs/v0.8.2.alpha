@@ -1,0 +1,26 @@
+{
+  "version": "v0.8.2.alpha",
+  "date": "August 3, 2026",
+  "title": "Small update by KONTREVOLUCIA",
+  "content": {
+    "bugs": [
+      "Fixed flamethrower turret can't shoot through walls",
+      "Player now holds plasma gun and some other weapons properly",
+      "Fixed molotov cocktail weren't stackable and couldn't burn platforms",
+      "Fixed dynamite craft required iron ore instead of iron bars",
+      "Fixed underground vents didn't work in peaceful mode"
+    ],
+    "features": [
+      "Slightly changed weapons balance",
+      "Game now procedurally generates position in hands for hand equipments",
+      "Flamethrower turret now works same as flamethrower",
+      "Added heavy rifle",
+      "Added shock grenade",
+      "Changed AK-47 sprite to sci-fi",
+      "AK-47 doesn't require wood in craft now",
+      "Enabled molotov cocktail craft",
+      "The paralysis effect lasts half as long as before",
+      "Poison grenade craft now requires iron bars"
+    ]
+  }
+}

@@ -2,10 +2,9 @@ const HandEquipment = require("./hand_equipment")
 
 class RangeEquipment extends HandEquipment {
   repositionSprite() {
-    this.sprite.anchor.set(0)
+    super.repositionSprite()
 
     this.sprite.position.x = 35
-    this.sprite.position.y = 12
 
     this.user.hands.x = 0
     this.user.hands.y = 0

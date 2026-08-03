@@ -56,7 +56,7 @@ class Effect extends BaseCommand {
       player.showChatSuccess("success")
     } else if (args[0] === 'set') {
       if (!args[1]) {
-        player.showChatError("/effect set [id] [" + allowedEffects.join(" | ") + "]")
+        player.showChatError("/effect give [id] [" + allowedEffects.join(" | ") + "]")
         return
       }
 

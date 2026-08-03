@@ -2,7 +2,7 @@ const HitscanProjectile = require("./hitscan_projectile")
 const Protocol = require('../../../common/util/protocol')
 const Constants = require("./../../../common/constants.json")
 
-class Explosion extends HitscanProjectile {
+class Shockwave extends HitscanProjectile {
 
   constructor(data) {
     super(data)
@@ -11,10 +11,10 @@ class Explosion extends HitscanProjectile {
   }
 
   onProjectileConstructed() {
-    this.damageExplosionTargets()
+    this.damageShockwaveTargets()
   }
 
-  damageExplosionTargets() {
+  damageShockwaveTargets() {
     let targets = this.findExplosionTargets(this)
     this.damageTargets(targets)
   }
@@ -22,27 +22,12 @@ class Explosion extends HitscanProjectile {
   damageTargets(entities) {
     entities.forEach((entity) => {
       entity.damage(this.getDamage(entity), this)
+      entity.addParalyze()
     })
   }
 
-  // addDirtToFloors() {
-  //   let buildings = this.getContainer().buildingTree.search(this.getBoundingBox())
-  //   buildings.forEach((building) => {
-  //     if (building.hasCategory("platform") && building.isPlatformDirtiable()) {
-  //       let chance = Math.random() < 0.6
-  //       if (chance) {
-  //         let dirtLevel = Math.floor(Math.random() * 4) + 1
-  //         for (var i = 0; i < dirtLevel; i++) {
-  //           building.addDirt()
-  //         }
-  //       }
-  //     }
-  //   })
-  // }
-
-
   getType() {
-    return Protocol.definition().ProjectileType.Explosion
+    return Protocol.definition().ProjectileType.Shockwave
   }
 
   updateRbushCoords() {
@@ -55,7 +40,7 @@ class Explosion extends HitscanProjectile {
   }
 
   getConstantsTable() {
-    return "Projectiles.Explosion"
+    return "Projectiles.Shockwave"
   }
 
   getAttackables() {
@@ -64,4 +49,4 @@ class Explosion extends HitscanProjectile {
 
 }
 
-module.exports = Explosion
+module.exports = Shockwave

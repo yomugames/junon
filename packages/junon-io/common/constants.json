@@ -2091,6 +2091,11 @@
       "height": 16,
       "speed": 20
     },
+    "ShockGrenade": {
+      "width": 20,
+      "height": 24,
+      "speed": 20
+    },
     "TeslaLaser": {
       "width": 10,
       "height": 10,
@@ -2104,6 +2109,13 @@
       "speed": 1
     },
     "MiningExplosion": {
+      "canDamageWalls": true,
+      "width": 192,
+      "height": 192,
+      "damage": 10,
+      "speed": 1
+    },
+    "Shockwave": {
       "canDamageWalls": true,
       "width": 192,
       "height": 192,
@@ -3716,7 +3728,7 @@
       "projectileBarrelLength": 4,
       "stats": {
         "range": 1280,
-        "damage": 75,
+        "damage": 55,
         "usageCapacity": 250,
         "health": 300,
         "reload": 3000,
@@ -3814,11 +3826,33 @@
         "usageCapacity": 500,
         "health": 300,
         "reload": 2000,
-        "spreadAngle": 0.5
+        "spreadAngle": 1.5
       },
       "requirements": {
         "IronBar": 150,
         "CopperBar": 20
+      },
+      "description": "Accurate and powerful Weapon that shoots fast projectiles"
+    },
+    "HeavyRifle": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 2000
+      },
+      "projectileBarrelLength": 2.5,
+      "stats": {
+        "range": 2048,
+        "damage": 65,
+        "usageCapacity": 1500,
+        "health": 300,
+        "reload": 2000,
+        "spreadAngle": 0
+      },
+      "requirements": {
+        "IronBar": 250,
+        "CopperBar": 80
       },
       "description": "Accurate and powerful Weapon that shoots fast projectiles"
     },
@@ -3876,14 +3910,13 @@
       "cost": {
         "gold": 900
       },
-      "projectileBiasByY": 7.5,
       "projectileBarrelLength": 0.71875,
       "stats": {
         "range": 768,
-        "damage": 25,
+        "damage": 75,
         "health": 300,
         "reload": 2000,
-        "spreadAngle": 3
+        "spreadAngle": 10
       },
       "requirements": {
         "IronBar": 100,
@@ -3948,6 +3981,7 @@
       "parent": "Equipments.MeleeEquipment",
       "isWeapon": true,
       "isThrowable": true,
+      "isStackable": true,
       "isUnbreakable": true,
       "cost": {
         "gold": 80
@@ -4000,6 +4034,7 @@
       },
       "requirements": {
         "Explosives": 1,
+        "IronBar": 5,
         "Poison": 1
       },
       "description": "Throwable item that emits poison to an area"
@@ -4021,9 +4056,31 @@
       },
       "requirements": {
         "Explosives": 30,
-        "IronOre": 5
+        "IronBar": 5
       },
-      "description": "Creates an explosion that easily destroys asteroids that can't be salvaged."
+      "description": "Creates an explosion that easily destroys asteroids that can't be salvaged"
+    },
+    "ShockGrenade": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "isThrowable": true,
+      "isStackable": true,
+      "isUnbreakable": true,
+      "isCostIndependent": true,
+      "cost": {
+        "gold": 1000
+      },
+      "stats": {
+        "damage": 10,
+        "range": 256,
+        "reload": 750
+      },
+      "requirements": {
+        "Explosives": 5,
+        "IronBar": 5,
+        "CircuitBoard": 5
+      },
+      "description": "Throwable item that creates shockwaves that stuns enemies in an area"
     },
     "FireExtinguisher": {
       "parent": "Equipments.BaseEquipment",
@@ -6926,9 +6983,9 @@
       "hasFillBar": true,
       "categories": {"turret":true,"editable_targets":true},
       "stats": {
-        "reload": 2000,
-        "damage": 2,
-        "range": 288,
+        "reload": 100,
+        "damage": 1,
+        "range": 300,
         "health": 200,
         "fuelConsumption": 1,
         "fuelCapacity": 500,
@@ -7280,6 +7337,7 @@
     "Tree": 2
   },
   "tileSize": 32,
+  "explosionRadius": 192,
   "collisionGroup": {
     "Player": 1,
     "Ground": 2,

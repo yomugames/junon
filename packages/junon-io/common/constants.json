@@ -3807,8 +3807,7 @@
       },
       "requirements": {
         "IronBar": 150,
-        "CopperBar": 20,
-        "Wood": 10
+        "CopperBar": 20
       },
       "description": "Kalashnikov's extremely durable assault rifle. Burst Weapon that shoots fast projectiles on short and medium distances"
     },

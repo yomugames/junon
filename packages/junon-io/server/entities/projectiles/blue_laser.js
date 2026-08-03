@@ -3,19 +3,24 @@ const Protocol = require('../../../common/util/protocol')
 const Constants = require("./../../../common/constants.json")
 
 class BlueLaser extends CollidableProjectile {
+  getType() {
+      return Protocol.definition().ProjectileType.BlueLaser
+  }
 
-    getType() {
-        return Protocol.definition().ProjectileType.BlueLaser
-    }
+  canDamageWalls() {
+      return true // all this does is bypass the wall, not damage it, unsure why. Code looks fine
+  }
 
-    canDamageWalls() {
-        return true //all this does is bypass the wall, not damage it, unsure why. Code looks fine
-    }
-
-    getConstantsTable() {
-        return "Projectiles.BlueLaser"
-    }
+  getConstantsTable() {
+      return "Projectiles.BlueLaser"
+  }
     
+  onCollide(entity) {
+    if (entity.isBuilding()) {
+      super.onCollide(entity)
+    }
+  }
+  
 }
 
 module.exports = BlueLaser                                                                                                                                                      

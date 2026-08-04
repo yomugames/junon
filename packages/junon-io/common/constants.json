@@ -4399,7 +4399,7 @@
       "requirements": {
         "IronBar": 50
       },
-      "description": "Fast Melee weapon. Damage 15"
+      "description": "Fast Melee weapon that can be used for backstabbing. Damage 15"
     },
     "Kukri": {
       "parent": "Equipments.BaseKnife",
@@ -4417,7 +4417,7 @@
         "backstabDamageMultiplier": 1.5
       },
       "requirements": {
-        "IronBar": 75,
+        "IronBar": 50,
         "Wood": 10
       },
       "description": "Nepalese knife-axe hybrid. Damage 30"

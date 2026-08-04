@@ -12,6 +12,19 @@ class Lamp extends BaseBuilding {
     }
   }
 
+  applyData(data) {
+    super.applyData(data)
+
+    if(this.content) {
+      // reset lamps with invalid color
+      const isHexColor = /^#?[0-9A-Fa-f]{3,8}$/i.test(this.content.split(":")[0]);
+      if(!isHexColor) {
+        this.setBuildingContent("#ffffff:15")
+      }
+    }
+
+  }
+
   setBuildingContent(content, player) {
     super.setBuildingContent(content, player)
 

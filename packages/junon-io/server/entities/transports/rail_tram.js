@@ -419,7 +419,7 @@ class RailTram extends BaseEntity {
 
 Object.assign(RailTram.prototype, Movable.prototype, {
   getSpeed() {
-    return 48
+    return this.getConstants().stats.speed ?? 100
   }
 })
 

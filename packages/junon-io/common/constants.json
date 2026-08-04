@@ -3479,6 +3479,13 @@
         "spreadAngle": 0
       }
     },
+    "BaseKnife": {
+      "parent": "Equipments.MeleeEquipment",
+      "abstract": true,
+      "stats": {
+        "backstabDamageMultiplier": 4
+      }
+    },
     "Syringe": {
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
@@ -4300,16 +4307,16 @@
       "concurrentTargetCount": 3,
       "isAnimatable": true,
       "stats": {
-        "damage": 15,
+        "damage": 25,
         "range": 64,
         "attackRadius": 64,
         "meleeRange": 64
       },
       "requirements": {
-        "IronOre": 50,
+        "IronBar": 50,
         "Wood": 20
       },
-      "description": "Can slice through 3 enemies at a time. Damage 15."
+      "description": "Can slice through 3 enemies at a time. Damage 25."
     },
     "BlueEnergySword": {
       "parent": "Equipments.MeleeEquipment",
@@ -4374,6 +4381,46 @@
         "CircuitBoard": 2
       },
       "description": "Melee Weapon that can stun enemy. Damage 6"
+    },
+    "Bayonet": {
+      "parent": "Equipments.BaseKnife",
+      "isWeapon": true,
+      "cost": {
+        "gold": 250
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 15,
+        "range": 50,
+        "reload": 250,
+        "meleeRange": 50
+      },
+      "requirements": {
+        "IronBar": 50
+      },
+      "description": "Fast Melee weapon. Damage 15"
+    },
+    "Kukri": {
+      "parent": "Equipments.BaseKnife",
+      "isWeapon": true,
+      "cost": {
+        "gold": 750
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 30,
+        "range": 80,
+        "reload": 800,
+        "meleeRange": 80,
+        "backstabDamageMultiplier": 1.5
+      },
+      "requirements": {
+        "IronBar": 75,
+        "Wood": 10
+      },
+      "description": "Nepalese knife-axe hybrid. Damage 30"
     },
     "SantaHat": {
       "parent": "Equipments.BaseEquipment",
@@ -4557,6 +4604,7 @@
       },
       "stats": {
         "health": 500,
+        "speed": 100,
         "count": 125
       },
       "upgrade": {

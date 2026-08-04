@@ -13,7 +13,7 @@ class RangeEquipment extends HandEquipment {
   }
 
   getAnimationTween() {
-  const ms = 400
+    const ms = 400
 
     const startWeaponX = this.sprite.x
     const startHandsX = this.user.hands.x

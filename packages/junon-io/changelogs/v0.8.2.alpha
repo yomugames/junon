@@ -1,7 +1,7 @@
 {
   "version": "v0.8.2.alpha",
   "date": "August 3, 2026",
-  "title": "Small update by KONTREVOLUCIA",
+  "title": "Bugfixes + new stuff update by KONTREVOLUCIA",
   "content": {
     "bugs": [
       "Fixed flamethrower turret can't shoot through walls",
@@ -17,6 +17,8 @@
       "Flamethrower turret now works same as flamethrower",
       "Added heavy rifle",
       "Added shock grenade",
+      "Added bayonet knife",
+      "Added kukri",
       "Changed AK-47 sprite to sci-fi",
       "AK-47 doesn't require wood in craft now",
       "Enabled molotov cocktail craft",
@@ -25,7 +27,10 @@
       "Deconstructor now attacks only buildings",
       "Fixed bosses(squid lord, raven) attack radius",
       "Added $simplex function",
-      "Added $getX/Y functions"
+      "Added $getX/Y functions",
+      "Plasma blade, plasma gun and squid staff are now craftable only in forge",
+      "Katana is now craftable without forge",
+      "Rail trams are now faster + can regulate it from constants"
     ]
   }
 }

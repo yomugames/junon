@@ -46,6 +46,8 @@ Equipments.Bowl = require("./hand/bowl")
 Equipments.Deconstructor = require('./hand/deconstructor')
 Equipments.Dynamite = require('./hand/dynamite')
 Equipments.ShockGrenade = require('./hand/shock_grenade')
+Equipments.Bayonet = require("./hand/bayonet")
+Equipments.Kukri = require("./hand/kukri")
 
 Equipments.SpaceSuit = require("./armor/space_suit")
 Equipments.CombatArmor = require("./armor/combat_armor")
@@ -62,7 +64,7 @@ Equipments.forType = (type) => {
   return Equipments[klassName]
 }
 
-const craftExcludeList = ["UndergroundVent", "Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "Katana", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit", "ImperialSpecialForcesArmor", "Dynamite", "ShockGrenade"]
+const craftExcludeList = ["UndergroundVent", "Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "PlasmaGun", "PlasmaBlade", "SquidStaff", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit", "ImperialSpecialForcesArmor", "Dynamite", "ShockGrenade"]
 
 Equipments.getList = () => {
   return Object.values(Equipments).filter((klass) => {

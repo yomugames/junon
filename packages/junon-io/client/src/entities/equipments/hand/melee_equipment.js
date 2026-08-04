@@ -8,6 +8,14 @@ class MeleeEquipment extends HandEquipment {
 
     this.user.openHands()
   }
+  
+  getEasing() {
+    return TWEEN.Easing.Quadratic.InOut
+  }
+  
+  getAnimSpeed() {
+    return 400
+  }
 
   getAnimationTween() {
     let halfRotation = 90 * (Math.PI / 180)
@@ -15,10 +23,13 @@ class MeleeEquipment extends HandEquipment {
     let midRotation   = this.user.getRadAngle() - (halfRotation)
     let endRotation   = this.user.getRadAngle() - (halfRotation * 2)
     let rotation = { rotation: startRotation }
+    
+    const easing = this.getEasing()
+    const speed = this.getAnimSpeed()
 
     const swing = new TWEEN.Tween(rotation)
-        .to({ rotation: endRotation  }, 400)
-        .easing(TWEEN.Easing.Quadratic.InOut) 
+        .to({ rotation: endRotation  }, speed)
+        .easing(easing) 
         .onUpdate(() => {
           let progress = Math.abs(rotation.rotation - startRotation)
           if (progress > halfRotation) {

@@ -274,6 +274,8 @@ enum BuildingType {
   SmallAirlock = 280;
   HeavyRifle = 281;
   ShockGrenade = 282;
+  Bayonet = 283;
+  Kukri = 284;
 }
 
 enum TerrainType {

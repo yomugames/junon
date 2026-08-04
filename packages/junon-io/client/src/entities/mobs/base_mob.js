@@ -916,7 +916,8 @@ class BaseMob extends BaseEntity {
     return this.getConstants().isTamable ||
            this.hasCategory("bot") ||
            this.hasCategory("worker") ||
-           this.hasCategory("trader") 
+           this.hasCategory("trader") ||
+           this.owner
   }
 
   canBecomeLivestock() {

@@ -1715,8 +1715,6 @@
         "los": 1024
       },
       "isFlamable": false,
-      "categories": {"flying": true},
-      "shouldAttackIgnoreObstacle": true,
       "isBuildingDestroyer": true,
       "attackGroups": ["players", "buildings", "mobs"],
       "sprite": {
@@ -2599,7 +2597,7 @@
         "range": 250
       },
       "requirements": {
-        "SulfurOre": 1
+        "SulfurOre": 10
       },
       "upgrade": {},
       "description": "Ammunition for Plasma Gun"
@@ -3647,7 +3645,7 @@
       },
       "projectileBarrelLength": 2,
       "stats": {
-        "range": 1024,
+        "range": 512,
         "damage": 20,
         "usageCapacity": 175,
         "health": 300,
@@ -3669,7 +3667,7 @@
       },
       "projectileBarrelLength": 2.75,
       "stats": {
-        "range": 716,
+        "range": 512,
         "damage": 10,
         "usageCapacity": 500,
         "health": 300,
@@ -3693,8 +3691,8 @@
       },
       "projectileBarrelLength": 2.5,
       "stats": {
-        "range": 716,
-        "damage": 12,
+        "range": 512,
+        "damage": 8,
         "usageCapacity": 750,
         "health": 300,
         "reload": 950,
@@ -3718,14 +3716,15 @@
       "projectileBarrelLength": 4,
       "stats": {
         "range": 1280,
-        "damage": 95,
-        "usageCapacity": 1000,
+        "damage": 75,
+        "usageCapacity": 250,
         "health": 300,
-        "reload": 2000,
-        "spreadAngle": 15
+        "reload": 3000,
+        "spreadAngle": 1
       },
       "requirements": {
         "CopperBar": 200,
+        "CircuitBoard": 20,
         "Meteorite": 50
       },
       "description": "Concentrated Energy Shot weapon"
@@ -3740,17 +3739,19 @@
       "projectileBarrelLength": 2.5,
       "stats": {
         "range": 960,
-        "damage": 25,
-        "usageCapacity": 500,
+        "damage": 10,
+        "usageCapacity": 300,
         "health": 300,
-        "reload": 250,
+        "reload": 500,
+        "burstCount": 5,
+        "burstTimeout": 100,
         "spreadAngle": 5
       },
       "requirements": {
         "IronBar": 80,
         "CopperBar": 30
       },
-      "description": "Burst Weapon that shoots fast projectiles"
+      "description": "Burst Rifle that shoots fast projectiles"
     },
     "Scar17": {
       "parent": "Equipments.RangeEquipment",
@@ -3765,16 +3766,14 @@
         "damage": 30,
         "usageCapacity": 1000,
         "health": 300,
-        "reload": 500,
-        "burstCount": 20,
-        "burstTimeout": 125,
+        "reload": 200,
         "spreadAngle": 1.5
       },
       "requirements": {
         "IronBar": 250,
         "CopperBar": 50
       },
-      "description": "Burst Weapon that shoots fast projectiles"
+      "description": "Semi Automatic Battle Rifle that shoots fast and powerful projectiles"
     },
     "Ak47": {
       "parent": "Equipments.RangeEquipment",
@@ -3785,12 +3784,12 @@
       },
       "projectileBarrelLength": 2.5,
       "stats": {
-        "range": 1024,
-        "damage": 20,
-        "usageCapacity": 1000,
+        "range": 768,
+        "damage": 15,
+        "usageCapacity": 10000,
         "health": 300,
         "reload": 500,
-        "burstCount": 10,
+        "burstCount": 5,
         "burstTimeout": 100,
         "spreadAngle": 4.5
       },
@@ -3799,7 +3798,7 @@
         "CopperBar": 20,
         "Wood": 10
       },
-      "description": "Kalashnikov's assault rifle. Burst Weapon that shoots fast projectiles on short and medium distances"
+      "description": "Kalashnikov's extremely durable assault rifle. Burst Weapon that shoots fast projectiles on short and medium distances"
     },
     "BoltActionRifle": {
       "parent": "Equipments.RangeEquipment",
@@ -3814,8 +3813,8 @@
         "damage": 50,
         "usageCapacity": 500,
         "health": 300,
-        "reload": 500,
-        "spreadAngle": 1.25
+        "reload": 2000,
+        "spreadAngle": 0.5
       },
       "requirements": {
         "IronBar": 150,
@@ -3861,7 +3860,7 @@
         "damage": 50,
         "usageCapacity": 1000,
         "health": 300,
-        "reload": 1000,
+        "reload": 3000,
         "spreadAngle": 7.5
       },
       "requirements": {
@@ -3880,11 +3879,11 @@
       "projectileBiasByY": 7.5,
       "projectileBarrelLength": 0.71875,
       "stats": {
-        "range": 960,
-        "damage": 100,
+        "range": 768,
+        "damage": 25,
         "health": 300,
-        "reload": 1350,
-        "spreadAngle": 11.5
+        "reload": 2000,
+        "spreadAngle": 3
       },
       "requirements": {
         "IronBar": 100,
@@ -3974,9 +3973,9 @@
         "gold": 1000
       },
       "stats": {
-        "damage": 25,
+        "damage": 50,
         "range": 256,
-        "reload": 1000
+        "reload": 750
       },
       "requirements": {
         "Explosives": 1,

@@ -30,7 +30,8 @@
       "Added $getX/Y functions",
       "Plasma blade, plasma gun and squid staff are now craftable only in forge",
       "Katana is now craftable without forge",
-      "Rail trams are now faster + can regulate it from constants"
+      "Rail trams are now faster + can regulate it from constants",
+      "Main menu background now uses one of 18 random game screenshots"
     ]
   }
 }

@@ -2,14 +2,17 @@
 
 <div id='more_io_games'><a href="/partners.html" target="_blank" id='partners_link'><%= t('More IO games') %></a></div>
 
-<div id='home_background'></div>
+<div id='home_background'>
+    <img id="home_background_image" src="\assets\images\background\space.jpg">
+</div>
+
 <div class='loading_modal modal_menu'>
     <div class='loading_modal_message'>Loading</div>
     <div class='loading_modal_spinner lds-ring'><div></div><div></div><div></div><div></div></div>
 </div>
 
 <div id='welcome_container'>
-    <div id='home_footer'>
+    <div id='home_footer' style="background-color: #00000080; padding: 10px">
         <a href="/changelogs.html" target="_blank" class='game_version'><%= gameVersion %></a> 
         <a href="/partners.html" target="_blank" id='partners_link'><%= t('Partners') %></a> 
         <a href="/privacy.html" target="_blank" id='privacy_link'><%= t('Privacy') %></a>
@@ -23,7 +26,7 @@
         <div id='username_errors'></div>
     </div>
 
-    <div class='left_sidebar'>
+    <div class='left_sidebar' style="background-color: #00000080;">
         <div id='home_user_account_container' class='home_menu_container'>
             <div id='login_cookies'>Cookies must be enabled to Login</div>
             <div id='auth_in_progress'>
@@ -1272,10 +1275,8 @@
             </div>
             <div class='inventory_header'><%= t('Ingredients') %></div>
             <div class='crafting_requirements'></div>
-            <div class='crafting_options'>
-                <input class='craft_count' maxlength="2" type='number' min='1' max='99' value='1' />
-                <button class='craft_btn' ><%= t('Craft') %></button>
-            </div>
+            <input class='craft_count' maxlength="2" type='number' min='1' max='99' value='1' />
+            <button class='craft_btn' ><%= t('Craft') %></button>
             <div class='product_unavailable_notice'></div>
         </div>
     </div>
@@ -1512,10 +1513,8 @@
             </div>
             <div class='inventory_header'><%= t('Ingredients') %></div>
             <div class='crafting_requirements'></div>
-            <div class='crafting_options'>
-                <input class='craft_count' maxlength="2" type='number' min='1' max='99' value='1' />
-                <button class='craft_btn' ><%= t('Craft') %></button>
-            </div>
+            <input class='craft_count' maxlength="2" type='number' min='1' max='99' value='1' />
+            <button class='craft_btn' ><%= t('Craft') %></button>
         </div>
     </div>
 
@@ -2322,6 +2321,5 @@
 </div>
 
 <div id='welcome_hud'>
-    <div id="total_online_count">0 online</div>
-
+    <div id="total_online_count" style="background-color: #00000080; padding: 10px">0 online</div>
 </div>

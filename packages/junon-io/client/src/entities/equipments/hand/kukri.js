@@ -7,9 +7,9 @@ class Kukri extends BaseKnife {
     super.repositionSprite()
     
     this.sprite.position.x += 8
-    this.sprite.position.y -= 1
+    this.sprite.position.y += 4
     
-    this.sprite.rotation = 45 * PIXI.DEG_TO_RAD
+    this.sprite.rotation = 65 * PIXI.DEG_TO_RAD
     
     this.sprite.scale.y = -1
   }

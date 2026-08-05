@@ -23,7 +23,7 @@ class BaseKnife extends MeleeEquipment {
     while (diff > 180) diff -= 360
     while (diff < -180) diff += 360
     
-    if (Math.abs(diff) < threshold) {
+    if (Math.abs(diff) < threshold && !targetEntity.isBuilding()) {
       damage = Math.floor(damage * backstabDamage)
     }
     

@@ -1290,6 +1290,13 @@ class EventHandler {
     }
   }
 
+  getState(entityId) {
+    const entity = this.game.getEntity(entityId)
+    if (!entity) return undefined
+    
+    return entity.isOpen
+  }
+
   isVariableInvalid(key) {
     return key.match(/[^a-zA-Z0-9_$]/)
   }
@@ -1392,7 +1399,8 @@ class EventHandler {
       "$getUsage": true,
       "$getCapacity": true,
       "$getForceX": true,
-      "$getForceY": true
+      "$getForceY": true,
+      "$getState": true
     }
   }
 

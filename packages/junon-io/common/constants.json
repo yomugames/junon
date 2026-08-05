@@ -243,6 +243,16 @@
         "entityType": "type of building "
       }
     },
+    "BuildingStateChanged": {
+      "description": "Event triggered when a building state changes",
+      "variables": {
+        "entityId": "id of building",
+        "entityType": "type of building",
+        "changerId": "id of entity that changed state",
+        "changerType": "type of entity that changed state",
+        "state": "new state of building"
+      }
+    },
     "AsteroidMined": {
       "description": "Event triggered when asteroid mined",
       "variables": {
@@ -4604,7 +4614,7 @@
       },
       "stats": {
         "health": 500,
-        "speed": 100,
+        "speed": 64,
         "count": 125
       },
       "upgrade": {

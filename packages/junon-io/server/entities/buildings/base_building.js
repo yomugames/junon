@@ -702,7 +702,7 @@ class BaseBuilding extends BaseEntity {
   onOpenStateChanged(user = null) {
     this.onStateChanged("isOpen")
 
-    let changerType = user?.getType()
+    let changerType = user?.getTypeName()
     
     if (user?.isPlayer()) {
       changerType = user?.getName()

@@ -1988,13 +1988,7 @@ class BaseMob extends BaseEntity {
 
   onClosedDoorEncountered(door) {
     if (door.getAlliance() === this.getAlliance()) {
-      if (this.isPet()) {
-        if (door.isAutomatic() || this.hasMaster()) {
-          door.openFor(3000)
-        }
-      } else {
-        door.openFor(3000)
-      }
+      door.interact(this)
     }
   }
 

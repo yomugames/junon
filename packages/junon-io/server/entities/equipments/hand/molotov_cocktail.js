@@ -18,7 +18,7 @@ class MolotovCocktail extends HandEquipment {
     return this.setOnFire(targetEntity)
   }
 
-  use(user, targetEntity, options = {}) {
+  static use(user, targetEntity, options = {}) {
     let distanceFromUser = 0
     let sourcePoint = user.game.pointFromDistance(user.getX(), user.getY(), distanceFromUser, user.getRadAngle())
     let destination = { x: options.targetX, y: options.targetY }
@@ -29,8 +29,17 @@ class MolotovCocktail extends HandEquipment {
       destination = user.getShootTarget(this)
     }
 
+    let damage = this.prototype.getEquipmentDamage() * user.getDamageMultiplier()
+
+    let weapon = {
+      owner: user,
+      sector: user.sector,
+      getDamage: () => { return damage },
+      isBuilding: () => { return false }
+    }
+
     const projectile = Projectiles.MolotovCocktail.build({
-      weapon:        this,
+      weapon:        weapon,
       source:      { x: sourcePoint[0],         y: sourcePoint[1] },
       destination: destination
     })

@@ -287,6 +287,10 @@ class Sector {
     return this.settings['isGravityEnabled']
   }
 
+  areItemsBreakable() {
+    return this.settings['isItemBreakingEnabled']
+  }
+
   importCommandBlockToEventHandler() {
     if (!this.commandBlock.isEnabled) return
     if (!this.canUseCommandBlocks()) return
@@ -372,7 +376,9 @@ class Sector {
 
   initSettings(entities) {
     let firespread = true;
+    let isItemBreakingEnabled = true;
     if(this.isPeaceful()) firespread = false;
+    if(this.isPeaceful()) isItemBreakingEnabled = false;
     this.settings = {
       isPvPAllowed: false,
       isFovMode: false,
@@ -398,6 +404,7 @@ class Sector {
       isMutantEnabled: true,
       isGravityEnabled: false,
       isFireSpreadEnabled: firespread,
+      isItemBreakingEnabled
     }
 
     if (!entities) return
@@ -809,7 +816,7 @@ class Sector {
   canEditSetting(key) {
     if(this.gameMode === 'hardcore' || !this.gameMode) return false;
     if(this.gameMode === 'survival') {
-      let allowedSettingChanges = ['isPvPAllowed',"isFovMode", "isZoomAllowed", "showMiniMap", "showPlayerList", "isFloorAutodirt", "isChatEnabled", "isShadowsEnabled", "isPlayerSavingEnabled", "isBloodEnabled", "isGravityEnabled"]
+      let allowedSettingChanges = ['isPvPAllowed',"isFovMode", "isZoomAllowed", "showMiniMap", "showPlayerList", "isFloorAutodirt", "isChatEnabled", "isShadowsEnabled", "isPlayerSavingEnabled", "isBloodEnabled", "isGravityEnabled", "isItemBreakingEnabled"]
 
       if(allowedSettingChanges.indexOf(key) === -1) return false;
     }

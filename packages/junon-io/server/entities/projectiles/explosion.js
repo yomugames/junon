@@ -7,7 +7,7 @@ class Explosion extends HitscanProjectile {
   constructor(data) {
     super(data)
 
-    this.width = data.explosionRadius || Constants.tileSize * 6
+    this.width = data.explosionRadius || Constants.explosionRadius
   }
 
   onProjectileConstructed() {

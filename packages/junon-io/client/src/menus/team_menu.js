@@ -111,6 +111,9 @@ class TeamMenu extends BaseMenu {
     this.el.querySelector("#enable_fire_spread").addEventListener("click", this.onEnableFireSpread.bind(this), true)
     this.el.querySelector("#disable_fire_spread").addEventListener("click", this.onDisableFireSpread.bind(this), true)
 
+    this.el.querySelector("#enable_item_breaking").addEventListener("click", this.onEnableItemBreaking.bind(this), true)
+    this.el.querySelector("#disable_item_breaking").addEventListener("click", this.onDisableItemBreaking.bind(this), true)
+
     this.el.querySelector(".colony_logs_refresh_btn").addEventListener("click", this.onLogsRefreshClick.bind(this), true)
     this.el.querySelector(".command_logs_refresh_btn").addEventListener("click", this.onCommandLogsRefreshClick.bind(this), true)
   }
@@ -324,12 +327,21 @@ class TeamMenu extends BaseMenu {
         }
       }
 
-      if(name === 'isFireSpreadEnabled') {
+      if (name === 'isFireSpreadEnabled') {
         let value = settings[name]
         if(value) {
           this.el.querySelector("#enable_fire_spread").checked = true;
         } else {
           this.el.querySelector("#disable_fire_spread").checked = true;
+        }
+      }
+
+      if (name === 'isItemBreakingEnabled') {
+        let value = settings[name]
+        if(value) {
+          this.el.querySelector("#enable_item_breaking").checked = true;
+        } else {
+          this.el.querySelector("#disable_item_breaking").checked = true;
         }
       }
 
@@ -896,6 +908,34 @@ class TeamMenu extends BaseMenu {
     }
   }
 
+  onEnableItemBreaking(e) {
+    e.preventDefault()
+
+    let value = e.target.value
+    if(value === 'yes') {
+      SocketUtil.emit("SectorAction", {
+        action: 'editSetting',
+        sectorId: this.game.sector.uid,
+        key: 'isItemBreakingEnabled',
+        value: 'true'
+      })
+    }
+  }
+
+  onDisableItemBreaking(e) {
+    e.preventDefault()
+
+    let value = e.target.value
+    if(value === 'no') {
+      SocketUtil.emit("SectorAction", {
+        action: 'editSetting',
+        sectorId: this.game.sector.uid,
+        key: 'isItemBreakingEnabled',
+        value: 'false'
+      })
+    }
+  }
+
   onEnableMinimapClick(e) {
     e.preventDefault()
 
@@ -1283,6 +1323,7 @@ class TeamMenu extends BaseMenu {
       this.el.querySelector(".colony_chat_allowed").style.display = 'block'
       this.el.querySelector(".is_infinite_ammo").style.display = 'block'
       this.el.querySelector(".is_infinite_power").style.display = 'block'
+      this.el.querySelector(".is_item_breaking_enabled").style.display = 'block'
     } else {
       this.el.querySelector(".alliance_entry").style.display = 'block'
       this.el.querySelector(".colony_playerlist").style.display = 'none'
@@ -1300,6 +1341,7 @@ class TeamMenu extends BaseMenu {
       this.el.querySelector(".is_corpse_enabled").style.display = 'none'
       this.el.querySelector(".is_mutant_enabled").style.display = 'none'
       this.el.querySelector(".is_fire_spread_enabled").style.display = 'none'
+      this.el.querySelector(".is_item_breaking_enabled").style.display = 'none'
     }
 
     this.renderVisitorActionsState()

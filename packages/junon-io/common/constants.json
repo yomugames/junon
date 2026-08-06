@@ -243,6 +243,16 @@
         "entityType": "type of building "
       }
     },
+    "BuildingStateChanged": {
+      "description": "Event triggered when a building state changes",
+      "variables": {
+        "entityId": "id of building",
+        "entityType": "type of building",
+        "changerId": "id of entity that changed state",
+        "changerType": "type of entity that changed state",
+        "state": "new state of building"
+      }
+    },
     "AsteroidMined": {
       "description": "Event triggered when asteroid mined",
       "variables": {
@@ -1711,7 +1721,7 @@
         "reload": 300,
         "health": 2000,
         "damage": 25,
-        "range": 128,
+        "range": 512,
         "los": 1024
       },
       "isFlamable": false,
@@ -1764,7 +1774,7 @@
         "reload": 250,
         "health": 1500,
         "damage": 25,
-        "range": 128,
+        "range": 512,
         "los": 1024
       },
       "isFlamable": false,
@@ -2091,6 +2101,11 @@
       "height": 16,
       "speed": 20
     },
+    "ShockGrenade": {
+      "width": 20,
+      "height": 24,
+      "speed": 20
+    },
     "TeslaLaser": {
       "width": 10,
       "height": 10,
@@ -2104,6 +2119,13 @@
       "speed": 1
     },
     "MiningExplosion": {
+      "canDamageWalls": true,
+      "width": 192,
+      "height": 192,
+      "damage": 10,
+      "speed": 1
+    },
+    "Shockwave": {
       "canDamageWalls": true,
       "width": 192,
       "height": 192,
@@ -3467,6 +3489,13 @@
         "spreadAngle": 0
       }
     },
+    "BaseKnife": {
+      "parent": "Equipments.MeleeEquipment",
+      "abstract": true,
+      "stats": {
+        "backstabDamageMultiplier": 4
+      }
+    },
     "Syringe": {
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
@@ -3716,7 +3745,7 @@
       "projectileBarrelLength": 4,
       "stats": {
         "range": 1280,
-        "damage": 75,
+        "damage": 55,
         "usageCapacity": 250,
         "health": 300,
         "reload": 3000,
@@ -3795,8 +3824,7 @@
       },
       "requirements": {
         "IronBar": 150,
-        "CopperBar": 20,
-        "Wood": 10
+        "CopperBar": 20
       },
       "description": "Kalashnikov's extremely durable assault rifle. Burst Weapon that shoots fast projectiles on short and medium distances"
     },
@@ -3814,11 +3842,33 @@
         "usageCapacity": 500,
         "health": 300,
         "reload": 2000,
-        "spreadAngle": 0.5
+        "spreadAngle": 1.5
       },
       "requirements": {
         "IronBar": 150,
         "CopperBar": 20
+      },
+      "description": "Accurate and powerful Weapon that shoots fast projectiles"
+    },
+    "HeavyRifle": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 2000
+      },
+      "projectileBarrelLength": 2.5,
+      "stats": {
+        "range": 2048,
+        "damage": 65,
+        "usageCapacity": 1500,
+        "health": 300,
+        "reload": 2000,
+        "spreadAngle": 0
+      },
+      "requirements": {
+        "IronBar": 250,
+        "CopperBar": 80
       },
       "description": "Accurate and powerful Weapon that shoots fast projectiles"
     },
@@ -3876,14 +3926,13 @@
       "cost": {
         "gold": 900
       },
-      "projectileBiasByY": 7.5,
       "projectileBarrelLength": 0.71875,
       "stats": {
         "range": 768,
-        "damage": 25,
+        "damage": 75,
         "health": 300,
         "reload": 2000,
-        "spreadAngle": 3
+        "spreadAngle": 10
       },
       "requirements": {
         "IronBar": 100,
@@ -3948,6 +3997,7 @@
       "parent": "Equipments.MeleeEquipment",
       "isWeapon": true,
       "isThrowable": true,
+      "isStackable": true,
       "isUnbreakable": true,
       "cost": {
         "gold": 80
@@ -4000,6 +4050,7 @@
       },
       "requirements": {
         "Explosives": 1,
+        "IronBar": 5,
         "Poison": 1
       },
       "description": "Throwable item that emits poison to an area"
@@ -4021,9 +4072,31 @@
       },
       "requirements": {
         "Explosives": 30,
-        "IronOre": 5
+        "IronBar": 5
       },
-      "description": "Creates an explosion that easily destroys asteroids that can't be salvaged."
+      "description": "Creates an explosion that easily destroys asteroids that can't be salvaged"
+    },
+    "ShockGrenade": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "isThrowable": true,
+      "isStackable": true,
+      "isUnbreakable": true,
+      "isCostIndependent": true,
+      "cost": {
+        "gold": 1000
+      },
+      "stats": {
+        "damage": 10,
+        "range": 256,
+        "reload": 750
+      },
+      "requirements": {
+        "Explosives": 5,
+        "IronBar": 5,
+        "CircuitBoard": 5
+      },
+      "description": "Throwable item that creates shockwaves that stuns enemies in an area"
     },
     "FireExtinguisher": {
       "parent": "Equipments.BaseEquipment",
@@ -4161,14 +4234,14 @@
       "categories": {"melee_damage": true},
       "isAnimatable": true,
       "stats": {
-        "damage": 7,
+        "damage": 10,
         "range": 55,
         "meleeRange": 55
       },
       "requirements": {
         "IronOre": 10
       },
-      "description": "Basic Melee weapon. Damage 7"
+      "description": "Basic Melee weapon. Damage 10"
     },
     "PlasmaBlade": {
       "parent": "Equipments.MeleeEquipment",
@@ -4244,16 +4317,16 @@
       "concurrentTargetCount": 3,
       "isAnimatable": true,
       "stats": {
-        "damage": 15,
+        "damage": 25,
         "range": 64,
         "attackRadius": 64,
         "meleeRange": 64
       },
       "requirements": {
-        "IronOre": 50,
+        "IronBar": 50,
         "Wood": 20
       },
-      "description": "Can slice through 3 enemies at a time. Damage 15."
+      "description": "Can slice through 3 enemies at a time. Damage 25."
     },
     "BlueEnergySword": {
       "parent": "Equipments.MeleeEquipment",
@@ -4318,6 +4391,46 @@
         "CircuitBoard": 2
       },
       "description": "Melee Weapon that can stun enemy. Damage 6"
+    },
+    "Bayonet": {
+      "parent": "Equipments.BaseKnife",
+      "isWeapon": true,
+      "cost": {
+        "gold": 250
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 15,
+        "range": 50,
+        "reload": 250,
+        "meleeRange": 50
+      },
+      "requirements": {
+        "IronBar": 50
+      },
+      "description": "Fast Melee weapon that can be used for backstabbing. Damage 15"
+    },
+    "Kukri": {
+      "parent": "Equipments.BaseKnife",
+      "isWeapon": true,
+      "cost": {
+        "gold": 750
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 30,
+        "range": 80,
+        "reload": 800,
+        "meleeRange": 80,
+        "backstabDamageMultiplier": 1.5
+      },
+      "requirements": {
+        "IronBar": 50,
+        "Wood": 10
+      },
+      "description": "Nepalese knife-axe hybrid. Damage 30"
     },
     "SantaHat": {
       "parent": "Equipments.BaseEquipment",
@@ -4501,6 +4614,7 @@
       },
       "stats": {
         "health": 500,
+        "speed": 64,
         "count": 125
       },
       "upgrade": {
@@ -6926,9 +7040,9 @@
       "hasFillBar": true,
       "categories": {"turret":true,"editable_targets":true},
       "stats": {
-        "reload": 2000,
-        "damage": 2,
-        "range": 288,
+        "reload": 100,
+        "damage": 1,
+        "range": 300,
         "health": 200,
         "fuelConsumption": 1,
         "fuelCapacity": 500,
@@ -7280,6 +7394,7 @@
     "Tree": 2
   },
   "tileSize": 32,
+  "explosionRadius": 192,
   "collisionGroup": {
     "Player": 1,
     "Ground": 2,

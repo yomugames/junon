@@ -7,7 +7,7 @@ const Helper = require("./../../../../common/helper")
 class Explosion extends BaseProjectile {
 
   onProjectileConstructed() {
-    if (this.data.width > (Constants.tileSize * 2)) {
+    if (this.data.width > (Constants.tileSize)) {
       this.game.playSound("explosion")
     }
     
@@ -17,7 +17,7 @@ class Explosion extends BaseProjectile {
   animateExplosion() {
     ClientHelper.animateExplosion(this.getX(), this.getY(), { 
       minWidth: 32, 
-      maxWidth: this.data.width,
+      maxWidth: this.data.width || Constants.explosionRadius,
       tint: 0xd1c04a
     })
 

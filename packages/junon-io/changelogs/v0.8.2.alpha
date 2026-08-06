@@ -1,6 +1,6 @@
 {
   "version": "v0.8.2.alpha",
-  "date": "August 3, 2026",
+  "date": "August 6, 2026",
   "title": "Bugfixes + new stuff update by KONTREVOLUCIA",
   "content": {
     "bugs": [
@@ -34,7 +34,8 @@
       "Katana is now craftable without forge",
       "Rail trams are now faster + can regulate it from constants",
       "Main menu background now uses one of 18 random game screenshots",
-      "Unified mobs and players door interaction logic"
+      "Unified mobs and players door interaction logic",
+      "Added Enable Items Breaking setting"
     ]
   }
 }

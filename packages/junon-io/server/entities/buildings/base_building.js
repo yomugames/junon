@@ -702,10 +702,12 @@ class BaseBuilding extends BaseEntity {
   onOpenStateChanged(user = null) {
     this.onStateChanged("isOpen")
 
-    let changerType = user?.getTypeName()
+    let changerType
     
     if (user?.isPlayer()) {
       changerType = user?.getName()
+    } else {
+      changerType = user?.getTypeName()
     }
 
     this.game.triggerEvent("BuildingStateChanged", {

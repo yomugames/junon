@@ -38,6 +38,18 @@ class VendingMachine extends BaseBuilding {
     return actions
   }
 
+  syncWithServer(data) {
+    super.syncWithServer(data)
+    // no idea how prices getting nullified happens. just check so we don't blank it out for... no reason '-'
+    if (Object.keys(data.prices).length > 0) {
+      if(Object.hasOwn(data.prices, "empty")) {
+        this.prices = {}
+      } else {
+        this.prices = data.prices
+      }
+    }
+  }
+
   onContentChanged() {
     if (this.game.vendingMachineMenu.entity === this) {
       this.game.vendingMachineMenu.updateStorageGoldAmount()

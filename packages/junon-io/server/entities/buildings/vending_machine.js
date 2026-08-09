@@ -8,6 +8,13 @@ class VendingMachine extends BaseBuilding {
     super.onConstructionFinished()
 
     this.purchaseHistory = {}
+    if (!this.prices) this.prices = {}
+    this.container.addProcessor(this)
+  }
+
+  remove() {
+    this.container.removeProcessor(this)
+    super.remove()
   }
 
   withdraw(player) {
@@ -58,7 +65,33 @@ class VendingMachine extends BaseBuilding {
     return {}
   }
 
+  changePrice(data) {
+    this.prices[data.itemId] = data.cost
+    this.onStateChanged("prices")
+  }
+
+  // remove prices for items that are no longer in vending machine
+  // can't use onStorageChanged as index changes will remove it... :(
+  executeTurn() {
+    const isOneSecondInterval = this.game.timestamp % (Constants.physicsTimeStep * 1) === 0
+    if (!isOneSecondInterval) return
+    if (!this.prices || Object.keys(this.prices).length === 0) return
+
+    for (let itemId of Object.keys(this.prices)) {
+      let item = this.game.getEntity(itemId)
+
+      if (!item || !Object.values(this.storage).includes(item)) {
+        delete this.prices[itemId]
+        if(Object.keys(this.prices).length === 0) {
+          this.prices.empty = 0 // use this to clear prices
+        } else {
+          delete this.prices.empty
+        }
+        this.onStateChanged("prices")
+      }
+    }
+  }
+
 }
 
 module.exports = VendingMachine
-

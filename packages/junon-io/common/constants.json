@@ -6067,7 +6067,7 @@
       "sprite": {
         "rotation": 90
       },
-      "categories": {"seller":true,"vending_machine":true},
+      "categories": {"seller":true,"vending_machine":true,"editable_permissions":true},
       "hasMenu": true,
       "menuDescription": "",
       "isInteractable": true,
@@ -6096,7 +6096,7 @@
       "sprite": {
         "rotation": 90
       },
-      "categories": {"seller":true,"vending_machine":true},
+      "categories": {"seller":true,"vending_machine":true,"editable_permissions":true},
       "hasMenu": true,
       "menuDescription": "",
       "isInteractable": true,
@@ -6115,6 +6115,32 @@
         "count": "+25"
       },
       "description": "Store and sell drinks"
+    },
+    "Dispenser": {
+      "width": 64,
+      "height": 96,
+      "cost": {
+        "gold": 500
+      },
+      "categories": {"seller":true,"vending_machine":true,"editable_permissions":true},
+      "hasMenu": true,
+      "menuDescription": "",
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 16,
+      "requirements": {
+        "IronBar": 80,
+        "Wire": 10,
+        "CircuitBoard": 20
+      },
+      "stats": {
+        "health": 250
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Store and sell items."
     },
     "Conveyor": {
       "width": 32,

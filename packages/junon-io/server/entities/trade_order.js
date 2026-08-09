@@ -127,6 +127,8 @@ class TradeOrder {
       } else {
         return this.klass.getCost() * this.count
       }
+    } else if (this.seller.hasCategory("vending_machine") && this.seller.prices[this.entityId]) {
+      return this.seller.prices[this.entityId] * this.count
     } else {
       return this.klass.getCost() * this.count
     }

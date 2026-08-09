@@ -6,6 +6,7 @@ const Trigger = require("./trigger")
 const Protocol = require('../../common/util/protocol')
 const Helper = require('../../common/helper')
 const Constants = require('../../common/constants.json')
+const EntityGroup = require("./entity_group")
 
 class EventHandler {
   constructor(sector) {
@@ -21,6 +22,8 @@ class EventHandler {
     this.isRoundStarted = false
     this.isRoundStarting = false
     this.processingEvents = new Set() // Track events currently being processed to prevent infinite loops
+    this.processingOverflow = 0
+    this.PROCESSING_LIMIT = 25
   }
 
   getSocketUtil() {
@@ -184,6 +187,14 @@ class EventHandler {
     return Math.abs(this._safeNumber(value))
   }
 
+  exp(value) {
+    return Math.exp(this._safeNumber(value))
+  }
+
+  tanh(value) {
+    return Math.tanh(this._safeNumber(value))
+  }
+
   log(value, base = Math.E) {
     const numValue = this._safeNumber(value)
     const numBase = this._safeNumber(base)
@@ -206,7 +217,7 @@ class EventHandler {
     return this._fixFloat(result, Math.max(12, -prec + 2))
   }
 
- ceil(value, precision = 0) {
+  ceil(value, precision = 0) {
     const num = this._safeNumber(value)
     const prec = this._safeNumber(precision)
     
@@ -225,6 +236,26 @@ class EventHandler {
   max(...values) {
     if (values.length === 0) return -Infinity
     return Math.max(...values.map(v => this._safeNumber(v)))
+  }
+
+  radian(value) {
+    return this._safeNumber(value) * (Math.PI / 180)
+  }
+
+  sin(value) {
+    return Math.sin(this._safeNumber(value))
+  }
+
+  cos(value) {
+    return Math.cos(this._safeNumber(value))
+  }
+
+  tan(value) {
+    return Math.tan(this._safeNumber(value))
+  }
+
+  atan2(y, x) {
+      return Math.atan2(this._safeNumber(y), this._safeNumber(x))
   }
 
   length(value) {
@@ -340,6 +371,13 @@ class EventHandler {
     return content    
   }
 
+  getIsPowered(buildingId) {
+    let building = this.game.getEntity(buildingId)
+    
+    if (!building) return undefined
+    
+    return building.isPowered
+  }
 
   getUsage(itemId) {
     let item = this.game.getEntity(itemId)
@@ -467,90 +505,6 @@ class EventHandler {
     return this.scoreIndexByPlayer[playerId]
   }
 
-  if(...vals) {
-    let condition = vals[1]
-    let val1 = vals[0]
-    let val2 = vals[2]
-
-    switch(condition) {
-      case "=": {
-        if (val1 === val2) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case "<": {
-        if (val1 < val2) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case ">": {
-        if (val1 > val2) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case "<=": {
-        if (val1 <= val2) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case ">=": {
-        if (val1 >= val2) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case "!=": {
-        if (!(val1 === val2)) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case "=~": {
-        if (val1.includes(val2)) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      default: {
-        return "undefined"
-      }
-    }
-  }
-
-  getNthWord(...values) {
-    if (values.length < 2) return ""
-    let index = parseInt(values[0])
-    let word = values.slice(1).join(" ")
-    let stringArray = word.split(" ")
-
-    if (isNaN(index) || index < 1) {
-      return ""
-    }
-    if (!word || typeof word !== "string") {
-      return ""
-    }
-    if(index > stringArray.length+1) {
-      return ""
-    }
-
-    let letter = stringArray[index - 1]
-    return letter
-  }
-
-  getNthLetter(...values) {
-    if (values.length === 0) return ""
-    let index = parseInt(values[0])
-    let word = values[1];
-    if (isNaN(index)) {
-      return ""
-    }
-    if (!word || typeof word !== "string") {
-      return ""
-    }
-    if (index < 1 || index > word.length) {
-      return ""
-    }
-    let letter = word[index - 1];
-    return letter
-  }
-
   setScoreIndex(playerId, index) {
     this.scoreIndexByPlayer[playerId] = index
   }
@@ -573,10 +527,19 @@ class EventHandler {
     return player.getTeam().scoreIndex || 0
   }
 
-  getAngle(playerId) {
-    let player = this.getPlayer(playerId)
-    if (!player) return 0
-    return player.angle
+  getAngle(entityId) {
+    let entity = this.game.getEntity(entityId)
+    if (!entity) return 0
+    return entity.angle
+  }
+
+  getName(entityId) {
+    const entity = this.game.getEntity(entityId)
+    if (entity) {
+      return entity.name
+    } else {
+      return undefined
+    }
   }
 
   getTeamColor(playerId) {
@@ -662,8 +625,8 @@ class EventHandler {
 
     let name = "Timer:" + timer.name + ":tick"
     let params = {
-      "seconds": timer.tick,
-      "remaining": timer.duration - timer.tick
+      "seconds": timer.tick * timer.every,
+      "remaining": timer.duration - (timer.tick * timer.every)
     }
     this.trigger(name, params)
 
@@ -704,7 +667,7 @@ class EventHandler {
   }
 
   hasReachedMaxVariableCount() {
-    return Object.keys(this.variables).length >= 100
+    return Object.keys(this.variables).length >= 10000
   }
 
   loadVariables(variables) {
@@ -1054,9 +1017,9 @@ class EventHandler {
 
     // Prevent infinite loops by checking if this event is already being processed
     // disable for now. need to fix to handle nested events
-    // if (this.processingEvents.has(eventKey)) {
-    //   return
-    // }
+    if (this.processingEvents.has(eventKey)) {
+      this.processingOverflow++
+    }
 
     // Mark this event as being processed
     this.processingEvents.add(eventKey)
@@ -1111,6 +1074,7 @@ class EventHandler {
 
   resetProcessingEvents() {
     this.processingEvents.clear()
+    this.processingOverflow = 0
   }
 
   updateTaskCompleted() {
@@ -1157,7 +1121,11 @@ class EventHandler {
   }
 
   runAction(action, params) {
-    this.commandDelay = 0 // always reset command delay at beginning
+    if(this.processingOverflow > this.PROCESSING_LIMIT) {
+      this.commandDelay = 0.1 * (this.processingOverflow - this.PROCESSING_LIMIT) // offload if overwhelmed
+    } else {
+      this.commandDelay = 0 // always reset command delay at beginning
+    }
 
     if (action.timer) {
       if (action.timer.shouldRemove) {
@@ -1242,6 +1210,136 @@ class EventHandler {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
 
+  seedRandom(seed, min, max) {
+    seed = parseInt(seed)
+    min = parseInt(min)
+    max = parseInt(max)
+    if (isNaN(seed) || isNaN(min) || isNaN(max)) return 0
+    const a = 1664525
+    const c = 1013904223
+    const rand = ((a * seed + c) % 4294967296) / 4294967296
+    return Math.floor(min + rand * (max - min + 1))
+  }
+
+  getPlayerId(playerName) {
+    const player = this.game.getPlayerByNameOrId(playerName)
+    
+    if (!player) return undefined
+    return player.getId() || undefined
+  }
+
+  getGoal(entityId) {
+    const entity = this.game.getEntity(entityId)
+
+    if (!entity) return undefined
+    if (!entity.isMob()) return undefined
+    if (entity.goals.length === 0) return undefined
+
+    return entity.getLatestGoal().getTargetEntity().getId()
+  }
+
+  getForceX(entityId) {
+    const entity = this.game.getEntity(entityId)
+    if (entity) {
+      return entity.getBody().force[0]
+    } else {
+      return 0
+    }
+  }
+
+  getForceY(entityId) {
+    const entity = this.game.getEntity(entityId)
+    if (entity) {
+      return entity.getBody().force[1]
+    } else {
+      return 0
+    }
+  }
+
+  if(...vals) {
+    let condition = vals[1]
+    let val1 = vals[0]
+    let val2 = vals[2]
+
+    switch(condition) {
+      case "=": {
+        if (val1 === val2) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case "<": {
+        if (val1 < val2) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case ">": {
+        if (val1 > val2) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case "<=": {
+        if (val1 <= val2) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case ">=": {
+        if (val1 >= val2) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case "!=": {
+        if (!(val1 === val2)) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      case "=~": {
+        if (val1.includes(val2)) {
+          return vals[3]
+        } else {return vals[4]}
+      }
+      default: {
+        return "undefined"
+      }
+    }
+  }
+
+  getNthWord(...values) {
+    if (values.length < 2) return ""
+    let index = parseInt(values[0])
+    let word = values.slice(1).join(" ")
+    let stringArray = word.split(" ")
+
+    if (isNaN(index) || index < 1) {
+      return ""
+    }
+    if (!word || typeof word !== "string") {
+      return ""
+    }
+    if(index > stringArray.length+1) {
+      return ""
+    }
+
+    let letter = stringArray[index - 1]
+    return letter
+  }
+
+  getNthLetter(...values) {
+    if (values.length === 0) return ""
+    let index = parseInt(values[0])
+    let word = values[1];
+    if (isNaN(index)) {
+      return ""
+    }
+    if (!word || typeof word !== "string") {
+      return ""
+    }
+    if (index < 1 || index > word.length) {
+      return ""
+    }
+    let letter = word[index - 1];
+    return letter
+  }
+
   isVariableInvalid(key) {
     return key.match(/[^a-zA-Z0-9_$]/)
   }
@@ -1288,8 +1386,10 @@ class EventHandler {
       "$getMaxStamina": true,
       "$getMaxOxygen": true,
       "$getMaxHunger": true,
+      "$getPlayerId": true,
       "$getOwner": true,
       "$random": true,
+      "$seedRandom": true,
       "$formatTime": true,
       "$getTeamMemberCount": true,
       "$getRoleMemberCount": true,
@@ -1310,11 +1410,17 @@ class EventHandler {
       "$pow": true,
       "$root": true,
       "$abs": true,
+      "$exp": true,
       "$log": true,
       "$min": true,
       "$max": true,
       "$floor": true,
       "$ceil": true,
+      "$radian": true,
+      "$sin": true,
+      "$cos": true,
+      "$tan": true,
+      "$atan2": true,
       "$isLoggedIn": true,
       "$getEquipId": true,
       "$getBuildingType": true,
@@ -1325,13 +1431,18 @@ class EventHandler {
       "$getStructureByCoords": true,
       "$hasEffect": true,
       "$getTotalMobCount": true,
+      "$getGoal": true,
       "$getAngle": true,
+      "$getName": true,
+      "$getIsPowered": true,
       "$getUsage": true,
       "$getCapacity": true,
+      "$getForceX": true,
+      "$getForceY": true,
       "$getNthLetter": true,
       "$getNthWord": true,
       "$if": true,
-}
+    }
   }
 
   buildFunctionMatchRegex() {

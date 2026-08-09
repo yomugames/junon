@@ -281,6 +281,10 @@ class BaseBuilding extends BaseEntity {
       this.isWatered = data.isWatered
     }
 
+    if (data.prices) {
+      this.prices = data.prices
+    }
+
     if (data.effects) {
       for (let effectName in data.effects) {
         let level = data.effects[effectName]

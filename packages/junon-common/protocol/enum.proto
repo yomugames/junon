@@ -273,6 +273,7 @@ enum BuildingType {
   Uzi = 279;
   SmallAirlock = 280;
   Revitalizer = 281;
+  Dispenser = 282;
 }
 
 enum TerrainType {

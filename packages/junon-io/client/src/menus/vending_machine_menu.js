@@ -79,13 +79,22 @@ class VendingMachineMenu extends StorageMenu {
     let group = this.selectedRow.dataset.group
     let type = this.selectedRow.dataset.type
     let index = parseInt(this.selectedRow.dataset.index)
+    let itemId = this.storage[index].id
 
-    SocketUtil.emit("Trade", { group: group, type: type, count: 1, recipientId: this.entity.getId(), index: index })
+    SocketUtil.emit("Trade", { group: group, type: type, count: 1, recipientId: this.entity.getId(), index: index, id: itemId })
   }
 
   onPurchasableItemsClick(event) {
     if (this.selectedRow) {
       this.unselectRow(this.selectedRow)
+    }
+
+    let reprice = event.target.closest(".reprice_btn")
+    if(reprice) {
+      let row = reprice.closest(".trade_item_row")
+      this.selectRow(row)
+      this.onRepriceBtnClick()
+      return
     }
 
     let row = event.target.closest(".trade_item_row")
@@ -117,12 +126,45 @@ class VendingMachineMenu extends StorageMenu {
     this.game.animateCraftSuccess(data)
   }
 
+  createTradeItem(klass, options = {}) {
+    let imagePath = "/assets/images/" + klass.prototype.getSpritePath()
+
+    let cost = (options.isSelling ? Math.ceil(klass.getCost() / 2) : klass.getCost())
+    if (options.cost) cost = options.cost
+    let currency = "G"
+    let currencyklass = ""
+    if (options.itemName) {
+      currency = options.itemName
+      currencyklass = "custom"
+    }
+
+    let team = this.game.player.getTeam()
+    let repriceButton = this.game.player.isAdmin() ? "<button class='reprice_btn'><img src='/assets/images/edit_icon.png' style='width: 16px;'></button>" : ""
+
+    const el = "<div class='trade_item_row' data-group='" + klass.getSellGroup() + "' data-type='" + klass.getType() + "' data-count='" + options.count + "' data-index='" + options.index + "' >" +
+                    repriceButton +
+                    "<img class='trade_item_image' src='" + imagePath + "'>" +
+                    "<div class='trade_item_name'>" + i18n.t(klass.getTypeName()) + "</div>" +
+                    "<div class='trade_item_count'>" + (options.count ? 'x' + options.count : '') + "</div>" +
+                    "<div class='trade_item_cost" + currencyklass + "'>" + cost  + " " + currency + "</div>" +
+                    "<input class='trade_item_cost trade_item_reprice'>" +
+                "</div>"
+
+    return el
+  }
+
   renderPurchasables() {
     let rows = ""
     for (let index in this.storage) {
       let item = this.storage[index]
       let itemKlass = Item.getKlass(item.type)
-      rows += this.createTradeItem(itemKlass, { count: item.count, index: index })
+
+      let itemId = item.id
+      if (this.entity.prices && Object.hasOwn(this.entity.prices, itemId)) {
+        rows += this.createTradeItem(itemKlass, { count: item.count, index: index, cost: this.entity.prices[itemId]})
+      } else {
+        rows += this.createTradeItem(itemKlass, { count: item.count, index: index })
+      }
     }
 
     this.el.querySelector(".purchasable_items_list").innerHTML = rows
@@ -143,6 +185,52 @@ class VendingMachineMenu extends StorageMenu {
       }
     }
 
+  }
+
+  onRepriceBtnClick() {
+    // verify perms before doing this...
+    if (!this.game.player.isAdmin()) return
+
+    if (this.selectedRow) {
+      let type = this.selectedRow.dataset.type
+      let index = this.selectedRow.dataset.index
+      let tradeItemRow = this.el.querySelector(`.trade_item_row[data-type='${type}'][data-index='${index}'`)
+      if (!tradeItemRow) {
+        return
+      }
+    } else {
+      return
+    }
+
+    let button = this.selectedRow.querySelector(".trade_item_reprice")
+    let itemCost = this.selectedRow.querySelector(".trade_item_cost")
+    let index = parseInt(this.selectedRow.dataset.index)
+
+    if(button.style.display !== 'block') {
+      button.style.display = 'block'
+      // grab number price
+      button.value = itemCost.innerText.split(" ", 1)
+      itemCost.innerText = " G"
+
+      button.focus()
+    } else {
+      button.style.display = 'none'
+      // make it a number
+      let cost = button.value.replace(/\D/g, "")
+      if(cost.length !== 0 && Number(cost) > 0 && Number(cost) <= 100000) {
+        itemCost.innerText = cost + " G"
+        SocketUtil.emit("VendingPriceChange", { vendId: this.entity.id, cost: cost, itemId: this.storage[index].id })
+      } else {
+        this.game.displayError("Invalid Amount", { warning: true })
+        itemCost.innerText = Item.getKlass(this.selectedRow.dataset.type).getCost() + " G"
+
+        if (this.entity.prices && this.entity.prices[this.storage[index].id]) {
+          itemCost.innerText = this.entity.prices[this.storage[index].id] + " G"
+        }
+      }
+    }
+
+    // this.selectedRow.querySelector(".trade_item_reprice").select()
   }
 
   updateGoldCount(gold) {

@@ -3,6 +3,11 @@ const Constants = require("./../../../../../common/constants.json")
 const Protocol = require("./../../../../../common/util/protocol")
 
 class Pistol extends RangeEquipment {
+  repositionSprite() {
+    super.repositionSprite()
+
+    this.user.closeHands()
+  }
 
   getSpritePath() {
     return 'pistol.png'

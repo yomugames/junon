@@ -15,7 +15,8 @@ class SetStatus extends BaseCommand {
     perform(caller, args) {
         let status = args[0]
 
-        if(!caller || !caller.isPlayer()) return
+        // if(!caller || !caller.isPlayer()) return
+        // Commented cuz of didn't work in command block and useless
 
         if(status == "public") {
             caller.sector.setIsPrivate(false)

@@ -652,6 +652,9 @@ class BaseEntity extends BaseTransientEntity {
     if (x > this.sector.getGridWidth()) x = this.sector.getGridWidth() - 1
     if (y > this.sector.getGridHeight()) y = this.sector.getGridHeight() - 1
     const prevChunk = { row: this.getChunkRow(), col: this.getChunkCol() }
+    
+    x = Math.round(x * Constants.tileSize) / Constants.tileSize
+    y = Math.round(y * Constants.tileSize) / Constants.tileSize
 
     this.setPositionInternal(x, y)
 
@@ -986,10 +989,12 @@ class BaseEntity extends BaseTransientEntity {
     if (tileHit.entity === null) return
     const otherBox = this.getTileBoxForEdgify(tileHit)
     const position = this.getPositionToEdgify(body)
+    // limit correction force so golems don't get stuck
+    let correction = body.entity.getWidth() >= 64 ? 32 : body.entity.getWidth() / 2
     if (body.velocity[0] < 0) { // going left
-      position[0] = otherBox.pos.x + otherBox.w + + body.entity.getWidth() / 2
+      position[0] = otherBox.pos.x + otherBox.w + correction // body.entity.getWidth() / 2
     } else if (body.velocity[0] > 0) { // going right
-      position[0] = otherBox.pos.x - body.entity.getWidth() / 2
+      position[0] = otherBox.pos.x - correction // body.entity.getWidth() / 2
     }
 
     this.postEdgify(body)
@@ -1000,10 +1005,11 @@ class BaseEntity extends BaseTransientEntity {
     if (tileHit.entity === null) return
     const otherBox = this.getTileBoxForEdgify(tileHit)
     const position = this.getPositionToEdgify(body)
+    let correction = body.entity.getWidth() >= 64 ? 32 : body.entity.getWidth() / 2
     if (body.velocity[1] < 0) { // going up
-      position[1] = otherBox.pos.y + otherBox.h + body.entity.getHeight() / 2
+      position[1] = otherBox.pos.y + otherBox.h + correction // body.entity.getHeight() / 2
     } else if (body.velocity[1] > 0) { // going down
-      position[1] = otherBox.pos.y - body.entity.getHeight() / 2 // we're setting center of body, so accomodate its on width/height
+      position[1] = otherBox.pos.y - correction // body.entity.getHeight() / 2 // we're setting center of body, so accomodate its on width/height
     }
 
     this.postEdgify(body)

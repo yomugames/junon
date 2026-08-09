@@ -1,0 +1,15 @@
+{
+  "version": "v0.6.1.alpha",
+  "date": "July 15, 2026",
+  "title": "Maths update by KONTREVOLUCIA",
+  "content": {
+    "bugs": [],
+    "features": [
+      "Added $seedRandom, same as $random but uses seed at first argument function",
+      "Added exponent($exp) function",
+      "Added $radian function",
+      "Added $sin function",
+      "Added $cos function"
+    ]
+  }
+}

@@ -1264,7 +1264,15 @@ class BaseMob extends BaseEntity {
 
     return goal
   }
-
+  
+  removeAllGoals() {
+    this.goals.forEach((goal) => {
+      goal.remove()
+    })
+    
+    this.goals = []
+  }
+  
   removeGoalAt(index) {
     const goal = this.goals[index]
     if (!goal) return
@@ -1930,9 +1938,16 @@ class BaseMob extends BaseEntity {
   isRaidMember() {
     return !!this.raid
   }
-
+  
   onGridPositionChanged() {
     this.trackRegions()
+
+    this.game.triggerEvent("MobMove", {
+      entityId: this.getId(),
+      entityType: this.getTypeName(),
+      row: this.getRow(),
+      col: this.getCol()
+    })
   }
 
   getOccupiedRoom() {
@@ -2254,6 +2269,15 @@ class BaseMob extends BaseEntity {
     const multiplier = 1.09
     const base = startGold + Math.floor(startGold * multiplier * this.getLevel())
     return base
+  }
+
+  ping(id) {
+    let data = {
+      entityId: this.getId(),
+      entityType: this.getTypeName(),
+      pingId: parseInt(id)
+    }
+    this.game.triggerEvent("MobPinged", data)
   }
 
 }

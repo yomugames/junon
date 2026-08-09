@@ -1,16 +1,15 @@
-const BaseProjectile = require("./base_projectile")
+const CollidableProjectile = require("./collidable_projectile")
 const Protocol = require('../../../common/util/protocol')
 const Constants = require("./../../../common/constants.json")
-const p2 = require("p2")
 
-class Flame extends BaseProjectile {
-
+class Flame extends CollidableProjectile {
   constructor(data) {
     super(data)
 
     this.radialExpansion = 0
-    this.MAX_RADIAL_EXPANSION = 16
-    this.hasTriggered = false
+    this.MAX_RADIAL_EXPANSION = this.getConstants().maxRadialExpansion
+    
+    this.w = data.w || this.getConstants().minWidth // for security
   }
 
   getType() {
@@ -20,14 +19,14 @@ class Flame extends BaseProjectile {
   getConstantsTable() {
     return "Projectiles.Flame"
   }
-
+  
   move() {
-    if (this.shouldRemove) {
-      return this.cleanupAfterDelay()
-    }
-
+    super.move()
+  
     this.damageEntity()
     this.expandRadius()
+    
+    this.onStateChanged()
   }
 
   getAttackables() {
@@ -35,12 +34,6 @@ class Flame extends BaseProjectile {
   }
 
   damageEntity() {
-    if (this.hasTriggered) {
-      const isOneSecondInterval = this.game.timestamp % Constants.physicsTimeStep === 0
-      if (!isOneSecondInterval) return
-    }
-
-    this.hasTriggered = true
 
     let boundingBox = this.getBoundingBox()
 
@@ -62,12 +55,11 @@ class Flame extends BaseProjectile {
     })
 
   }
-
-
+  
   expandRadius() {
     if (this.stopExpanding) return
 
-    this.radialExpansion += 1
+    this.radialExpansion += 3
     this.setWidthFromExpansion()
 
     this.onStateChanged()
@@ -89,7 +81,10 @@ class Flame extends BaseProjectile {
   }
 
   onCollide(entity) {
-    // dont do anything
+    if (entity?.hasCategory("wall")) {
+      this.stopExpanding = true
+      this.onMoveComplete()
+    }
   }
 
 }

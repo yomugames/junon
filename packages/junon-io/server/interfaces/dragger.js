@@ -76,6 +76,7 @@ Dragger.prototype = {
     if (entity === this) return // cant drag self
     if (entity && entity.isPlayer()) return // cant drag player
     if (entity && entity.dragger) return // already being dragged by someone
+    if (entity.getContainer().passengers) return // cant drag if corpse is moving on tram
     if(!Helper.isTargetWithinRange(this, entity)) {
       this.showError("Too far", { isWarning: true })
       return false

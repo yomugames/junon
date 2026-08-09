@@ -857,6 +857,11 @@
                             <td>The max amount of hunger player currently has (usually 100). Ex. /chat @a $player now has maximum hunger of $getMaxHunger($player)</td>
                         </tr>
                         <tr>
+                            <td class="function_name">$getPlayerId</td>
+                            <td>$player</td>
+                            <td>The id of player.</td>
+                        </tr>
+                        <tr>
                             <td class='function_name'>$getOwner</td>
                             <td>buildingId</td>
                             <td>The id of owner. Ex. /setowner @b[type=wall] $getOwner(2917)</td>
@@ -865,6 +870,11 @@
                             <td class='function_name'>$random</td>
                             <td>min, max</td>
                             <td>A random number between min and max. Ex. $random(2,5)</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$seedRandom</td>
+                            <td>seed, min, max</td>
+                            <td>A random number between min and max, but uses seed. Ex. $random(42, 2,5)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$formatTime</td>
@@ -967,6 +977,11 @@
                             <td>Calculates the nth root of a number. Ex. $root(8,3) = 2</td>
                         </tr>
                         <tr>
+                            <td class='function_name'>$exp</td>
+                            <td>value</td>
+                            <td>Calculates Euler's number raised to the power of x. Ex. $exp(1) = 2.718...</td>
+                        </tr>
+                        <tr>
                             <td class='function_name'>$log</td>
                             <td>value1, value2</td>
                             <td>Calculates the logarithm of a number with optional base. Ex. $log(100,10) = 2</td>
@@ -977,6 +992,11 @@
                             <td>Returns the absolute value of a number. Ex. $abs(-4.5) = 4.5</td>
                         </tr>
                         <tr>
+                            <td class='function_name'>$tanh</td>
+                            <td>value</td>
+                            <td>Calculates hyperbolic tangent of a number.</td>
+                        </tr>
+                        <tr>
                             <td class='function_name'>$max</td>
                             <td>value1, value2, ... , valueN</td>
                             <td>Returns the largest value among the given arguments. Ex. $max(9,2,15) = 15</td>
@@ -985,6 +1005,31 @@
                             <td class='function_name'>$min</td>
                             <td>value1, value2, ... , valueN</td>
                             <td>Returns the smallest value among the given arguments. Ex. $min(1,2,3,4,5) = 1</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$radian</td>
+                            <td>value</td>
+                            <td>Turns out angle into radian. Ex. $radian(90) = π/2 ≈ 1.5707...</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$sin</td>
+                            <td>value</td>
+                            <td>Calculates sin of a number.</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$cos</td>
+                            <td>value</td>
+                            <td>Calculates cos of a number.</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$tan</td>
+                            <td>value</td>
+                            <td>Calculates tangent of a number.</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$atan2</td>
+                            <td>y, x</td>
+                            <td>Returns angle of in radians from y/x.</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$isLoggedIn</td>
@@ -1019,22 +1064,37 @@
                         <tr>
                             <td class='function_name'>$getPlatformByCoords</td>
                             <td>$row, $col</td>
-                            <td>Returns the id of a platform based on the row and col specified. Ex. /chat @a the id of the floor at 2, 2 is $getPlatformByCoords(2,2)td>
+                            <td>Returns the id of a platform based on the row and col specified. Ex. /chat @a the id of the floor at 2, 2 is $getPlatformByCoords(2,2)</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$hasEffect</td>
                             <td>$entityId, effectName</td>
-                            <td>true if the entity, player, or building gets the specified effect. false if not.</td>
+                            <td>true if the entity, player, or building gets the specified effect. false if not</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getTotalMobCount</td>
                             <td>None</td>
-                            <td>Returns the total count of all mobs in the game sector (hostile + neutral).</td>
+                            <td>Returns the total count of all mobs in the game sector (hostile + neutral)</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getGoal</td>
+                            <td>$entityId</td>
+                            <td>Returns the goal of mob</td>
                         </tr>
                         <tr>
                             <td class='function_name'>$getAngle</td>
-                            <td>$player</td>
-                            <td>Returns the angle of the specified player. Ex. /chat @a $getAngle($player)</td>
+                            <td>$entityId/$playerId</td>
+                            <td>Returns the angle of the specified entity or player. Ex. /chat @a $getAngle($entityId/$playerId)</td>
+                        </tr>
+                        <tr>
+                            <td class='function_name'>$getName</td>
+                            <td>$entityId/$playerId</td>
+                            <td>Returns the name of the specified entity or player. Ex. /chat @a $getName($entityId/$playerId)</td>
+                        </tr>
+                        <tr>
+                            <td class="function_name">$getIsPowered</td>
+                            <td>$buildingId</td>
+                            <td>Returns true if building is powered, else false</td>
                         </tr>
                         <tr>
                             <td class="function_name">$getUsage</td>
@@ -1047,6 +1107,7 @@
                             <td>Returns the usage capacity of an item</td>
                         </tr>
                         <tr>
+<<<<<<< HEAD
                             <td class="function_name">$getNthLetter</td>
                             <td>index, word</td>
                             <td>Returns the Nth letter of a word</td>
@@ -1055,6 +1116,16 @@
                             <td class="function_name">$getNthWord</td>
                             <td>index, string</td>
                             <td>Returns the Nth word of a string</td>
+=======
+                            <td class="function_name">$getForceX</td>
+                            <td>$entityId</td>
+                            <td>Returns the x force applied on entity</td>
+                        </tr>
+                        <tr>
+                            <td class="function_name">$getForceY</td>
+                            <td>$entityId</td>
+                            <td>Returns the y force applied on entity</td>
+>>>>>>> ebc575deca280ce9a470d80853662fd49f17e521
                         </tr>
                     </table>
                 </div>
@@ -1202,8 +1273,10 @@
             </div>
             <div class='inventory_header'><%= t('Ingredients') %></div>
             <div class='crafting_requirements'></div>
-            <input class='craft_count' maxlength="2" type='number' min='1' max='99' value='1' />
-            <button class='craft_btn' ><%= t('Craft') %></button>
+            <div class='crafting_options'>
+                <input class='craft_count' maxlength="2" type='number' min='1' max='99' value='1' />
+                <button class='craft_btn' ><%= t('Craft') %></button>
+            </div>
             <div class='product_unavailable_notice'></div>
         </div>
     </div>
@@ -1440,8 +1513,10 @@
             </div>
             <div class='inventory_header'><%= t('Ingredients') %></div>
             <div class='crafting_requirements'></div>
-            <input class='craft_count' maxlength="2" type='number' min='1' max='99' value='1' />
-            <button class='craft_btn' ><%= t('Craft') %></button>
+            <div class='crafting_options'>
+                <input class='craft_count' maxlength="2" type='number' min='1' max='99' value='1' />
+                <button class='craft_btn' ><%= t('Craft') %></button>
+            </div>
         </div>
     </div>
 

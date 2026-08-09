@@ -13,6 +13,10 @@ class Terminal extends BaseBuilding {
         message = user.replaceBadWords(message)
         message = user.sanitize(message)
         if (!message) return
+        this.game.triggerEvent("PlayerTerminalMessage", {
+          message: message,
+          player: user.getName()
+        })
         this.sector.addTerminalMessage(user, message)
       }
 

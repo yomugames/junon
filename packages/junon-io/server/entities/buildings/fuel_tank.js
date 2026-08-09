@@ -10,10 +10,8 @@ class FuelTank extends BaseBuilding {
     let refueableEquipments = [Protocol.definition().BuildingType.Lighter, Protocol.definition().BuildingType.FlameThrower]
 
     if (handEquipment && refueableEquipments.indexOf(handEquipment.getType()) !== -1) {
-      let amountDrained = this.consumeResource("fuel", handEquipment.getResourceConsumption("fuel"))
-      let requirementPercentage = (amountDrained / handEquipment.getResourceConsumption("fuel"))  
-      let amountToAdd = Math.floor(requirementPercentage * handEquipment.getUsageCapacity())
-      handEquipment.setUsage(handEquipment.getUsage() + amountToAdd)
+      let amount = this.consumeResource("fuel", Math.min(this.getResourceStored("fuel"), handEquipment.getUsageCapacity()))
+      handEquipment.setUsage(handEquipment.getUsage() + amount)
     }
   }
 

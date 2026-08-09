@@ -247,9 +247,10 @@ Taintable.prototype = {
 
   removeEffect(effectName) {
     if (!this.effects) return
+    this.setEffectLevel(effectName, 0)
       
-    delete this.effects[effectName]
-    this.onEffectRemoved(effectName)
+    // delete this.effects[effectName]
+    // this.onEffectRemoved(effectName)
   },
 
   removeAllEffects() {
@@ -278,4 +279,3 @@ Taintable.prototype = {
 }
 
 module.exports = Taintable
-

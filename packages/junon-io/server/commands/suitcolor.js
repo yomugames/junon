@@ -17,12 +17,12 @@ class SuitColor extends BaseCommand {
     return ["gray", "red", "green", "blue", "orange", "purple", "yellow", "black"]
   }
 
-  perform(player, args) {
+  perform(caller, args) {
     const selector = args[0]
     const color = args[1]
 
     if (this.getAvailableSuitColors().indexOf(color) === -1) {
-      player.showChatError("Invalid color")
+      caller.showChatError("Invalid color")
       return
     }
 

@@ -53,7 +53,7 @@ class Pickup extends BaseEntity {
 
     return new TWEEN.Tween(position)
         .to({ position: origPosition + 20 }, 1000)
-        .easing(TWEEN.Easing.Linear.None)
+        .easing(TWEEN.Easing.Quadratic.InOut) 
         .onUpdate(() => {
           this.sprite.position.y = position.position
         })

@@ -23,11 +23,13 @@ class GetNthLetter extends BaseCommand {
         let word = args[1];
         if (!word || typeof word !== "string") {
             caller.showChatError("Invalid word");
+            this.game.executeCommand(this.sector, `/variable set word undefined`);
             return;
         }
 
         if (index < 1 || index > word.length) {
             caller.showChatError("Invalid index");
+            this.game.executeCommand(this.sector, `/variable set word undefined`);
             return;
         }
 

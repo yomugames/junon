@@ -1256,12 +1256,17 @@ class Server {
 
       try {
         game.recordClock()
+        // less lag tolerance for guest worlds
+        let limit = game.isCreatedByAnonynmous() ? 400 : 1200
+        
         let startProcessTime = (new Date()).getTime()
         game.stepWorld()
         game.sendUpdates()
         let endProcessTime = (new Date()).getTime()
+        
         // remove worlds that are likely too resource-intensive
-        if(endProcessTime - startProcessTime >= 300){
+        if(endProcessTime - startProcessTime >= limit){
+          game.isGameReady = false
           game.forEachPlayer((player) => {
             if (player.socket) player.socket.close()
             player.remove()

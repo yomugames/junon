@@ -5,13 +5,14 @@ const Protocol = require('../../common/util/protocol')
 class Interact extends BaseCommand {
   getUsage() {
     return [
-      "/interact [entity_id] [open|close]",
-      "/interact [entity_id] angle [0-360]",
-      "/interact [entity_id] generate [type]",
-      "/interact [entity_id] processingrate [1-5]",
-      "/interact [entity_id] unown",
-      "/interact [entity_id] shoot",
-      "/interact [entity_id] content"
+      "/interact [entityId] [open|close]",
+      "/interact [entityId] angle [0-360]",
+      "/interact [entityId] generate [type]",
+      "/interact [entityId] processingrate [1-5]",
+      "/interact [entityId] unown",
+      "/interact [entityId] shoot",
+      "/interact [entityId] content",
+      "/interact [entityId] attack [target]"
     ]
   }
 
@@ -31,14 +32,14 @@ class Interact extends BaseCommand {
     }
 
     entities.forEach((entity) => {
-      if (entity.isBuilding()) {
-        if (operation === "angle") {
-          const angle = parseInt(args[2])
-          if (!isNaN(angle)) {
-            entity.setAngle(angle)
-          }
+      if (operation === "angle") {
+        const angle = parseInt(args[2])
+        if (!isNaN(angle)) {
+          entity.setAngle(angle)
         }
+      }
 
+      if (entity.isBuilding()) {
         if (operation === "generate") {
           if (entity.hasCategory("mining_drill")) {
             const output = args[2]
@@ -71,7 +72,7 @@ class Interact extends BaseCommand {
           }
         }
 
-        if (entity.hasCategory("door")) {
+        if (entity.hasCategory("door") || entity.hasCategory("switch")) {
           if (operation === "open") {
             entity.open()
           } else if (operation === "close") {
@@ -90,6 +91,16 @@ class Interact extends BaseCommand {
         }
 
       }
+      if (operation === "attack") {
+        if (entity.isMob() || entity.isBuilding()) {
+          const target = this.game.getEntityByNameOrId(args[2])
+          
+          if (target && typeof entity.performAttack === 'function') {
+            entity.performAttack(target)
+          }
+        }
+      }
+      
     })
 
   }

@@ -71,6 +71,13 @@
         "message": "message sent by player"
       }
     },
+    "PlayerTerminalMessage": {
+      "description": "Event triggered when a player sends a terminal message",
+      "variables": {
+        "player": "username of player",
+        "message": "message sent by player"
+      }
+    },
     "PlayerAttacked": {
       "description": "Event triggered when a player gets damaged",
       "variables": {
@@ -97,7 +104,16 @@
       "variables": {
         "player": "username of player",
         "row": "row position of player",
-        "col": "row position of player"
+        "col": "column position of player"
+      }
+    },
+    "MobMove": {
+      "description": "Event triggered when mob changes position",
+      "variables": {
+        "entityId": "id of mob",
+        "entityType": "type of mob",
+        "row": "row position of mob",
+        "col": "column position of mob"
       }
     },
     "PlayerRespawn": {
@@ -218,6 +234,13 @@
         "entityType": "type of building ",
         "player": "username of player",
         "playerId": "id of player"
+      }
+    },
+    "BuildingDestroyed": {
+      "description": "Event triggered when a building gets destroyed",
+      "variables": {
+        "entityId": "id of building ",
+        "entityType": "type of building "
       }
     },
     "AsteroidMined": {
@@ -515,10 +538,42 @@
     "ButtonClicked": {
       "description": "Event triggered when a player clicks custom button",
       "variables": {
-        "player": "username of player that clicked",
         "playerId":"id of player",
+        "player": "username of player that clicked",
         "entityId": "id of entity button attached",
         "name": "name of button clicked"
+      }
+    },
+    "PlayerPinged": {
+      "description": "Event triggered when a player is pinged by command",
+      "variables": {
+        "playerId":"id of player",
+        "player": "username of player",
+        "pingId": "id of ping"
+      }
+    },
+    "BuildingPinged": {
+      "description": "Event triggered when a building is pinged by command",
+      "variables": {
+        "entityId":"id of building",
+        "entityType": "type of building",
+        "pingId": "id of ping"
+      }
+    },
+    "MobPinged": {
+      "description": "Event triggered when a mob is pinged by command",
+      "variables": {
+        "entityId":"id of mob",
+        "entityType": "type of mob",
+        "pingId": "id of ping"
+      }
+    },
+    "IsPowerChanged": {
+      "description": "Event triggered when a building power state changes",
+      "variables": {
+        "entityId":"id of building",
+        "entityType": "type of building",
+        "isPowered": "true if powered, false if not"
       }
     },
     "Timer:start": {
@@ -1061,10 +1116,10 @@
         "rotation": 90
       },
       "stats": {
-        "health": 30,
+        "health": 100,
         "damage": 10,
         "range": 32,
-        "los": 256
+        "los": 512
       },
       "upgrade": {
         "health": "+10",
@@ -1115,7 +1170,7 @@
         "height": 72
       },
       "stats": {
-        "health": 150,
+        "health": 200,
         "damage": 12,
         "range": 256,
         "los": 256
@@ -1160,7 +1215,7 @@
         "rotation": 90
       },
       "stats": {
-        "health": 90,
+        "health": 125,
         "damage": 1,
         "range": 256,
         "los": 256,
@@ -1171,8 +1226,8 @@
       "parent": "Mobs.BaseMob",
       "hasBlood": true,
       "drop": ["Flamethrower"],
-      "resistance": ["fire"],
-      "immunity": ["poison"],
+      "isFlamable": false,
+      "immunity": ["poison", "fire"],
       "canTargetTraps": true,
       "canFly": true,
       "cost": {
@@ -1197,8 +1252,8 @@
         "health": 150,
         "damage": 1,
         "range": 256,
-        "los": 256,
-        "reload": 8000
+        "los": 512,
+        "reload": 100
       }
     },
     "DummyPlayer": {
@@ -1652,16 +1707,14 @@
       "height": 256,
       "drop": "SquidLordHeart",
       "stats": {
-        "speed": 4,
-        "reload": 3000,
+        "speed": 6,
+        "reload": 300,
         "health": 2000,
-        "damage": 10,
-        "range": 256,
-        "los": 384
+        "damage": 25,
+        "range": 128,
+        "los": 1024
       },
       "isFlamable": false,
-      "categories": {"flying": true},
-      "shouldAttackIgnoreObstacle": true,
       "isBuildingDestroyer": true,
       "attackGroups": ["players", "buildings", "mobs"],
       "sprite": {
@@ -1679,12 +1732,12 @@
     "Drone": {
       "parent": "Mobs.BaseMob",
       "stats": {
-        "speed": 4,
-        "reload": 3000,
-        "health": 200,
-        "damage": 10,
-        "range": 256,
-        "los": 384
+        "speed": 12,
+        "reload": 500,
+        "health": 50,
+        "damage": 20,
+        "range": 512,
+        "los": 718
       },
       "isFlamable": false,
       "immunity": ["poison"],
@@ -1708,11 +1761,11 @@
       "parent": "Mobs.BaseMob",
       "stats": {
         "speed": 4,
-        "reload": 3000,
-        "health": 800,
-        "damage": 5,
-        "range": 384,
-        "los": 512
+        "reload": 250,
+        "health": 1500,
+        "damage": 25,
+        "range": 128,
+        "los": 1024
       },
       "isFlamable": false,
       "immunity": ["poison"],
@@ -1936,13 +1989,14 @@
     "BlueLaser": {
       "width": 5,
       "height": 5,
-      "speed": 15,
+      "speed": 60,
       "damage": 75,
       "sprite": {
         "width": 32,
-        "height": 4
-      }
-
+        "height": 4,
+        "tint": "#0000ff"
+      },
+      "categories": {"distance_dependent_width": true}
     },
     "MiningBeam": {
       "width": 32,
@@ -1973,7 +2027,7 @@
     "Bubble": {
       "width": 32,
       "height": 32,
-      "speed": 12
+      "speed": 48
     },
     "BlasterLaser": {
       "width": 24,
@@ -2013,19 +2067,19 @@
       "canDamageWalls": true,
       "width": 16,
       "height": 16,
-      "speed": 8
+      "speed": 20
     },
     "Dynamite": {
       "canDamageWalls": true,
       "width": 16,
       "height": 16,
-      "speed": 8
+      "speed": 20
     },
     "MolotovCocktail": {
       "canDamageWalls": false,
       "width": 24,
       "height": 28,
-      "speed": 12
+      "speed": 20
     },
     "Meteor": {
       "width": 64,
@@ -2035,7 +2089,7 @@
     "PoisonGrenade": {
       "width": 16,
       "height": 16,
-      "speed": 8
+      "speed": 20
     },
     "TeslaLaser": {
       "width": 10,
@@ -2057,13 +2111,13 @@
       "speed": 1
     },
     "Flame": {
-      "width": 32,
-      "height": 32,
-      "minWidth": 32,
-      "maxWidth": 64,
-      "maxRadialExpansion": 16,
-      "damage": 10,
-      "speed": 0,
+      "width": 16,
+      "height": 16,
+      "minWidth": 16,
+      "maxWidth": 32,
+      "maxRadialExpansion": 32,
+      "damage": 1,
+      "speed": 10,
       "categories": {"elemental":true,"fire":true}
     },
     "IonBeam": {
@@ -2084,7 +2138,7 @@
         "tint": "#ffff07"
       },
       "damage": 10,
-      "speed": 70,
+      "speed": 100,
       "categories": {"distance_dependent_width": true}
     },
     "ShotgunBullet": {
@@ -2096,18 +2150,18 @@
         "tint": "#777777"
       },
       "damage": 12,
-      "speed": 50,
+      "speed": 100,
       "categories": {"distance_dependent_width": true}
     },
     "RifleBullet": {
-      "width": 8,
-      "height": 8,
+      "width": 10,
+      "height": 12,
       "sprite": {
         "width": 32,
         "height": 5,
         "tint": "#666666"
       },
-      "speed": 70,
+      "speed": 100,
       "damage": 7,
       "categories": {"distance_dependent_width": true}
     },
@@ -2122,6 +2176,19 @@
       "isPiercing": true,
       "speed": 120,
       "damage": 40,
+      "categories": {"distance_dependent_width": true}
+    },
+    "MinigunBullet": {
+      "width": 10,
+      "height": 12,
+      "sprite": {
+        "width": 32,
+        "height": 5,
+        "tint": "#666666"
+      },
+      "isPiercing": true,
+      "damage": 10,
+      "speed": 100,
       "categories": {"distance_dependent_width": true}
     },
     "Missile": {
@@ -2530,7 +2597,7 @@
         "range": 250
       },
       "requirements": {
-        "SulfurOre": 1
+        "SulfurOre": 10
       },
       "upgrade": {},
       "description": "Ammunition for Plasma Gun"
@@ -2731,6 +2798,7 @@
     "Gelatin": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "cost": {
         "gold": 15
       },
@@ -2819,6 +2887,7 @@
     "HotDog": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "sprite": {
         "position": {
           "x": 60,
@@ -2841,6 +2910,7 @@
     "Bread": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "isIngredient": true,
       "sprite": {
         "position": {
@@ -2864,6 +2934,7 @@
     "VeganPizza": {
       "width": 40,
       "height": 40,
+      "isCooked": true,
       "sprite": {
         "position": {
           "x": 95,
@@ -2886,6 +2957,7 @@
     "SlimyMeatPizza": {
       "width": 40,
       "height": 40,
+      "isCooked": true,
       "cost": {
         "gold": 500
       },
@@ -2908,6 +2980,7 @@
     "LectersDinner": {
       "width": 40,
       "height": 40,
+      "isCooked": true,
       "cost": {
         "gold": 300
       },
@@ -3033,6 +3106,7 @@
     "Fries": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "cost": {
         "gold": 100
       },
@@ -3056,6 +3130,7 @@
     "Steak": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "cost": {
         "gold": 200
       },
@@ -3098,6 +3173,7 @@
     "PotatoSoup": {
       "width": 32,
       "height": 32,
+      "isCooked": true,
       "cost": {
         "gold": 200
       },
@@ -3118,6 +3194,7 @@
     "SlimeBroth": {
       "width": 32,
       "height": 32,
+      "isCooked": true,
       "cost": {
         "gold": 200
       },
@@ -3137,6 +3214,7 @@
     "MisoSoup": {
       "width": 32,
       "height": 32,
+      "isCooked": true,
       "cost": {
         "gold": 200
       },
@@ -3156,6 +3234,7 @@
     "Omelette": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "cost": {
         "gold": 200
       },
@@ -3178,6 +3257,7 @@
     "Nigiri": {
       "width": 24,
       "height": 24,
+      "isCooked": true,
       "cost": {
         "gold": 400
       },
@@ -3202,6 +3282,7 @@
     "PumpkinPie": {
       "width": 32,
       "height": 32,
+      "isCooked": true,
       "cost": {
         "gold": 250
       },
@@ -3374,6 +3455,18 @@
         "range": 32
       }
     },
+    "RangeEquipment": {
+      "parent": "Equipments.BaseEquipment",
+      "abstract": true,
+      "isAnimatable": true,
+      "projectileBiasByX": 0,
+      "projectileBiasByY": 0,
+      "projectileBarrelLength": 1,
+      "stats": {
+        "range": 32,
+        "spreadAngle": 0
+      }
+    },
     "Syringe": {
       "parent": "Equipments.BaseEquipment",
       "isWeapon": true,
@@ -3521,18 +3614,19 @@
       "description": "Mines Asteroids faster. Damage 5"
     },
     "Deconstructor": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "canDamageWalls": true,
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 2050
       },
+      "projectileBarrelLength": 1.84375,
       "stats": {
-        "range": 1500,
-        "damage": 100,
+        "range": 1024,
+        "damage": 20,
         "health": 20,
-        "reload": 2000
+        "reload": 500
       },
       "requirements": {
         "IronBar": 95,
@@ -3543,135 +3637,283 @@
       "description": "An energy powered gun which easily destroys buildings"
     },
     "Pistol": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 250
       },
+      "projectileBarrelLength": 2,
       "stats": {
-        "range": 960,
-        "damage": 10,
+        "range": 512,
+        "damage": 20,
+        "usageCapacity": 175,
         "health": 300,
-        "reload": 500
+        "reload": 500,
+        "spreadAngle": 2.5
       },
       "requirements": {
         "IronBar": 10,
         "CopperBar": 10
       },
-      "description": "Range weapon. Damage 10"
+      "description": "Range weapon. Damage 20"
+    },
+    "Uzi": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 250
+      },
+      "projectileBarrelLength": 2.75,
+      "stats": {
+        "range": 512,
+        "damage": 10,
+        "usageCapacity": 500,
+        "health": 300,
+        "reload": 100,
+        "burstCount": 2,
+        "burstTimeout": 100,
+        "spreadAngle": 3.5
+      },
+      "requirements": {
+        "IronBar": 40,
+        "CopperBar": 20
+      },
+      "description": "SMG Weapon. Damage 10"
     },
     "Shotgun": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 550
       },
+      "projectileBarrelLength": 2.5,
       "stats": {
-        "range": 256,
-        "damage": 12,
+        "range": 512,
+        "damage": 8,
+        "usageCapacity": 750,
         "health": 300,
-        "reload": 1500
+        "reload": 950,
+        "spreadAngle": 10,
+        "burstCount": 8
       },
       "requirements": {
-        "IronBar": 20,
-        "CopperBar": 20
+        "IronBar": 80,
+        "CopperBar": 20,
+        "Wood": 10
       },
-      "description": "Spread shot weapon. Each Deals Damage 12"
+      "description": "Spread shot weapon. Each shell deals 12 damage."
     },
     "PlasmaGun": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 2000
       },
+      "projectileBarrelLength": 4,
       "stats": {
         "range": 1280,
-        "damage": 52,
+        "damage": 75,
+        "usageCapacity": 250,
         "health": 300,
-        "reload": 1200
+        "reload": 3000,
+        "spreadAngle": 1
       },
       "requirements": {
-        "CopperBar": 20,
-        "Meteorite": 20
+        "CopperBar": 200,
+        "CircuitBoard": 20,
+        "Meteorite": 50
       },
       "description": "Concentrated Energy Shot weapon"
     },
     "AssaultRifle": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 900
       },
+      "projectileBarrelLength": 2.5,
       "stats": {
         "range": 960,
-        "damage": 7,
+        "damage": 10,
+        "usageCapacity": 300,
         "health": 300,
-        "reload": 1000
+        "reload": 500,
+        "burstCount": 5,
+        "burstTimeout": 100,
+        "spreadAngle": 5
       },
       "requirements": {
-        "IronBar": 30,
+        "IronBar": 80,
         "CopperBar": 30
       },
-      "description": "Burst Weapon that shoots fast projectiles"
+      "description": "Burst Rifle that shoots fast projectiles"
     },
     "Scar17": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 700
       },
+      "projectileBarrelLength": 3.125,
       "stats": {
-        "range": 960,
-        "damage": 9,
+        "range": 1024,
+        "damage": 30,
+        "usageCapacity": 1000,
         "health": 300,
-        "reload": 1200
+        "reload": 200,
+        "spreadAngle": 1.5
       },
       "requirements": {
-        "IronBar": 70,
-        "CopperBar": 70
+        "IronBar": 250,
+        "CopperBar": 50
       },
-      "description": "Burst Weapon that shoots fast projectiles"
+      "description": "Semi Automatic Battle Rifle that shoots fast and powerful projectiles"
+    },
+    "Ak47": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 700
+      },
+      "projectileBarrelLength": 2.5,
+      "stats": {
+        "range": 768,
+        "damage": 15,
+        "usageCapacity": 10000,
+        "health": 300,
+        "reload": 500,
+        "burstCount": 5,
+        "burstTimeout": 100,
+        "spreadAngle": 4.5
+      },
+      "requirements": {
+        "IronBar": 150,
+        "CopperBar": 20,
+        "Wood": 10
+      },
+      "description": "Kalashnikov's extremely durable assault rifle. Burst Weapon that shoots fast projectiles on short and medium distances"
+    },
+    "BoltActionRifle": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 700
+      },
+      "projectileBarrelLength": 2.5,
+      "stats": {
+        "range": 2048,
+        "damage": 50,
+        "usageCapacity": 500,
+        "health": 300,
+        "reload": 2000,
+        "spreadAngle": 0.5
+      },
+      "requirements": {
+        "IronBar": 150,
+        "CopperBar": 20
+      },
+      "description": "Accurate and powerful Weapon that shoots fast projectiles"
+    },
+    "Minigun": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 700
+      },
+      "projectileBiasByY": 7,
+      "projectileBarrelLength": 3.46875,
+      "stats": {
+        "range": 512,
+        "damage": 10,
+        "usageCapacity": 2500,
+        "health": 300,
+        "reload": 100,
+        "burstCount": 10,
+        "burstTimeout": 50,
+        "spreadAngle": 10
+      },
+      "requirements": {
+        "IronBar": 300,
+        "CopperBar": 20
+      },
+      "description": "Absolutely lethal power Weapon. Damage 10 per bullet"
+    },
+    "GrenadeLauncher": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 700
+      },
+      "projectileBarrelLength": 3.875,
+      "stats": {
+        "range": 716,
+        "damage": 50,
+        "usageCapacity": 1000,
+        "health": 300,
+        "reload": 3000,
+        "spreadAngle": 7.5
+      },
+      "requirements": {
+        "IronBar": 200,
+        "CopperBar": 50
+      },
+      "description": "Powerful Weapon that shoots grenades."
     },
     "RocketLauncher": {
-      "parent": "Equipments.BaseEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
         "gold": 900
       },
+      "projectileBiasByY": 7.5,
+      "projectileBarrelLength": 0.71875,
       "stats": {
-        "range": 960,
+        "range": 768,
         "damage": 25,
         "health": 300,
-        "reload": 1000
+        "reload": 2000,
+        "spreadAngle": 3
       },
       "requirements": {
+        "IronBar": 100,
+        "CopperBar": 150,
         "SulfurOre": 2,
         "CircuitBoard": 20
       },
       "description": "Shoots missiles towards target enemy"
     },
     "FlameThrower": {
-      "parent": "Equipments.MeleeEquipment",
+      "parent": "Equipments.RangeEquipment",
       "isWeapon": true,
+      "isFireArm": true,
       "cost": {
         "gold": 450
       },
-      "isFireArm": true,
       "shouldNotRemoveOnBreak": true,
+      "projectileBarrelLength": 2.5,
       "stats": {
-        "damage": 2,
-        "usageCapacity": 20,
-        "fuelConsumption": 80,
-        "range": 200
+        "damage": 1,
+        "reload": 100,
+        "usageCapacity": 500,
+        "fuelConsumption": 1,
+        "range": 300,
+        "burstCount": 5,
+        "burstTimeout": 25,
+        "spreadAngle": 10
       },
       "requirements": {
-        "CopperBar": 30
+        "CopperBar": 100
       },
       "description": "Shoots flames"
     },
@@ -3731,9 +3973,9 @@
         "gold": 1000
       },
       "stats": {
-        "damage": 25,
+        "damage": 50,
         "range": 256,
-        "reload": 1000
+        "reload": 750
       },
       "requirements": {
         "Explosives": 1,
@@ -5003,6 +5245,7 @@
     "Cage": {
       "width": 32,
       "height": 32,
+      "categories": {"custom_colors": true},
       "cost": {
         "gold": 50
       },
@@ -6035,19 +6278,33 @@
       "description": "Airtight door. No power required to operate"
     },
     "SmallAirlock": {
-      "width": 64,
+      "width": 32,
       "height": 32,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "isUpgradable": true,
+      "isAirtight": true,
+      "categories": {"door":true,"melee_resistant":true},
+      "minimapColor": "#3bceaa",
+      "requirements": {
+        "IronBar": 5
+      },
       "cost": {
         "gold": 50
+      },
+      "sprite":{
+        "width": 32,
+        "height": 32
       },
       "stats": {
         "health": 100,
         "count": 125
       },
       "upgrade": {
-        "health": "+25",
-        "count": "+25"
-      }
+        "health": "+15",
+        "count": "+15"
+      },
+      "description":"A smaller airtight door."
     },
     "ResearchTable": {
       "width": 32,
@@ -6670,17 +6927,20 @@
       "categories": {"turret":true,"editable_targets":true},
       "stats": {
         "reload": 2000,
-        "damage": 10,
+        "damage": 2,
         "range": 288,
         "health": 200,
-        "fuelConsumption": 25,
-        "fuelCapacity": 100,
+        "fuelConsumption": 1,
+        "fuelCapacity": 500,
         "powerConsumption": 100,
-        "clientResource": "fuel"
+        "clientResource": "fuel",
+        "burstCount": 5,
+        "burstTimeout": 25,
+        "spreadAngle": 10
       },
       "requirements": {
-        "IronBar": 20,
-        "CopperBar": 40
+        "IronBar": 80,
+        "CopperBar": 175
       },
       "upgrade": {
         "damage": "+3",
@@ -6780,8 +7040,8 @@
         "powerConsumption": 750
       },
       "requirements": {
-        "IronBar": 50,
-        "Meteorite": 20,
+        "IronBar": 100,
+        "Meteorite": 30,
         "CircuitBoard": 20
       },
       "upgrade": {
@@ -6812,8 +7072,8 @@
         "powerConsumption": 200
       },
       "requirements": {
-        "IronBar": 50,
-        "SulfurOre": 30,
+        "IronBar": 200,
+        "SulfurOre": 15,
         "CircuitBoard": 15
       },
       "upgrade": {
@@ -6844,7 +7104,8 @@
         "powerConsumption": 250
       },
       "requirements": {
-        "IronBar": 50,
+        "IronBar": 200,
+        "CopperBar": 150,
         "SulfurOre": 10,
         "CircuitBoard": 20
       },

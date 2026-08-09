@@ -2894,7 +2894,7 @@ html[lang='ru'] #blueprint_menu {
 
 #product_main_container .craft_btn {
     float: none;
-    margin-top: 25px;
+    margin-top: 0px;
 }
 
 .ui_btn {
@@ -3293,6 +3293,14 @@ html[lang='ru'] .blueprint_name {
     margin-left: 10px;
 }
 
+.crafting_options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 15px;
+}
+
 .crafting_requirements .inventory_slot {
     width: 30px;
     height: 30px;
@@ -3377,13 +3385,13 @@ html[lang='ru'] .blueprint_name {
     color: white;
     text-align: center;
     width: 50px;
-    height: 26px;
+    height: 30px;
     vertical-align: middle;
 }
 
 .buy_count {
     float: right;
-    margin-top: 2px;
+    /* margin-top: 2px; */
 }
 
 input[type=number]::-webkit-inner-spin-button,

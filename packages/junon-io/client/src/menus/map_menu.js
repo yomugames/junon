@@ -57,6 +57,7 @@ class MapMenu extends BaseMenu {
   reinit() {
     // the grid size is 200x200. map is 600px by 600px wide
     let sectorColCount = this.game.sector.getColCount()
+    this.alerts = {}
 
     this.zoomMultiplier = Math.floor(this.mapSize / sectorColCount)
   }

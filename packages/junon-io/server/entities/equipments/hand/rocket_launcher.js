@@ -1,35 +1,26 @@
-const HandEquipment = require("./hand_equipment")
+const RangeEquipment = require("./range_equipment")
 const Projectiles = require("./../../projectiles/index")
 
 const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
 
 
-class RocketLauncher extends HandEquipment {
+class RocketLauncher extends RangeEquipment {
+  getProjectileType() {
+    return Projectiles.Missile
+  }
+  
+  constructProjectileData(data) {
+    let projectileData = super.constructProjectileData(data)
+    
+    projectileData.shouldCreateExplosion = true,
+    projectileData.shouldAttackBuildings = true
+    
+    return projectileData
+  }
 
   use(user, targetEntity) {
-    if (!user.hasInfiniteAmmo()) {
-      const ammoType = this.getAmmoType()
-      const ammo = user.inventory.search(ammoType)
-      if (!ammo) {
-        user.showError("Missile Required")
-        return false
-      }
-
-      ammo.reduceCount(1)
-    }
-
     super.use(user, targetEntity)
-
-    let sourcePoint = user.game.pointFromDistance(user.getX(), user.getY(), Constants.tileSize, user.getRadAngle())
-
-    const projectile = Projectiles.Missile.build({
-      weapon:        this,
-      source:      { x: sourcePoint[0],         y: sourcePoint[1] },
-      destination: user.getShootTarget(this),
-      shouldCreateExplosion: true,
-      shouldAttackBuildings: true
-    })
 
     return true
   }

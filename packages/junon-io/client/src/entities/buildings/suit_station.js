@@ -12,6 +12,8 @@ class SuitStation extends BaseBuilding {
   onContentChanged() {
     const armorType = this.content
 
+    // just remove armor when content change
+    if (this.armor) this.armor.remove()
     if (armorType) {
       let suitType = armorType.split(":")[0]
       let color = armorType.split(":")[1]
@@ -22,9 +24,6 @@ class SuitStation extends BaseBuilding {
       }
 
       this.armor = Equipments.forType(suitType).build(this.game, data)
-    } else if (this.armor) {
-      // no more armor in storage, remove it
-      this.armor.remove()
     }
   }
 

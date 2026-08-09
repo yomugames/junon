@@ -9,11 +9,11 @@ class FlameThrower extends RangeEquipment {
   repositionSprite() {
     super.repositionSprite()
 
-    this.sprite.position.x = 30
+    this.sprite.position.x = 25
   }
 
   getSpritePath() {
-    return 'flame_thrower.png'
+    return 'flame_thrower_reskin.png'
   }
 
   getType() {

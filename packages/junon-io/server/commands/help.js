@@ -63,6 +63,7 @@ class Help extends BaseCommand {
         player.showChatSuccess("/setting   - modify settings")
         player.showChatSuccess("/chat      - send chat message to players")
         player.showChatSuccess("/suitcolor - change spacesuit color")
+        player.showChatSuccess("/projectile - spawn projectiles")
         player.showChatSuccess("/variable  - create variables for command block")
         player.showChatSuccess("/respawn   - respawn player")
         player.showChatSuccess("/health    - manage health")
@@ -81,6 +82,8 @@ class Help extends BaseCommand {
         player.showChatSuccess("/unmute      - unmute a specified player")
         player.showChatSuccess("/playsound      - play specific sounds")
         player.showChatSuccess("/path      - create and manage paths")
+        player.showChatSuccess("/ping      - ping an entity")
+        player.showChatSuccess("/goal      - manage mob(s) goals")
       }
     }
     player.showChatSuccess("\n")

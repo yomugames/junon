@@ -30,9 +30,9 @@ class Timer extends ActionEntry {
     if (key === 'name') {
       this.timer.name = value
     } else if (key === 'duration') {
-      this.timer.duration = parseInt(value)
+      this.timer.duration = parseFloat(value)
     } else if (key === 'every') {
-      this.timer.every = parseInt(value)
+      this.timer.every = parseFloat(value)
     }
 
     this.redraw()
@@ -157,7 +157,7 @@ class Timer extends ActionEntry {
 
     let timerInput = document.createElement("input") 
     timerInput.setAttribute("type", "number")
-    timerInput.setAttribute("min", "1")
+    timerInput.setAttribute("min", "0.05")
     timerInput.classList.add("black_input")
     timerInput.addEventListener("change", this.onEveryChanged.bind(this), true)
 

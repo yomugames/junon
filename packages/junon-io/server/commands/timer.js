@@ -41,7 +41,7 @@ class Timer extends BaseCommand {
           return
         }
 
-        let duration = parseInt(args[2])
+        let duration = parseFloat(args[2])
         if (isNaN(duration) || duration < 0) {
           caller.showChatError("invalid duration")
           return

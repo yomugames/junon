@@ -83,14 +83,14 @@ class Variable extends BaseCommand {
       case "set":
         key = args[1]
         value = args.slice(2).join(" ") || ""
-        value = value.substring(0, 1000)
+        value = value.substring(0, 100000)
 
         if (this.getReservedVariableNames()[key]) {
           caller.showChatError("Cannot use reserved variable name")
         } else if (this.sector.eventHandler.hasReachedMaxVariableCount()) {
-          caller.showChatError("reached max limit of 100 variables")
+          caller.showChatError("Reached max limit of 10000 variables")
         } else if (this.hasInvalidCharacter(key)) {
-          caller.showChatError("invalid variable name")
+          caller.showChatError("Invalid variable name")
         } else if (key) {
           this.sector.eventHandler.setVariable(key, value)
           caller.showChatSuccess([key, value].join("="))

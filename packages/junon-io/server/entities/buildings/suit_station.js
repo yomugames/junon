@@ -127,6 +127,15 @@ class SuitStation extends BaseBuilding {
     return item.isArmor()
   }
 
+  store(item) {
+    // to prevent non-armors from being stored
+    if(item.isArmor()) {
+      super.store(item)
+    } else {
+      return
+    }
+  }
+
   onStorageChanged(item, index) {
     super.onStorageChanged(item, index)
 

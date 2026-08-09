@@ -4,20 +4,14 @@ const Protocol = require("./../../../../common/util/protocol")
 const ClientHelper = require("./../../util/client_helper")
 
 class Flame extends BaseProjectile {
-
   constructor(game, data) {
     super(game, data)
-
+    
     this.MAX_WIDTH_EXPANSION = this.getConstants().maxRadialExpansion * 2
   }
 
   onProjectileConstructed() {
     this.game.playSound("flame", { skipIfPlaying: true })
-  }
-
-  reset() {
-    super.reset()
-    this.sprite.width = 0
   }
 
   setAttributes(data) {
@@ -40,6 +34,8 @@ class Flame extends BaseProjectile {
   }
 
   interpolate(lastFrameTime) {
+    super.interpolate(lastFrameTime)
+  
     this.interpolateExpansion(lastFrameTime)
   }
 
@@ -50,24 +46,7 @@ class Flame extends BaseProjectile {
   getSpritePath() {
     return 'white_gas.png'
   }
-
-//   remove() {
-//     // let animation finish before removing..
-// 
-//     let alpha = { alpha: this.sprite.alpha }
-//     let vanish = new TWEEN.Tween(alpha)
-//         .to({ alpha: 0 }, 3000)
-//         .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
-//         .onUpdate(() => {
-//           this.sprite.alpha = alpha.alpha
-//         })
-//         .onComplete(() => {
-//           this.removeSelfAndChildrens(this.sprite)
-//         })
-//         .start()
-// 
-//   }
-// 
+  
   getType() {
     return Protocol.definition().ProjectileType.Flame
   }
@@ -79,4 +58,3 @@ class Flame extends BaseProjectile {
 }
 
 module.exports = Flame
-

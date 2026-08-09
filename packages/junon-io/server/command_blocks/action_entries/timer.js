@@ -27,7 +27,7 @@ class Timer extends ActionEntry {
   }
 
   parseData(data) {
-    this.timer = { name: "Timer", duration: 10, every: 1 }
+    this.timer = { name: "Timer", duration: 10, every: 1/20 }
 
     if (data.timer) {
       this.timer.name = data.timer.name
@@ -37,7 +37,7 @@ class Timer extends ActionEntry {
   }
 
   setDuration(duration) {
-    this.timer.duration = parseInt(duration)
+    this.timer.duration = parseFloat(duration)
 
     if (isNaN(this.timer.duration)) {
       this.timer.duration = 1
@@ -47,12 +47,12 @@ class Timer extends ActionEntry {
   }
 
   setEvery(every) {
-    this.timer.every = parseInt(every)
+    this.timer.every = parseFloat(every)
 
     if (isNaN(this.timer.every)) {
-      this.timer.every = 1
-    } else if (this.timer.every < 1) {
-      this.timer.every = 1
+      this.timer.every = 1/20
+    } else if (this.timer.every < 1/20) {
+      this.timer.every = 1/20
     }
   }
 

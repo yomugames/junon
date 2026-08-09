@@ -174,6 +174,7 @@ message MessageWrapper {
     EquipBadge EquipBadge = 181;
     BadgeEquipped BadgeEquipped = 182;
     RevitalizerActivate RevitalizerActivate = 183;
+    VendingPriceChange VendingPriceChange = 184;
   }
 }
 
@@ -241,6 +242,12 @@ message RevitalizerActivate {
   uint32 entityId = 1;
   uint32 targetId = 2;
   bool isEmpty = 3;
+}
+
+message VendingPriceChange {
+  uint32 vendId = 1;
+  uint32 cost = 2;
+  uint32 itemId = 3;
 }
 
 message CommandEventLogList {

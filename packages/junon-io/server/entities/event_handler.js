@@ -1302,7 +1302,6 @@ class EventHandler {
       "$getInventoryItemCount": true,
       "$getArmorEquip": true,
       "$add": true,
-      "$if": true,
       "$subtract": true,
       "$multiply": true,
       "$divide": true,
@@ -1331,7 +1330,8 @@ class EventHandler {
       "$getCapacity": true,
       "$getNthLetter": true,
       "$getNthWord": true,
-    }
+      "$if": true,
+}
   }
 
   buildFunctionMatchRegex() {
@@ -1403,7 +1403,8 @@ class EventHandler {
   parseAndEvalExpression(expression) {
     let stack = []
     let characters = expression.split("")
-    let keyword = ""
+    
+    let currentToken = ""
     let parenthesisDepth = 0 
 
     for (var i = 0; i < characters.length; i++) {
@@ -1411,50 +1412,34 @@ class EventHandler {
       
       if (character === '(') {
         parenthesisDepth++ 
-        if (keyword.trim()) {
-          stack.push(keyword.trim())
+        if (currentToken.trim()) {
+          stack.push(currentToken.trim())
         }
         stack.push("(")
-        keyword = ""
-      } else if (character === " ") {
-        if (parenthesisDepth > 0) {
-          if (keyword.trim()) {
-            stack.push(keyword.trim())
-            keyword = ""
-          }
-        } else {
-          if (keyword) {
-            stack.push(keyword)
-            keyword = ""
-          }
-          stack.push(" ")
-        }
-      } else if (character === ",") {
-        if (keyword.trim()) {
-          stack.push(keyword.trim())
-          keyword = ""
-        }
-      } else if (character === ")") {
+        currentToken = ""
+      } 
+      else if (character === ')') {
         parenthesisDepth-- 
-        if (keyword.trim()) {
-          stack.push(keyword.trim())
-          keyword = ""
+        if (currentToken.trim() || currentToken.includes(" ")) {
+          stack.push(this.cleanArgument(currentToken))
+          currentToken = ""
         }
 
         let args = []
         let arg
         let isFuncFound = false
+        
         while (!isFuncFound && stack.length > 0) {
           arg = stack.pop()
 
           if (arg === "(") {
             isFuncFound = true
-            arg = stack.pop() 
-            args.unshift(arg)
-          } else {
-            if (arg !== "" && arg !== " ") {
-              args.unshift(arg)
+            let funcName = stack.pop()
+            if (funcName) {
+              args.unshift(funcName)
             }
+          } else {
+            args.unshift(arg)
           }
         }
 
@@ -1465,20 +1450,43 @@ class EventHandler {
             stack.push(typeof result === 'object' ? JSON.stringify(result) : String(result))
           } else {
             this.queueLog({ type: 'error', message: "Does not have function named: " + funcName })
+            stack.push(`${funcName}(${args.join(",")})`)
           }
         }
-      } else {
-        keyword += character
+      } 
+      else if (character === ',') {
+        if (parenthesisDepth > 1) {
+          currentToken += character
+        } else {
+          stack.push(this.cleanArgument(currentToken))
+          currentToken = ""
+        }
+      } 
+      else {
+        currentToken += character
       }
     }
 
-    if (keyword) {
-      stack.push(keyword)
+    if (currentToken) {
+      stack.push(this.cleanArgument(currentToken))
     }
 
     let finalResult = stack.map(item => typeof item === 'string' ? item : String(item)).join("")
     return finalResult.trim()
   }
+
+  cleanArgument(arg) {
+    let trimmed = arg.trim()
+    
+    if (trimmed === "") return ""
+    
+    if (/^[\d\s]+$/.test(trimmed)) {
+      return trimmed.replace(/\s+/g, "")
+    }
+    
+    return trimmed
+  }
+
 
   interpolate(value, params, options = {}) {
     let result = value.trim()

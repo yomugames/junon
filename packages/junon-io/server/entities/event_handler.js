@@ -1450,122 +1450,133 @@ class EventHandler {
     return this.getFunctionTable()[funcName]
   }
 
-   interpolateFunctions(result) {
-    result = result.replace(/[\r\n]+/g, " ").trim();
-    let chars = result.split("")
-    let functionBuffer = ""
-    let resultBuffer = ""
-    let padepth = 0
+  interpolateFunctions(result) {
+    let chars = result.split("");
+    let functionBuffer = "";
+    let resultBuffer = "";
+    let padepth = 0;
 
     for (var i = 0; i < chars.length; i++) {
-      let char = chars[i]
-      let isEndOfString = i === chars.length - 1
+      let char = chars[i];
+      let isEndOfString = i === chars.length - 1;
 
-      if (char === '(') padepth++
-      if (char === ')') padepth--
+      if (char === '(') padepth++;
+      if (char === ')') padepth--;
 
       if (isEndOfString) {
         if (functionBuffer.length > 0) {
-          functionBuffer += char
-          let result = this.parseAndEvalExpression(functionBuffer)
-          functionBuffer = ""
-          resultBuffer += result
+          functionBuffer += char;
+          let evaluated = this.parseAndEvalExpression(functionBuffer);
+          functionBuffer = "";
+          resultBuffer += evaluated;
         } else {
-          resultBuffer += char
+          resultBuffer += char;
         }
       } else if (char === " ") {
         if (functionBuffer.length > 0 && padepth === 0) {
-          let result = this.parseAndEvalExpression(functionBuffer)
-          functionBuffer = ""
-          resultBuffer += result
-          resultBuffer += char
+          let evaluated = this.parseAndEvalExpression(functionBuffer);
+          functionBuffer = "";
+          resultBuffer += evaluated + char;
         } else if (functionBuffer.length > 0 && padepth > 0) {
-          functionBuffer += char
+          functionBuffer += char;
         } else {
-          resultBuffer += char
+          resultBuffer += char;
         }
       } else if (functionBuffer.length > 0 || char === "$") {
-        functionBuffer += char
+        functionBuffer += char;
       } else {
-        resultBuffer += char
+        resultBuffer += char;
       }
     }
 
-    return resultBuffer
+    return resultBuffer;
   }
-  
-     parseAndEvalExpression(expression) {
-    let stack = [{ funcName: null, args: [""] }]
-    let characters = expression.split("")
-    
+
+  parseAndEvalExpression(expression) {
+    if (!expression) return "";
+
+    let stack = [];
+    let characters = expression.split("");
+    let keyword = "";
+
     for (var i = 0; i < characters.length; i++) {
-      let character = characters[i]
-      let currentFrame = stack[stack.length - 1]
+      let character = characters[i];
       
       if (character === '(') {
-        let currentArgValue = currentFrame.args[currentFrame.args.length - 1]
-        let dollarIndex = currentArgValue.lastIndexOf('$')
-        
+        let dollarIndex = keyword.lastIndexOf('$');
         if (dollarIndex !== -1) {
-          let funcName = currentArgValue.substring(dollarIndex).trim()
-          
-          currentFrame.args[currentFrame.args.length - 1] = currentArgValue.substring(0, dollarIndex)
-          
-          stack.push({ funcName: funcName, args: [""] })
-        } else {
-          currentFrame.args[currentFrame.args.length - 1] += character
-        }
-      } 
-      else if (character === ')') {
-        if (stack.length > 1) {
-          let completedFrame = stack.pop()
-          let funcName = completedFrame.funcName
-          
-          let finalizedArgs = completedFrame.args.map(arg => this.cleanArgument(arg))
-          
-          let result = ""
-          if (this.hasFunction(funcName)) {
-            result = this.runFunction(funcName, finalizedArgs)
-          } else {
-            this.queueLog({ type: 'error', message: "Does not have function named: " + funcName })
-            result = `${funcName}(${finalizedArgs.join(",")})`
+          let textPrefix = keyword.substring(0, dollarIndex);
+          let actualFuncName = keyword.substring(dollarIndex);
+          if (textPrefix) {
+            stack.push(textPrefix);
           }
-          
-          stack[stack.length - 1].args[stack[stack.length - 1].args.length - 1] += String(result)
+          stack.push(actualFuncName);
         } else {
-          currentFrame.args[currentFrame.args.length - 1] += character
+          stack.push(keyword);
         }
-      } 
-      else if (character === ',') {
-        if (stack.length > 1) {
-          currentFrame.args.push("")
-        } else {
-          currentFrame.args[currentFrame.args.length - 1] += character
+        stack.push("(");
+        keyword = "";
+      } else if (character === ",") {
+        if (keyword) {
+          stack.push(this.cleanArgument(keyword));
+          keyword = "";
         }
-      } 
-      else {
-        currentFrame.args[currentFrame.args.length - 1] += character
+      } else if (character === ")") {
+        if (keyword) {
+          stack.push(this.cleanArgument(keyword));
+          keyword = "";
+        }
+
+        let args = [];
+        let arg;
+        let isFuncFound = false;
+        
+        while (!isFuncFound && stack.length > 0) {
+          arg = stack.pop();
+
+          if (arg === "(") {
+            isFuncFound = true;
+            arg = stack.pop(); 
+            args.unshift(arg);
+          } else {
+            args.unshift(arg);
+          }
+        }
+
+        if (isFuncFound) {
+          let funcName = args.shift();
+          if (this.hasFunction(funcName)) {
+            let finalizedArgs = args.map(a => this.cleanArgument(a));
+            let result = this.runFunction(funcName, finalizedArgs);
+            stack.push(result);
+          } else {
+            stack.push(`${funcName}(${args.join(",")})`);
+          }
+        }
+      } else {
+        keyword += character;
       }
     }
-    
-    return stack[0].args[0].trim()
+
+    if (keyword) {
+      stack.push(this.cleanArgument(keyword));
+    }
+
+    return stack.map(token => typeof token === 'object' ? JSON.stringify(token) : String(token)).join("");
   }
 
   cleanArgument(arg) {
-    if (typeof arg !== 'string') return arg
-    let trimmed = arg.trim()
-    
-    if (!trimmed) return ""
-    
+    if (typeof arg !== 'string') return arg;
+    let trimmed = arg.trim();
+
+    if (!trimmed) return "";
+
     if (/^[\d\s]+$/.test(trimmed)) {
-      return trimmed.replace(/\s+/g, "")
+      return trimmed.replace(/\s+/g, "");
     }
-    
-    return trimmed
+
+    return trimmed;
   }
-
-
-
 
   interpolate(value, params, options = {}) {
     let result = value.trim()

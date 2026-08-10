@@ -5553,7 +5553,6 @@ class Player extends BaseEntity {
         this.game.sendToMatchmaker({ event: "GlobalClientChat", data: data })
       } else {
         LOG.info("[" + this.game.getSectorUid() + "] chat> " + this.name + ": " + message)
-        console.log(this.game.playerChatPrefixes)
         let data = { playerId: this.id, message: message, username: this.name, isTeam: isTeamChat,prefixesList:JSON.stringify(this.game.playerChatPrefixes||{})}
         if (this.isLoggedIn()) {
           data.uid = this.getUid()

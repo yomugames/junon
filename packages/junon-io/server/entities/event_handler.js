@@ -625,10 +625,12 @@ class EventHandler {
 
     let name = "Timer:" + timer.name + ":tick"
     let params = {}
-    this.trigger(name, params)
 
     params["seconds"] = timer.tick * timer.every
     params["remaining"] = (timer.duration - timer.tick) * timer.every
+
+    this.trigger(name, params)
+
     params["name"] = timer.name
 
     this.trigger("Timer:tick", params)

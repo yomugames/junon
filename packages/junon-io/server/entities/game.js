@@ -1097,9 +1097,7 @@ class Game {
         this.sector.eventHandler.triggerTimerTick(timer)
       }
 
-      const currentElapsedSeconds = Number((timer.elapsedFrames * 0.1).toFixed(2));
-
-      if (timer.duration > 0 && currentElapsedSeconds >= timer.duration) {
+      if (timer.duration > 0 && timer.tick >= timer.duration) {
         delete this.timers[name]
         this.sector.eventHandler.triggerTimerEnd(timer)
       }

@@ -1511,11 +1511,10 @@ class EventHandler {
 
     return resultBuffer
   }
-  parseAndEvalExpression(expression) {
+   parseAndEvalExpression(expression) {
     let stack = []
     let characters = expression.split("")
-    
-    let currentToken = ""
+    let keyword = ""
     let parenthesisDepth = 0 
 
     for (var i = 0; i < characters.length; i++) {
@@ -1523,63 +1522,94 @@ class EventHandler {
       
       if (character === '(') {
         parenthesisDepth++ 
-        if (currentToken.trim()) {
-          stack.push(currentToken.trim())
+        if (keyword.trim()) {
+          stack.push(keyword.trim())
         }
         stack.push("(")
-        currentToken = ""
+        keyword = ""
       } 
-      else if (character === ')') {
-        parenthesisDepth-- 
-        if (currentToken.trim() || currentToken.includes(" ")) {
-          stack.push(this.cleanArgument(currentToken))
-          currentToken = ""
-        }
-
-        let args = []
-        let arg
-        let isFuncFound = false
-        
-        while (!isFuncFound && stack.length > 0) {
-          arg = stack.pop()
-
-          if (arg === "(") {
-            isFuncFound = true
-            let funcName = stack.pop()
-            if (funcName) {
-              args.unshift(funcName)
-            }
-          } else {
-            args.unshift(arg)
+      else if (character === " ") {
+        if (parenthesisDepth === 0) {
+          if (keyword) {
+            stack.push(this.cleanArgument(keyword))
+            keyword = ""
           }
-        }
-
-        if (isFuncFound) {
-          let funcName = args.shift()
-          if (this.hasFunction(funcName)) {
-            let result = this.runFunction(funcName, args)
-            stack.push(typeof result === 'object' ? JSON.stringify(result) : String(result))
-          } else {
-            this.queueLog({ type: 'error', message: "Does not have function named: " + funcName })
-            stack.push(`${funcName}(${args.join(",")})`)
-          }
-        }
-      } 
-      else if (character === ',') {
-        if (parenthesisDepth > 1) {
-          currentToken += character
+          stack.push(" ")
         } else {
-          stack.push(this.cleanArgument(currentToken))
-          currentToken = ""
+          keyword += character
+        }
+      } 
+      else if (character === ",") {
+        let openCount = (keyword.match(/\(/g) || []).length
+        let closeCount = (keyword.match(/\)/g) || []).length
+        
+        if (openCount > closeCount) {
+          keyword += character
+        } else {
+          if (keyword || parenthesisDepth > 0) {
+            stack.push(this.cleanArgument(keyword))
+            keyword = ""
+          }
+        }
+      } 
+      else if (character === ")") {
+        parenthesisDepth-- 
+        
+        let openCount = (keyword.match(/\(/g) || []).length
+        let closeCount = (keyword.match(/\)/g) || []).length
+        
+        if (openCount > closeCount) {
+          keyword += character
+        } else {
+          if (keyword || parenthesisDepth >= 0) {
+            stack.push(this.cleanArgument(keyword))
+            keyword = ""
+          }
+
+          let args = []
+          let arg
+          let isFuncFound = false
+          
+          while (!isFuncFound && stack.length > 0) {
+            arg = stack.pop()
+
+            if (arg === "(") {
+              isFuncFound = true
+              arg = stack.pop() 
+              if (arg) args.unshift(arg)
+            } else {
+              if (arg !== undefined && arg !== " ") {
+                args.unshift(arg)
+              }
+            }
+          }
+
+          if (isFuncFound) {
+            let funcName = args.shift()
+            if (this.hasFunction(funcName)) {
+              let finalizedArgs = args.map(a => {
+                if (typeof a === 'string' && a.includes("$") && a.includes("(")) {
+                  return this.parseAndEvalExpression(a)
+                }
+                return this.cleanArgument(a)
+              })
+
+              let result = this.runFunction(funcName, finalizedArgs)
+              stack.push(typeof result === 'object' ? JSON.stringify(result) : String(result))
+            } else {
+              this.queueLog({ type: 'error', message: "Does not have function named: " + funcName })
+              stack.push(`${funcName}(${args.join(",")})`)
+            }
+          }
         }
       } 
       else {
-        currentToken += character
+        keyword += character
       }
     }
 
-    if (currentToken) {
-      stack.push(this.cleanArgument(currentToken))
+    if (keyword) {
+      stack.push(this.cleanArgument(keyword))
     }
 
     let finalResult = stack.map(item => typeof item === 'string' ? item : String(item)).join("")
@@ -1587,9 +1617,13 @@ class EventHandler {
   }
 
   cleanArgument(arg) {
+    if (typeof arg !== 'string') return arg
     let trimmed = arg.trim()
-    
-    if (trimmed === "") return ""
+  
+    if (!trimmed) return ""
+    if (trimmed.includes("$") && trimmed.includes("(")) {
+      return trimmed
+    }
     
     if (/^[\d\s]+$/.test(trimmed)) {
       return trimmed.replace(/\s+/g, "")
@@ -1597,6 +1631,7 @@ class EventHandler {
     
     return trimmed
   }
+
 
 
   interpolate(value, params, options = {}) {

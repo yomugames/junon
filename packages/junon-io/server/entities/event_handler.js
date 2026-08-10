@@ -1489,7 +1489,7 @@ class EventHandler {
 
     return resultBuffer
   }
-   parseAndEvalExpression(expression) {
+    parseAndEvalExpression(expression) {
     let stack = []
     let characters = expression.split("")
     let keyword = ""
@@ -1518,10 +1518,7 @@ class EventHandler {
         }
       } 
       else if (character === ",") {
-        let openCount = (keyword.match(/\(/g) || []).length
-        let closeCount = (keyword.match(/\)/g) || []).length
-        
-        if (openCount > closeCount) {
+        if (parenthesisDepth > 1) {
           keyword += character
         } else {
           if (keyword || parenthesisDepth > 0) {
@@ -1533,10 +1530,7 @@ class EventHandler {
       else if (character === ")") {
         parenthesisDepth-- 
         
-        let openCount = (keyword.match(/\(/g) || []).length
-        let closeCount = (keyword.match(/\)/g) || []).length
-        
-        if (openCount > closeCount) {
+        if (parenthesisDepth > 0) {
           keyword += character
         } else {
           if (keyword || parenthesisDepth >= 0) {
@@ -1597,8 +1591,9 @@ class EventHandler {
   cleanArgument(arg) {
     if (typeof arg !== 'string') return arg
     let trimmed = arg.trim()
-  
+    
     if (!trimmed) return ""
+    
     if (trimmed.includes("$") && trimmed.includes("(")) {
       return trimmed
     }
@@ -1609,6 +1604,7 @@ class EventHandler {
     
     return trimmed
   }
+
 
 
 

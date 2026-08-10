@@ -1256,51 +1256,29 @@ class EventHandler {
     }
   }
 
-  if(...vals) {
-    let condition = vals[1]
-    let val1 = vals[0]
-    let val2 = vals[2]
+  if(...args) {
+    let leftSide  = (args[0] || "").trim();
+    let operator  = (args[1] || "").trim();
+    let rightSide = (args[2] || "").trim();
+    
+    let successVal = args[3] !== undefined ? args[3].trim() : "";
+    let failureVal = args[4] !== undefined ? args[4].trim() : "";
 
-    switch(condition) {
-      case "=": {
-        if (val1 === val2) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case "<": {
-        if (val1 < val2) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case ">": {
-        if (val1 > val2) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case "<=": {
-        if (val1 <= val2) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case ">=": {
-        if (val1 >= val2) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case "!=": {
-        if (!(val1 === val2)) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      case "=~": {
-        if (val1.includes(val2)) {
-          return vals[3]
-        } else {return vals[4]}
-      }
-      default: {
-        return "undefined"
-      }
+    let conditionMet = false;
+
+    if (operator === "=" || operator === "==") {
+        conditionMet = (leftSide === rightSide);
+    } else if (operator === "!=") {
+        conditionMet = (leftSide !== rightSide);
+    } else if (operator === ">") {
+        conditionMet = (Number(leftSide) > Number(rightSide));
+    } else if (operator === "<") {
+        conditionMet = (Number(leftSide) < Number(rightSide));
+    } else if (operator === "~=") {
+        conditionMet = leftSide.includes(rightSide);
     }
+
+    return conditionMet ? successVal : failureVal;
   }
 
   getNthWord(...values) {

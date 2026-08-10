@@ -624,12 +624,11 @@ class EventHandler {
     if (this.shouldPreventTimer(timer)) return
 
     let name = "Timer:" + timer.name + ":tick"
-    let params = {
-      "seconds": timer.tick * timer.every,
-      "remaining": timer.duration - (timer.tick * timer.every)
-    }
+    let params = {}
     this.trigger(name, params)
 
+    params["seconds"] = timer.tick * timer.every
+    params["remaining"] = (timer.duration - timer.tick) * timer.every
     params["name"] = timer.name
 
     this.trigger("Timer:tick", params)
@@ -1276,8 +1275,11 @@ class EventHandler {
         conditionMet = (Number(leftSide) < Number(rightSide));
     } else if (operator === "~=") {
         conditionMet = leftSide.includes(rightSide);
+    } else if (operator === ">=") {
+        conditionMet = (Number(leftSide) >= Number(rightSide));
+    } else if (operator === "<=") {
+        conditionMet = (Number(leftSide) <= Number(rightSide));
     }
-
     return conditionMet ? successVal : failureVal;
   }
 

@@ -91,8 +91,6 @@ class VendingMachineMenu extends StorageMenu {
     if (this.selectedRow && row !== this.selectedRow) {
       this.unselectRow(this.selectedRow)
     }
-
-    let reprice = event.target.closest(".reprice_btn")
     
     if(reprice) {
       this.selectRow(row)

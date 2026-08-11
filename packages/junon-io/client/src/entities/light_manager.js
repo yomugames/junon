@@ -39,6 +39,7 @@ class LightManager {
     this.skyMapCanvas.width  = this.container.getColCount()
     this.skyMapCanvas.height = this.container.getRowCount()
     this.skyMapCanvas.id = "skymap_canvas"
+    let setting = this.skyMapCanvas.getContext("2d", { willReadFrequently: true })
     // document.body.appendChild(this.skyMapCanvas) // uncomment to debug lightmap
 
     this.drawSky()
@@ -49,6 +50,7 @@ class LightManager {
     this.fovMapCanvas.width  = this.container.getColCount()
     this.fovMapCanvas.height = this.container.getRowCount()
     this.fovMapCanvas.id = "fov_canvas"
+    let setting = this.fovMapCanvas.getContext("2d", { willReadFrequently: true })
     // let ctx = this.fovMapCanvas.getContext("2d")
     // ctx.fillStyle = '#333333'
     // ctx.fillRect(0, 0, this.fovMapCanvas.width, this.fovMapCanvas.height)
@@ -60,6 +62,7 @@ class LightManager {
     this.lightMapCanvas.width  = this.container.getColCount()
     this.lightMapCanvas.height = this.container.getRowCount()
     this.lightMapCanvas.id = "lightmap_canvas"
+    let setting = this.lightMapCanvas.getContext("2d", { willReadFrequently: true })
     // let ctx = this.lightMapCanvas.getContext("2d")
     // ctx.fillStyle = '#333333'
     // ctx.fillRect(0, 0, this.lightMapCanvas.width, this.lightMapCanvas.height)

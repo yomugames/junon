@@ -398,6 +398,7 @@ class Sector {
       isMutantEnabled: true,
       isGravityEnabled: false,
       isFireSpreadEnabled: firespread,
+      isSpectateAllowed: true,
     }
 
     if (!entities) return
@@ -803,13 +804,23 @@ class Sector {
       this.getSocketUtil().broadcast(this.game.getSocketIds(), "SectorUpdated", {
         settings: this.settings
       })
+
+      if (key === "isSpectateAllowed") {
+        if (value === false) {
+          this.game.forEachPlayer((player) => {
+            if (player.ghost) {
+            player.possess(player)
+            }
+          })
+        }
+      }
     }
   }
 
   canEditSetting(key) {
     if(this.gameMode === 'hardcore' || !this.gameMode) return false;
     if(this.gameMode === 'survival') {
-      let allowedSettingChanges = ['isPvPAllowed',"isFovMode", "isZoomAllowed", "showMiniMap", "showPlayerList", "isFloorAutodirt", "isChatEnabled", "isShadowsEnabled", "isPlayerSavingEnabled", "isBloodEnabled", "isGravityEnabled"]
+      let allowedSettingChanges = ['isPvPAllowed',"isFovMode", "isZoomAllowed", "showMiniMap", "showPlayerList", "isFloorAutodirt", "isChatEnabled", "isShadowsEnabled", "isPlayerSavingEnabled", "isBloodEnabled", "isGravityEnabled","isSpectateAllowed"]
 
       if(allowedSettingChanges.indexOf(key) === -1) return false;
     }
@@ -1209,7 +1220,7 @@ class Sector {
       }
     }
   }
-
+  
 
   addClaim(entity, claimer) {
     new Claim(this, entity, claimer, this.game.timestamp)
@@ -1494,6 +1505,10 @@ class Sector {
 
   isFovMode() {
     return this.settings.isFovMode
+  }
+
+  isSpectateAllowed() {
+    return this.settings.isSpectateAllowed
   }
 
   isZoomAllowed() {

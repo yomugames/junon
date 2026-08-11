@@ -624,10 +624,11 @@ class EventHandler {
     if (this.shouldPreventTimer(timer)) return
 
     let name = "Timer:" + timer.name + ":tick"
-    let params = {
-      "seconds": timer.tick * timer.every,
-      "remaining": timer.duration - (timer.tick * timer.every)
-    }
+    let params = {}
+
+    params["seconds"] = timer.tick
+    params["remaining"] = timer.duration - timer.tick
+
     this.trigger(name, params)
 
     params["name"] = timer.name
@@ -1256,6 +1257,71 @@ class EventHandler {
     }
   }
 
+  if(...args) {
+    let leftSide  = (args[0] || "").trim();
+    let operator  = (args[1] || "").trim();
+    let rightSide = (args[2] || "").trim();
+    
+    let successVal = args[3] !== undefined ? args[3].trim() : "";
+    let failureVal = args[4] !== undefined ? args[4].trim() : "";
+
+    let conditionMet = false;
+
+    if (operator === "=" || operator === "==") {
+        conditionMet = (leftSide === rightSide);
+    } else if (operator === "!=") {
+        conditionMet = (leftSide !== rightSide);
+    } else if (operator === ">") {
+        conditionMet = (Number(leftSide) > Number(rightSide));
+    } else if (operator === "<") {
+        conditionMet = (Number(leftSide) < Number(rightSide));
+    } else if (operator === "~=") {
+        conditionMet = leftSide.includes(rightSide);
+    } else if (operator === ">=") {
+        conditionMet = (Number(leftSide) >= Number(rightSide));
+    } else if (operator === "<=") {
+        conditionMet = (Number(leftSide) <= Number(rightSide));
+    }
+    return conditionMet ? successVal : failureVal;
+  }
+
+  getNthWord(...values) {
+    if (values.length < 2) return ""
+    let index = parseInt(values[0])
+    let word = values.slice(1).join(" ")
+    let stringArray = word.split(" ")
+
+    if (isNaN(index) || index < 1) {
+      return ""
+    }
+    if (!word || typeof word !== "string") {
+      return ""
+    }
+    if(index > stringArray.length+1) {
+      return ""
+    }
+
+    let letter = stringArray[index - 1]
+    return letter
+  }
+
+  getNthLetter(...values) {
+    if (values.length === 0) return ""
+    let index = parseInt(values[0])
+    let word = values[1];
+    if (isNaN(index)) {
+      return ""
+    }
+    if (!word || typeof word !== "string") {
+      return ""
+    }
+    if (index < 1 || index > word.length) {
+      return ""
+    }
+    let letter = word[index - 1];
+    return letter
+  }
+
   isVariableInvalid(key) {
     return key.match(/[^a-zA-Z0-9_$]/)
   }
@@ -1354,7 +1420,10 @@ class EventHandler {
       "$getUsage": true,
       "$getCapacity": true,
       "$getForceX": true,
-      "$getForceY": true
+      "$getForceY": true,
+      "$getNthLetter": true,
+      "$getNthWord": true,
+      "$if": true,
     }
   }
 
@@ -1382,96 +1451,131 @@ class EventHandler {
   }
 
   interpolateFunctions(result) {
-    let chars = result.split("")
-    let functionBuffer = ""
-    let resultBuffer = ""
+    let chars = result.split("");
+    let functionBuffer = "";
+    let resultBuffer = "";
+    let padepth = 0;
 
     for (var i = 0; i < chars.length; i++) {
-      let char = chars[i]
-      let isEndOfString = i === chars.length - 1
+      let char = chars[i];
+      let isEndOfString = i === chars.length - 1;
+
+      if (char === '(') padepth++;
+      if (char === ')') padepth--;
+
       if (isEndOfString) {
         if (functionBuffer.length > 0) {
-          functionBuffer += char
-          let result = this.parseAndEvalExpression(functionBuffer)
-          functionBuffer = ""
-          resultBuffer += result
+          functionBuffer += char;
+          let evaluated = this.parseAndEvalExpression(functionBuffer);
+          functionBuffer = "";
+          resultBuffer += evaluated;
         } else {
-          resultBuffer += char
+          resultBuffer += char;
         }
       } else if (char === " ") {
-        if (functionBuffer.length > 0) {
-          let result = this.parseAndEvalExpression(functionBuffer)
-          functionBuffer = ""
-          resultBuffer += result
-          resultBuffer += char
+        if (functionBuffer.length > 0 && padepth === 0) {
+          let evaluated = this.parseAndEvalExpression(functionBuffer);
+          functionBuffer = "";
+          resultBuffer += evaluated + char;
+        } else if (functionBuffer.length > 0 && padepth > 0) {
+          functionBuffer += char;
         } else {
-          resultBuffer += char
+          resultBuffer += char;
         }
       } else if (functionBuffer.length > 0 || char === "$") {
-        functionBuffer += char
+        functionBuffer += char;
       } else {
-        resultBuffer += char
+        resultBuffer += char;
       }
     }
 
-    return resultBuffer
+    return resultBuffer;
   }
 
   parseAndEvalExpression(expression) {
-    let stack = []
-    let characters = expression.split("")
-    let keyword = ""
+    if (!expression) return "";
+
+    let stack = [];
+    let characters = expression.split("");
+    let keyword = "";
 
     for (var i = 0; i < characters.length; i++) {
-      let character = characters[i]
+      let character = characters[i];
+      
       if (character === '(') {
-        stack.push(keyword)
-        stack.push("(")
-        keyword = ""
-        // end functionName
+        let dollarIndex = keyword.lastIndexOf('$');
+        if (dollarIndex !== -1) {
+          let textPrefix = keyword.substring(0, dollarIndex);
+          let actualFuncName = keyword.substring(dollarIndex);
+          if (textPrefix) {
+            stack.push(textPrefix);
+          }
+          stack.push(actualFuncName);
+        } else {
+          stack.push(keyword);
+        }
+        stack.push("(");
+        keyword = "";
       } else if (character === ",") {
         if (keyword) {
-          stack.push(keyword)
-          keyword = ""
+          stack.push(this.cleanArgument(keyword));
+          keyword = "";
         }
       } else if (character === ")") {
         if (keyword) {
-          stack.push(keyword)
-          keyword = ""
+          stack.push(this.cleanArgument(keyword));
+          keyword = "";
         }
 
-        let args = []
-        let arg
-        let isFuncFound = false
+        let args = [];
+        let arg;
+        let isFuncFound = false;
+        
         while (!isFuncFound && stack.length > 0) {
-          arg = stack.pop()
+          arg = stack.pop();
 
           if (arg === "(") {
-            isFuncFound = true
-            arg = stack.pop() // func name
-            args.unshift(arg)
+            isFuncFound = true;
+            arg = stack.pop(); 
+            args.unshift(arg);
           } else {
-            args.unshift(arg)
+            args.unshift(arg);
           }
-
         }
 
         if (isFuncFound) {
-          let funcName = args.shift()
+          let funcName = args.shift();
           if (this.hasFunction(funcName)) {
-            let result = this.runFunction(funcName, args)
-            stack.push(result)
+            let finalizedArgs = args.map(a => this.cleanArgument(a));
+            let result = this.runFunction(funcName, finalizedArgs);
+            stack.push(result);
           } else {
-            this.queueLog({ type: 'error', message: "Does not have function named: " + funcName })
+            stack.push(`${funcName}(${args.join(",")})`);
           }
-        } else {
         }
       } else {
-        keyword += character
+        keyword += character;
       }
     }
 
-    return stack[0]
+    if (keyword) {
+      stack.push(this.cleanArgument(keyword));
+    }
+
+    return stack.map(token => typeof token === 'object' ? JSON.stringify(token) : String(token)).join("");
+  }
+
+  cleanArgument(arg) {
+    if (typeof arg !== 'string') return arg;
+    let trimmed = arg.trim();
+
+    if (!trimmed) return "";
+
+    if (/^[\d\s]+$/.test(trimmed)) {
+      return trimmed.replace(/\s+/g, "");
+    }
+
+    return trimmed;
   }
 
   interpolate(value, params, options = {}) {

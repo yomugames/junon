@@ -798,6 +798,7 @@ message ServerChat {
   string username = 3;
   string uid = 4;
   bool isTeam = 5;
+  string prefixesList = 6;
 }
 
 message Chunk {

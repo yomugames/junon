@@ -927,6 +927,11 @@
                             <td>Sums all given values. Ex. $add(2,5,8) = 15</td>
                         </tr>
                         <tr>
+                            <td class='function_name'>$if</td>
+                            <td>value1, operator, value2, then, else</td>
+                            <td>Returns the value given the condition.</td>
+                        </tr>
+                        <tr>
                             <td class='function_name'>$subtract</td>
                             <td>value1, value2, ... , valueN</td>
                             <td>Subtracts subsequent values from the first. Ex. $subtract(2,5,1) = -4</td>
@@ -1102,6 +1107,14 @@
                             <td>Returns the usage capacity of an item</td>
                         </tr>
                         <tr>
+                            <td class="function_name">$getNthLetter</td>
+                            <td>index, word</td>
+                            <td>Returns the Nth letter of a word</td>
+                        </tr>
+                        <tr>
+                            <td class="function_name">$getNthWord</td>
+                            <td>index, string</td>
+                            <td>Returns the Nth word of a string</td>
                             <td class="function_name">$getForceX</td>
                             <td>$entityId</td>
                             <td>Returns the x force applied on entity</td>
@@ -1994,6 +2007,15 @@
                             <label for='enable_fire_spread'><%= t('Yes') %></label>
                             <input type="radio" id="disable_fire_spread" name='is_fire_spread_enabled' value='no'>
                             <label for='disable_fire_spread'><%= t('No') %></label>
+                        </div>
+                    </div>
+                    <div class="colony_info_entry is_spectate_enabled">
+                        <label><%= t('Allow Spectate Command') %></label>
+                        <div class='colony_info_entry_radio_container'>
+                            <input type="radio" id="enable_spectate" name='is_spectate_enabled' value='yes'>
+                            <label for='enable_spectate'><%= t('Yes') %></label>
+                            <input type="radio" id="disable_spectate" name='is_spectate_enabled' value='no'>
+                            <label for='disable_spectate'><%= t('No') %></label>
                         </div>
                     </div>
                 </div>

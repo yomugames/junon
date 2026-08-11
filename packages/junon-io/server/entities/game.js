@@ -1070,33 +1070,40 @@ class Game {
   hasTimer(name) {
     return this.timers[name]
   }
-
+  
   runTimers() {
     const isIntervalElapsed = this.timestamp % (Constants.physicsTimeStep / 20) === 0
     if (!isIntervalElapsed) return
     
     for (let name in this.timers) {
       let timer = this.timers[name]
-      if (!timer.tick) {
+      
+      if (timer.elapsedFrames === undefined) {
         timer.tick = 0
+        timer.elapsedFrames = 0
         this.sector.eventHandler.triggerTimerStart(timer)
       }
 
-      timer.tick += 1
-      if (timer.every) {
-        if (timer.tick % Math.round(timer.every * 20) === 0) {
+      timer.elapsedFrames += 1;
+
+      const stepsPerTick = Math.round(timer.every * 10);
+
+      if (timer.every && stepsPerTick > 0) {
+        if (timer.elapsedFrames % stepsPerTick === 0) {
+          timer.tick += 1;
           this.sector.eventHandler.triggerTimerTick(timer)
         }
       } else {
         this.sector.eventHandler.triggerTimerTick(timer)
       }
 
-      if (timer.duration > 0 && timer.tick === timer.duration) {
-        delete this.timers[timer.name]
+      if (timer.duration > 0 && timer.tick >= timer.duration) {
+        delete this.timers[name]
         this.sector.eventHandler.triggerTimerEnd(timer)
       }
     }
   }
+
 
   onRoundStarted() {
     this.sendToMatchmaker({ event: "RoundStarted", data: this.getSectorData() })

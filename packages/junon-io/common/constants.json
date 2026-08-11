@@ -3733,7 +3733,7 @@
         "CopperBar": 20,
         "Wood": 10
       },
-      "description": "Spread shot weapon. Each shell deals 12 damage."
+      "description": "Spread shot weapon. Each shell deals 8 damage."
     },
     "PlasmaGun": {
       "parent": "Equipments.RangeEquipment",

@@ -100,8 +100,21 @@ class CryoTube extends BaseBuilding {
     return Protocol.definition().BuildingType.CryoTube
   }
 
+  store(item) {
+    // don't store items
+    if (typeof item.setDormant === "function") {
+      super.store(item)
+    }
+  }
+
+  storeAt(index, item) {
+    if(this.canStore(index, item)) {
+      super.storeAt(index, item)
+    }
+  }
+
   canStore(index, item) {
-    return item.isDraggable() && !item.isPlayer() && typeof item.setDormant === "function"
+    return item.isDraggable && item.isDraggable() && !item.isPlayer() && typeof item.setDormant === "function"
   }
 
   onStorageChanged(item, index) {

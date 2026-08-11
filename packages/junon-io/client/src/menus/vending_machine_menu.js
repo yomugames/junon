@@ -85,26 +85,32 @@ class VendingMachineMenu extends StorageMenu {
   }
 
   onPurchasableItemsClick(event) {
-    if (this.selectedRow) {
+    let reprice = event.target.closest(".reprice_btn")
+    let row = event.target.closest(".trade_item_row")
+
+    if (this.selectedRow && row !== this.selectedRow) {
       this.unselectRow(this.selectedRow)
     }
 
     let reprice = event.target.closest(".reprice_btn")
+    
     if(reprice) {
-      let row = reprice.closest(".trade_item_row")
       this.selectRow(row)
       this.onRepriceBtnClick()
-      return
-    }
-
-    let row = event.target.closest(".trade_item_row")
-
-    if (row) {
+    } else if (row) {
       this.selectRow(row)
     }
   }
 
   unselectRow(row) {
+    let input = row.querySelector(".trade_item_reprice")
+
+    if(input.style.display !== 'none') {
+      input.style.display = 'none'
+      let itemCost = row.querySelector(".trade_item_cost")
+      this.resetCost(row)
+    }
+
     this.selectedRow = null
 
     if (row) {
@@ -202,35 +208,43 @@ class VendingMachineMenu extends StorageMenu {
       return
     }
 
-    let button = this.selectedRow.querySelector(".trade_item_reprice")
+    let input = this.selectedRow.querySelector(".trade_item_reprice")
     let itemCost = this.selectedRow.querySelector(".trade_item_cost")
     let index = parseInt(this.selectedRow.dataset.index)
 
-    if(button.style.display !== 'block') {
-      button.style.display = 'block'
+    if(input.style.display !== 'block') {
+      input.style.display = 'block'
       // grab number price
-      button.value = itemCost.innerText.split(" ", 1)
+      input.value = itemCost.innerText.split(" ", 1)
       itemCost.innerText = " G"
 
-      button.focus()
+      input.focus()
     } else {
-      button.style.display = 'none'
+      input.style.display = 'none'
       // make it a number
-      let cost = button.value.replace(/\D/g, "")
+      let cost = input.value.replace(/\D/g, "")
       if(cost.length !== 0 && Number(cost) > 0 && Number(cost) <= 100000) {
         itemCost.innerText = cost + " G"
         SocketUtil.emit("VendingPriceChange", { vendId: this.entity.id, cost: cost, itemId: this.storage[index].id })
       } else {
         this.game.displayError("Invalid Amount", { warning: true })
-        itemCost.innerText = Item.getKlass(this.selectedRow.dataset.type).getCost() + " G"
-
-        if (this.entity.prices && this.entity.prices[this.storage[index].id]) {
-          itemCost.innerText = this.entity.prices[this.storage[index].id] + " G"
-        }
+        this.resetCost(this.selectedRow)
       }
     }
 
     // this.selectedRow.querySelector(".trade_item_reprice").select()
+  }
+
+  resetCost(row) {
+    if (!row) return
+    let itemCost = this.row.querySelector(".trade_item_cost")
+    let index = parseInt(this.row.dataset.index)
+
+    itemCost.innerText = Item.getKlass(this.row.dataset.type).getCost() + " G"
+
+    if (this.entity.prices && this.entity.prices[this.storage[index].id]) {
+      itemCost.innerText = this.entity.prices[this.storage[index].id] + " G"
+    }
   }
 
   updateGoldCount(gold) {

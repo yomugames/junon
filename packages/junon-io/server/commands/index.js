@@ -71,6 +71,7 @@ Commands.dirt = require('./dirt')
 Commands.blood = require('./blood')
 Commands.setstatus = require('./set_status')
 Commands.menu = require('./menu')
+Commands.chatprefix = require('./chatprefix')
 Commands.ping = require('./ping')
 Commands.goal = require('./goal')
 

@@ -182,19 +182,23 @@ class Fill extends BaseCommand {
         let building = klass.build(data, this.sector)
 
         if (building && building.hasCustomColors()) {
-          
-
           if(args[5] && Constants.FloorColors[args[5]]) {
             building.setColorIndex(Constants.FloorColors[args[5]].index)
           } else {
-            if (player.colorIndex >= 0) {
+            const isHexColor = /^#?[0-9A-Fa-f]{3,8}$/i.test(args[5]);
+            if(isHexColor) {
+              let color = parseInt(args[5].replace("#", ""), 16) + 38
+              building.setColorIndex(color)
+            } else if (player.colorIndex >= 0) {
               building.setColorIndex(player.colorIndex)
             }
-            if (player.textureIndex >= 0) {
-              building.setTextureIndex(player.textureIndex)
-            }
           }
-      
+
+          if(args[6] && Constants.FloorTextures[args[6]]) {
+            building.setTextureIndex(Constants.FloorTextures[args[6]].index)
+          } else if (player.textureIndex >= 0) {
+            building.setTextureIndex(player.textureIndex)
+          }
         }
       }
     }

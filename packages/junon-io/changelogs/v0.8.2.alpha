@@ -10,7 +10,8 @@
       "Fixed dynamite craft required iron ore instead of iron bars",
       "Fixed underground vents didn't work in peaceful mode",
       "Fixed $tanh function was disabled",
-      "Fixed interpolator. Now it doesn't break while zooming & also fixed phantom projectiles bug"
+      "Fixed interpolator. Now it doesn't break while zooming & also fixed phantom projectiles bug",
+      "Fixed raven's hitbox"
     ],
     "features": [
       "Slightly changed weapons balance",

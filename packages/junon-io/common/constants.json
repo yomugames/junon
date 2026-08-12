@@ -1769,6 +1769,8 @@
     },
     "Raven": {
       "parent": "Mobs.BaseMob",
+      "width": 147,
+      "height": 96,
       "stats": {
         "speed": 4,
         "reload": 250,

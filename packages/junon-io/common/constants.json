@@ -3932,7 +3932,7 @@
       "projectileBarrelLength": 0.71875,
       "stats": {
         "range": 768,
-        "damage": 75,
+        "damage": 25,
         "health": 300,
         "reload": 2000,
         "spreadAngle": 10

@@ -1466,7 +1466,7 @@ class EventHandler {
       "$getCapacity": true,
       "$getForceX": true,
       "$getForceY": true,
-      "$getState": true
+      "$getState": true,
       "$getNthLetter": true,
       "$getNthWord": true,
       "$if": true

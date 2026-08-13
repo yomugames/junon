@@ -6,6 +6,7 @@ Bars.IronBar = require("./iron_bar")
 Bars.Glass = require("./glass")
 Bars.CircuitBoard = require("./circuit_board")
 Bars.Cloth = require("../ores/cloth")
+Bars.Straw = require("../ores/straw")
 
 Bars.forType = (type) => {
   const klassName = Helper.getTypeNameById(type)

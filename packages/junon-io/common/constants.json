@@ -2302,6 +2302,23 @@
       },
       "upgrade": {},
       "description": "Glass"
+    },
+    "Straw": {
+      "width": 26,
+      "height": 22,
+      "isIngredient": true,
+      "cost": {
+        "gold": 5
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "requirements": {
+        "PlantFiber": 1
+      },
+      "upgrade": {},
+      "description": "Straw"
     }
   },
   "Ores": {
@@ -2422,6 +2439,23 @@
       },
       "upgrade": {},
       "description": "Ingredient for crafting furnitures and armors"
+    },
+    "Straw": {
+      "width": 26,
+      "height": 22,
+      "isIngredient": true,
+      "cost": {
+        "gold": 5
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "requirements": {
+        "PlantFiber": 1
+      },
+      "upgrade": {},
+      "description": "Straw"
     },
     "Web": {
       "width": 26,
@@ -4406,13 +4440,13 @@
       "stats": {
         "damage": 15,
         "range": 50,
-        "reload": 250,
+        "reload": 300,
         "meleeRange": 50
       },
       "requirements": {
         "IronBar": 50
       },
-      "description": "Fast Melee weapon that can be used for backstabbing. Damage 15"
+      "description": "Fast Melee weapon. Damage 15"
     },
     "Kukri": {
       "parent": "Equipments.BaseKnife",
@@ -4450,6 +4484,85 @@
         "Cloth": 20
       },
       "description": "Hat that santa wears"
+    },
+    "StrawHat": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 53,
+      "height": 32,
+      "cost": {
+        "gold": 50
+      },
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "Straw": 10
+      },
+      "description": "Stylish hat made of straw"
+    },
+    "CowboyHat": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 53,
+      "height": 32,
+      "cost": {
+        "gold": 150
+      },
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "Cloth": 20
+      },
+      "description": "Wild West?"
+    },
+    "JesterHat": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 76,
+      "height": 47,
+      "cost": {
+        "gold": 150
+      },
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "Cloth": 20
+      },
+      "description": "Some foolish people wear this hat"
+    },
+    "Wreath": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 100
+      },
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "PlantFiber": 10,
+        "Poppy": 2,
+        "BlueLotus": 3,
+        "Sunflower": 4
+      },
+      "description": "Wreath made of flowers"
+    },
+    "Crown": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 20000
+      },
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "Gold": 20,
+        "Meteorite": 1
+      },
+      "description": "Only real kings wear this"
     },
     "SpaceSuit": {
       "parent": "Equipments.BaseEquipment",
@@ -4522,14 +4635,11 @@
       "parent": "Equipments.BaseEquipment",
       "width": 64,
       "height": 64,
-      "lightColor": "#ffffff",
-      "isLightPersistent": true,
-      "brightness": 0.8,
       "stats": {
         "range": 64
       },
       "requirements": {
-        "PlantFiber": 30
+        "Cloth": 50
       },
       "description": "Prisoner clothing"
     },
@@ -4537,14 +4647,11 @@
       "parent": "Equipments.BaseEquipment",
       "width": 64,
       "height": 64,
-      "lightColor": "#ffffff",
-      "isLightPersistent": true,
-      "brightness": 0.8,
       "stats": {
         "range": 64
       },
       "requirements": {
-        "PlantFiber": 50
+        "Cloth": 50
       },
       "description": "Police clothing"
     },
@@ -4552,14 +4659,11 @@
       "parent": "Equipments.BaseEquipment",
       "width": 64,
       "height": 64,
-      "lightColor": "#ffffff",
-      "isLightPersistent": true,
-      "brightness": 0.8,
       "stats": {
         "range": 64
       },
       "requirements": {
-        "PlantFiber": 50
+        "Cloth": 50
       },
       "description": "Scientist clothing"
     },
@@ -4567,16 +4671,25 @@
       "parent": "Equipments.BaseEquipment",
       "width": 80,
       "height": 75,
-      "lightColor": "#ffffff",
-      "isLightPersistent": true,
-      "brightness": 0.8,
       "stats": {
         "range": 64
       },
       "requirements": {
-        "PlantFiber": 50
+        "Cloth": 50
       },
       "description": "Cult Leader clothing"
+    },
+    "NobleSuit": {
+      "parent": "Equipments.BaseEquipment",
+      "width": 64,
+      "height": 64,
+      "stats": {
+        "range": 64
+      },
+      "requirements": {
+        "Cloth": 50
+      },
+      "description": "Nobleman clothing"
     },
     "HazmatSuit": {
       "parent": "Equipments.BaseEquipment",
@@ -6577,6 +6690,34 @@
       },
       "description": "Craft drugs and explosives"
     },
+    "SewingMachine": {
+      "width": 32,
+      "height": 64,
+      "cost": {
+        "gold": 500
+      },
+      "hasMenu": true,
+      "categories": {"producer": true},
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 1,
+      "isCraftingStorage": true,
+      "useOriginalSize": true,
+      "stats": {
+        "health": 250,
+        "count": 125,
+        "powerConsumption": 100
+      },
+      "requirements": {
+        "Wire": 5,
+        "IronBar": 20
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Allows you to sew clothing and carpets"
+    },
     "Workshop": {
       "width": 64,
       "height": 64,
@@ -7295,6 +7436,20 @@
         "count": "+1"
       },
       "description": "Basic Fighter Drone"
+    },
+    "Hay": {
+      "width": 32,
+      "height": 32,
+      "requirements": {
+        "Straw": 5
+      },
+      "cost": {
+        "gold": 25
+      },
+      "stats": {
+        "health": 100
+      },
+      "description": "Hay bale"
     }
   },
   "Terrains": {

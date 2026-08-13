@@ -276,6 +276,16 @@ enum BuildingType {
   ShockGrenade = 282;
   Bayonet = 283;
   Kukri = 284;
+  Straw = 285;
+  StrawHat = 286;
+  Hay = 287;
+  Wreath = 288;
+  SewingMachine = 289;
+  GunsmithTable = 290;
+  CowboyHat = 291;
+  Crown = 292;
+  NobleSuit = 293;
+  JesterHat = 294;
 }
 
 enum TerrainType {

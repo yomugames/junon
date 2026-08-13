@@ -56,9 +56,14 @@ Equipments.HazmatSuit = require("./armor/hazmat_suit")
 Equipments.PrisonerSuit = require("./armor/prisoner_suit")
 Equipments.PoliceSuit = require("./armor/police_suit")
 Equipments.LabCoat = require("./armor/lab_coat")
+Equipments.NobleSuit = require("./armor/noble_suit")
 Equipments.CultistSuit = require("./armor/cultist_suit")
 Equipments.ImperialSpecialForcesArmor = require("./armor/imperial_special_forces_armor")
-
+Equipments.StrawHat = require("./armor/straw_hat")
+Equipments.CowboyHat = require("./armor/straw_hat")
+Equipments.JesterHat = require("./armor/jester_hat")
+Equipments.Wreath = require("./armor/wreath")
+Equipments.Crown = require("./armor/crown")
 
 Equipments.forType = (type) => {
   const klassName = Helper.getTypeNameById(type)

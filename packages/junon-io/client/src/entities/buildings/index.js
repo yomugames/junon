@@ -26,6 +26,7 @@ Buildings.Production.ChemistryStation = require("./chemistry_station")
 Buildings.Production.MiningDrill = require("./mining_drill")
 Buildings.Production.DeepDrill = require("./deep_drill")
 Buildings.Production.AmmoPrinter = require("./ammo_printer")
+Buildings.Production.SewingMachine = require("./sewing_machine")
 
 // structures
 
@@ -81,6 +82,8 @@ for (let name in Constants.Walls) {
     }
   }
 }
+
+Buildings.Furnitures.Hay = require('./hay')
 
 Buildings.Furnitures.Bed = require("./bed")
 Buildings.Furnitures.Sign = require("./sign")
@@ -217,7 +220,8 @@ Buildings.getConstructors = () => {
     Buildings.Structures.Workshop,
     Buildings.Structures.Furnace,
     Buildings.Structures.Refinery,
-    Buildings.Structures.AmmoPrinter
+    Buildings.Structures.AmmoPrinter,
+    Buildings.Structures.SewingMachine
   ]
 }
 

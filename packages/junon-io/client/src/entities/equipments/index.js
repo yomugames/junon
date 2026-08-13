@@ -52,19 +52,25 @@ Equipments.Kukri = require("./hand/kukri")
 Equipments.SpaceSuit = require("./armor/space_suit")
 Equipments.CombatArmor = require("./armor/combat_armor")
 Equipments.SantaHat = require("./armor/santa_hat")
+Equipments.StrawHat = require("./armor/straw_hat")
+Equipments.CowboyHat = require("./armor/cowboy_hat")
+Equipments.JesterHat = require("./armor/jester_hat")
+Equipments.Wreath = require("./armor/wreath")
 Equipments.HazmatSuit = require("./armor/hazmat_suit")
 Equipments.PrisonerSuit = require("./armor/prisoner_suit")
 Equipments.PoliceSuit = require("./armor/police_suit")
 Equipments.LabCoat = require("./armor/lab_coat")
+Equipments.NobleSuit = require("./armor/noble_suit")
 Equipments.CultistSuit = require("./armor/cultist_suit")
 Equipments.ImperialSpecialForcesArmor = require("./armor/imperial_special_forces_armor")
+Equipments.Crown = require("./armor/crown")
 
 Equipments.forType = (type) => {
   const klassName = Helper.getTypeNameById(type)
   return Equipments[klassName]
 }
 
-const craftExcludeList = ["UndergroundVent", "Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "PlasmaGun", "PlasmaBlade", "SquidStaff", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit", "ImperialSpecialForcesArmor", "Dynamite", "ShockGrenade"]
+const craftExcludeList = ["UndergroundVent", "Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "PlasmaGun", "PlasmaBlade", "SquidStaff", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit", "NobleSuit", "ImperialSpecialForcesArmor", "Dynamite", "ShockGrenade", "StrawHat", "CowboyHat", "JesterHat", "Crown"]
 
 Equipments.getList = () => {
   return Object.values(Equipments).filter((klass) => {

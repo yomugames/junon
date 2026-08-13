@@ -83,6 +83,10 @@ class RangeEquipment extends HandEquipment {
     
     const sourcePoint = user.game.pointFromDistance(user.getX() + rotatedBiasX, user.getY() + rotatedBiasY, Constants.tileSize * barrelLength, user.getRadAngle())
 
+    if (!this.sector.settings.isGunsShootThroughWalls && this.isObstructed(user, sourcePoint)) {
+      return
+    }
+
     const projectile = this.getProjectileType()
     
     const destination = this.getDestination(user)

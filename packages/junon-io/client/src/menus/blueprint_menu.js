@@ -200,6 +200,15 @@ class BlueprintMenu extends CraftMenu {
     })
   }
 
+  getUncraftableFloors(klasses) {
+    let uncraftableKlasses = ["CarpetFloor"]
+    return klasses.filter((klass) => {
+      let klassName = Protocol.definition().BuildingType[klass.getType()]
+      let isUncraftable = uncraftableKlasses.indexOf(klassName) !== -1 
+      return !isUncraftable
+    })
+  }
+
   getCraftingListContainer() {
     let groups = []
     let containers = ""
@@ -220,7 +229,8 @@ class BlueprintMenu extends CraftMenu {
 
       let buildingKlasses = Object.values(Buildings[group])
       if (group === 'Floors') {
-        buildingKlasses = this.getFloorKlasses(buildingKlasses)  
+        buildingKlasses = this.getFloorKlasses(buildingKlasses)
+        buildingKlasses = this.getUncraftableFloors(buildingKlasses) 
       }
       let el = this.buildBlueprintInventorySlots(buildingKlasses, group)
 

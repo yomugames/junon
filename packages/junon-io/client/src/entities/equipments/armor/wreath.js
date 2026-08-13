@@ -9,8 +9,8 @@ class Wreath extends ArmorEquipment {
   }
   
   repositionSprite() {
-    this.sprite.width = 40
-    this.sprite.height = 46
+    this.sprite.width = 42
+    this.sprite.height = 48
     this.sprite.position.x = 13.5
     this.sprite.position.y = 19.5
   }

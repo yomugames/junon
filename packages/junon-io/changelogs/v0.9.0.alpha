@@ -16,7 +16,9 @@
       "Added new building: gunsmith table. Used to craft guns",
       "Shower is now centered",
       "Minimal lamps intensity is now 0 instead of 3",
-      "Fixed issue with guns shooting through walls"
+      "Fixed issue with guns shooting through walls",
+      "Uzi reskin",
+      "Uzi & AK-47 attack radius were increased"
     ]
   }
 }

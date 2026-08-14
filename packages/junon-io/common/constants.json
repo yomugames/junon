@@ -3732,7 +3732,7 @@
       },
       "projectileBarrelLength": 2.75,
       "stats": {
-        "range": 512,
+        "range": 1024,
         "damage": 10,
         "usageCapacity": 500,
         "health": 300,
@@ -3849,7 +3849,7 @@
       },
       "projectileBarrelLength": 2.5,
       "stats": {
-        "range": 768,
+        "range": 1024,
         "damage": 15,
         "usageCapacity": 10000,
         "health": 300,

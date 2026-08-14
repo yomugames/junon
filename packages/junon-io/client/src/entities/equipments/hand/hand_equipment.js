@@ -19,7 +19,7 @@ class HandEquipment extends BaseEquipment {
     this.sprite.anchor.set(0)
 
     this.sprite.position.x = 45
-    this.sprite.position.y = Math.round((this.user.hands.height - this.sprite.height) / 2)
+    this.sprite.position.y = (this.user.hands.height - this.sprite.height) / 2
   }
 }
 

@@ -1428,7 +1428,7 @@ class BaseEntity extends BaseTransientEntity {
     const isTwoSecondInterval = this.game.timestamp % (Constants.physicsTimeStep * 2) === 0
     if (!isTwoSecondInterval) return
 
-    const paralyzeDuration = 2.5 * Constants.physicsTimeStep
+    const paralyzeDuration = 5 * Constants.physicsTimeStep
 
     if (this.hasEffect("paralyze")) {
       const accumulatedTime = this.game.timestamp - this.getEffectCreatedAt("paralyze")

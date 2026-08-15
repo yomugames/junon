@@ -2,15 +2,19 @@ const HandEquipment = require("./hand_equipment")
 
 class MeleeEquipment extends HandEquipment {
   repositionSprite() {
-    this.sprite.anchor.set(0)
+    super.repositionSprite()
 
     this.sprite.rotation = 90 * PIXI.DEG_TO_RAD
 
-    if (!this.getConstants().sprite) {
-      this.sprite.position.x = 50
-    }
-
     this.user.openHands()
+  }
+  
+  getEasing() {
+    return TWEEN.Easing.Quadratic.InOut
+  }
+  
+  getAnimSpeed() {
+    return 400
   }
 
   getAnimationTween() {
@@ -19,10 +23,13 @@ class MeleeEquipment extends HandEquipment {
     let midRotation   = this.user.getRadAngle() - (halfRotation)
     let endRotation   = this.user.getRadAngle() - (halfRotation * 2)
     let rotation = { rotation: startRotation }
+    
+    const easing = this.getEasing()
+    const speed = this.getAnimSpeed()
 
     const swing = new TWEEN.Tween(rotation)
-        .to({ rotation: endRotation  }, 400)
-        .easing(TWEEN.Easing.Quadratic.InOut) 
+        .to({ rotation: endRotation  }, speed)
+        .easing(easing) 
         .onUpdate(() => {
           let progress = Math.abs(rotation.rotation - startRotation)
           if (progress > halfRotation) {

@@ -9,6 +9,8 @@ class Flame extends CollidableProjectile {
     this.radialExpansion = 0
     this.MAX_RADIAL_EXPANSION = this.getConstants().maxRadialExpansion
     
+    this.piercesWalls = data.piercesWalls || false
+    
     this.w = data.w || this.getConstants().minWidth // for security
   }
 
@@ -81,7 +83,7 @@ class Flame extends CollidableProjectile {
   }
 
   onCollide(entity) {
-    if (entity?.hasCategory("wall")) {
+    if (entity?.hasCategory("wall") && !this.piercesWalls) {
       this.stopExpanding = true
       this.onMoveComplete()
     }

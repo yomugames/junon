@@ -64,6 +64,7 @@ class BaseEquipment extends BaseTransientEntity {
   }
 
   isBreakable() {
+    if (!this.sector.areItemsBreakable()) return false
     if (this.isUnbreakable) return false
     if (this.getConstants().isUnbreakable) return false
 

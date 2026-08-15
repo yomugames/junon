@@ -30,12 +30,10 @@ class MolotovCocktail extends BaseProjectile {
   }
 
   createFlames() {
-    let terrains = this.getContainer().groundMap.search(this.getFlameBoundingBox())
+    let terrains = this.getContainer().platformMap.search(this.getFlameBoundingBox())
     terrains.forEach((terrain) => {
-      if (terrain.isGroundTile()) {
-        let level = Math.floor(Math.random() * 4)
-        terrain.addFire(level, { forceFlamable: true })
-      }
+      let level = Math.floor(Math.random() * 4)
+      terrain.addFire(level, { forceFlamable: true })
     })
   }
 

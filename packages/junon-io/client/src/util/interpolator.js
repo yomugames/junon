@@ -62,7 +62,9 @@ class Interpolator {
     let remainingX = Math.abs(this.distanceToCover.x) - this.distanceCovered.x
     let remainingY = Math.abs(this.distanceToCover.y) - this.distanceCovered.y
     
-    if (remainingX === 0 && remainingY === 0) { return true }
+    if (remainingX < 0 || remainingY < 0) {
+        return true
+    }
     
     return remainingX <= margin && remainingY <= margin
    
@@ -120,7 +122,7 @@ class Interpolator {
       millisecondsToRenderPacket = 150 // assume quick at first, then if turns out its slow, use duration above
     }
 
-    return distance / (millisecondsToRenderPacket / game.resolution)
+    return distance / millisecondsToRenderPacket
   }
 
   instructToMove(x,y) {

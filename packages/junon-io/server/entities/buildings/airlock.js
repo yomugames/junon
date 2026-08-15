@@ -102,8 +102,14 @@ class Airlock extends BaseBuilding {
     if (this.isOpen) {
       this.close()
     } else {
-      this.open()
+      if (user.isMob()) {
+        this.openFor(3000)
+      } else {
+        this.open()
+      }
     }
+
+    this.onOpenStateChanged(user)
   }
 
   onNetworkAssignmentChanged(networkCollection, network) {

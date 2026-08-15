@@ -477,11 +477,28 @@ body {
 #home_background {
     width: 100%;
     height: 100%;
-    background-color: #0b1825;
+    background-color: #000000;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
 }
 
 #home_background.security_camera {
     background-color: #444;
+}
+
+#home_background_image {
+    opacity: 0.8;
+    -webkit-user-select: none;
+    user-select: none;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+}
+
+#home_background.security_camera #home_background_image {
+    display: none;
 }
 
 .arrow-right {
@@ -2894,7 +2911,7 @@ html[lang='ru'] #blueprint_menu {
 
 #product_main_container .craft_btn {
     float: none;
-    margin-top: 0px;
+    margin-top: 25px;
 }
 
 .ui_btn {
@@ -3293,14 +3310,6 @@ html[lang='ru'] .blueprint_name {
     margin-left: 10px;
 }
 
-.crafting_options {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    margin-top: 15px;
-}
-
 .crafting_requirements .inventory_slot {
     width: 30px;
     height: 30px;
@@ -3385,13 +3394,13 @@ html[lang='ru'] .blueprint_name {
     color: white;
     text-align: center;
     width: 50px;
-    height: 30px;
+    height: 26px;
     vertical-align: middle;
 }
 
 .buy_count {
     float: right;
-    /* margin-top: 2px; */
+    margin-top: 2px;
 }
 
 input[type=number]::-webkit-inner-spin-button,

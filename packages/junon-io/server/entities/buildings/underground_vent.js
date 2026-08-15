@@ -18,7 +18,7 @@ class UndergroundVent extends BaseBuilding {
       return
     }
 
-    if (!this.isPeaceful()) {
+    if (!this.game.isPeaceful()) {
       user.showError("Only usable in peaceful")
       return
     }

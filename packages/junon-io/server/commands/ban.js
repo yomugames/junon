@@ -5,7 +5,9 @@ class Ban extends BaseCommand {
 
   getUsage() {
     return [
-      "/ban [player]"
+      "Permanently blocks a player from this world until manually unbanned using /unban command",
+      "/ban [player]",
+      "e.g. /ban kuroro",
     ]
   }
 

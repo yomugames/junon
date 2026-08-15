@@ -978,16 +978,21 @@ class BaseMob extends BaseEntity {
   }
 
   showAction(entityMenu) {
+    let actions = ""
+let customActions = this.getActions()
+    if (customActions) {
+      actions += customActions
+    }
+    
     if (!this.belongToOwner(this.game.player)) {
       // reset
-      entityMenu.querySelector(".entity_action").innerHTML = ""
+      entityMenu.querySelector(".entity_action").innerHTML = actions
       return
     }
 
     let player = this.game.player
     let team = player.getTeam()
-    let actions = ""
-
+    
     if (this.canTakeAlong()) {
       const take = "<div class='take_btn ui_btn' data-action='take_along'>" + i18n.t("Take Along") + "</div>"
       const release = "<div class='release_btn ui_btn' data-action='release'>" + i18n.t("Release") + "</div>"
@@ -1014,6 +1019,20 @@ class BaseMob extends BaseEntity {
     }
 
     entityMenu.querySelector(".entity_action").innerHTML = actions
+  }
+
+  getActions() {
+    let buttons = this.sector.getButtonsFor(this.getTypeNameCamelCase())
+    if (buttons.length == 0) {
+      buttons = this.sector.getButtonsFor(this.getId())
+    }
+    let html = ""
+
+    buttons.forEach((button) => {
+      html += button.buildHTML(this)
+    })
+
+    return html
   }
 
   isNPC() {

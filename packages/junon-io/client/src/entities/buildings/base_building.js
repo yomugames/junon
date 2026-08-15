@@ -477,6 +477,9 @@ class BaseBuilding extends BaseEntity {
 
   getActions() {
     let buttons = this.sector.getButtonsFor(this.getTypeNameCamelCase())
+    if (buttons.length == 0) {
+      buttons = this.sector.getButtonsFor(this.getId())
+    }
     let html = ""
 
     buttons.forEach((button) => {

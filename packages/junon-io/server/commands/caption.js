@@ -5,7 +5,7 @@ class Caption extends BaseCommand {
 
   getUsage() {
     return [
-      "Shows a large announcement in the screen of the specified player.",
+      "Shows a large announcement in the screen of the specified player",
       "/caption title [text]",
       "/caption subtitle [text]",
       "/caption [player] title [text]",

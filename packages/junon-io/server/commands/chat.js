@@ -5,7 +5,7 @@ class Chat extends BaseCommand {
 
   getUsage() {
     return [
-      "Sends a message to the chat box.",
+      "Sends a message to the chat box",
       "/chat [text]",
       "/chat [player] [text]",
       "e.g. /chat @a %success% Welcome, players!",

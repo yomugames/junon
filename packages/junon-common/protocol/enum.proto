@@ -272,8 +272,12 @@ enum BuildingType {
   Minigun = 278;
   Uzi = 279;
   SmallAirlock = 280;
-  Revitalizer = 281;
-  Dispenser = 282;
+  HeavyRifle = 281;
+  ShockGrenade = 282;
+  Bayonet = 283;
+  Kukri = 284;
+  Revitalizer = 285;
+  Dispenser = 286;
 }
 
 enum TerrainType {
@@ -325,6 +329,8 @@ enum ProjectileType {
   Dynamite = 27;
   MiningExplosion = 28;
   MinigunBullet = 29;
+  ShockGrenade = 30;
+  Shockwave = 31;
 }
 
 enum MobStatus {

@@ -7,6 +7,7 @@ const Protocol = require('../../common/util/protocol')
 const Helper = require('../../common/helper')
 const Constants = require('../../common/constants.json')
 const EntityGroup = require("./entity_group")
+const Perlin = require("../util/perlin")
 
 class EventHandler {
   constructor(sector) {
@@ -766,6 +767,30 @@ class EventHandler {
     return entity.health
   }
 
+  getY(entityId) {
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.getY()
+    }
+
+    let entity = this.game.getEntity(entityId)
+    if (!entity) return 0
+
+    return entity.getY()
+  }
+
+  getX(entityId) {
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.getX()
+    }
+
+    let entity = this.game.getEntity(entityId)
+    if (!entity) return 0
+
+    return entity.getX()
+  }
+
   getRow(entityId) {
     let player = this.getPlayer(entityId)
     if (player) {
@@ -1222,6 +1247,15 @@ class EventHandler {
     return Math.floor(min + rand * (max - min + 1))
   }
 
+  simplex(seed, x, y) {
+    const nx = this._safeNumber(x)
+    const ny = this._safeNumber(y)
+    if (seed !== undefined && seed !== null && seed !== '') {
+      Perlin.seed(this._safeNumber(seed))
+    }
+    return Perlin.simplex2(nx, ny)
+  }
+
   getPlayerId(playerName) {
     const player = this.game.getPlayerByNameOrId(playerName)
     
@@ -1257,6 +1291,13 @@ class EventHandler {
     }
   }
 
+  getState(entityId) {
+    const entity = this.game.getEntity(entityId)
+    if (!entity) return undefined
+    
+    return entity.isOpen
+  }
+  
   if(...args) {
     let leftSide  = (args[0] || "").trim();
     let operator  = (args[1] || "").trim();
@@ -1372,10 +1413,13 @@ class EventHandler {
       "$getOwner": true,
       "$random": true,
       "$seedRandom": true,
+      "$simplex": true,
       "$formatTime": true,
       "$getTeamMemberCount": true,
       "$getRoleMemberCount": true,
       "$getPlayerCount": true,
+      "$getY": true,
+      "$getX": true,
       "$getRow": true,
       "$getCol": true,
       "$getRegionPlayerCount": true,
@@ -1393,6 +1437,7 @@ class EventHandler {
       "$root": true,
       "$abs": true,
       "$exp": true,
+      "$tanh": true,
       "$log": true,
       "$min": true,
       "$max": true,
@@ -1421,9 +1466,10 @@ class EventHandler {
       "$getCapacity": true,
       "$getForceX": true,
       "$getForceY": true,
+      "$getState": true,
       "$getNthLetter": true,
       "$getNthWord": true,
-      "$if": true,
+      "$if": true
     }
   }
 

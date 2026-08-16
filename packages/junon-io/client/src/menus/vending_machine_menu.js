@@ -235,10 +235,10 @@ class VendingMachineMenu extends StorageMenu {
 
   resetCost(row) {
     if (!row) return
-    let itemCost = this.row.querySelector(".trade_item_cost")
-    let index = parseInt(this.row.dataset.index)
+    let itemCost = row.querySelector(".trade_item_cost")
+    let index = parseInt(row.dataset.index)
 
-    itemCost.innerText = Item.getKlass(this.row.dataset.type).getCost() + " G"
+    itemCost.innerText = Item.getKlass(row.dataset.type).getCost() + " G"
 
     if (this.entity.prices && this.entity.prices[this.storage[index].id]) {
       itemCost.innerText = this.entity.prices[this.storage[index].id] + " G"

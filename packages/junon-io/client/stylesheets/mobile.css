@@ -69,11 +69,6 @@
 }
 
 @media only screen and (max-height: 600px) {
-    .main_colony_list {
-        max-height: 160px;
-        overflow-y: scroll;
-    }
-
     #chat_container.vote_mode {
         left: 0px !important;
         top: 0px !important;

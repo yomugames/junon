@@ -17,5 +17,8 @@
   "dependencies": {
     "perlin-noise": "^0.0.1",
     "sharp": "^0.33.1"
+  },
+  "overrides": {
+    "form-data": "4.0.6"
   }
 }

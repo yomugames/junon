@@ -65,7 +65,7 @@ Equipments.StrawHat = require("./armor/straw_hat")
 Equipments.CowboyHat = require("./armor/straw_hat")
 Equipments.JesterHat = require("./armor/jester_hat")
 Equipments.Wreath = require("./armor/wreath")
-Equipments.Crown = require("./armor/crown")
+// Equipments.Crown = require("./armor/crown")
 
 Equipments.forType = (type) => {
   const klassName = Helper.getTypeNameById(type)

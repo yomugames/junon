@@ -65,14 +65,14 @@ Equipments.LabCoat = require("./armor/lab_coat")
 Equipments.NobleSuit = require("./armor/noble_suit")
 Equipments.CultistSuit = require("./armor/cultist_suit")
 Equipments.ImperialSpecialForcesArmor = require("./armor/imperial_special_forces_armor")
-Equipments.Crown = require("./armor/crown")
+// Equipments.Crown = require("./armor/crown")
 
 Equipments.forType = (type) => {
   const klassName = Helper.getTypeNameById(type)
   return Equipments[klassName]
 }
 
-const craftExcludeList = ["UndergroundVent", "Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "PlasmaGun", "PlasmaBlade", "SquidStaff", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit", "NobleSuit", "ImperialSpecialForcesArmor", "Dynamite", "ShockGrenade", "StrawHat", "CowboyHat", "JesterHat", "Crown"]
+const craftExcludeList = ["UndergroundVent", "Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "PlasmaGun", "PlasmaBlade", "PlasmaSabre", "SquidStaff", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit", "NobleSuit", "ImperialSpecialForcesArmor", "Dynamite", "ShockGrenade", "StrawHat", "CowboyHat", "JesterHat", "Crown"]
 
 Equipments.getList = () => {
   return Object.values(Equipments).filter((klass) => {

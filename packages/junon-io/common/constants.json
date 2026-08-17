@@ -4402,7 +4402,7 @@
         "reload": 400
       },
       "requirements": {
-        "CopperBar": 20,
+        "CopperBar": 10,
         "Meteorite": 25
       },
       "description": "A lightweight sword forged with plasma. Can be used for swift attacks"
@@ -4700,7 +4700,7 @@
         "resistance": {
           "stab": 4.5,
           "blunt": 2,
-          "bullet": 10,
+          "bullet": 2,
           "fire": 1
         }
       },
@@ -4708,7 +4708,7 @@
         "Meteorite": 40,
         "SpaceSuit": 1
       },
-      "description": "Good for melee combat. Reduces damage by 4."
+      "description": "Good for melee combat. Reduces stab damage by 5"
     },
     "ImperialSpecialForcesArmor": {
       "parent": "Equipments.BaseEquipment",

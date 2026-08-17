@@ -2,7 +2,7 @@ const CollidableProjectile = require("./collidable_projectile")
 const Protocol = require('../../../common/util/protocol')
 const Constants = require("./../../../common/constants.json")
 
-class RifleBullet extends CollidableProjectile {
+class RifleBullet extends CollidableProcjectile {
 
   getType() {
     return Protocol.definition().ProjectileType.RifleBullet

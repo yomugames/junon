@@ -378,7 +378,7 @@ class Sector {
     let firespread = true;
     let isItemBreakingEnabled = true;
     if(this.isPeaceful()) firespread = false;
-    if(this.isPeaceful()) isItemBreakingEnabled = false;
+    if(this.isPeaceful()) isItemBreakingEnabled = true;
     this.settings = {
       isPvPAllowed: false,
       isFovMode: false,
@@ -404,7 +404,7 @@ class Sector {
       isMutantEnabled: true,
       isGravityEnabled: false,
       isFireSpreadEnabled: firespread,
-      isItemBreakingEnabled,
+      isItemBreakingEnabled: true,
       isSpectateAllowed: true
     }
 
@@ -827,7 +827,7 @@ class Sector {
   canEditSetting(key) {
     if(this.gameMode === 'hardcore' || !this.gameMode) return false;
     if(this.gameMode === 'survival') {
-      let allowedSettingChanges = ['isPvPAllowed',"isFovMode", "isZoomAllowed", "showMiniMap", "showPlayerList", "isFloorAutodirt", "isChatEnabled", "isShadowsEnabled", "isPlayerSavingEnabled", "isBloodEnabled", "isGravityEnabled", "isItemBreakingEnabled", "isSpectateAllowed"]
+      let allowedSettingChanges = ['isPvPAllowed',"isFovMode", "isZoomAllowed", "showMiniMap", "showPlayerList", "isChatEnabled", "isPlayerSavingEnabled", "isGravityEnabled", "isSpectateAllowed"]
 
       if(allowedSettingChanges.indexOf(key) === -1) return false;
     }

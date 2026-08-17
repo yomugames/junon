@@ -2729,7 +2729,7 @@ class Player extends BaseEntity {
       if (!this.sector.isTutorial() && !entity.isOwnedBy(this)) return
       if (!entity.isHitPassable(hit)) return
       if (!entity.isOpen) {
-        entity.openFor(3000)
+        entity.openFor(3000, entity)
       }
     }
   }

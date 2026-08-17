@@ -1,40 +1,18 @@
 {
   "version": "v0.8.2.alpha",
-  "date": "August 6, 2026",
-  "title": "Bugfixes + new stuff update by KONTREVOLUCIA",
+  "date": "August 10, 2026",
+  "title": "QOL Update #1 - By Perrito",
   "content": {
     "bugs": [
-      "Fixed flamethrower turret can't shoot through walls",
-      "Player now holds plasma gun and some other weapons properly",
-      "Fixed molotov cocktail weren't stackable and couldn't burn platforms",
-      "Fixed dynamite craft required iron ore instead of iron bars",
-      "Fixed underground vents didn't work in peaceful mode",
-      "Fixed $tanh function was disabled",
-      "Fixed interpolator. Now it doesn't break while zooming & also fixed phantom projectiles bug",
-      "Fixed raven's hitbox"
+      "Fixed bug: Timers not working properly"
     ],
     "features": [
-      "Slightly changed weapons balance",
-      "Game now procedurally generates position in hands for hand equipments",
-      "Flamethrower turret now works same as flamethrower",
-      "Added heavy rifle",
-      "Added shock grenade",
-      "Added bayonet knife",
-      "Added kukri",
-      "Enabled molotov cocktail craft",
-      "Poison grenade craft now requires iron bars",
-      "Deconstructor now attacks only buildings",
-      "Fixed bosses(squid lord, raven) attack radius",
-      "Added $simplex function",
-      "Added $getX/Y functions",
-      "Added $getState function(used to get lamps or doors state)",
-      "Added BuildingStateChanged trigger(used for lamps and doors)",
-      "Plasma blade, plasma gun and squid staff are now craftable only in forge",
-      "Katana is now craftable without forge",
-      "Rail trams are now faster + can regulate it from constants",
-      "Main menu background now uses one of 18 random game screenshots",
-      "Unified mobs and players door interaction logic",
-      "Added Enable Items Breaking setting"
+      "Added /chatprefix command",
+      "Added new functions: $if(), $getNthLetter(), and $getNthWord()",
+      "Added isSpectateAllowed setting to enable/disable /spectate command",
+      "Reworked /god and /fly, they both function as usual but have an optional true/false parameter",
+      "Reworked the way $ functions are read in command block",
+      "ex. $add(1, 2 5) would normally break, with this update it now functions properly and is read as 1 + 25"
     ]
   }
 }

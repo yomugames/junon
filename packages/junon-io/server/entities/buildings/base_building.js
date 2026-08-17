@@ -256,6 +256,12 @@ class BaseBuilding extends BaseEntity {
     if (data.name) {
       this.setName(data.name)
     }
+    if (data.nameColor) {
+      this.setNameColor(data.nameColor)
+    }
+    if (data.nameSize) {
+      this.setNameSize(data.nameSize)
+    }
 
     if (data.containerId) {
       this.container = this.game.getEntity(data.containerId)
@@ -1912,6 +1918,14 @@ class BaseBuilding extends BaseEntity {
   setName(name) {
     this.name = name
     this.onStateChanged('name')
+  }
+  setNameColor(color) {
+    this.nameColor = color || 16777215
+    this.onStateChanged('nameColor')
+  }
+  setNameSize(size) {
+    this.nameSize = Math.min(Math.max(parseInt(size),1),50) || 23
+    this.onStateChanged('nameSize')
   }
 
   getAmmoType() {

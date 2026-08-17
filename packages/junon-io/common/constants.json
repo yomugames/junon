@@ -550,8 +550,9 @@
       "variables": {
         "playerId":"id of player",
         "player": "username of player that clicked",
-        "entityId": "id of entity button attached",
-        "name": "name of button clicked"
+        "entityId": "id of the entity the button is attached to",
+        "name": "name of button clicked",
+        "entityName": "name of the entity the button is attached to"
       }
     },
     "PlayerPinged": {

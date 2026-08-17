@@ -5,6 +5,7 @@ const EntityGroup = require("./../entities/entity_group")
 const Helper = require("../../common/helper")
 const Mobs = require("../entities/mobs/index")
 const Buildings = require("../entities/buildings/index")
+const { toNumber } = require("lodash")
 
 class Name extends BaseCommand {
 
@@ -23,6 +24,11 @@ class Name extends BaseCommand {
   cleanName(text) {
     let newText = this.game.sanitize(text)
     return newText.substring(0,30)
+  }
+
+  convertHexToPixiColor(hexString) {
+    const cleanHex = hexString.replace("#", "").replace("0x", "").trim();  
+    return parseInt(cleanHex, 16);
   }
 
   perform(caller, args) {
@@ -73,6 +79,11 @@ class Name extends BaseCommand {
         entity.setName("")
         caller.showChatSuccess("removed name from " + entity.id)
         break
+      case "setcolor":
+        entity.setNameColor(this.convertHexToPixiColor(args[2])||16777215)
+        break;
+      case "setsize":
+        entity.setNameSize(toNumber(args[2]))
       default:
         break
     }

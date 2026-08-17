@@ -399,7 +399,8 @@ class RemoteEventHandler {
     player.sector.onButtonClicked({
       player: player.name, 
       playerId: player.id,
-      entityId: data.entityId,
+      entityId: data.entityId || "",
+      entityName: data.entityName || "",
       name: data.name
     })
   }

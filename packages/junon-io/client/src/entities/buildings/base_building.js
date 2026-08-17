@@ -19,6 +19,8 @@ const BaseBuildingCommon = require("./../../../../common/entities/base_building_
 const NetworkSprite = require("./../network_sprite")
 const BitmapText = require("../../util/bitmap_text");
 const Grid = require("../../../../common/entities/grid");
+const { str } = require("../../../../common/util/vec2")
+const { toNumber } = require("lodash")
 
 let attributeHandlers = {}
 
@@ -1159,17 +1161,40 @@ class BaseBuilding extends BaseEntity {
       this.onNeighborChanged()
     }
   }
-
+  
+  setNameColor(color) {
+    this.nameColor = color
+    // Upd:
+    let SavedName = this.name
+    this.setName(" ")
+    this.setName(SavedName)
+    // Upd
+    this.onNameChanged();
+  }
+  setNameSize(size) {
+    this.nameSize = size
+    // Upd:
+    let SavedName = this.name
+    this.setName(" ")
+    this.setName(SavedName)
+    // Upd
+    this.onNameChanged();
+  }
   setName(name) {
     this.name = name
-    this.onNameChanged()
+    this.onNameChanged();
   }
 
   onNameChanged() {
     this.createNameSpriteIfNotPresent()
-    this.nameText.sprite.text = this.name
+  
+    if (this.nameText && this.nameText.sprite) {
+      this.nameText.sprite.text = this.name || "";
+      this.nameText.sprite._font.tint = this.nameColor !== undefined ? this.nameColor : 0xffffff;
+      this.nameText.sprite._font.size = this.nameSize || 23;
+    }
   }
-
+  
   createNameSpriteIfNotPresent() {
     if (!this.nameSprite) {
       const margin = this.getRotatedHeight() - this.getRotatedHeight()/4
@@ -1183,9 +1208,8 @@ class BaseBuilding extends BaseEntity {
         label: "NameText",
         text: this.name, 
         align: 'center',
-        spriteContainer: this.nameSprite
+        spriteContainer: this.nameSprite,
       })
-
       this.sector.effectsContainer.addChild(this.nameSprite)
     }
   }

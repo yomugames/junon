@@ -1329,7 +1329,7 @@ class EventHandler {
   getNthWord(...values) {
     if (values.length < 2) return ""
     let index = parseInt(values[0])
-    let word = values.slice(1).join(" ")
+    let word = values.slice(1).join(" ").toString()
     let stringArray = word.split(" ")
 
     if (isNaN(index) || index < 1) {
@@ -1349,7 +1349,7 @@ class EventHandler {
   getNthLetter(...values) {
     if (values.length === 0) return ""
     let index = parseInt(values[0])
-    let word = values[1];
+    let word = values[1].toString();
     if (isNaN(index)) {
       return ""
     }

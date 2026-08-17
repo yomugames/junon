@@ -53,7 +53,7 @@ class ChatPrefix extends BaseCommand {
         }
         selectedPlayers.forEach(ply => {
           this.game.playerChatPrefixes[ply.name] = {
-            prefix:args[2].replace(/[^a-zA-Z]/g, '').slice(0, 10),
+            prefix:args[2].replace(/[^a-zA-Z0-9]/g, '').slice(0, 12),
             color:args[3] || "#ffffff",
             styleA:style[0],
             styleB:style[1]

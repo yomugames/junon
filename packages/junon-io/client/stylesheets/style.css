@@ -4321,6 +4321,11 @@ html[lang='ja'] #total_online_count {
     margin-top: 20px;
 }
 
+.main_colony_list, .search_colony_list {
+    height: 50vh;
+    overflow-y: scroll;
+}
+
 .colony_list.list_mode .team_entry_row {
     height: 40px;
     float: none;

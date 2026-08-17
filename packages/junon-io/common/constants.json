@@ -754,7 +754,8 @@
     "xchecker_texture":    { "index": 9 },
     "x_texture":           { "index": 10 },
     "noise_texture":       { "index": 11 },
-    "simplex_texture":     { "index": 12 }
+    "simplex_texture":     { "index": 12 },
+    "grass_texture":       { "index": 13 }
   },
   "SuitColors": {
     "gray":   { "index": 1 , "value": "#999999" },

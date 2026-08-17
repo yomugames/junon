@@ -27,7 +27,9 @@
       "Kukri was nerfed to 20 damage",
       "Refactored bullets' logic and some outdated code",
       "Added sabre and its plasma version",
-      "Added different types of damage(stab, blunt, acid..)"
+      "Added different types of damage(stab, blunt, acid..)",
+      "Molotov cocktail can flame terrains now",
+      "Added grass texture for floor"
     ]
   }
 }

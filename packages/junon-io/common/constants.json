@@ -3698,7 +3698,7 @@
       "cost": {
         "gold": 250
       },
-      "projectileBarrelLength": 2.75,
+      "projectileBarrelLength": 2,
       "stats": {
         "range": 512,
         "damage": 10,
@@ -5729,6 +5729,26 @@
         "count": "+25"
       },
       "description": "wood table"
+    },
+    "SmallWoodTable": {
+      "width": 32,
+      "height": 64,
+      "cost": {
+        "gold": 150
+      },
+      "categories": {"dining_table":true},
+      "requirements": {
+        "Wood": 10
+      },
+      "stats": {
+        "health": 100,
+        "count": 100
+      },
+      "upgrade": {
+        "health": "+100",
+        "count": "+25"
+      },
+      "description": "small wood table"
     },
     "LargeTable": {
       "width": 64,

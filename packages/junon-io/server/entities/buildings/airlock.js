@@ -104,6 +104,7 @@ class Airlock extends BaseBuilding {
     } else {
       if (user.isMob()) {
         this.openFor(3000, user)
+        return
       } else {
         this.open()
       }
@@ -127,32 +128,39 @@ class Airlock extends BaseBuilding {
   openFor(duration, entity) {
     this.open()
 
-    if (entity && !entity.isMob()) {}
-      let changerType
-      if (entity?.isPlayer()) {
-        changerType = entity?.getName()
+    let changerType
+    let changerId
+
+    if (entity) {
+      changerId = entity.getId()
+
+      if (entity.isPlayer()) {
+        changerType = entity.getName()
       } else {
-        changerType = entity?.getTypeName()
+        changerType = entity.getTypeName()
       }
-      this.game.triggerEvent("BuildingStateChanged", {
-        entityId: this.getId(),
-        entityType: this.getTypeName(),
-        changerId: entity?.getId(),
-        changerType,
-        state: this.isOpen
-      })}
+    }
+
+    this.game.triggerEvent("BuildingStateChanged", {
+      entityId: this.getId(),
+      entityType: this.getTypeName(),
+      changerId,
+      changerType,
+      state: this.isOpen
+    })
 
     clearTimeout(this.closeTimeout)
+
     this.closeTimeout = setTimeout(() => {
       this.close()
-      if (entity) {
+
       this.game.triggerEvent("BuildingStateChanged", {
         entityId: this.getId(),
         entityType: this.getTypeName(),
-        changerId: entity?.getId(),
+        changerId,
         changerType,
         state: this.isOpen
-      })}
+      })
     }, duration)
   }
 

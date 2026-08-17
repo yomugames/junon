@@ -1,0 +1,21 @@
+{
+  "version": "v0.8.4.alpha",
+  "date": "August 17, 2026",
+  "title": "Bug Fix & Patch of v0.8.3.alpha by BigTforLife",
+  "content": {
+    "bugs": [
+      "Reverted balancing edits from v0.8.3.alpha",
+      "Added a default value (true) for isItemBreakingEnabled setting",
+      "Locked isItemBreakingEnabled setting in survival and hardcore",
+      "Removed crafting of shock grenade, kurki, and bayonet (now peaceful only)",
+      "Fixed $getX and $getY, now they return the proper float coordinates",
+      "Fixed item descriptions",
+      "Fixed buildingStateChanged trigger, now triggers properly on open and close",
+      "Added missing changelog"
+    ],
+    "features": [
+      "HeavyRifle now does double damage to armored mobs (sapper, golem, drone, and raven)",
+      "Added small wooden table"
+    ]
+  }
+}

@@ -5262,7 +5262,7 @@ class Player extends BaseEntity {
       if (target.isOnFire()) {
         target.reduceFireSlowly()
       } else if (this.canDamage(targetEntity)) {
-        target.damage(this.getDamage(), this)
+        target.damage(this.getDamage(), this, this, "blunt")
       }
     }
 
@@ -5949,24 +5949,12 @@ Object.assign(Player.prototype, ShipMountable.prototype, {
 })
 
 Object.assign(Player.prototype, Destroyable.prototype, {
-  damage(amount, attacker, sourceEntity) {
+  damage(amount, attacker, sourceEntity, damageType) {
+
     if (this.isInvulnerable) return
     if (this.isGod()) return
 
-    if (this.getArmorEquipment()) {
-      amount = this.getArmorEquipment().reduceDamage(amount, sourceEntity)
-    }
-
-    if (isNaN(amount)) {
-      throw new Error("damage amount " + amount + " is invalid")
-    }
-
-    const prevHealth = this.health
-
-    let delta = this.health - amount
-    this.onDamaged(attacker, prevHealth)
-    this.setHealth(this.health - amount)
-
+    Destroyable.prototype.damage.call(this, amount, attacker, sourceEntity, damageType)
 
     let data = {
       player: this.getName(),

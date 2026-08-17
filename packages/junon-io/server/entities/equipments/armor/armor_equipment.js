@@ -6,7 +6,7 @@ class ArmorEquipment extends BaseEquipment {
     player.body.velocity = velocity // by default, set immediately
   }
 
-  reduceDamage(amount, sourceEntity) {
+  reduceDamage(amount, sourceEntity, damageType) {
     if (sourceEntity && sourceEntity.hasCategory("elemental")) {
       return amount
     }

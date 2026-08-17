@@ -1,9 +1,13 @@
 {
-  "version": "v0.9.0.alpha",
+  "version": "v0.9.0.alpha(WIP)",
   "date": "August 13, 2026",
   "title": "Decorations update by KONTREVOLUCIA: Part 1",
   "content": {
-    "bugs": [],
+    "bugs": [
+      "Fixed oil refinery wasn't centered",
+      "Fixed shotgun was shooting all bullets not at the same time",
+      "Fixed bullets go through buildings sometimes"
+    ],
     "features": [
       "Added straw(craftable in furnace)",
       "Added straw hat",
@@ -18,7 +22,14 @@
       "Minimal lamps intensity is now 0 instead of 3",
       "Fixed issue with guns shooting through walls",
       "Uzi reskin",
-      "Uzi & AK-47 attack radius were increased"
+      "Rebalance of most ranged weapons",
+      "Added damage decay when travelled distance increases for some ranged weapons",
+      "Missiles can boost up now",
+      "Bayonet now requires 10 iron bars instead of 50",
+      "Kukri was nerfed to 20 damage",
+      "Refactored bullets' logic and some outdated code",
+      "Added sabre and its plasma version",
+      "Added different types of damage(stab, blunt, acid..)"
     ]
   }
 }

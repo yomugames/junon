@@ -216,6 +216,16 @@ class BaseMenu {
     this.buildingTooltip.querySelector(".entity_name_label").innerText = i18n.t(buildingKlass.getCraftTypeName(itemContent))
     this.buildingTooltip.querySelector(".entity_id").innerText = "ID: " + itemId
     this.buildingTooltip.querySelector(".entity_description").innerText = buildingKlass.getDescription(itemContent)
+    this.buildingTooltip.querySelector(".entity_damage_type").innerText = "Damage type: " + buildingKlass.getDamageType(itemContent)
+
+    const itemType = Item.getKlassType(buildingKlass.getType())
+    const isWeapon = itemType === 'equipment'
+
+    if (isWeapon) {
+      this.buildingTooltip.querySelector(".entity_damage_type").style.display = 'inline-block'
+    } else {
+      this.buildingTooltip.querySelector(".entity_damage_type").style.display = 'none'
+    }
 
     // if (!this.isTouchDevice()) {
     this.repositionTooltip(inventorySlot, boundingRect)
@@ -381,11 +391,13 @@ class BaseMenu {
 
   showProductInfo(type) {
     const itemKlass = Item.getKlass(type)
+    const itemType = Item.getKlassType(type)
     let imagePath = "/assets/images/" + itemKlass.prototype.getSpritePath()
 
     this.el.querySelector(".blueprint_image").src = imagePath
     this.el.querySelector(".blueprint_name").innerText = i18n.t(itemKlass.getCraftTypeName())
     this.el.querySelector(".blueprint_description").innerText = itemKlass.getDescription()
+    this.el.querySelector(".blueprint_damage_type").innerText = "Damage type: " + itemKlass.getDamageType()
 
     let productUnavailableEl = this.el.querySelector(".product_unavailable_notice")
     if (!this.isBuildingAllowedInGame(type)) {
@@ -400,6 +412,14 @@ class BaseMenu {
       }
       this.el.querySelector(".craft_count").style.display = 'inline-block'
       this.el.querySelector(".craft_btn").style.display = 'inline-block'
+    }
+
+    const isWeapon = itemType === 'equipment'
+
+    if (isWeapon) {
+      this.el.querySelector(".blueprint_damage_type").style.display = 'inline-block'
+    } else {
+      this.el.querySelector(".blueprint_damage_type").style.display = 'none'
     }
 
     this.showRequirements(type)

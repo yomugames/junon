@@ -1451,7 +1451,7 @@ class BaseEntity extends BaseTransientEntity {
       if (accumulatedTime >= poisonDuration) {
         this.removeEffect("poison")
       } else {
-        this.setHealth(this.health - 10)
+        this.damage(Constants.poisonDamage, this, this, "acid")
       }
     }
 
@@ -1561,7 +1561,7 @@ class BaseEntity extends BaseTransientEntity {
 
     const miasmaDuration = 60 * Constants.physicsTimeStep
 
-    this.reduceHealth(this.getMiasmaDamage())
+    this.applyMiasmaDamage()
 
     const accumulatedTime = this.game.timestamp - this.getEffectCreatedAt(effectName)
     if (accumulatedTime >= miasmaDuration) {
@@ -1582,8 +1582,8 @@ class BaseEntity extends BaseTransientEntity {
     }
   }
 
-  getMiasmaDamage() {
-    return 1
+  applyMiasmaDamage() {
+    this.damage(Constants.miasmaDamage, this, this, "miasma")
   }
 
   consumeDrunk() {
@@ -1676,9 +1676,9 @@ class BaseEntity extends BaseTransientEntity {
 
     if (platform && platform.isOnFire()) {
       if (platform.isLava()) {
-        this.reduceHealth(24)
+        this.damage(Constants.lavaDamage, this, this, "fire")
       } else {
-        this.reduceHealth(15)
+        this.damage(15, this, this, "fire")
         this.addFire(3)
       }
     } else {
@@ -1768,7 +1768,7 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   applyFireDamage() {
-    this.setHealth(this.health - 1)
+    this.damage(Constants.fireDamage, this, this, "fire")
   }
 
   canSpreadFire() {

@@ -1860,7 +1860,10 @@
       },
       "stats": {
         "liquidCapacity": 10,
-        "health": 100
+        "health": 100,
+        "resistance": {
+          "miasma": -9
+        }
       }
     },
     "FiberSeed": {
@@ -1996,6 +1999,7 @@
         "height": 4,
         "tint": "#ffff07"
       },
+      "damageType": "fire",
       "categories": {"distance_dependent_width": true}
     },
     "BlueLaser": {
@@ -2008,17 +2012,20 @@
         "height": 4,
         "tint": "#0000ff"
       },
+      "damageType": "fire",
       "categories": {"distance_dependent_width": true}
     },
     "MiningBeam": {
       "width": 32,
       "height": 32,
-      "speed": 0
+      "speed": 0,
+      "damageType": "fire"
     },
     "VoidRayLight": {
       "width": 32,
       "height": 32,
-      "speed": 0
+      "speed": 0,
+      "damageType": "fire"
     },
     "LightLaser": {
       "width": 5,
@@ -2029,6 +2036,7 @@
         "height": 3,
         "tint": "#f33136"
       },
+      "damageType": "fire",
       "categories": {"distance_dependent_width": true}
     },
     "CannonBall": {
@@ -2039,12 +2047,14 @@
     "Bubble": {
       "width": 32,
       "height": 32,
-      "speed": 48
+      "speed": 48,
+      "damageType": "fire"
     },
     "BlasterLaser": {
       "width": 24,
       "height": 8,
-      "speed": 15
+      "speed": 15,
+      "damageType": "fire"
     },
     "CarbonGas": {
       "width": 64,
@@ -2068,55 +2078,65 @@
       "minWidth": 42,
       "maxWidth": 50,
       "maxRadialExpansion": 90,
-      "speed": 0
+      "speed": 0,
+      "damageType": "acid"
     },
     "AcidSpit": {
       "width": 24,
       "height": 24,
-      "speed": 8
+      "speed": 8,
+      "damageType": "acid"
     },
     "Grenade": {
       "canDamageWalls": true,
       "width": 16,
       "height": 16,
-      "speed": 20
+      "speed": 20,
+      "damageType": "blunt"
     },
     "Dynamite": {
       "canDamageWalls": true,
       "width": 16,
       "height": 16,
-      "speed": 20
+      "speed": 20,
+      "damageType": "blunt"
     },
     "MolotovCocktail": {
       "canDamageWalls": false,
       "width": 24,
       "height": 28,
-      "speed": 20
+      "speed": 20,
+      "damageType": "blunt"
     },
     "Meteor": {
       "width": 64,
       "height": 64,
-      "speed": 30
+      "speed": 30,
+      "damageType": "blunt"
     },
     "PoisonGrenade": {
       "width": 16,
       "height": 16,
-      "speed": 20
+      "speed": 20,
+      "damageType": "blunt"
     },
     "ShockGrenade": {
       "width": 20,
       "height": 24,
-      "speed": 20
+      "speed": 20,
+      "damageType": "blunt"
     },
     "TeslaLaser": {
       "width": 10,
       "height": 10,
-      "damage": 40
+      "damage": 40,
+      "damageType": "electricity"
     },
     "Explosion": {
       "canDamageWalls": true,
       "width": 192,
       "height": 192,
+      "damageType": "blunt",
       "damage": 25,
       "speed": 1
     },
@@ -2124,6 +2144,7 @@
       "canDamageWalls": true,
       "width": 192,
       "height": 192,
+      "damageType": "blunt",
       "damage": 10,
       "speed": 1
     },
@@ -2131,6 +2152,7 @@
       "canDamageWalls": true,
       "width": 192,
       "height": 192,
+      "damageType": "blunt",
       "damage": 10,
       "speed": 1
     },
@@ -2140,6 +2162,7 @@
       "minWidth": 16,
       "maxWidth": 32,
       "maxRadialExpansion": 32,
+      "damageType": "fire",
       "damage": 1,
       "speed": 10,
       "categories": {"elemental":true,"fire":true}
@@ -2147,7 +2170,8 @@
     "IonBeam": {
       "width": 512,
       "height": 32,
-      "speed": 5
+      "speed": 5,
+      "damageType": "fire"
     },
     "Spike": {
       "width": 32,
@@ -2161,6 +2185,7 @@
         "height": 5,
         "tint": "#ffff07"
       },
+      "damageType": "bullet",
       "damage": 10,
       "speed": 100,
       "categories": {"distance_dependent_width": true}
@@ -2173,6 +2198,7 @@
         "height": 5,
         "tint": "#777777"
       },
+      "damageType": "bullet",
       "damage": 12,
       "speed": 100,
       "categories": {"distance_dependent_width": true}
@@ -2186,6 +2212,7 @@
         "tint": "#666666"
       },
       "speed": 100,
+      "damageType": "bullet",
       "damage": 7,
       "categories": {"distance_dependent_width": true}
     },
@@ -2199,6 +2226,7 @@
       },
       "isPiercing": true,
       "speed": 120,
+      "damageType": "bullet",
       "damage": 40,
       "categories": {"distance_dependent_width": true}
     },
@@ -2211,6 +2239,7 @@
         "tint": "#666666"
       },
       "isPiercing": true,
+      "damageType": "bullet",
       "damage": 10,
       "speed": 100,
       "categories": {"distance_dependent_width": true}
@@ -2218,7 +2247,10 @@
     "Missile": {
       "width": 32,
       "height": 32,
-      "speed": 25,
+      "speed": 5,
+      "maxSpeed": 200,
+      "acceleration": 12,
+      "damageType": "bullet",
       "damage": 20
     }
   },
@@ -2675,7 +2707,7 @@
         "IronOre": 2
       },
       "upgrade": {},
-      "description": "Ammunition for AssaultRifle"
+      "description": "Ammunition for Rifles"
     },
     "ShotgunShell": {
       "width": 32,
@@ -3510,6 +3542,7 @@
       "useOriginalSize": true,
       "abstract": true,
       "stats": {
+        "damageType": "stab",
         "range": 32
       }
     },
@@ -3521,16 +3554,14 @@
       "projectileBiasByY": 0,
       "projectileBarrelLength": 1,
       "stats": {
+        "damageType": "bullet",
         "range": 32,
         "spreadAngle": 0
       }
     },
     "BaseKnife": {
       "parent": "Equipments.MeleeEquipment",
-      "abstract": true,
-      "stats": {
-        "backstabDamageMultiplier": 4
-      }
+      "abstract": true
     },
     "Syringe": {
       "parent": "Equipments.BaseEquipment",
@@ -3710,12 +3741,13 @@
       },
       "projectileBarrelLength": 2,
       "stats": {
-        "range": 512,
+        "range": 718,
         "damage": 20,
         "usageCapacity": 175,
         "health": 300,
         "reload": 500,
-        "spreadAngle": 2.5
+        "spreadAngle": 2.5,
+        "decay": 10
       },
       "requirements": {
         "IronBar": 10,
@@ -3733,19 +3765,20 @@
       "projectileBarrelLength": 2.75,
       "stats": {
         "range": 1024,
-        "damage": 10,
+        "damage": 15,
         "usageCapacity": 500,
         "health": 300,
         "reload": 100,
         "burstCount": 2,
         "burstTimeout": 100,
-        "spreadAngle": 3.5
+        "spreadAngle": 3.75,
+        "decay": 2
       },
       "requirements": {
-        "IronBar": 40,
+        "IronBar": 80,
         "CopperBar": 20
       },
-      "description": "SMG Weapon. Damage 10"
+      "description": "SMG Weapon. Damage 15"
     },
     "Shotgun": {
       "parent": "Equipments.RangeEquipment",
@@ -3756,13 +3789,15 @@
       },
       "projectileBarrelLength": 2.5,
       "stats": {
-        "range": 512,
+        "range": 718,
         "damage": 8,
         "usageCapacity": 750,
         "health": 300,
         "reload": 950,
-        "spreadAngle": 10,
-        "burstCount": 8
+        "spreadAngle": 4,
+        "burstCount": 12,
+        "burstTimeout": 0,
+        "decay": 2.5
       },
       "requirements": {
         "IronBar": 80,
@@ -3781,7 +3816,7 @@
       "projectileBarrelLength": 4,
       "stats": {
         "range": 1280,
-        "damage": 55,
+        "damage": 65,
         "usageCapacity": 250,
         "health": 300,
         "reload": 3000,
@@ -3803,14 +3838,15 @@
       },
       "projectileBarrelLength": 2.5,
       "stats": {
-        "range": 960,
-        "damage": 10,
-        "usageCapacity": 300,
+        "range": 1024,
+        "damage": 16,
+        "usageCapacity": 500,
         "health": 300,
         "reload": 500,
         "burstCount": 5,
         "burstTimeout": 100,
-        "spreadAngle": 5
+        "spreadAngle": 1.85,
+        "decay": 2
       },
       "requirements": {
         "IronBar": 80,
@@ -3828,17 +3864,19 @@
       "projectileBarrelLength": 3.125,
       "stats": {
         "range": 1024,
-        "damage": 30,
+        "damage": 20,
         "usageCapacity": 1000,
         "health": 300,
         "reload": 200,
+        "burstCount": 25,
+        "burstTimeout": 100,
         "spreadAngle": 1.5
       },
       "requirements": {
         "IronBar": 250,
         "CopperBar": 50
       },
-      "description": "Semi Automatic Battle Rifle that shoots fast and powerful projectiles"
+      "description": "Automatic Battle Rifle that shoots fast and powerful projectiles"
     },
     "Ak47": {
       "parent": "Equipments.RangeEquipment",
@@ -3850,13 +3888,14 @@
       "projectileBarrelLength": 2.5,
       "stats": {
         "range": 1024,
-        "damage": 15,
-        "usageCapacity": 10000,
+        "damage": 14,
+        "usageCapacity": 2500,
         "health": 300,
-        "reload": 500,
-        "burstCount": 5,
+        "reload": 350,
+        "burstCount": 7,
         "burstTimeout": 100,
-        "spreadAngle": 4.5
+        "spreadAngle": 4.5,
+        "decay": 5
       },
       "requirements": {
         "IronBar": 150,
@@ -3914,25 +3953,26 @@
       "isWeapon": true,
       "isFireArm": true,
       "cost": {
-        "gold": 700
+        "gold": 2000
       },
-      "projectileBiasByY": 7,
+      "projectileBiasByY": 10,
       "projectileBarrelLength": 3.46875,
       "stats": {
-        "range": 512,
-        "damage": 10,
+        "range": 718,
+        "damage": 12,
         "usageCapacity": 2500,
         "health": 300,
         "reload": 100,
-        "burstCount": 10,
+        "burstCount": 8,
         "burstTimeout": 50,
-        "spreadAngle": 10
+        "spreadAngle": 5,
+        "decay": 0
       },
       "requirements": {
         "IronBar": 300,
         "CopperBar": 20
       },
-      "description": "Absolutely lethal power Weapon. Damage 10 per bullet"
+      "description": "Absolutely lethal power Weapon. Damage 12 per bullet"
     },
     "GrenadeLauncher": {
       "parent": "Equipments.RangeEquipment",
@@ -3948,7 +3988,7 @@
         "usageCapacity": 1000,
         "health": 300,
         "reload": 3000,
-        "spreadAngle": 7.5
+        "spreadAngle": 4
       },
       "requirements": {
         "IronBar": 200,
@@ -3963,13 +4003,13 @@
       "cost": {
         "gold": 900
       },
-      "projectileBarrelLength": 0.71875,
+      "projectileBarrelLength": 1.71875,
       "stats": {
         "range": 768,
         "damage": 25,
         "health": 300,
         "reload": 2000,
-        "spreadAngle": 10
+        "spreadAngle": 2
       },
       "requirements": {
         "IronBar": 100,
@@ -4252,6 +4292,7 @@
       "isAnimatable": true,
       "stats": {
         "damage": 1,
+        "damageType": "blunt",
         "health": 30,
         "range": 40,
         "meleeRange": 48
@@ -4272,6 +4313,7 @@
       "isAnimatable": true,
       "stats": {
         "damage": 10,
+        "damageType": "blunt",
         "range": 55,
         "meleeRange": 55
       },
@@ -4279,6 +4321,34 @@
         "IronOre": 10
       },
       "description": "Basic Melee weapon. Damage 10"
+    },
+    "Sabre": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "sprite": {
+        "position": {
+          "x": 48,
+          "y": 8
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "cost": {
+        "gold": 300
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 20,
+        "range": 90,
+        "meleeRange": 90,
+        "reload": 400
+      },
+      "requirements": {
+        "IronBar": 70,
+        "Wood": 10
+      },
+      "description": "A fast blade used by cavalry"
     },
     "PlasmaBlade": {
       "parent": "Equipments.MeleeEquipment",
@@ -4299,7 +4369,7 @@
       "categories": {"melee_damage": true},
       "isAnimatable": true,
       "stats": {
-        "damage": 35,
+        "damage": 45,
         "range": 75,
         "meleeRange": 75
       },
@@ -4308,6 +4378,34 @@
         "Meteorite": 25
       },
       "description": "Strong blade made of plasma"
+    },
+    "PlasmaSabre": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "sprite": {
+        "position": {
+          "x": 48,
+          "y": 8
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "cost": {
+        "gold": 1000
+      },
+      "categories": {"melee_damage": true},
+      "isAnimatable": true,
+      "stats": {
+        "damage": 30,
+        "range": 90,
+        "meleeRange": 90,
+        "reload": 400
+      },
+      "requirements": {
+        "CopperBar": 20,
+        "Meteorite": 25
+      },
+      "description": "A lightweight sword forged with plasma. Can be used for swift attacks"
     },
     "AssassinsKnife": {
       "parent": "Equipments.MeleeEquipment",
@@ -4438,13 +4536,13 @@
       "categories": {"melee_damage": true},
       "isAnimatable": true,
       "stats": {
-        "damage": 15,
+        "damage": 10,
         "range": 50,
         "reload": 300,
         "meleeRange": 50
       },
       "requirements": {
-        "IronBar": 50
+        "IronBar": 10
       },
       "description": "Fast Melee weapon. Damage 15"
     },
@@ -4457,17 +4555,17 @@
       "categories": {"melee_damage": true},
       "isAnimatable": true,
       "stats": {
-        "damage": 30,
+        "damageType": "blunt",
+        "damage": 20,
         "range": 80,
         "reload": 800,
-        "meleeRange": 80,
-        "backstabDamageMultiplier": 1.5
+        "meleeRange": 80
       },
       "requirements": {
         "IronBar": 50,
         "Wood": 10
       },
-      "description": "Nepalese knife-axe hybrid. Damage 30"
+      "description": "Nepalese knife-axe hybrid. Damage 20"
     },
     "SantaHat": {
       "parent": "Equipments.BaseEquipment",
@@ -4599,7 +4697,12 @@
       "stats": {
         "range": 64,
         "oxygen": 150,
-        "defense": 4
+        "resistance": {
+          "stab": 4.5,
+          "blunt": 2,
+          "bullet": 10,
+          "fire": 1
+        }
       },
       "requirements": {
         "Meteorite": 40,
@@ -4621,7 +4724,13 @@
       "stats": {
         "range": 64,
         "oxygen": 100,
-        "defense": 10
+        "resistance": {
+          "stab": 10,
+          "blunt": 4,
+          "bullet": 10,
+          "fire": 1,
+          "miasma": 1
+        }
       },
       "requirements": {
         "Meteorite": 180,
@@ -4629,7 +4738,7 @@
         "CombatArmor": 1,
         "CircuitBoard": 40
       },
-      "description": "Advanced armor used by Imperial Special Forces. That reduces damage by 10 and is immune to negative effects."
+      "description": "Advanced armor used by Imperial Special Forces. That reduces stab damage by 10 and is immune to negative effects."
     },
     "PrisonerSuit": {
       "parent": "Equipments.BaseEquipment",
@@ -4704,7 +4813,11 @@
       },
       "stats": {
         "range": 64,
-        "oxygen": 150
+        "oxygen": 150,
+        "resistance": {
+          "acid": 10,
+          "miasma": 1
+        }
       },
       "requirements": {
         "Meteorite": 50,
@@ -7553,6 +7666,10 @@
   },
   "tileSize": 32,
   "explosionRadius": 192,
+  "fireDamage": 1,
+  "lavaDamage": 24,
+  "poisonDamage": 10,
+  "miasmaDamage": 1,
   "collisionGroup": {
     "Player": 1,
     "Ground": 2,

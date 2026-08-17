@@ -9,10 +9,6 @@ class ImperialSpecialForcesArmor extends ArmorEquipment {
     return true
   }
 
-  getImmunity() {
-    return ["poison", "miasma", "fear", "spin", "paralyze", "fire"]
-  }
-
   getDampingFactor() {
     return 0.9
   }

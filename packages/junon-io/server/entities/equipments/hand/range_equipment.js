@@ -71,6 +71,10 @@ class RangeEquipment extends HandEquipment {
     return this.getConstants().stats.burstTimeout || 0
   }
   
+  getDamageDecay() {
+    return this.getConstants().stats?.decay
+  }
+  
   shoot(user, targetEntity) {
     const biasX = this.getProjectileBiasByX()
     const biasY = this.getProjectileBiasByY()
@@ -123,8 +127,13 @@ class RangeEquipment extends HandEquipment {
       this.shoot(user, targetEntity)
       
       bursts++
+      
       if (bursts < burstCount) {
-        setTimeout(fireNext, burstTimeout)
+        if (burstTimeout > 0) {
+            setTimeout(fireNext, burstTimeout)
+        } else {
+            fireNext()
+        }
       }
       
     }

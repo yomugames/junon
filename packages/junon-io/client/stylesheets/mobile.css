@@ -339,6 +339,11 @@
         margin-top: 5px;
     }
 
+    .blueprint_damage_type {
+        font-size: 10px;
+        margin-top: 5px;
+    }
+
     #product_main_container .inventory_header {
         margin-top: 15px;
     }

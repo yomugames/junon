@@ -182,8 +182,15 @@ class BaseTransientEntity {
   isItem() {
     return false
   }
-
-
+  
+  getDamageResistance(damageType) {
+    const constants = this.getConstants().stats.resistance
+    return constants?.[damageType] ?? 0
+  }
+  
+  getDamageType() {
+    return this.getConstants()?.stats?.damageType ?? "stab"
+  }
 }
 
 Object.assign(BaseTransientEntity.prototype, Definable.prototype, {

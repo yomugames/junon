@@ -48,6 +48,8 @@ Equipments.Dynamite = require('./hand/dynamite')
 Equipments.ShockGrenade = require('./hand/shock_grenade')
 Equipments.Bayonet = require("./hand/bayonet")
 Equipments.Kukri = require("./hand/kukri")
+Equipments.Sabre = require("./hand/sabre")
+Equipments.PlasmaSabre = require("./hand/plasma_sabre")
 
 Equipments.SpaceSuit = require("./armor/space_suit")
 Equipments.CombatArmor = require("./armor/combat_armor")

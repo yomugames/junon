@@ -286,6 +286,13 @@ enum BuildingType {
   Crown = 292;
   NobleSuit = 293;
   JesterHat = 294;
+  Axe = 295;
+  Sabre = 296;
+  PlasmaAxe = 297;
+  PlasmaSabre = 298;
+  Pillow = 299;
+  Curtains = 300;
+  Sword = 301;
 }
 
 enum TerrainType {

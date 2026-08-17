@@ -267,10 +267,6 @@ class BaseSeed extends BaseDistribution {
     }
   }
 
-  getMiasmaDamage() {
-    return 10
-  }
-
   isCropHarvestable() {
     return this.health >= this.getMaxHealth()
   }

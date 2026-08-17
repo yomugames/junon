@@ -2296,32 +2296,20 @@ Object.assign(BaseMob.prototype, Movable.prototype, {
 
 
 Object.assign(BaseMob.prototype, Destroyable.prototype, {
-  getDamageResistance(amount, attackEntity) {
-    if (attackEntity.hasCategory("fire") && this.isResistantTo("fire")) {
-      return Math.floor(amount / 2)
-    }
-
-    return 0
-  },
   onDamaged(attacker, amount) {
-    this.attackerId = attacker.id
-
-    if (attacker.isPlayer()) {
-      this.counterAttack(attacker)
-    } else if (attacker.isMob()) {
-      if (Math.random() < 0.10) {
-        this.counterAttack(attacker)
-      }
-    } else if (attacker.isProjectile()) {
+    this.attackerId = attacker?.id
+    if (attacker?.isProjectile()) {
       if (attacker.weapon) {
-        if (attacker.weapon.isBuilding()) {
-          this.counterAttack(attacker.weapon)
-        } else if (attacker.getPlayer()) {
-          this.counterAttack(attacker.getPlayer())
+        if (attacker.weapon?.isBuilding()) {
+          attacker = attacker.weapon
+        } else if (attacker?.getPlayer()) {
+          attacker = attacker?.getPlayer()
         }
 
       }
     }
+
+    if (attacker !== undefined) this.counterAttack(attacker)
 
     if (this.hasBlood()) {
       this.spillBlood()

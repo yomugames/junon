@@ -28,7 +28,7 @@ Destroyable.prototype = {
     return true
   },
 
-  damage(amount, attacker, attackEntity) {
+  damage(amount, attacker, attackEntity, damageType) {
     if (isNaN(amount)) {
       throw new Error("damage amount " + amount + " is invalid")
     }
@@ -37,21 +37,33 @@ Destroyable.prototype = {
       attackEntity = attacker
     }
 
-    amount = Math.max(1, amount - this.getDamageResistance(amount, attackEntity))
+    if (damageType === undefined) {
+        damageType = attackEntity && attackEntity.getDamageType ? attackEntity.getDamageType() : "stab";
+    }
+
+    let defense = 0
+
+    const armor = this && this.getArmorEquipment ? this.getArmorEquipment() : null
+
+    if (armor) {
+      defense += armor.getDefense()
+      defense += armor.getDamageResistance(damageType)
+    }
+
+    amount = Math.max(0, amount - defense)
+
     amount = parseInt(amount)
 
     const prevHealth = this.health 
     
     this.onDamaged(attacker, amount)
     this.setHealth(this.health - amount)
+
+    console.log(damageType, defense)
   },
 
   reduceHealth(amount = 1) {
     this.setHealth(this.health - amount)
-  },
-
-  getDamageResistance(amount, attackEntity) {
-    return 0
   },
 
   setHealth(newHealth) {

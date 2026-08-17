@@ -1506,6 +1506,15 @@ html[lang='ja'] .stats_type {
     padding-left: 0px;
 }
 
+.entity_damage_type {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+    border-bottom: solid 1px #222;
+    padding: 10px;
+    padding-left: 0px;
+}
+
 .upgrade_cost_gold {
     color: gold;
     font-weight: bold;
@@ -3199,6 +3208,11 @@ html[lang='ru'] .blueprint_name {
 }
 
 .blueprint_description {
+    font-size: 12px !important;
+    margin-top: 10px;
+}
+
+.blueprint_damage_type {
     font-size: 12px !important;
     margin-top: 10px;
 }

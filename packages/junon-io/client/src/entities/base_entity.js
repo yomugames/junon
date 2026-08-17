@@ -174,11 +174,32 @@ class BaseEntity {
     }
   }
 
+  getDamageType() {
+    const constants = this.getConstants()
+    let damageType = constants.stats ? constants.stats.damageType : undefined
+    let canAttack = (constants.stats ? constants.stats.damage : false) > 0
+
+
+    if (!canAttack) damageType = "none"
+
+    let translationKey = this.getTypeNameCamelCase() + ".DamageType"
+
+    if (i18n.has(translationKey)) {
+      return i18n.t(translationKey)
+    } else {
+      return damageType || "none"
+    }
+  }
+
   onClick() {
   }
 
   static getDescription() {
     return this.prototype.getDescription()
+  }
+  
+  static getDamageType() {
+    return this.prototype.getDamageType()
   }
 
   static getConstants() {

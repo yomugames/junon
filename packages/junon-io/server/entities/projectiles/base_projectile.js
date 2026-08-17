@@ -46,7 +46,7 @@ class BaseProjectile extends BaseEntity {
     this.angle       = Math.floor(radian * (180 / Math.PI))
     this.chunksTraversed = {}
 
-    this.speed       = this.getSpeed()
+    this.speed       = this.getExactSpeed()
     this.postDeathCounter = 1 // give hitscan 3 ticks before completely removing so that client can receive projectile object, and render it for instant enemy kills
     this.isFreshSpawn = true
 
@@ -322,6 +322,8 @@ class BaseProjectile extends BaseEntity {
   setPositionFromVelocity() {
     if (this.isRemoved) return
 
+    this.updateSpeed()
+
     this.lastPosition = [this.getX(), this.getY()]
 
     super.setPositionFromVelocity()
@@ -367,21 +369,37 @@ class BaseProjectile extends BaseEntity {
   }
 
   getDamage(attackTarget) {
+    const distanceTravelled = Helper.distance(this.getX(), this.getY(), this.source.x, this.source.y)
+
+    // decay is supposed to be a minimal damage
+    const decay = this.weapon?.getDamageDecay?.()
+
+    let damage
+
     if (this.customDamage) return this.customDamage
 
     if (this.weapon) {
-      return this.weapon.getDamage(attackTarget)
+      damage = this.weapon.getDamage(attackTarget)
     } else {
       if (this.owner && this.owner.isSector()) {
-        return this.getConstants().damage
+        damage = this.getConstants().damage
       } else {
-        return this.owner.getDamage()
+        damage = this.owner.getDamage()
       }
     }
+
+    if (decay !== undefined) {
+      const range = (this.getRange?.() || 1)
+      const distanceSquare = (distanceTravelled * distanceTravelled) / (range * range)
+
+      damage = damage + (decay - damage) * distanceSquare
+    }
+
+    return Math.floor(damage)
   }
 
   getRange() {
-    return this.weapon ? this.weapon.getRange() : this.owner.getRange()
+    return this.weapon ? this.weapon?.getRange?.() : this.owner?.getRange?.()
   }
 
   onStateChanged() {
@@ -423,7 +441,7 @@ class BaseProjectile extends BaseEntity {
   getBodyProperties(x, y) {
     return {
         mass: 0,
-        type: p2.Body.KINEMATIC,
+        type: p2.Body.DYNAMIC,
         position: [x,y]
     }
   }
@@ -438,11 +456,35 @@ class BaseProjectile extends BaseEntity {
     return this.getY()
   }
 
+  getExactSpeed() { 
+    const speed = this.speed ?? this.getConstants().speed
+
+    return speed
+  }
+
+  updateSpeed() {
+    const maxSpeed = this.getConstants().maxSpeed
+    let acceleration = this.getConstants().acceleration ?? 0
+
+    if (this.speed !== undefined && acceleration) {
+      this.speed += acceleration
+    }
+
+    if (maxSpeed) {
+      this.speed = Math.min(maxSpeed, this.speed)
+    }
+  }
+  
+  getDamageType() {
+    return this.getConstants()?.damageType ?? "stab"
+  }
 }
 
 Object.assign(BaseProjectile.prototype, Movable.prototype, {
   getSpeed() {
-    return this.getConstants().speed * Constants.globalSpeedMultiplier
+    const speed = this.getExactSpeed()
+
+    return speed * Constants.globalSpeedMultiplier
   }
 })
 

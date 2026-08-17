@@ -11,7 +11,8 @@
       "Fixed $getX and $getY, now they return the proper float coordinates",
       "Fixed item descriptions",
       "Fixed buildingStateChanged trigger, now triggers properly on open and close",
-      "Added missing changelog"
+      "Added missing changelog",
+      "Fixed underground vent still being craftable"
     ],
     "features": [
       "HeavyRifle now does double damage to armored mobs (sapper, golem, drone, and raven)",

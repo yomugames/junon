@@ -284,7 +284,7 @@ class Player extends BaseEntity {
     let actions = ""
     let permissionSelect = this.createRoleSelect(entityMenu)
 
-    let customActions = getActions()
+    let customActions = this.getActions()
     if (customActions) {
       actions += customActions
     }

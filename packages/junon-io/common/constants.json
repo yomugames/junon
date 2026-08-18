@@ -4081,6 +4081,7 @@
         "gold": 80
       },
       "stats": {
+        "damageType": "blunt",
         "damage": 5,
         "range": 256
       },
@@ -4101,6 +4102,7 @@
         "gold": 1000
       },
       "stats": {
+        "damageType": "blunt",
         "damage": 50,
         "range": 256,
         "reload": 750
@@ -4122,6 +4124,7 @@
         "gold": 750
       },
       "stats": {
+        "damageType": "blunt",
         "damage": 25,
         "range": 256,
         "reload": 1000
@@ -4144,6 +4147,7 @@
         "gold": 1500
       },
       "stats": {
+        "damageType": "blunt",
         "damage": 10,
         "range": 256,
         "reload": 900
@@ -4165,6 +4169,7 @@
         "gold": 1000
       },
       "stats": {
+        "damageType": "blunt",
         "damage": 10,
         "range": 256,
         "reload": 750
@@ -4517,6 +4522,7 @@
       },
       "categories": {"wall_breaker":true,"melee_damage":true},
       "stats": {
+        "damageType": "blunt",
         "damage": 6,
         "health": 200,
         "range": 48,

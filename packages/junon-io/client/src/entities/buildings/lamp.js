@@ -135,7 +135,7 @@ class Lamp extends BaseBuilding {
     let radius = this.getLightRadius()
     return "<div class='light_radius_container'>" + 
              "<span>Intensity:</span>" +
-             "<input type='range' min='3' max='15' value='" + radius + "' />" + 
+             "<input type='range' min='0' max='15' value='" + radius + "' />" + 
            "</div>"
   }
 

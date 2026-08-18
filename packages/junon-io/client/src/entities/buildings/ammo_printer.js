@@ -16,7 +16,6 @@ class AmmoPrinter extends BaseBuilding {
     templateList.push(Equipments.PoisonGrenade)
     templateList.push(Equipments.Dynamite)
     templateList.push(Equipments.MolotovCocktail)
-    templateList.push(Equipments.ShockGrenade)
     templateList.push(this.sector.getTimerBombKlass())
 
     let options = {}

@@ -24,6 +24,10 @@ class CollidableProjectile extends BaseProjectile {
 
   getDamage(entity) {
     let damage = super.getDamage(entity)
+    
+    if (entity.isArmored() && this.weapon.getTypeName() === "HeavyRifle") {
+        damage *= 2
+    }
 
     if (this.damageReduction) {
       return Math.max(0, damage - this.damageReduction)

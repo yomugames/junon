@@ -13,6 +13,10 @@ class Unmute extends BaseCommand {
     return true
   }
 
+  isNonSandboxCommand() {
+    return true
+  }
+
   perform(caller, args) {
     const selector = args[0]
 

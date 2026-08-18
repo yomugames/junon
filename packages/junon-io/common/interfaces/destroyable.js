@@ -58,8 +58,6 @@ Destroyable.prototype = {
     
     this.onDamaged(attacker, amount)
     this.setHealth(this.health - amount)
-
-    console.log(damageType, defense)
   },
 
   reduceHealth(amount = 1) {

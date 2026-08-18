@@ -276,7 +276,7 @@ class BaseMob extends BaseEntity {
   }
   
   setNameColor(color) {
-    this.nameColor = color
+    this.nameColor = color || 16777215 
     // Upd:
     let SavedName = this.name
     this.setName(" ")
@@ -285,7 +285,7 @@ class BaseMob extends BaseEntity {
     this.onNameChanged();
   }
   setNameSize(size) {
-    this.nameSize = size
+    this.nameSize = size || 23
     // Upd:
     let SavedName = this.name
     this.setName(" ")

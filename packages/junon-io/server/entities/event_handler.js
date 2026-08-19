@@ -529,6 +529,11 @@ class EventHandler {
   }
 
   getAngle(entityId) {
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.angle
+    }
+
     let entity = this.game.getEntity(entityId)
     if (!entity) return 0
     return entity.angle

@@ -776,7 +776,7 @@ class EventHandler {
     let entity = this.game.getEntity(entityId)
     if (!entity) return 0
 
-    return entity.getX() / 32
+    return entity.getY() / 32
   }
 
   getX(entityId) {
@@ -788,7 +788,7 @@ class EventHandler {
     let entity = this.game.getEntity(entityId)
     if (!entity) return 0
 
-    return entity.getY() / 32
+    return entity.getX() / 32
   }
 
   getRow(entityId) {

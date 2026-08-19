@@ -1188,7 +1188,6 @@
     },
     "Sapper": {
       "parent": "Mobs.Guard",
-      "isArmored": true,
       "sprite": {
         "width": 60,
         "height": 181
@@ -1750,7 +1749,6 @@
         "range": 512,
         "los": 718
       },
-      "isArmored": true,
       "isFlamable": false,
       "immunity": ["poison"],
       "categories": {"flying": true},
@@ -1781,7 +1779,6 @@
         "range": 512,
         "los": 1024
       },
-      "isArmored": true,
       "isFlamable": false,
       "immunity": ["poison"],
       "categories": {"flying": true},
@@ -3498,6 +3495,7 @@
       "parent": "Equipments.MeleeEquipment",
       "abstract": true,
       "stats": {
+        "backstabDamageMultiplier": 4
       }
     },
     "Syringe": {
@@ -3698,7 +3696,7 @@
       "cost": {
         "gold": 250
       },
-      "projectileBarrelLength": 2,
+      "projectileBarrelLength": 2.75,
       "stats": {
         "range": 512,
         "damage": 10,
@@ -3847,7 +3845,7 @@
         "usageCapacity": 500,
         "health": 300,
         "reload": 2000,
-        "spreadAngle": 0.5
+        "spreadAngle": 1.5
       },
       "requirements": {
         "IronBar": 150,
@@ -3865,17 +3863,17 @@
       "projectileBarrelLength": 2.5,
       "stats": {
         "range": 2048,
-        "damage": 40,
+        "damage": 65,
         "usageCapacity": 1500,
         "health": 300,
-        "reload": 2500,
+        "reload": 2000,
         "spreadAngle": 0
       },
       "requirements": {
         "IronBar": 250,
         "CopperBar": 80
       },
-      "description": "Accurate and powerful Weapon that does extra damage to armored enemies"
+      "description": "Accurate and powerful Weapon that shoots fast projectiles"
     },
     "Minigun": {
       "parent": "Equipments.RangeEquipment",
@@ -3937,7 +3935,7 @@
         "damage": 25,
         "health": 300,
         "reload": 2000,
-        "spreadAngle": 3
+        "spreadAngle": 10
       },
       "requirements": {
         "IronBar": 100,
@@ -4239,14 +4237,14 @@
       "categories": {"melee_damage": true},
       "isAnimatable": true,
       "stats": {
-        "damage": 7,
+        "damage": 10,
         "range": 55,
         "meleeRange": 55
       },
       "requirements": {
         "IronOre": 10
       },
-      "description": "Basic Melee weapon. Damage 7"
+      "description": "Basic Melee weapon. Damage 10"
     },
     "PlasmaBlade": {
       "parent": "Equipments.MeleeEquipment",
@@ -4322,7 +4320,7 @@
       "concurrentTargetCount": 3,
       "isAnimatable": true,
       "stats": {
-        "damage": 15,
+        "damage": 25,
         "range": 64,
         "attackRadius": 64,
         "meleeRange": 64
@@ -4331,7 +4329,7 @@
         "IronBar": 50,
         "Wood": 20
       },
-      "description": "Can slice through 3 enemies at a time. Damage 15."
+      "description": "Can slice through 3 enemies at a time. Damage 25."
     },
     "BlueEnergySword": {
       "parent": "Equipments.MeleeEquipment",
@@ -4414,7 +4412,7 @@
       "requirements": {
         "IronBar": 50
       },
-      "description": "Fast Melee weapon. Damage 15"
+      "description": "Fast Melee weapon that can be used for backstabbing. Damage 15"
     },
     "Kukri": {
       "parent": "Equipments.BaseKnife",
@@ -4428,7 +4426,8 @@
         "damage": 30,
         "range": 80,
         "reload": 800,
-        "meleeRange": 80
+        "meleeRange": 80,
+        "backstabDamageMultiplier": 1.5
       },
       "requirements": {
         "IronBar": 50,
@@ -5729,26 +5728,6 @@
         "count": "+25"
       },
       "description": "wood table"
-    },
-    "SmallWoodTable": {
-      "width": 32,
-      "height": 64,
-      "cost": {
-        "gold": 150
-      },
-      "categories": {"dining_table":true},
-      "requirements": {
-        "Wood": 10
-      },
-      "stats": {
-        "health": 100,
-        "count": 100
-      },
-      "upgrade": {
-        "health": "+100",
-        "count": "+25"
-      },
-      "description": "small wood table"
     },
     "LargeTable": {
       "width": 64,

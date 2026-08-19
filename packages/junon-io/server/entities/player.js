@@ -2721,16 +2721,15 @@ class Player extends BaseEntity {
   onHitEntity(entity, hit) {
     if (this.isControllingGhost()) return
 
-    if (entity.getType() === Protocol.definition().BuildingType.MiasmaGate) {
+    if(entity.getType() === Protocol.definition().BuildingType.MiasmaGate) { //miasma gate
       this.removeEffect('miasma')
     }
-
+    // does nothing by default
     if (entity.hasCategory("door") && entity.isAutomatic()) {
       if (!this.sector.isTutorial() && !entity.isOwnedBy(this)) return
       if (!entity.isHitPassable(hit)) return
-
       if (!entity.isOpen) {
-        entity.openFor(3000, this)
+        entity.openFor(3000)
       }
     }
   }

@@ -36,10 +36,6 @@ class BaseTransientEntity {
     return this.getConstants().isFlamable || false
   }
 
-  isArmored() {
-    return this.getConstants().isArmored || false
-  }
-
   isWeapon() {
     return false
   }

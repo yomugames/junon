@@ -1279,6 +1279,10 @@ class EventHandler {
   }
 
   getForceX(entityId) {
+    const player = this.getPlayer(entityId)
+    if (player) {
+      return player.getBody().force[0]
+    }
     const entity = this.game.getEntity(entityId)
     if (entity) {
       return entity.getBody().force[0]
@@ -1288,6 +1292,10 @@ class EventHandler {
   }
 
   getForceY(entityId) {
+    const player = this.getPlayer(entityId)
+    if (player) {
+      return player.getBody().force[1]
+    }
     const entity = this.game.getEntity(entityId)
     if (entity) {
       return entity.getBody().force[1]

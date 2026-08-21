@@ -38,6 +38,14 @@ class VendingMachine extends BaseBuilding {
     return actions
   }
 
+  setPrices(prices) {
+    if(Object.hasOwn(prices, "empty")) {
+      this.prices = {}
+    } else {
+      this.prices = prices
+    }
+  }
+  
   onContentChanged() {
     if (this.game.vendingMachineMenu.entity === this) {
       this.game.vendingMachineMenu.updateStorageGoldAmount()

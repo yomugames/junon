@@ -2815,6 +2815,14 @@ html[lang='ru'] #blueprint_menu {
     color: #ccc;
 }
 
+.reprice_btn {
+    float: right;
+    margin: 0px -5px 0px 5px;
+    height: 35px;
+    background: none;
+    border: none;
+}
+
 .sell_trade_content {
     display: none;
 }
@@ -2825,6 +2833,16 @@ html[lang='ru'] #blueprint_menu {
     font-size: 18px;
     line-height: 35px;
     font-family: 'cc';
+}
+
+.trade_item_reprice {
+    display: none;
+    text-align: end;
+    border: none;
+    background: none;
+    height: 18px;
+    width: 80px;
+    margin: 8px 4px;
 }
 
 .trade_item_cost.custom {
@@ -5539,6 +5557,8 @@ html[lang='ja'] .mobile_authentication_container .btn {
 .purchasable_items_list {
     margin-top: 20px;
     margin-bottom: 20px;
+    max-height: 320px;
+    overflow-y: scroll;
 }
 
 .vending_machine_tab_content .buy_btn {

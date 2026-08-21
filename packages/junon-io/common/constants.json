@@ -6205,7 +6205,7 @@
       "sprite": {
         "rotation": 90
       },
-      "categories": {"seller":true,"vending_machine":true},
+      "categories": {"seller":true,"vending_machine":true,"editable_permissions":true},
       "hasMenu": true,
       "menuDescription": "",
       "isInteractable": true,
@@ -6234,7 +6234,7 @@
       "sprite": {
         "rotation": 90
       },
-      "categories": {"seller":true,"vending_machine":true},
+      "categories": {"seller":true,"vending_machine":true,"editable_permissions":true},
       "hasMenu": true,
       "menuDescription": "",
       "isInteractable": true,
@@ -6253,6 +6253,32 @@
         "count": "+25"
       },
       "description": "Store and sell drinks"
+    },
+    "Dispenser": {
+      "width": 64,
+      "height": 96,
+      "cost": {
+        "gold": 500
+      },
+      "categories": {"seller":true,"vending_machine":true,"editable_permissions":true},
+      "hasMenu": true,
+      "menuDescription": "",
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "storageCount": 16,
+      "requirements": {
+        "IronBar": 80,
+        "Wire": 10,
+        "CircuitBoard": 20
+      },
+      "stats": {
+        "health": 250
+      },
+      "upgrade": {
+        "health": "+25",
+        "count": "+25"
+      },
+      "description": "Store and sell items."
     },
     "Conveyor": {
       "width": 32,
@@ -7253,6 +7279,38 @@
         "count": "+1"
       },
       "description": "Launches homing missile towards locked target."
+    },
+    "Revitalizer": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 500
+      },
+      "shouldAttackIgnoreObstacle": true,
+      "categories": {"turret":true,"editable_targets":false},
+      "hasFillBar": true,
+      "stats": {
+        "reload": 500,
+        "damage": 5,
+        "health": 150,
+        "range": 480,
+        "powerConsumption": 500,
+        "fuelConsumption": 5,
+        "fuelCapacity": 100,
+        "clientResource": "fuel"
+      },
+      "requirements": {
+        "IronBar": 90,
+        "Meteorite": 40,
+        "CircuitBoard": 25,
+        "FuelPipe": 5
+      },
+      "upgrade": {
+        "damage": "+1",
+        "health": "+50",
+        "count": "+1"
+      },
+      "description": "Slowly repairs damaged structures. Requires fuel and power."
     },
     "Cannon": {
       "width": 64,

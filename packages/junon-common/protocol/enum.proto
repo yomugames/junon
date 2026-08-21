@@ -277,6 +277,8 @@ enum BuildingType {
   Bayonet = 283;
   Kukri = 284;
   SmallWoodTable = 285;
+  Revitalizer = 286;
+  Dispenser = 287;
 }
 
 enum TerrainType {

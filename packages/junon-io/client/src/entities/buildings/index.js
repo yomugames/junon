@@ -42,6 +42,7 @@ Buildings.Structures.SteelCrate = require("./steel_crate")
 Buildings.Structures.FarmController = require("./farm_controller")
 Buildings.Structures.FoodVendingMachine = require("./food_vending_machine")
 Buildings.Structures.DrinksVendingMachine = require("./drinks_vending_machine")
+Buildings.Structures.Dispenser = require("./dispenser")
 Buildings.Structures.Atm = require("./atm")
 Buildings.Structures.WaterPump = require("./water_pump")
 Buildings.Structures.LiquidPipe = require("./liquid_pipe")
@@ -56,6 +57,7 @@ Buildings.Structures.FlamethrowerTurret = require("./towers/flamethrower_turret"
 Buildings.Structures.MissileTurret = require("./towers/missile_turret")
 Buildings.Structures.TeslaCoil = require("./towers/tesla_coil")
 Buildings.Structures.BomberTurret = require("./towers/bomber_turret")
+Buildings.Structures.Revitalizer = require("./towers/revitalizer")
 Buildings.Structures.KeypadDoor = require("./keypad_door")
 Buildings.Structures.MiasmaGate = require("./miasma_gate.js")
 
@@ -168,6 +170,7 @@ Buildings.Towers.IonCannon = require("./towers/ion_cannon")
 Buildings.Towers.MiniTurret = require("./towers/mini_turret")
 Buildings.Towers.MissileTurret = require("./towers/missile_turret")
 Buildings.Towers.BomberTurret = require("./towers/bomber_turret")
+Buildings.Towers.Revitalizer = require("./towers/revitalizer")
 Buildings.Towers.Fighter = require("./units/fighter")
 
 // crops

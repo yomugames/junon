@@ -529,6 +529,11 @@ class EventHandler {
   }
 
   getAngle(entityId) {
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.angle
+    }
+
     let entity = this.game.getEntity(entityId)
     if (!entity) return 0
     return entity.angle
@@ -770,18 +775,6 @@ class EventHandler {
   getY(entityId) {
     let player = this.getPlayer(entityId)
     if (player) {
-      return player.getX() / 32
-    }
-
-    let entity = this.game.getEntity(entityId)
-    if (!entity) return 0
-
-    return entity.getX() / 32
-  }
-
-  getX(entityId) {
-    let player = this.getPlayer(entityId)
-    if (player) {
       return player.getY() / 32
     }
 
@@ -789,6 +782,18 @@ class EventHandler {
     if (!entity) return 0
 
     return entity.getY() / 32
+  }
+
+  getX(entityId) {
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.getX() / 32
+    }
+
+    let entity = this.game.getEntity(entityId)
+    if (!entity) return 0
+
+    return entity.getX() / 32
   }
 
   getRow(entityId) {
@@ -1274,6 +1279,10 @@ class EventHandler {
   }
 
   getForceX(entityId) {
+    const player = this.getPlayer(entityId)
+    if (player) {
+      return player.getBody().force[0]
+    }
     const entity = this.game.getEntity(entityId)
     if (entity) {
       return entity.getBody().force[0]
@@ -1283,6 +1292,10 @@ class EventHandler {
   }
 
   getForceY(entityId) {
+    const player = this.getPlayer(entityId)
+    if (player) {
+      return player.getBody().force[1]
+    }
     const entity = this.game.getEntity(entityId)
     if (entity) {
       return entity.getBody().force[1]

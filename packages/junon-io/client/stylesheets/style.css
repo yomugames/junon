@@ -8090,6 +8090,7 @@ body.imposter_mode .minigame_poster {
 }
 
 .in_game_middle_menu {
+    height: calc(50vh + 50px);
     display: block;
     position: absolute;
     z-index: 11;

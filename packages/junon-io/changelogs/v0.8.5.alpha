@@ -1,21 +1,21 @@
 {
   "version": "v0.8.5.alpha",
-  "date": "August 10-20, 2026",
+  "date": "August 10, 2026",
   "title": "QOL Update #1 and #2 by Perrito and akrolpative",
   "content": {
-    "miscellaneous": [
-      "QOL Update #1 and #2 By Perrito and akrolpative",
-    ],
     "features": [
+      "QOL Update #1 and #2 By Perrito and akrolpative"
+    ],
+    "bugs": [
       "Added /chatprefix command",
       "Added /name setcolor and /name setsize subcommands to /name",
       "Added $getNthLetter(), $getNthWord() and $if() functions",
-      "Added isSpectateAllowed setting",
+      "Added isSpectateAllowed setting"
     ],
-    "bugs": [
+    "miscellaneous": [
       "Re-worked /god and /fly commands",
       "Re-coded the way $ functions are read in the command block",
-      "Fixed Timers and added [tick] parameter to them",
+      "Fixed Timers and added [tick] parameter to them"
     ]
   }
 }

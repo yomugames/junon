@@ -1,25 +1,5 @@
 {
   "version": "v0.8.3.alpha",
-<<<<<<< HEAD
-  "date": "August 10, 2026",
-  "title": "QOL Update #1 by Perrito",
-  "content": {
-    "miscellaneous": [
-      "QOL Update #1 by Perrito"
-    ],
-    "features": [
-      "Added /chatprefix command",
-      "Added isSpectateAllowed setting",
-      "Added $if(), $getNthLetter and $getNthWord functions (shoutout to BigTforLife)"
-    ],
-    "bugs": [
-      "Reworked /god and /fly commands",
-      "Remade the way $ functions are read in the command block",
-      "Fixed timers and added a new tick parameter to /timer (shoutout to KONTREVOLUCIA)"
-    ]
-  }
-}
-=======
   "date": "August 15, 2026",
   "title": "Bugfixes + new stuff update by KONTREVOLUCIA",
   "content": {
@@ -58,4 +38,3 @@
     ]
   }
 }
->>>>>>> e9918183d8367ff521a2b8369ca687ed43dc3531

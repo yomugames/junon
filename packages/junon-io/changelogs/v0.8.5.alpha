@@ -1,10 +1,10 @@
 {
   "version": "v0.8.5.alpha",
-  "date": "August 10, 2026",
-  "title": "QOL Update #1 and #2 by Perrito and akrolpative",
+  "date": "August 22, 2026",
+  "title": "QOL Update #1 and #2 by Perrito, BigTforLife and akrolpative",
   "content": {
     "features": [
-      "QOL Update #1 and #2 By Perrito and akrolpative"
+      "QOL Update #1 and QOL Update #2 By Perrito, BigTforLife and akrolpative"
     ],
     "bugs": [
       "Added /chatprefix command",
@@ -16,6 +16,11 @@
       "Re-worked /god and /fly commands",
       "Re-coded the way $ functions are read in the command block",
       "Fixed Timers and added [tick] parameter to them"
+      "Title screen scrolling is changed so that the main content will not be cut off",
+      "Fixed $getX() and $getY() to properly return col and row respectively",
+      "Added ability to put $player as a parameter for $getAngle(), $getForceX(), and $getForceY()",
+      "Added to cleanliness for world menu in the middle of a game by setting a height to the world menu"
+
     ]
   }
 }

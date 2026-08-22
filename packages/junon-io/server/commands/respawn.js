@@ -5,7 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class Respawn extends BaseCommand {
   getUsage() {
     return [
-      "/respawn [player]"
+      "Respawns a player",
+      "/respawn [player]",
+      "ex: /respawn kuroro"
     ]
   }
   

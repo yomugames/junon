@@ -5,10 +5,10 @@ class ChatPrefix extends BaseCommand {
 
   getUsage() {
     return [
-      "/chatprefix set [player] [prefix] [color] [style]",
+      "Gives a player a custom tag before their name in chat",
+      "/chatprefix set [player] [text] [color] [style:1-7]",
       "/chatprefix clear [player]",
-      "Styles:",
-      "1: [Test], 2: (Test), 3: {Test}",
+      "ex: /chatprefix set kuroro Owner red 1",
     ]
   }
 
@@ -26,14 +26,25 @@ class ChatPrefix extends BaseCommand {
     
     let subcommand = args[0]
     let style = args[4]
-    if (style) {
+    if (style && style < 9) {
       if (style==1) {
         style = "[]"
       } else if (style==2) {
         style = "()"
-      } else {
+      } else if (style==3){
         style = "{}"
+      } else if (style==4) {
+        style = '""'
+      } else if (style==5) {
+        style = " -"
+      } else if (style==6) {
+        style = " /"
+      } else if (style==7) {
+        style = " :"
+      } else if (style==8) {
+        style = "  "
       }
+      
     } else {style="[]"}
 
     switch(subcommand) {
@@ -44,7 +55,7 @@ class ChatPrefix extends BaseCommand {
         }
         selectedPlayers.forEach(ply => {
           this.game.playerChatPrefixes[ply.name] = {
-            prefix:args[2].replace(/[^a-zA-Z]/g, '').slice(0, 8),
+            prefix:args[2].replace(/[^a-zA-Z0-9]/g, '').slice(0, 12),
             color:args[3] || "#ffffff",
             styleA:style[0],
             styleB:style[1]

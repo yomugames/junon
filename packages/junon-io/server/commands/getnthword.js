@@ -5,7 +5,7 @@ class GetNthWord extends BaseCommand {
         return [
             "Gets nth word of sentence and sets it to $word variable",
             "/getnthword [index] [message]",
-            "Ex: /getnthword 2 a random message - creates a $word variable, and assigns the word 'random' to it."
+            "ex: /getnthword 2 a random message - creates a $word variable, and assigns the word 'random' to it."
         ]
     }
     allowOwnerOnly() {

@@ -5,9 +5,11 @@ const Protocol = require('../../common/util/protocol')
 class Oxygen extends BaseCommand {
   getUsage() {
     return [
-      "/oxygen set [player|mob|building] [amount]",
-      "/oxygen gain [player|mob|building] [amount]",
-      "/oxygen lose [player|mob|building] [amount]"
+      "Sets the oxygen of an entity to a certain value",
+      "/oxygen set [player|entity_id] [amount]",
+      "/oxygen gain [player|entity_id] [amount]",
+      "/oxygen lose [player|entity_id] [amount]",
+      "ex: /oxygen set kuroro 100",
     ]
   }
 

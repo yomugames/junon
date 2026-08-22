@@ -5,7 +5,10 @@ const Protocol = require('../../common/util/protocol')
 class Map extends BaseCommand {
   getUsage() {
     return [
-      "/map [subcommand] [selector]"
+      "Interacts with the map in different ways",
+      "/map [subcommand] [selector]",
+      "ex: /map regenerate",
+      "Note: 'regenerate' will destroy everything and generate a new map"
     ]
   }
 

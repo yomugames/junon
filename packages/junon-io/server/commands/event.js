@@ -6,6 +6,7 @@ class Event extends BaseCommand {
 
   getUsage() {
     return [
+      "Starts an event",
       "/event [eventname]",
       "/event [eventname] [row] [col]",
       `ex: ${this.getValidEvents().join(", ")}` 

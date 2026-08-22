@@ -5,9 +5,11 @@ class Dialogue extends BaseCommand {
 
   getUsage() {
     return [
+      "Assigns a dialogue to an entity",
       "/dialogue list",
       "/dialogue assign [entity_id] [text]",
-      "/dialogue remove [entity_id]"
+      "/dialogue remove [entity_id]",
+      "ex: /dialogue assign 1234 Welcome to Junon.io!"
     ]
   }
 

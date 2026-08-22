@@ -11,7 +11,7 @@ class Command extends ActionValue {
     if (!Commands[cmd]) {
       return false
     }
-
+ 
     return true
   }
 

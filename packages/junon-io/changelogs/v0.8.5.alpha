@@ -1,0 +1,21 @@
+{
+  "version": "v0.8.5.alpha",
+  "date": "August 22, 2026",
+  "title": "QOL #2 by Perrito and akrolpative",
+  "content": {
+    "bugs": [
+      "QOL Update #2 By Perrito and akrolpative",
+      "/button command now works with individual ids and Players",
+      "Fixed minor visual glitches for the main menu",
+      "Title screen scrolling is changed so that the main content will not be cut off",
+      "Fixed $getX() and $getY() to properly return col and row respectively",
+      "Added to cleanliness for world menu in the middle of a game by setting a height to the world menu"
+    ],
+    
+    "features": [
+      "Added PlayerMenu Trigger for Command Block",
+      "Added /name setcolor and /name setsize subcommands to /name",
+      "Added ability to put $player as a parameter for $getAngle(), $getForceX(), and $getForceY()"
+    ]
+  }
+}

@@ -5,8 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class Force extends BaseCommand {
   getUsage() {
     return [
-      "/force [player] [x] [y]",
-      "ex. /force sus -5 -5"
+      "Creates a force for an entity that pushes them in the set direction",
+      "/force [player|entity_id] [x] [y]",
+      "ex: /force kuroro -5 -5"
     ]
   }
   

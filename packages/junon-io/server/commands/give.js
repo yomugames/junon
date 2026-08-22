@@ -6,7 +6,9 @@ const Item = require("../entities/item")
 class Give extends BaseCommand {
   getUsage() {
     return [
-      "/give [username|entity_id] [type] [count]"
+      "Gives a certain amount of an item to an entity",
+      "/give [player|entity_id] [item_type] [count]",
+      "ex: /give kuroro Potato 10",
     ]
   }
 

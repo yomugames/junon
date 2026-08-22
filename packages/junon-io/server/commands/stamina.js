@@ -5,11 +5,14 @@ const Protocol = require('../../common/util/protocol')
 class Stamina extends BaseCommand {
   getUsage() {
     return [
-      "/stamina set [player|mob|building] [amount]",
-      "/stamina gain [player|mob|building] [amount]",
-      "/stamina lose [player|mob|building] [amount]"
+      "Sets the stamina of an entity to a certain value",
+      "/stamina set [player|entity_id] [amount]",
+      "/stamina gain [player|entity_id] [amount]",
+      "/stamina lose [player|entity_id] [amount]",
+      "ex: /stamina set kuroro 100",
     ]
   }
+
 
   allowOwnerOnly() {
     return true

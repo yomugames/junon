@@ -131,6 +131,14 @@
         "key": "key pressed"
       }
     },
+    "PlayerMenu": {
+      "description": "Event triggered when player opens or closes menu.",
+      "variables": {
+         "menuName": "name of menu",
+         "state": "new state of menu, true if open",
+         "player": "username of player who opened or closed menu"
+      }
+    },
     "MobAttacked": {
       "description": "Event triggered when a mob gets damaged",
       "variables": {
@@ -550,8 +558,9 @@
       "variables": {
         "playerId":"id of player",
         "player": "username of player that clicked",
-        "entityId": "id of entity button attached",
-        "name": "name of button clicked"
+        "entityId": "id of the entity the button is attached to",
+        "name": "name of button clicked",
+        "entityName": "name of the entity the button is attached to"
       }
     },
     "PlayerPinged": {

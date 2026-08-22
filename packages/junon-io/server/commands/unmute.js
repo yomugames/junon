@@ -5,7 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class Unmute extends BaseCommand {
   getUsage() {
     return [
+      "Grants back the ability to chat to a player",
       "/unmute [player]",
+      "ex: /unmute kuroro"
     ]
   }
 

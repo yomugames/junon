@@ -5,7 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class Mute extends BaseCommand {
   getUsage() {
     return [
+      "Revokes chatting permissions from a player",
       "/mute [player]",
+      "ex: /mute kuroro"
     ]
   }
 

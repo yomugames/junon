@@ -173,7 +173,13 @@ message MessageWrapper {
     BadgesData BadgesData = 180;
     EquipBadge EquipBadge = 181;
     BadgeEquipped BadgeEquipped = 182;
+    TriggerPlayerMenu TriggerPlayerMenu = 183;
   }
+}
+
+message TriggerPlayerMenu {
+  string menuName = 1;
+  bool state = 2;
 }
 
 message BadgeEquipped {
@@ -305,6 +311,7 @@ message ButtonUpdated {
 message ButtonClick {
   string name = 1;
   uint32 entityId = 2;
+  string entityName = 3;
 }
 
 message Button {

@@ -326,7 +326,8 @@ class EntityMenu extends BaseMenu {
 
       SocketUtil.emit("ButtonClick", { 
         name: button.dataset.name,
-        entityId: this.selectedEntity && this.selectedEntity.id
+        entityId: this.selectedEntity && this.selectedEntity.id,
+        entityName: this.selectedEntity.name
       })
 
       switch(button.dataset.action) {

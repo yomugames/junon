@@ -529,6 +529,11 @@ class EventHandler {
   }
 
   getAngle(entityId) {
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.angle
+    }
+
     let entity = this.game.getEntity(entityId)
     if (!entity) return 0
     return entity.angle
@@ -770,18 +775,6 @@ class EventHandler {
   getY(entityId) {
     let player = this.getPlayer(entityId)
     if (player) {
-      return player.getX() / 32
-    }
-
-    let entity = this.game.getEntity(entityId)
-    if (!entity) return 0
-
-    return entity.getX() / 32
-  }
-
-  getX(entityId) {
-    let player = this.getPlayer(entityId)
-    if (player) {
       return player.getY() / 32
     }
 
@@ -789,6 +782,18 @@ class EventHandler {
     if (!entity) return 0
 
     return entity.getY() / 32
+  }
+
+  getX(entityId) {
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.getX() / 32
+    }
+
+    let entity = this.game.getEntity(entityId)
+    if (!entity) return 0
+
+    return entity.getX() / 32
   }
 
   getRow(entityId) {
@@ -1274,6 +1279,10 @@ class EventHandler {
   }
 
   getForceX(entityId) {
+    const player = this.getPlayer(entityId)
+    if (player) {
+      return player.getBody().force[0]
+    }
     const entity = this.game.getEntity(entityId)
     if (entity) {
       return entity.getBody().force[0]
@@ -1283,6 +1292,10 @@ class EventHandler {
   }
 
   getForceY(entityId) {
+    const player = this.getPlayer(entityId)
+    if (player) {
+      return player.getBody().force[1]
+    }
     const entity = this.game.getEntity(entityId)
     if (entity) {
       return entity.getBody().force[1]
@@ -1326,10 +1339,11 @@ class EventHandler {
     return conditionMet ? successVal : failureVal;
   }
 
+
   getNthWord(...values) {
     if (values.length < 2) return ""
     let index = parseInt(values[0])
-    let word = values.slice(1).join(" ")
+    let word = values.slice(1).join(" ").toString()
     let stringArray = word.split(" ")
 
     if (isNaN(index) || index < 1) {
@@ -1349,7 +1363,7 @@ class EventHandler {
   getNthLetter(...values) {
     if (values.length === 0) return ""
     let index = parseInt(values[0])
-    let word = values[1];
+    let word = values[1].toString();
     if (isNaN(index)) {
       return ""
     }
@@ -1501,14 +1515,16 @@ class EventHandler {
     let functionBuffer = "";
     let resultBuffer = "";
     let padepth = 0;
+    let startCheckingEven = false;
 
     for (var i = 0; i < chars.length; i++) {
       let char = chars[i];
       let isEndOfString = i === chars.length - 1;
 
+      if (startCheckingEven) {
       if (char === '(') padepth++;
       if (char === ')') padepth--;
-
+    }
       if (isEndOfString) {
         if (functionBuffer.length > 0) {
           functionBuffer += char;
@@ -1523,12 +1539,14 @@ class EventHandler {
           let evaluated = this.parseAndEvalExpression(functionBuffer);
           functionBuffer = "";
           resultBuffer += evaluated + char;
+          startCheckingEven = false
         } else if (functionBuffer.length > 0 && padepth > 0) {
           functionBuffer += char;
         } else {
           resultBuffer += char;
         }
       } else if (functionBuffer.length > 0 || char === "$") {
+        startCheckingEven = true
         functionBuffer += char;
       } else {
         resultBuffer += char;

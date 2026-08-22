@@ -1,19 +1,10 @@
 {
   "version": "v0.8.3.alpha",
   "date": "August 15, 2026",
-  "title": "Bugfixes + new stuff update by KONTREVOLUCIA",
+  "title": "Bugfixes + new stuff update by KONTREVOLUCIA and akrolpative",
   "content": {
-    "bugs": [
-      "Fixed flamethrower turret can't shoot through walls",
-      "Player now holds plasma gun and some other weapons properly",
-      "Fixed molotov cocktail weren't stackable and couldn't burn platforms",
-      "Fixed dynamite craft required iron ore instead of iron bars",
-      "Fixed underground vents didn't work in peaceful mode",
-      "Fixed $tanh function was disabled",
-      "Fixed interpolator. Now it doesn't break while zooming & also fixed phantom projectiles bug",
-      "Fixed raven's hitbox"
-    ],
     "features": [
+      "Main menu background now uses one of 18 random game screenshots - By akrolpative, Canadian_guy, AndyLin2023, Mathmaticians, and more!",
       "Slightly changed weapons balance",
       "Game now procedurally generates position in hands for hand equipments",
       "Flamethrower turret now works same as flamethrower",
@@ -32,9 +23,18 @@
       "Plasma blade, plasma gun and squid staff are now craftable only in forge",
       "Katana is now craftable without forge",
       "Rail trams are now faster + can regulate it from constants",
-      "Main menu background now uses one of 18 random game screenshots",
       "Unified mobs and players door interaction logic",
       "Added Enable Items Breaking setting"
+    ],
+    "bugs": [
+      "Fixed flamethrower turret can't shoot through walls",
+      "Player now holds plasma gun and some other weapons properly",
+      "Fixed molotov cocktail weren't stackable and couldn't burn platforms",
+      "Fixed dynamite craft required iron ore instead of iron bars",
+      "Fixed underground vents didn't work in peaceful mode",
+      "Fixed $tanh function was disabled",
+      "Fixed interpolator. Now it doesn't break while zooming & also fixed phantom projectiles bug",
+      "Fixed raven's hitbox"
     ]
   }
 }

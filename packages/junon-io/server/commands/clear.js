@@ -5,10 +5,12 @@ const Protocol = require('../../common/util/protocol')
 class Clear extends BaseCommand {
   getUsage() {
     return [
+      "Clears the inventory or items of a player.",
       "/clear",
       "/clear [player]",
       "/clear [player] [item]",
-      "/clear [player] [item] [amount]"
+      "/clear [player] [item] [amount]",
+      "ex: /clear kuroro potato 3"
     ]
   }
   

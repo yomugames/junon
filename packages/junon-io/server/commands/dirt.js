@@ -4,9 +4,11 @@ const BaseCommand = require("./base_command")
 class DirtCommand extends BaseCommand {
     getUsage() {
         return [
+           "Spawns dirt onto a surface",
             "/dirt add [entity_id]",
             "/dirt clear [entity_id]",
-            "/dirt decrease [entity_id]"
+            "/dirt decrease [entity_id]",
+            "ex: /dirt add 1234"
         ]
     }
     allowOwnerOnly() {

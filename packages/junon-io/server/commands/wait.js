@@ -5,8 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class Wait extends BaseCommand {
   getUsage() {
     return [
+      "Waits a set amount of seconds in the command block to run the next line of commands",
       "/wait [seconds]",
-      "ex. /wait 5"
+      "ex: /wait 5"
     ]
   }
 

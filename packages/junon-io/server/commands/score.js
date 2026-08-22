@@ -5,9 +5,11 @@ const Protocol = require('../../common/util/protocol')
 class Score extends BaseCommand {
   getUsage() {
     return [
-      "/score set [player] [amount]",
-      "/score gain [player] [amount]",
-      "/score lose [player] [amount]"
+      "Sets the score of an entity to a certain value",
+      "/score set [player|entity_id] [amount]",
+      "/score gain [player|entity_id] [amount]",
+      "/score lose [player|entity_id] [amount]",
+      "ex: /score set kuroro 100",
     ]
   }
 

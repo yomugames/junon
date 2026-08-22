@@ -310,9 +310,23 @@ class Player extends BaseEntity {
       }
     }
 
+    let customActions = this.getActions()
+    if (customActions) {
+      actions += customActions
+    }
     entityMenu.querySelector(".entity_action").innerHTML = actions
 
     this.initPermissionSelect(entityMenu)
+  }
+  getActions() {
+    let buttons = this.sector.getButtonsFor(this.name)
+    let html = ""
+
+    buttons.forEach((button) => {
+      html += button.buildHTML(this)
+    })
+
+    return html
   }
 
   isLoggedIn() {

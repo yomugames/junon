@@ -6,8 +6,10 @@ const { setting } = require(".")
 class Spectate extends BaseCommand {
   getUsage() {
     return [
+      "Enables or disables spectate state for players",
       "/spectate",
-      "/spectate [player]"
+      "/spectate [player]",
+      "ex: /spectate kuroro"
     ]
   }
 

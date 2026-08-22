@@ -6,9 +6,11 @@ class Needs extends BaseCommand {
 
   getUsage() {
     return [
+      "Manages the needs of an entity",
       "/needs list",
-      "/needs assign [entity_id] [type]",
-      "/needs remove [entity_id]"
+      "/needs assign [entity_id] [item_type]",
+      "/needs remove [entity_id]",
+      "ex: /needs assign 1234 Potato",
     ]
   }
 

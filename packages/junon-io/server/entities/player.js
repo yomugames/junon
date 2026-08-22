@@ -226,6 +226,14 @@ class Player extends BaseEntity {
     return gold >= 1000000
   }
 
+  triggerPlayerMenu(data) {
+    this.game.triggerEvent("PlayerMenu", {
+      menuName: data.menuName,
+      state: data.state,
+      player: this.getName(),
+    })
+  }
+
   canEditCommandBlock() {
     if (this.sector.isLobby()) return true
     if (!this.sector.canUseCommandBlocks()) return false

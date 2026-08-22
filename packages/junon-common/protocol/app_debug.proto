@@ -46,6 +46,8 @@ message Building {
   Network liquidNetwork = 54;
   Network railNetwork = 55;
   Network soilNetwork = 56;
+  uint32 nameColor = 57;
+  uint32 nameSize = 58;
 }
 
 message Mob {
@@ -81,6 +83,8 @@ message Mob {
   uint32 raycastX = 51;
   uint32 raycastY = 52;
   Goal goals = 53;
+  uint32 nameColor = 54;
+  uint32 nameSize = 55;
 }
 
 message Network {

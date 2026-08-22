@@ -5,10 +5,11 @@ const Protocol = require('../../common/util/protocol')
 class God extends BaseCommand {
   getUsage() {
     return [
-      "Enables or disables god state for players.",
+      "Enables or disables god state for players",
       "/god",
       "/god [player]",
-      "/god [player] [true/false]"
+      "/god [player] [true/false]",
+      "ex: /god kuroro"
     ]
   }
 

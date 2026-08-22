@@ -7,6 +7,7 @@ class RegionCommand extends BaseCommand {
 
   getUsage() {
     return [
+      "Manages regions",
       "/region display",
       "/region list",
       "/region set [name] [start_row] [start_col] [end_row] [end_col]",

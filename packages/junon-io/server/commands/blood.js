@@ -3,8 +3,10 @@ const BaseCommand = require("./base_command")
 class Blood extends BaseCommand {
     getUsage() {
         return [
+            "Spawns blood splatters onto a surface",
             "/blood add [entity_id]",
-            "/blood decrease [entity_id]"
+            "/blood decrease [entity_id]",
+            "ex: /blood add 1234"
         ]
     }
     allowOwnerOnly() {

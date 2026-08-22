@@ -5,7 +5,7 @@ class GetNthLetter extends BaseCommand {
         return [
             "Gets nth letter of a word and sets it to $letter variable",
             "/getnthletter [index] [word]",
-            "Ex: /getnthletter 3 example - creates a $letter variable and assigns the letter 'a' to it."
+            "ex: /getnthletter 3 example - creates a $letter variable and assigns the letter 'a' to it."
         ];
     }
 

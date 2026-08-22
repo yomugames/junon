@@ -46,7 +46,7 @@
             document.querySelector("#game_caption").style.fontFamily = "monospace"    
             document.querySelector("#parent_project").innerText = "made by junon.io"
         };
-
+        
         onload = () => {
             const img_src = [
                 'menubg1.png',
@@ -69,6 +69,17 @@
                 'menubg18.png',
             ];
             document.getElementById('home_background_image').src = "/assets/images/background/" + img_src[Math.floor(Math.random() * img_src.length)];
+
+window.addEventListener('scroll', function() {
+  const scrolled = window.scrollY; 
+  const viewportHeight = window.innerHeight; 
+  
+  const scrollInVh = (scrolled / viewportHeight) * 100;
+  const backgroundImage = document.getElementById('home_background_image');
+  
+              backgroundImage.style.transform = `translateY(${scrollInVh * 0.15}vh)`;
+            });
+
         };
     </script>
     <script src="/<%= assetPath('vendor.js') %>"></script>

@@ -5,6 +5,7 @@ const Protocol = require('../../common/util/protocol')
 class Variable extends BaseCommand {
   getUsage() {
     return [
+      "Manages and stores variables",
       "/variable list",
       "/variable set [name] [value]",
       "/variable delete [name]",

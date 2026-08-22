@@ -5,11 +5,13 @@ class Tp extends BaseCommand {
 
   getUsage() {
     return [
+      "Teleports an entity to a certain location",
       "/tp [name]",
       "/tp [row] [col]",
       "/tp [name] [row] [col]",
       "/tp [name] [name]",
-      "/tp [name] !randomland"
+      "/tp [name] !randomland",
+      "ex: /tp kuroro 5 5"
     ]
   }
 

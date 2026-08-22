@@ -25,6 +25,9 @@ class RemoteEventHandler {
 
   }
 
+  onTriggerPlayerMenu(player, data, socket) {
+    player.triggerPlayerMenu(data)
+  }
   onPing(player, data, socket) {
     this.getSocketUtil().emit(socket, "Pong", {})
   }

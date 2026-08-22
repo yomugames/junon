@@ -11,9 +11,11 @@ class Stat extends BaseCommand {
 
   getUsage() {
     return [
-      "/stat [mob|building|weapon|player]",
-      "/stat [mob|building|weapon|player] <flags>",
-      "/stat [mob|building|weapon|player] <stat>:*[multiply]"
+      "Manages the stats of an entity, weapon or player",
+      "/stat [mob_type|building_type|weapon|player]",
+      "/stat [mob_type|building_type|weapon|player] <flags>",
+      "/stat [mob_type|building_type|weapon|player] <stat>:*[multiply]",
+      "ex: /stat Lead_Pipe damage:8"
     ]
   }
   

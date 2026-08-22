@@ -259,6 +259,8 @@ class BaseMob extends BaseEntity {
     this.setGoalTargets(data.goalTargets)
     this.setName(data.name)
     this.setContent(data.content)
+    this.setNameColor(data.nameColor)
+    this.setNameSize(data.nameSize)
 
     if (data.hasOwnProperty('weaponType')) {
       this.setWeaponType(data.weaponType)
@@ -272,7 +274,25 @@ class BaseMob extends BaseEntity {
       this.ship = this.game.ships[data.shipId]
     }
   }
-
+  
+  setNameColor(color) {
+    this.nameColor = color || 16777215 
+    // Upd:
+    let SavedName = this.name
+    this.setName(" ")
+    this.setName(SavedName)
+    // Upd
+    this.onNameChanged();
+  }
+  setNameSize(size) {
+    this.nameSize = size || 23
+    // Upd:
+    let SavedName = this.name
+    this.setName(" ")
+    this.setName(SavedName)
+    // Upd
+    this.onNameChanged();
+  }
   setName(name) {
     if (this.name !== name) {
       this.name = name
@@ -332,7 +352,6 @@ class BaseMob extends BaseEntity {
       if (!this.usernameText) {
         this.createUsernameSprite()
       } else {
-        this.usernameText.sprite.text = this.name
         if (this.game.changeNameMenu.isOpen()) {
           this.game.changeNameMenu.close()
         }
@@ -343,6 +362,9 @@ class BaseMob extends BaseEntity {
         this.usernameText = null
       }
     }
+ this.usernameText.sprite.text = this.name || "";
+    this.usernameText.sprite.tint = this.nameColor !== undefined ? this.nameColor : 0xffffff;
+    this.usernameText.sprite._font.size = this.nameSize || 23;
   }
 
   createUsernameSprite() {
@@ -351,7 +373,6 @@ class BaseMob extends BaseEntity {
       text: this.getName(),
       spriteContainer: this.sprite
     })
-
     this.usernameText.sprite.position.y = this.getHeight()
   }
 
@@ -978,16 +999,21 @@ class BaseMob extends BaseEntity {
   }
 
   showAction(entityMenu) {
+    let actions = ""
+let customActions = this.getActions()
+    if (customActions) {
+      actions += customActions
+    }
+    
     if (!this.belongToOwner(this.game.player)) {
       // reset
-      entityMenu.querySelector(".entity_action").innerHTML = ""
+      entityMenu.querySelector(".entity_action").innerHTML = actions
       return
     }
 
     let player = this.game.player
     let team = player.getTeam()
-    let actions = ""
-
+    
     if (this.canTakeAlong()) {
       const take = "<div class='take_btn ui_btn' data-action='take_along'>" + i18n.t("Take Along") + "</div>"
       const release = "<div class='release_btn ui_btn' data-action='release'>" + i18n.t("Release") + "</div>"
@@ -1014,6 +1040,20 @@ class BaseMob extends BaseEntity {
     }
 
     entityMenu.querySelector(".entity_action").innerHTML = actions
+  }
+
+  getActions() {
+    let buttons = this.sector.getButtonsFor(this.getTypeNameCamelCase())
+    if (buttons.length == 0) {
+      buttons = this.sector.getButtonsFor(this.getId())
+    }
+    let html = ""
+
+    buttons.forEach((button) => {
+      html += button.buildHTML(this)
+    })
+
+    return html
   }
 
   isNPC() {

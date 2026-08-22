@@ -8,6 +8,7 @@ class Team extends BaseCommand {
 
   getUsage() {
     return [
+      "Manages teams",
       "/team list",
       "/team add [name]",
       "/team remove [name]",
@@ -18,7 +19,9 @@ class Team extends BaseCommand {
       "/team setowner [name] [region_name]",
       "/team rename [name] [newName]",
       "/team editrole [teamname] [rolename] [permission] [true|false]",
-      "/team editrole blueteam guest EditSign false"
+      "/team editrole blueteam guest EditSign false",
+      "ex: /team add kuroroteam",
+      "/team join kuroro kuroroteam",
     ]
   }
 

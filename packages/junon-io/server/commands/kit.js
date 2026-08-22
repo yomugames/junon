@@ -6,13 +6,17 @@ class Kit extends BaseCommand {
 
   getUsage() {
     return [
+      "Creates and manages kits of items",
       "/kit list",
       "/kit show [name]",
       "/kit create [name]",
       "/kit delete [name]",
       "/kit rename [name] [newname]",
       "/kit give [player] [name]",
-      "/kit give [role] [name]"
+      "/kit give [role] [name]",
+      "ex: (You must be equipping a set of items)",
+      "/kit create DefaultItems",
+      "/kit give kuroro DefaultItems"
     ]
   }
 

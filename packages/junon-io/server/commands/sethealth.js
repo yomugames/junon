@@ -5,7 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class SetHealth extends BaseCommand {
   getUsage() {
     return [
-      "/sethealth [entity_id] [health]"
+      "Sets the health of an entity to a certain value",
+      "/sethealth [entity_id] [health]",
+      "ex: /sethealth 1234 100"
     ]
   }
 

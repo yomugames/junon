@@ -5,9 +5,10 @@ const Protocol = require('../../common/util/protocol')
 class Setting extends BaseCommand {
   getUsage() {
     return [
+      "Configures the settings of the colony",
       "/setting [key] [value]",
-      "i.e. /setting isChatEnabled false",
-      "Guide: https://pastebin.com/raw/4jsmPjws"
+     "Guide: https://pastebin.com/raw/4jsmPjws",
+      "ex: /setting isChatEnabled false",
     ]
   }
 

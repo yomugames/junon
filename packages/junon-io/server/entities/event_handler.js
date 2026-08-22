@@ -1339,10 +1339,11 @@ class EventHandler {
     return conditionMet ? successVal : failureVal;
   }
 
+
   getNthWord(...values) {
     if (values.length < 2) return ""
     let index = parseInt(values[0])
-    let word = values.slice(1).join(" ")
+    let word = values.slice(1).join(" ").toString()
     let stringArray = word.split(" ")
 
     if (isNaN(index) || index < 1) {
@@ -1362,7 +1363,7 @@ class EventHandler {
   getNthLetter(...values) {
     if (values.length === 0) return ""
     let index = parseInt(values[0])
-    let word = values[1];
+    let word = values[1].toString();
     if (isNaN(index)) {
       return ""
     }
@@ -1514,14 +1515,16 @@ class EventHandler {
     let functionBuffer = "";
     let resultBuffer = "";
     let padepth = 0;
+    let startCheckingEven = false;
 
     for (var i = 0; i < chars.length; i++) {
       let char = chars[i];
       let isEndOfString = i === chars.length - 1;
 
+      if (startCheckingEven) {
       if (char === '(') padepth++;
       if (char === ')') padepth--;
-
+    }
       if (isEndOfString) {
         if (functionBuffer.length > 0) {
           functionBuffer += char;
@@ -1536,12 +1539,14 @@ class EventHandler {
           let evaluated = this.parseAndEvalExpression(functionBuffer);
           functionBuffer = "";
           resultBuffer += evaluated + char;
+          startCheckingEven = false
         } else if (functionBuffer.length > 0 && padepth > 0) {
           functionBuffer += char;
         } else {
           resultBuffer += char;
         }
       } else if (functionBuffer.length > 0 || char === "$") {
+        startCheckingEven = true
         functionBuffer += char;
       } else {
         resultBuffer += char;

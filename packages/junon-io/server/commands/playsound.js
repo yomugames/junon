@@ -6,7 +6,9 @@ class Playsound extends BaseCommand {
 
   getUsage() {
     return [
-      "/playsound [soundname]",
+      "Plays a sound",
+      "/playsound [sound_name]",
+      "ex: /playsound alert"
     ]
   }
 

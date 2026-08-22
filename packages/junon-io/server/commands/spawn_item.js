@@ -5,8 +5,10 @@ class SpawnItem extends BaseCommand {
 
   getUsage() {
     return [
+      "Spawns a certain amount of an item",
       "/spawnitem [type] [count]",
-      "/spawnitem [type] [count] [row] [col]"
+      "/spawnitem [type] [count] [row] [col]",
+      "ex: /spawnitem Potato 15 5 5"
     ]
   }
 

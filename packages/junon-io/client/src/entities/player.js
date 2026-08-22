@@ -284,6 +284,11 @@ class Player extends BaseEntity {
     let actions = ""
     let permissionSelect = this.createRoleSelect(entityMenu)
 
+    let customActions = this.getActions()
+    if (customActions) {
+      actions += customActions
+    }
+
     let team = this.game.player.getTeam()
     if (!team) return
 
@@ -313,6 +318,16 @@ class Player extends BaseEntity {
     entityMenu.querySelector(".entity_action").innerHTML = actions
 
     this.initPermissionSelect(entityMenu)
+  }
+  getActions() {
+    let buttons = this.sector.getButtonsFor(this.name)
+    let html = ""
+
+    buttons.forEach((button) => {
+      html += button.buildHTML(this)
+    })
+
+    return html
   }
 
   isLoggedIn() {

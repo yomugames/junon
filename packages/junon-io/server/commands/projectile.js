@@ -7,7 +7,9 @@ class Projectile extends BaseCommand {
 
   getUsage() {
     return [
-      "/projectile [type] [row] [col] "
+      "Fires a projectile in a certain location",
+      "/projectile [type] [row] [col]",
+      "ex: /projectile poison_gas 5 5"
     ]
   }
   

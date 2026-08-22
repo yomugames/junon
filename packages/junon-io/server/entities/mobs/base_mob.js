@@ -173,6 +173,12 @@ class BaseMob extends BaseEntity {
     if (data.name) {
       this.setName(data.name)
     }
+    if (data.nameSize) {
+this.setNameSize(data.nameSize)
+    }
+    if (data.nameColor) {
+this.setNameColor(data.nameColor)
+    }
 
     if (data.owner) {
       let owner = this.game.getEntity(data.owner.id)
@@ -610,10 +616,15 @@ class BaseMob extends BaseEntity {
     }
   }
 
+  setNameColor(color) {
+    this.nameColor = color || 16777215
+  }
+  setNameSize(size) {
+    this.nameSize = Math.min(Math.max(parseInt(size),1),50) || 23
+  }
   setName(name) {
     this.name = name
   }
-
   autocreateName() {
     return true
   }

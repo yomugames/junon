@@ -8,8 +8,10 @@ const Buildings = require("../entities/buildings/index")
 class Fill extends BaseCommand {
   getUsage() {
     return [
+      "Fills an area with the chosen terrain or building",
       "/fill [start_row] [start_col] [end_row] [end_col] [terrain_type] [color]",
-      "/fill building [start_row] [start_col] [end_row] [end_col] [1x1 building] [color]"
+      "/fill building [start_row] [start_col] [end_row] [end_col] [1x1 building] [color]",
+      "ex: /fill 1 1 5 5 floor",
     ]
   }
   

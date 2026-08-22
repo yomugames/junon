@@ -87,6 +87,8 @@ class BaseCommand {
     }
 
     if (this.isArgumentRequired() && args.length === 0 && caller.isPlayer()) {
+          caller.showChatSuccess("\n")
+caller.showChatError("/"+message.split()[0]+" command:")
       this.getUsage().forEach((usage) => {
         caller.showChatSuccess(usage)
       })
@@ -98,7 +100,7 @@ class BaseCommand {
   }
 
   showUsage(caller) {
-    this.getUsage().forEach((usage) => {
+      this.getUsage().forEach((usage) => {
       caller.showChatSuccess(usage)
     })
   }

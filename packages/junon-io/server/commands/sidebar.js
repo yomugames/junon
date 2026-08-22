@@ -7,12 +7,14 @@ class Sidebar extends BaseCommand {
 
   getUsage() {
     return [
+      "Manages the sidebar",
       "/sidebar clear",
       "/sidebar set [row] [text]",
       "/sidebar set [row] @scoreboard",
       "/sidebar [player] clear",
       "/sidebar [player] set [row] [text]",
-      "/sidebar unset @scoreboard"
+      "/sidebar unset @scoreboard",
+      "ex: /sidebar kuroro set 1 Welcome to Junon.io!"
     ]
   }
 

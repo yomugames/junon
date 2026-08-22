@@ -7,10 +7,12 @@ class Path extends BaseCommand {
 
   getUsage() {
     return [
+      "Manages paths",
       "/path list",
-      "/path set [name] [row,col] [row,col] [row,col] ...",
+      "/path set [name] [row] [col] [row] [col] ...",
       "/path delete [name]",
-      "/path rename [name] [newname]"
+      "/path rename [name] [newname]",
+      "ex: /path set Path1 1 1 2 2 3 3"
     ]
   }
 

@@ -5,10 +5,11 @@ class Fly extends BaseCommand {
 
   getUsage() {
     return [
-      "Enables or disables fly state for players.",
+      "Enables or disables fly state for players",
       "/fly",
       "/fly [player]",
-      "/fly [player] [true/false]"
+      "/fly [player] [true/false]",
+      "ex: /fly kuroro"
     ]
   }
 

@@ -5,7 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class SuitColor extends BaseCommand {
   getUsage() {
     return [
+      "Changes the color of the suit of a player",
       "/suitcolor [player] [color]",
+      "ex: /suitcolor kuroro red",
     ]
   }
   

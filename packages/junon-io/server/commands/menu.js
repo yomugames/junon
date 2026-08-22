@@ -5,9 +5,10 @@ const Protocol = require('../../common/util/protocol')
 class Menu extends BaseCommand {
     getUsage() {
         return [
-            "/menu close [menu name] [player name]",
-            "/menu open [menu name] [player name]",
-            "Available menu names:",
+            "Toggles a menu's visibility to players",
+            "/menu close [menu] [player]",
+            "/menu open [menu] [player]",
+            "ex: available menu names:",
             this.getAllowedMenusToOpen().join(", ")
         ]
     }

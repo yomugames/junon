@@ -5,8 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class Effect extends BaseCommand {
   getUsage() {
     return [
-      "/effect give [player] [effectname]",
-      "/effect clear [player] [effectname]",
+      "Gives an effect to an entity",
+      "/effect give [player|entity_id] [effectname]",
+      "/effect clear [player|entity_id] [effectname]",
       "/effect clear [player]",
       "ex: " + this.getAllowedEffects().join(", ")
     ]

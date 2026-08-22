@@ -5,9 +5,11 @@ const Protocol = require('../../common/util/protocol')
 class Limit extends BaseCommand {
   getUsage() {
     return [
+      "Sets a limit that players will have to place a certain building",
       "/limit list",
       "/limit set [building] [count]",
-      "/limit remove [building]"
+      "/limit remove [building]",
+      "ex: /limit set Wall 15"
     ]
   }
 

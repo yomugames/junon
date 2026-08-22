@@ -5,10 +5,12 @@ const Protocol = require('../../common/util/protocol')
 class Kill extends BaseCommand {
   getUsage() {
     return [
-      "/kill [name]",
-      "/kill [mobtype]",
-      "/kill pickup [itemtype]",
-      "/kill corpse [mobtype]"
+      "Kills or destroys an entity",
+      "/kill [player]",
+      "/kill [entity_id]",
+      "/kill pickup [item_type]",
+      "/kill corpse [mob_type]",
+      "ex: /kill kuroro"
     ]
   }
 

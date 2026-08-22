@@ -8,11 +8,11 @@ class Menu extends BaseCommand {
             "/menu close [menu name] [player name]",
             "/menu open [menu name] [player name]",
             "Available menu names:",
-            this.getAllowedMenus().join(", ")
+            this.getAllowedMenusToOpen().join(", ")
         ]
     }
 
-    getAllowedMenus()
+    getAllowedMenusToOpen()
     {
         return ["blueprintMenu",
                 "inventoryMenu",
@@ -28,7 +28,14 @@ class Menu extends BaseCommand {
                 "voteMenu",
                 "friendsMenu",
                 "badgeMenu",
-                "teamMenu"]
+                "teamMenu",
+                "terminalMenu"]
+    }
+
+    getUnallowedMenusToClose()
+    {
+        return ["friendsMenu",
+                "badgeMenu"]
     }
 
     allowOwnerOnly() {
@@ -53,10 +60,10 @@ class Menu extends BaseCommand {
             // only check allowed menus here
             // since player shouldn't have entity-dependent menus open with this cmd
             // but should be able to have them closed
-            let allowedMenus = this.getAllowedMenus()
+            let allowedMenus = this.getAllowedMenusToOpen()
             if(allowedMenus.indexOf(menuName) === -1)
             {
-                caller.showChatError("Menu invalid / unallowed: " + menuName)
+                caller.showChatError("Menu invalid or unallowed: " + menuName)
                 return
             }
 
@@ -70,6 +77,12 @@ class Menu extends BaseCommand {
             return
         }
         if(subcommand == "close") {
+            let disallowedMenus = this.getUnallowedMenusToClose()
+            if(disallowedMenus.indexOf(menuName) !== -1)
+            {
+                caller.showChatError("Menu invalid or unallowed: " + menuName)
+                return
+            }
             if(multiplePlayers) {
                 player.forEach((entity) => {
                     this.getSocketUtil().emit(entity.socket, "CloseMenu", {menuName: menuName})

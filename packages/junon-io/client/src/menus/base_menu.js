@@ -254,6 +254,13 @@ class BaseMenu {
     return false
   }
 
+  menuChanged(newState) {
+    SocketUtil.emit("TriggerPlayerMenu", {
+      menuName: this.el.id,
+      state: newState,
+    })
+  }
+
   open(options = {}) {
     if (this.isControllingPlayerRequired()) {
       if (!this.game.player) return
@@ -274,6 +281,7 @@ class BaseMenu {
     }
 
     this.setOpenDisplay()
+    this.menuChanged(true)
   }
 
   setOpenDisplay() {
@@ -301,6 +309,7 @@ class BaseMenu {
     }
 
     this.el.style.display = 'none'
+    this.menuChanged(false)
   }
 
   isOpen() {

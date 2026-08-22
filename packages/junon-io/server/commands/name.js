@@ -17,7 +17,7 @@ class Name extends BaseCommand {
       "/name setcolor [entity_id] [hex_color]",
       "/name setsize [entity_id] [size:1-50]",
       "/name remove [entity_id]",
-      "/name set 1234 Welcome!"
+      "ex: /name set 1234 Welcome!"
     ]
   }
   

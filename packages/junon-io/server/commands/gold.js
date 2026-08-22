@@ -5,9 +5,11 @@ const Protocol = require('../../common/util/protocol')
 class Gold extends BaseCommand {
   getUsage() {
     return [
+      "Sets the player's gold count to a certain value",
       "/gold set [player] [amount]",
       "/gold gain [player] [amount]",
-      "/gold lose [player] [amount]"
+      "/gold lose [player] [amount]",
+      "ex: /gold set kuroro 1234"
     ]
   }
 

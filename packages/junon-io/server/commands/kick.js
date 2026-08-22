@@ -5,7 +5,9 @@ class Kick extends BaseCommand {
 
   getUsage() {
     return [
-      "/kick [player]"
+      "Removes a player from this world",
+      "/kick [player]",
+      "ex: /kick kuroro",
     ]
   }
 

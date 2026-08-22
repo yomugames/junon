@@ -11,9 +11,13 @@ class Name extends BaseCommand {
 
   getUsage() {
     return [
+      "Sets a name to an entity",
       "/name [entity_id]",
-      "/name set [entity_id] [name]",
+      "/name set [entity_id] [text]",
+      "/name setcolor [entity_id] [hex_color]",
+      "/name setsize [entity_id] [size:1-50]",
       "/name remove [entity_id]",
+      "/name set 1234 Welcome!"
     ]
   }
   

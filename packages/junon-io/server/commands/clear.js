@@ -10,7 +10,7 @@ class Clear extends BaseCommand {
       "/clear [player]",
       "/clear [player] [item]",
       "/clear [player] [item] [amount]",
-      "e.g. /clear kuroro potato 3"
+      "ex: /clear kuroro potato 3"
     ]
   }
   

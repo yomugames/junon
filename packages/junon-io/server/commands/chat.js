@@ -8,8 +8,8 @@ class Chat extends BaseCommand {
       "Sends a message to the chat box",
       "/chat [text]",
       "/chat [player] [text]",
-      "e.g. /chat @a %success% Welcome, players!",
-      "e.g. /chat @a %error% Something wrong happened..."
+      "ex: /chat @a %success% Welcome, players!",
+      "/chat @a %error% Something wrong happened..."
     ]
   }
 

@@ -4,7 +4,9 @@ class SpawnCorpse extends BaseCommand {
 
   getUsage() {
     return [
-      "/spawncorpse [type]",
+      "Spawns the corpse of a mob",
+      "/spawncorpse [corpse_type] [row] [col]",
+      "ex: /spawncorpse human 5 5"
     ]
   }
   

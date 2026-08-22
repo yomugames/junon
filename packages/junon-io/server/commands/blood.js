@@ -6,7 +6,7 @@ class Blood extends BaseCommand {
             "Spawns blood splatters onto a surface",
             "/blood add [entity_id]",
             "/blood decrease [entity_id]",
-            "e.g. /blood add 1234"
+            "ex: /blood add 1234"
         ]
     }
     allowOwnerOnly() {

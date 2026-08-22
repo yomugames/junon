@@ -5,8 +5,10 @@ const Protocol = require('../../common/util/protocol')
 class Ping extends BaseCommand {
   getUsage() {
     return [
-      "/ping [entityId/player/selector] [pingId]",
-      "Ping id is used to differentiate command calls"
+      "Triggers a ping event in the command block",
+      "/ping [player|entity_id] [ping_id]",
+      "Ping id is used to differentiate command calls",
+      "ex: /ping @a 1"
     ]
   }
 

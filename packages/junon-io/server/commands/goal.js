@@ -5,10 +5,11 @@ const Protocol = require('../../common/util/protocol')
 class Goal extends BaseCommand {
   getUsage() {
     return [
-      "/goal move [mobId] goal",
-      "/goal attack [mobId] target",
-      "/goal clear [mobId] [goalId/all]",
-      "Used to manage mob goals"
+      "Manages mob goals",
+      "/goal move [mob_id] goal",
+      "/goal attack [mob_id] target",
+      "/goal clear [mob_id] [player|entity_id]",
+      "ex: /goal move 1234 kuroro"
     ]
   }
 

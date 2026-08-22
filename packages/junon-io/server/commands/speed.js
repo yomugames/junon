@@ -5,7 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class Speed extends BaseCommand {
   getUsage() {
     return [
-      "/speed [player] [1-20]"
+      "Sets the speed of an entity to a certain value",
+      "/speed [player] [1-20]",
+      "ex: /speed kuroro 20"
     ]
   }
 

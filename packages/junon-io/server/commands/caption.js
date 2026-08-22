@@ -10,7 +10,7 @@ class Caption extends BaseCommand {
       "/caption subtitle [text]",
       "/caption [player] title [text]",
       "/caption [player] subtitle [text]",
-      "e.g. /caption kuroro title Hello, World!"
+      "ex: /caption kuroro title Hello, World!"
     ]
   }
 

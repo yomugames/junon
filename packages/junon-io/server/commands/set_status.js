@@ -4,7 +4,8 @@ class SetStatus extends BaseCommand {
     getUsage() {
         return [
             "Sets this sector's visibility to public or private",
-            "/setstatus [public/private]"
+            "/setstatus [public/private]",
+            "ex: /setstatus public"
         ]
     }
 

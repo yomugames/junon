@@ -6,7 +6,9 @@ const Item = require("../entities/item")
 class SetEquipment extends BaseCommand {
   getUsage() {
     return [
-      "/setequipment [armor|hand] [username] [type]"
+      "Sets the hand or armor equipment of a player to a certain suit or item",
+      "/setequipment [armor|hand] [player] [suit_type|item_type]",
+      "ex: /setequipment armor kuroro Combat_Armor"
     ]
   }
 

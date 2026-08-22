@@ -5,14 +5,16 @@ const Protocol = require('../../common/util/protocol')
 class Interact extends BaseCommand {
   getUsage() {
     return [
-      "/interact [entityId] [open|close]",
-      "/interact [entityId] angle [0-360]",
-      "/interact [entityId] generate [type]",
-      "/interact [entityId] processingrate [1-5]",
-      "/interact [entityId] unown",
-      "/interact [entityId] shoot",
-      "/interact [entityId] content",
-      "/interact [entityId] attack [target]"
+      "Interacts in different ways with an entity",
+      "/interact [entity_id] [open|close]",
+      "/interact [entity_id] angle [0-360]",
+      "/interact [entity_id] generate [type]",
+      "/interact [entity_id] processingrate [1-5]",
+      "/interact [entity_id] unown",
+      "/interact [entity_id] shoot",
+      "/interact [entity_id] content",
+      "/interact [entity_id] attack [target]",
+      "ex: /interact 1234 angle 45"
     ]
   }
 

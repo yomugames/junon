@@ -5,6 +5,7 @@ const Protocol = require('../../common/util/protocol')
 class Day extends BaseCommand {
   getUsage() {
     return [
+      "Returns the current day",
       "/day",
     ]
   }

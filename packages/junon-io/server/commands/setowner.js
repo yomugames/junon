@@ -5,7 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class SetOwner extends BaseCommand {
   getUsage() {
     return [
-      "/setowner [entity_id] [team]"
+      "Changes the owner of an entity to a certain team",
+      "/setowner [entity_id] [team]",
+      "ex: /setowner 1234 kuroroteam"
     ]
   }
 

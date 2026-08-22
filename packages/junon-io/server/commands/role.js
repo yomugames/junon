@@ -5,7 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class Role extends BaseCommand {
   getUsage() {
     return [
-      "/role [player] [rolename]"
+      "Assigns a role to a player",
+      "/role [player] [role_name]",
+      "ex: /role kuroro Admin"
     ]
   }
 

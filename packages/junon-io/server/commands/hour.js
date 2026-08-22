@@ -5,6 +5,7 @@ const Protocol = require('../../common/util/protocol')
 class Hour extends BaseCommand {
   getUsage() {
     return [
+      "Returns the current hour",
       "/hour",
     ]
   }

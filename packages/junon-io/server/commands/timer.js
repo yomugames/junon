@@ -5,9 +5,11 @@ const Protocol = require('../../common/util/protocol')
 class Timer extends BaseCommand {
   getUsage() {
     return [
+      "Manages timers",
       "/timer list",
       "/timer start [name] [duration] [tick]",
-      "/timer stop [name]"
+      "/timer stop [name]",
+      "ex: /timer start Intermission 15 1"
     ]
   }
   

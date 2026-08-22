@@ -8,7 +8,7 @@ class ChatPrefix extends BaseCommand {
       "Gives a player a custom tag before their name in chat",
       "/chatprefix set [player] [text] [color] [style:1-7]",
       "/chatprefix clear [player]",
-      "e.g. /chatprefix set kuroro Owner red 1",
+      "ex: /chatprefix set kuroro Owner red 1",
     ]
   }
 
@@ -34,7 +34,7 @@ class ChatPrefix extends BaseCommand {
       } else if (style==3){
         style = "{}"
       } else if (style==4) {
-        style = "<>"
+        style = "||"
       } else if (style==5) {
         style = " -"
       } else if (style==6) {

@@ -5,9 +5,11 @@ const Protocol = require('../../common/util/protocol')
 class Health extends BaseCommand {
   getUsage() {
     return [
-      "/health set [player|mob|building] [amount]",
-      "/health gain [player|mob|building] [amount]",
-      "/health lose [player|mob|building] [amount]"
+      "Sets the health of an entity to a certain value",
+      "/health set [player|entity_id] [amount]",
+      "/health gain [player|entity_id] [amount]",
+      "/health lose [player|entity_id] [amount]",
+      "ex: /health set kuroro 100",
     ]
   }
 

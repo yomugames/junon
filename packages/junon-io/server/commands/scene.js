@@ -5,7 +5,9 @@ const Protocol = require('../../common/util/protocol')
 class Scene extends BaseCommand {
   getUsage() {
     return [
-      "/scene play [sceneName] camera:[entityid]"
+      "Manages scenes - Coming soon!",
+      "/scene play [scene_name] camera:[entity_id]",
+      "Manages scenes - Coming soon!"
     ]
   }
 

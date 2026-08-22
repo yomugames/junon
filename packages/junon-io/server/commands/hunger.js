@@ -5,9 +5,11 @@ const Protocol = require('../../common/util/protocol')
 class Hunger extends BaseCommand {
   getUsage() {
     return [
-      "/hunger set [player|mob|building] [amount]",
-      "/hunger gain [player|mob|building] [amount]",
-      "/hunger lose [player|mob|building] [amount]"
+      "Sets the hunger of an entity to a certain value",
+      "/hunger set [player|entity_id] [amount]",
+      "/hunger gain [player|entity_id] [amount]",
+      "/hunger lose [player|entity_id] [amount]",
+      "ex: /hunger set kuroro 100",
     ]
   }
 

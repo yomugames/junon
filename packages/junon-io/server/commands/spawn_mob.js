@@ -8,16 +8,17 @@ class SpawnMob extends BaseCommand {
 
   getUsage() {
     return [
+      "Spawns a mob",
       "/spawnmob [type] [count]",
       "/spawnmob [type] [count] [row] [col]",
       "/spawnmob [type] [count] [row] [col] [flags]",
-      "=== available flags:",
+      "Available flags:",
       "goal:[entityId]",
       "status:[hostile|neutral|]",
       "mapdisplay:[true|false]",
       "taming:[true|false]",
       "attackables:[players|mobs|buildings]",
-      "ex. /spawnmob guard 1 20 20 goal:4531 status:hostile mapdisplay:true"
+      "ex: /spawnmob guard 1 20 20 goal:4531 status:hostile mapdisplay:true"
     ]
   }
 

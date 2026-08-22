@@ -18,9 +18,9 @@ class ButtonCommand extends BaseCommand {
       "/button show [name]",
       "/button rename [name] [newname]",
       "/button describe [name] [description]",
-      "/button attach [name] [mob_type|building_type|entity_id]",
-      "/button dettach [name] [mob_type|building_type|entity_id]",
-      "e.g. /button add Hug",
+      "/button attach [name] [player|entity_type|entity_id]",
+      "/button dettach [name] [player|entity_type|entity_id]",
+      "ex: /button add Hug",
       "/button attach Hug kuroro",
     ]
   }
@@ -153,14 +153,13 @@ class ButtonCommand extends BaseCommand {
 
         type = this.cleanName(args[2])
         klassName = this.sector.klassifySnakeCase(type)
-        entityById = this.getEntitiesBySelector(args[2])
-        playerByName = this.game.getPlayerByName(args[2])
-        if (!Mobs[klassName] && !Buildings[klassName] && !entityById && !playerByName) {
+        entityById = this.game.getEntityByNameOrId(args[2])
+        if (!Mobs[klassName] && !Buildings[klassName] && !entityById) {
           caller.showChatError(`invalid entity ${args[2]} `)
           return
         }
 
-        button.attach(klassName || entityById || playerByName)
+        button.attach(klassName || entityById)
         caller.showChatSuccess(`${buttonName} attached to ${args[2]}`)
         break
       case "detach":
@@ -173,14 +172,13 @@ class ButtonCommand extends BaseCommand {
 
         type = this.cleanName(args[2])
         klassName = this.sector.klassifySnakeCase(type)
-        entityById = this.getEntitiesBySelector(args[2])
-        playerByName = this.game.getPlayerByName(args[2])
-        if (!Mobs[klassName] && !Buildings[klassName] && !entityById && !playerByName) {
+        entityById = this.game.getEntityByNameOrId(args[2])
+        if (!Mobs[klassName] && !Buildings[klassName] && !entityById) {
           caller.showChatError(`invalid entity ${args[2]} `)
           return
         }
 
-        button.detach(klassName || entityById || playerByName)
+        button.detach(klassName || entityById)
         caller.showChatSuccess(`${buttonName} dettached from ${args[2]}`)
         break
       default:

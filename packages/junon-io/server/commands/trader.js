@@ -7,11 +7,13 @@ const Mobs = require("../entities/mobs/index")
 class Trader extends BaseCommand {
   getUsage() {
     return [
-      "/trader buy [item] [cost]",
-      "/trader unbuy [item]",
+      "Customizes the trader",
+      "/trader buy [item_type] [cost]",
+      "/trader unbuy [item_type]",
       "/trader sellcustom [allow|deny]",
-      "/trader sell [item] [cost]",
-      "/trader unsell [item]"
+      "/trader sell [item_type] [cost]",
+      "/trader unsell [item_type]",
+      "ex: /trader buy Potato 100"
     ]
   }
 

@@ -34,7 +34,7 @@ class ChatPrefix extends BaseCommand {
       } else if (style==3){
         style = "{}"
       } else if (style==4) {
-        style = "||"
+        style = '""'
       } else if (style==5) {
         style = " -"
       } else if (style==6) {

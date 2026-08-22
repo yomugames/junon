@@ -26,7 +26,7 @@ class ChatPrefix extends BaseCommand {
     
     let subcommand = args[0]
     let style = args[4]
-    if (style) {
+    if (style && style < 9) {
       if (style==1) {
         style = "[]"
       } else if (style==2) {
@@ -41,6 +41,8 @@ class ChatPrefix extends BaseCommand {
         style = " /"
       } else if (style==7) {
         style = " :"
+      } else if (style==8) {
+        style = "  "
       }
       
     } else {style="[]"}

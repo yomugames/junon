@@ -284,11 +284,6 @@ class Player extends BaseEntity {
     let actions = ""
     let permissionSelect = this.createRoleSelect(entityMenu)
 
-    let customActions = this.getActions()
-    if (customActions) {
-      actions += customActions
-    }
-
     let team = this.game.player.getTeam()
     if (!team) return
 
@@ -315,6 +310,10 @@ class Player extends BaseEntity {
       }
     }
 
+    let customActions = this.getActions()
+    if (customActions) {
+      actions += customActions
+    }
     entityMenu.querySelector(".entity_action").innerHTML = actions
 
     this.initPermissionSelect(entityMenu)

@@ -159,7 +159,11 @@ class ButtonCommand extends BaseCommand {
           return
         }
 
-        button.attach(klassName || entityById)
+        if (Mobs[klassName] || Buildings[klassName]) {
+        button.attach(klassName)
+        } else {
+        button.attach(args[2])
+        }
         caller.showChatSuccess(`${buttonName} attached to ${args[2]}`)
         break
       case "detach":
@@ -178,7 +182,11 @@ class ButtonCommand extends BaseCommand {
           return
         }
 
-        button.detach(klassName || entityById)
+        if (Mobs[klassName] || Buildings[klassName]) {
+        button.detach(klassName)
+        } else {
+        button.detach(args[2])
+        }
         caller.showChatSuccess(`${buttonName} dettached from ${args[2]}`)
         break
       default:

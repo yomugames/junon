@@ -362,10 +362,12 @@ class BaseMob extends BaseEntity {
         this.usernameText = null
       }
     }
+    if (this.usernameText && this.usernameText.sprite) {
  this.usernameText.sprite.text = this.name || "";
     this.usernameText.sprite.tint = this.nameColor !== undefined ? this.nameColor : 0xffffff;
     this.usernameText.sprite._font.size = this.nameSize || 23;
   }
+}
 
   createUsernameSprite() {
     this.usernameText = BitmapText.create({

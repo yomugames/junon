@@ -9018,3 +9018,16 @@ body.moderator .team_entry_row .ban_world_btn {
 .team_entry_row .ban_world_btn:hover {
     background-color: #c44242;
 }
+
+#home_background {
+    background-color:rgba(0,0,0,0);
+}
+#home_background_image {
+    top: -5vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 120vh;
+    object-fit: cover;
+}

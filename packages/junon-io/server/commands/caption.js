@@ -17,6 +17,11 @@ class Caption extends BaseCommand {
   allowOwnerOnly() {
     return true
   }
+  
+  isNonSandboxCommand() {
+    return true
+  }
+
 
   isSubCommand(text) {
     return ["title", "subtitle"].indexOf(text) !== -1

@@ -17,6 +17,10 @@ class Dialogue extends BaseCommand {
     return true
   }
 
+  isNonSandboxCommand() {
+    return true
+  }
+
   perform(player, args) {
     let subcommand = args[0]
     let text

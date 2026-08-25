@@ -17,6 +17,10 @@ class Timer extends BaseCommand {
     return true
   }
 
+  isNonSandboxCommand() {
+    return true
+  }
+
   perform(caller, args) {
     let subcommand = args[0]
     let name

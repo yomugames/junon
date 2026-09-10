@@ -1,0 +1,84 @@
+name: Deploy production
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Production uploads and the server dependency installation must not overlap.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy client and server
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 30
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: junon
+      SENTRY_PROJECT: junon-client
+      CLIENT_HOST: 68.183.126.88
+      CLIENT_PATH: /var/www/junon-io/
+      SERVER_HOST: prime-nyc1-9471aeba.junon.io
+      SERVER_PATH: ~/junon
+
+    steps:
+      - name: Check out the pushed revision
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Configure deployment SSH
+        env:
+          DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build client
+        env:
+          NODE_ENV: production
+        run: npm run client:build
+
+      - name: Upload client source maps to Sentry
+        run: |
+          SENTRY_RELEASE="junon-io@$(git rev-parse --short=7 HEAD)"
+          npm exec --workspace packages/junon-io -- sentry-cli releases --org "$SENTRY_ORG" new --finalize --project "$SENTRY_PROJECT" "$SENTRY_RELEASE"
+          npm exec --workspace packages/junon-io -- sentry-cli releases --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" files "$SENTRY_RELEASE" upload-sourcemaps --ignore-file packages/junon-io/.sourcemapignore --no-rewrite packages/junon-io/dist
+
+      - name: Deploy client files
+        run: rsync -rI --delete --exclude='*.map' packages/junon-io/dist/ "root@$CLIENT_HOST:$CLIENT_PATH"
+
+      - name: Update server checkout and dependencies
+        run: ssh "root@$SERVER_HOST" "source ~/.bash_profile; cd $SERVER_PATH; git pull origin master && npm ci"
+
+      - name: Start graceful server rollout
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          NODE_ENV: production
+        run: |
+          firebase_credentials_file="$(mktemp)"
+          trap 'rm -f "$firebase_credentials_file"' EXIT
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$firebase_credentials_file"
+          chmod 600 "$firebase_credentials_file"
+          export GOOGLE_APPLICATION_CREDENTIALS="$firebase_credentials_file"
+          revision="$(git rev-parse --short=7 HEAD)"
+          node deployment/set-firebase-node-revision.js nyc1 prime-nyc1-9471aeba "$revision"

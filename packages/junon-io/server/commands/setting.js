@@ -42,6 +42,17 @@ class Setting extends BaseCommand {
       return
     }
 
+    if (key === 'lighting') {
+      value = parseInt(value)
+      if (value > 50 && value <= 100) {
+        this.game.isLightingCustom = value
+        player.showChatSuccess("lighting set to " + value)
+      } else {
+        this.game.isLightingCustom = 0
+      }
+      return
+    }
+
     if (!this.sector.settings.hasOwnProperty(key)) {
       player.showChatError("invalid key. Valid keys are: " + Object.keys(this.sector.settings).join(", "))
       return

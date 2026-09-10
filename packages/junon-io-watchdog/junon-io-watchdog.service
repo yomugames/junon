@@ -1,0 +1,16 @@
+[Unit]
+Description=junon io game-server watchdog
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=/root/env_variables
+ExecStart=/usr/local/bin/npm run start --prefix /root/junon/packages/junon-io-watchdog
+Restart=always
+RestartSec=3s
+MemoryAccounting=true
+MemoryHigh=128M
+MemoryMax=128M
+
+[Install]
+WantedBy=multi-user.target

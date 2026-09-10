@@ -136,6 +136,7 @@ class Player extends BaseEntity {
     await user.save();
   }
 
+
   async userHasBadge(badgeId) {
     let user = await User.findOne({where: {uid: this.uid}})
     if(!user || !user.badges) return
@@ -150,14 +151,14 @@ class Player extends BaseEntity {
    * Use await with this function!!!!
    * @returns {Promise<boolean>}
    */
-  async hasUserPlayed2Years() {
+  async hasUserPlayed5Years() {
     let userCreatedAt = await this.getUserCreatedAt()
 
     let now = new Date()
     let diff = now - userCreatedAt
     let diffDays = diff / (1000 * 60 * 60 * 24)
 
-    return diffDays > 730
+    return diffDays > 360*5
   }
 
   getBadgeKlass(id) {
@@ -199,8 +200,16 @@ class Player extends BaseEntity {
     
   }
 
-  async equipBadge(badgeName) {
+  async equipBadge(badgeSetName) {
     try {
+      let badgeName = badgeSetName
+      let user = await User.findOne({where: {uid: this.uid}})
+      if(!user) return
+
+      if (badgeName == "Default") {
+        badgeName = "None"
+      }
+      
       let badge = new Badges.badges[badgeName]()
       if(!await this.userHasBadge(badge.getId())) {
         return
@@ -215,7 +224,10 @@ class Player extends BaseEntity {
         },
         playerId: this.id
       })
+      
+      await user.save();
     } catch(e) {
+      console.log(e)
       return
     }
     
@@ -488,12 +500,15 @@ class Player extends BaseEntity {
     this.resumeTime = Date.now()
 
     this.joinTimestamp = this.game.timestamp
+    this.prefixesList = {}
 
     if (data.name) {
       this.name = data.name
     } else {
       this.name = this.sanitize(data.username)
     }
+
+    if (this.game.arrowList) {this.game.arrowList[this.name] = {}}
 
     if (data.uid) {
       this.uid = data.uid
@@ -776,7 +791,7 @@ class Player extends BaseEntity {
       this.tutorialIndex["main"] = 1
     }
 
-    this.equipBadge("None")
+    this.equipBadge("Default")
 
     this.game.sendToMatchmaker({ event: "PlayerJoin",
       data: {
@@ -3218,6 +3233,11 @@ class Player extends BaseEntity {
     this.score = 0
   }
 
+  setArrow() {
+    this.arrowList = JSON.stringify(this.game.playerArrows[this.name])
+    this.onStateChanged("arrowList")
+  }
+
   getTurnSpeed() {
     return 20
   }
@@ -3929,15 +3949,15 @@ class Player extends BaseEntity {
   }
 
   consumeRage() {
-    const isFiveSecondInterval = this.game.timestamp % (Constants.physicsTimeStep * 5) === 0
-    if (!isFiveSecondInterval) return
+    const isOneSecondInterval = this.game.timestamp % Constants.physicsTimeStep === 0
+    if (!isOneSecondInterval) return
 
     if (!this.hasEffect("rage")) return
 
     let effectDuration = this.game.timestamp - this.getEffectCreatedAt("rage")
     let effectDurationInSeconds = Math.floor(effectDuration / Constants.physicsTimeStep)
 
-    if (effectDurationInSeconds >= 60) {
+    if (effectDurationInSeconds >= this.getEffectDuration("rage")) {
       this.removeRage()
     }
   }
@@ -5055,8 +5075,9 @@ class Player extends BaseEntity {
   }
 
   setScore(amount) {
+    let prevScore = this.score
     this.score = amount
-    this.onScoreChanged()
+    this.onScoreChanged(prevScore, this.score)
   }
 
   increaseScore(amount) {

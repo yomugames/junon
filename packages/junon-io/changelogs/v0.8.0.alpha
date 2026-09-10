@@ -1,30 +1,38 @@
 {
   "version": "v0.8.0.alpha",
-  "date": "July 25, 2026",
-  "title": "Combat update by KONTREVOLUCIA",
+  "date": "September 8, 2026",
+  "title": "QOL Update #3 - Perrito and akrolpative",
   "content": {
     "bugs": [
-      "Fixed flamethrower wrongly consume fuel from fuel tank",
-      "Partially fixed phantom projectiles bug",
-      "Human isn't dormant now if spawned with command",
-      "Firebat no longer takes damage from fire",
-      "Tangent function is now enabled"
+      "'/score set' will no longer trigger ScoreChanged with $previous and $current displaying undefined.",
+      "Fixed '/spawncorpse' not spawning correctly with 'row, col' arguments.",
+      "Fixed the visual bug of the timer being at tick 0.05 when it should be at tick 1 when the timer action is created.",
+      "Fixed command block example typos.",
+      "Fixed the description of the molotov cocktail to be clearer.",
+      "$getInventoryItemCount() now works on structures.",
+      "$getName() will now accept $player as a parameter for consistency.",
+      "The molotov cocktail will no longer affect floors of the same team on impact, and will affect structures, platforms, and rock."
     ],
     "features": [
-      "Added server class for ranged weapons",
-      "Grenades have physics now",
-      "Reworked and rebalanced all ranged weapons",
-      "Added AK-47",
-      "Added bolt action rifle",
-      "Added minigun weapon",
-      "Added uzi",
-      "Added grenade launcher",
-      "Projectiles now fly out of gun's barrel, not shooter's body",
-      "New hands holding weapon sprites",
-      "New shoot animation for ranged weapons",
-      "Melee attack and items on ground animations are smoother now",
-      "Bosses and some mobs are stronger now",
-      "Only melee weapons get damage debuff when attacking walls"
+      "Changelog full re-design",
+      "Added new /arrow command",
+      "Added new subcommands for /caption, /dirt and /blood",
+      "Added new subcommand lighting for /setting to set lighting level from 0 to 100",
+      "Added consistency along with a few more examples to functions page in the command blocks menu.",
+      "/caption now allows hex colors or color values, example: /caption title \u00a7red test || /caption title \u00a7#ffaa33 test",
+      "Added the functions $getValuePosition, $getValueLength, $getPushedValue, $getDate(), $getEntityDistance, and $getRemovedValue.",
+      "Replaced $getBuildingType() with $getEntityType() because it might be too confusing, making it obsolete, $getBuildingType() will still be usable for old games, but it will not be included in the command block functions to promote use of $getEntityType().",
+      "$getBuildingType() and $getEntityType() will now accept $player names and return Player .",
+      "New ordering and collapsible sections added in command blocks, with functions being sorted in alphabetical order for cleanliness.",
+      "The (large) oxygen tank will now hold 2.5 times as much oxygen so that it is better than the small oxygen tank.",
+      "Molotov cocktail can only be crafted in the craft menu.",
+      "Virtually all entities should now be able to be set on fire through /effect."
+    ],
+    "Miscellaneous": [
+      "Changed the code of /spawncorpse to behave more similarly to /spawnmob.",
+      "Changed $getX() and $getY() to stop using magic numbers.",
+      "Changed the method of adding more command block examples.",
+      "Made the duration constants identify themselves for consistency in base_entity.js for consuming effects."
     ]
   }
 }

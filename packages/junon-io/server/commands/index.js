@@ -75,6 +75,7 @@ Commands.chatprefix = require('./chatprefix')
 Commands.ping = require('./ping')
 Commands.goal = require('./goal')
 Commands.setstructure = require('./setstructure')
+Commands.arrow = require('./arrow')
 
 Commands.accept_rules = require("./accept_rules")
 

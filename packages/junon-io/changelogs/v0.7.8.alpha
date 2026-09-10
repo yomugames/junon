@@ -1,0 +1,20 @@
+{
+  "version": "v0.7.8.alpha",
+  "date": "September 3, 2026",
+  "title": "Update by Wahlee",
+  "content": {
+    "features": [
+      "revitalizer tower, repairs buildings, needs fuel & power",
+      "dispenser, larger vending machine that stores more, sells most items (excludes food and drink)",
+      "vending machines can have custom prices for items",
+      "vending machine storage & withdraw is limited to owner",
+      "can use hex colors and texture in /fill",
+      "can also use hex colors in /fill building"
+    ],
+    "bugs": [
+      "fix lamps having invalid content (gets fixed when loading sector)",
+      "fix items being stored in cryotube (would crash sector when loading it)",
+      "fix guns firing through walls"
+    ]
+  }
+}

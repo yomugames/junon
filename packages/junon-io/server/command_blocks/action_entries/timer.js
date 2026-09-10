@@ -27,7 +27,7 @@ class Timer extends ActionEntry {
   }
 
   parseData(data) {
-    this.timer = { name: "Timer", duration: 10, every: 1/20 }
+    this.timer = { name: "Timer", duration: 10, every: 1 }
 
     if (data.timer) {
       this.timer.name = data.timer.name

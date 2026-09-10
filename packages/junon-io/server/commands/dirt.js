@@ -8,7 +8,8 @@ class DirtCommand extends BaseCommand {
             "/dirt add [entity_id]",
             "/dirt clear [entity_id]",
             "/dirt decrease [entity_id]",
-            "ex: /dirt add 1234"
+            "/dirt set [entity_id] [level]",
+            "ex: /dirt set 1234 2"
         ]
     }
     allowOwnerOnly() {
@@ -29,7 +30,10 @@ class DirtCommand extends BaseCommand {
                     entities[entity].addDirt()
             } else if (subcommand == "clear") {
                 entities[entity].removeDirt()
-            } else if (subcommand == "decrease") {
+            } else if (subcommand == "set") {
+                entities[entity].setDirt(args[2] || 0)
+            }
+            else if (subcommand == "decrease") {
                 entities[entity].reduceDirt()
             }
         }

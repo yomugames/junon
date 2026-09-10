@@ -895,6 +895,8 @@ message ErrorMessage {
   uint32 size = 5;
   bool isTitle = 6;
   bool isSuccess = 7;
+  bool isCenter = 8;
+  bool isFooter = 9;
 }
 
 message Craft {
@@ -975,6 +977,8 @@ message GameState {
   double tick = 4;
   uint32 memory = 5;
   Camera camera = 6;
+  uint32 isLightingCustom = 7;
+  string arrowList = 8;
 }
 
 message InventoryChanged {
@@ -1247,6 +1251,7 @@ message JoinGame {
   map<string, Objective> objectives = 28;
   map<uint32, EntityDialogues> dialogueMap = 29;
   FullMap fullMap = 30;
+  uint32 isLightingCustom = 31;
 }
 
 message Objective {

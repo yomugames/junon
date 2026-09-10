@@ -1734,6 +1734,11 @@ class BaseBuilding extends BaseEntity {
     this.setEffectLevel("blood", this.getEffectLevel("blood") + 1)
   }
 
+  setBlood(lvl) {
+    if (!this.sector.settings['isBloodEnabled']) return
+    this.setEffectLevel("blood", Math.max(Math.min(parseInt(lvl),4),0))
+  }
+
   getSpeedMultiplier() {
     let multiplier = 1
 
@@ -1913,6 +1918,19 @@ class BaseBuilding extends BaseEntity {
     }
 
     return countMet
+  }
+  
+  getInventoryItemCount(ingredientType) {
+    let currentCount = 0
+
+    for (let index in this.storage) {
+      let item = this.storage[index]
+      if (item && item.type === Helper.getBuildingTypeByName(this.sector.klassifySnakeCase(ingredientType))) {
+        currentCount += item.count
+      }
+    }
+
+    return currentCount
   }
 
   canAddEffect(effectName) {

@@ -30,10 +30,48 @@ class MolotovCocktail extends BaseProjectile {
   }
 
   createFlames() {
-    let terrains = this.getContainer().platformMap.search(this.getFlameBoundingBox())
+    let alreadyOnFire = []
+
+    let structures = this.getContainer().structureMap.search(this.getFlameBoundingBox())
+    structures.forEach((structure) => {
+      if (!structure.isOwnedBy(this.owner)) {
+        let level = Math.floor(Math.random() * 4)
+        structure.addFire(structure.getEffectLevel("fire") + level, { forceFlamable: true })
+      }
+      alreadyOnFire.push([structure.getRow(), structure.getCol()])
+    })
+
+    let platforms = this.getContainer().platformMap.search(this.getFlameBoundingBox())
+    platforms.forEach((platform) => {
+      let onStructureOrPlatform = false;
+      for (let coordinate in alreadyOnFire) {
+        if (alreadyOnFire[coordinate][0] === platform.getRow() && alreadyOnFire[coordinate][1] === platform.getCol()) {
+          onStructureOrPlatform = true;
+          break;
+        }
+      }
+      if (!onStructureOrPlatform) {
+        if (!platform.isOwnedBy(this.owner)) {
+          let level = Math.floor(Math.random() * 4)
+          platform.addFire(platform.getEffectLevel("fire") + level, { forceFlamable: true })
+        }
+        alreadyOnFire.push([platform.getRow(), platform.getCol()])
+      }
+    })
+
+    let terrains = this.getContainer().groundMap.search(this.getFlameBoundingBox())
     terrains.forEach((terrain) => {
-      let level = Math.floor(Math.random() * 4)
-      terrain.addFire(level, { forceFlamable: true })
+      let onStructureOrPlatform = false;
+      for (let coordinate in alreadyOnFire) {
+        if (alreadyOnFire[coordinate][0] === terrain.row && alreadyOnFire[coordinate][1] === terrain.col) {
+          onStructureOrPlatform = true;
+          break;
+        }
+      }
+      if (!onStructureOrPlatform && terrain.getTypeName()=='Rock') {
+        let level = Math.floor(Math.random() * 4)
+        terrain.addFire(terrain.getEffectLevel("fire") + level, { forceFlamable: true })
+      }
     })
   }
 

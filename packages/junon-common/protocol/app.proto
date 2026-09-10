@@ -78,4 +78,5 @@ message Mob {
   uint32 nameColor = 31;
   uint32 nameSize = 32;
   Equipments equipments = 33;
+  string arrowList = 34;
 }

@@ -6,11 +6,10 @@ class Caption extends BaseCommand {
   getUsage() {
     return [
       "Shows a large announcement in the screen of the specified player",
-      "/caption title [text]",
-      "/caption subtitle [text]",
-      "/caption [player] title [text]",
-      "/caption [player] subtitle [text]",
-      "ex: /caption kuroro title Hello, World!"
+      "/caption [type] [text]",
+      "/caption [player] [type] [text]",
+      "ex: /caption kuroro title Hello, World!",
+      "Caption types: title, subtitle, center, footer, error, success"
     ]
   }
 
@@ -19,14 +18,10 @@ class Caption extends BaseCommand {
   }
 
   isSubCommand(text) {
-    return ["title", "subtitle"].indexOf(text) !== -1
+    return ["title", "subtitle", "footer", "center","error", "success"].indexOf(text) !== -1
   }
 
   perform(player, args) {
-    let row
-    let col
-    let entityToTeleport
-
     let selector = args[0]
     let subcommand
     let text
@@ -51,6 +46,10 @@ class Caption extends BaseCommand {
   caption(subcommand, text, playerList) {
 
     let isTitle = subcommand === "title"
+let isFooter = subcommand === "footer"
+let isCenter = subcommand === "center"
+let isError = subcommand === "error"
+let isSuccess = subcommand === "success"
 
     try {
       let json = JSON.parse(text)
@@ -58,14 +57,14 @@ class Caption extends BaseCommand {
 
       playerList.forEach((player) => {
         let message = i18n.t(data.locale, json.text)
-        player.showError(message, { isTransparent: true, color: json.color, size: json.size, isTitle: isTitle })
+        player.showError(message, { isTransparent: true, color: json.color, size: json.size, isTitle: isTitle,isCenter:isCenter, isFooter:isFooter, isWarning:isError, isSuccess:isSuccess })
       })
     } catch(e) {
       // not json. assume plain text
 
       playerList.forEach((player) => {
         let message = i18n.t(player.locale, text)
-        player.showError(message, { isTransparent: true, isTitle: isTitle })
+        player.showError(message, { isTransparent: true, isTitle: isTitle, isCenter:isCenter, isFooter:isFooter, isWarning:isError, isSuccess:isSuccess })
       })
     }
 

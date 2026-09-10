@@ -162,7 +162,7 @@ function compressMangle() {
       }
     })
 
-    let result = Terser.minify(build, options)
+    let result = Terser.minify_sync(build, options)
 
     require("fs").writeFileSync(paths.dist + sourceMapFileName, result.map)
 

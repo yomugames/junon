@@ -70,17 +70,406 @@
             ];
             document.getElementById('home_background_image').src = "/assets/images/background/" + img_src[Math.floor(Math.random() * img_src.length)];
 
-window.addEventListener('scroll', function() {
-  const scrolled = window.scrollY; 
-  const viewportHeight = window.innerHeight; 
-  
-  const scrollInVh = (scrolled / viewportHeight) * 100;
-  const backgroundImage = document.getElementById('home_background_image');
-  
+            window.addEventListener('scroll', function() {
+              const scrolled = window.scrollY; 
+              const viewportHeight = window.innerHeight; 
+            
+              const scrollInVh = (scrolled / viewportHeight) * 100;
+              const backgroundImage = document.getElementById('home_background_image');
+            
               backgroundImage.style.transform = `translateY(${scrollInVh * 0.15}vh)`;
             });
 
-        };
+            const function_table = {
+                Location: [
+                    [   `$getY`,
+                        `$player/$entityId`,
+                        `The y position of an entity. Ex. /tp @a[role=Admin] $getY($player) 64`,
+                    ],
+                    [   `$getX`,
+                        `$player/$entityId`,
+                        `The x position of an entity. Ex. /tp @a[role=Admin] 64 $getX($player)`,
+                    ],
+                    [   `$getRow`,
+                        `$player/$entityId`,
+                        `The row position of an entity. Ex. /tp @a[role=Admin] $getRow($player) 64`,
+                    ],
+                    [   `$getCol`,
+                        `$player/$entityId`,
+                        `The col position of an entity. Ex. /tp @a[role=Admin] 64 $getCol($player)`,
+                    ],
+                    [   `$getForceX`,
+                        `$player/$entityId`,
+                        `Returns the x force applied on entity.`,
+                    ],
+                    [   `$getForceY`,
+                        `$player/$entityId`,
+                        `Returns the y force applied on entity.`,
+                    ],
+                    [   `$getRegionPlayerCount`,
+                        `$region`,
+                        `Number of players in a region. Ex. $getRegionPlayerCount(cafe)`,
+                    ],
+                    [   `$getPlayerCount`,
+                        `None`,
+                        `Number of players in game. Ex. $getPlayerCount()`,
+                    ],
+                    [   `$getRegion`,
+                        `$player/$entityId`,
+                        `name of region for player or entity. Ex. /tp @a $getRegion($player)`,
+                    ],
+                    [   `$getStructureByCoords`,
+                        `$row, $col`,
+                        `Returns the id of a structure based on the row and col specified. Ex. /chat @a the id of the building at 2, 2 is $getStructureByCoords(2,2)`,
+                    ],
+                    [   `$getPlatformByCoords`,
+                        `$row, $col`,
+                        `Returns the id of a platform based on the row and col specified. Ex. /chat @a the id of the floor at 2, 2 is $getPlatformByCoords(2,2)`,
+                    ],
+                    [   `$getTotalMobCount`,
+                        `None`,
+                        `Returns the total count of all mobs in the game sector (hostile + neutral).`,
+                    ],
+                    [   `$getGoal`,
+                        `$entityId`,
+                        `Returns the goal of mob.`,
+                    ],
+                    [   `$getAngle`,
+                        `$player/$entityId`,
+                        `Returns the angle of the specified entity or player. Ex. /chat @a $getAngle($entityId)`,
+                    ],
+                    [
+                        '$getEntityDistance',
+                        '$player/$entityId, $player/$entityId',
+                        `Returns the exact distance between two entities. Ex. /chat @a the distance between $entityId and $player is $getEntityDistance($player,$entityId)`,
+                    ],
+                ],
+                Entity_Properties: [
+                    [   `$getGold`,
+                        `$player`,
+                        `The amount of gold player currently has. Ex. /chat @a $getGold($player) /g`,
+                    ],
+                    [   `$getTeam`,
+                        `$player`,
+                        `The name of team player belongs to. Ex. /chat $player %success% Your team is $getTeam($player)`,
+                    ],
+                    [   `$getSpeed`,
+                        `$player`,
+                        `The speed of player. Ex. /score gain $player $getSpeed($player)`,
+                    ],
+                    [   `$getHealth`,
+                        `$player/$entityId`,
+                        `The amount of health player currently has. Ex. /chat @a $player now has $getHealth($player) health.`,
+                    ],
+                    [   `$getStamina`,
+                        `$player`,
+                        `The amount of stamina player currently has. Ex. /chat @a $player now has $getStamina($player) stamina.`,
+                    ],
+                    [   `$getOxygen`,
+                        `$player`,
+                        `The amount of oxygen player currently has. Ex. /chat @a $player now has $getOxygen($player) oxygen.`,
+                    ],
+                    [   `$getHunger`,
+                        `$player`,
+                        `The amount of hunger player currently has. Ex. /chat @a $player now has $getHunger($player) hunger.`,
+                    ],
+                    [   `$getMaxHealth`,
+                        `$player/$entityId`,
+                        `The max amount of health player currently has. Ex. /chat @a $player now has maximum health of $getMaxHealth($player)`,
+                    ],
+                    [   `$getMaxStamina`,
+                        `$player`,
+                        `The max amount of stamina player currently has (usually 100). Ex. /chat @a $player now has maximum stamina of $getMaxStamina($player)`,
+                    ],
+                    [   `$getMaxOxygen`,
+                        `$player`,
+                        `The max amount of oxygen player currently has (usually 100). Ex. /chat @a $player now has maximum oxygen of $getMaxOxygen($player)`,
+                    ],
+                    [   `$getMaxHunger`,
+                        `$player`,
+                        `The max amount of hunger player currently has (usually 100). Ex. /chat @a $player now has maximum hunger of $getMaxHunger($player)`,
+                    ],
+                    [   `$getOwner`,
+                        `$buildingId`,
+                        `The id of owner. Ex. /setowner @b[type=wall] $getOwner(2917)`,
+                    ],
+                    [   `$getArmorEquip`,
+                        `$player`,
+                        `name of equipped armor. Ex. /setequipment armor $player $getArmorEquip(kuroro)`,
+                    ],
+                    [   `$getEntityType`,
+                        `$entityId`,
+                        `the type name of a entity. Ex. /chat @a The entity type of entity id 2017 is $getEntityType(2017)`,
+                    ],
+                    [   `$getContent`,
+                        `$entityId`,
+                        `Gives the content of a sign/beacon/lamp. Ex. /chat The sign says $getContent(191)`,
+                    ],
+                    [   `$hasEffect`,
+                        `$entityId, effectName`,
+                        `true if the entity, player, or building has the specified effect, and is false if not.`,
+                    ],
+                    [   `$getName`,
+                        `$player/$entityId`,
+                        `Returns the name of the specified entity or player. Ex. /chat @a $getName($entityId)`,
+                    ],
+                    [   `$getIsPowered`,
+                        `$buildingId`,
+                        `Returns true if building is powered, otherwise it is false`,
+                    ],
+                    [   `$getState`,
+                        `$entityId`,
+                        `Returns the state of the specified entity. Works on lamps and doors.`,
+                    ],
+                    [   `$getTeamMemberCount`,
+                        `teamName`,
+                        `Number of members in a team. Ex. $getTeamMemberCount(owner)`,
+                    ],
+                    [   `$getRoleMemberCount`,
+                        `roleName`,
+                        `Number of members with role. Ex. $getRoleMemberCount(innocent)`,
+                    ],
+                    [   `$isLoggedIn`,
+                        `$player`,
+                        `true if logged in. false if not.`,
+                    ],
+                    [   `$getPlayerId`,
+                        `$player`,
+                        `The id of player.`,
+                    ],
+                    [   `$getRole`,
+                        `$player`,
+                        `The name of role that player belongs to. Ex. /chat $player %success% Your role is $getRole($player)`,
+                    ],
+                    [   `$getScore`,
+                        `$player`,
+                        `The score of player. Ex. /variable set score $getScore($player)`,
+                    ],
+                ],
+                Items: [
+                    [   `$getEquip`,
+                        `$player`,
+                        `The name of current equip player is holding. Ex. /clear $player $getEquip($player)`,
+                    ],
+                    [   `$getEquipId`,
+                        `$player`,
+                        `The id of current equip player is holding. Ex. /stat $getEquipId($player) damage:250`,
+                    ],
+                    [   `$getEquipCount`,
+                        `$player`,
+                        `count of equipped item. Ex. /sethealth $player $getEquipCount(kuroro)`,
+                    ],
+                    [   `$getInventoryItemCount`,
+                        `$player/$entityId, $itemType`,
+                        `total count of item in inventory. Ex. $getInventoryItemCount(kuroro,steak)`,
+                    ],
+                    [   `$getUsage`,
+                        `$itemId`,
+                        `Returns the usage level of an item.`,
+                    ],
+                    [   `$getCapacity`,
+                        `$itemId`,
+                        `Returns the usage capacity of an item.`,
+                    ],
+                ],
+                Logical_Evaluations: [
+                    [   `$if`,
+                        `value1, ==/!=/>/</~=/>=/<=, value2, value3 (then), value4 (else)`,
+                        `Returns the value given the condition, ex. /give @a $if($getPlayerCount(),>,2,leadPipe,Pistol) 1`,
+                    ],
+                    [   `$getNthLetter`,
+                        `index, value`,
+                        `Returns the Nth letter of a value. Ex. $getNthLetter(3,abcdef) = c`,
+                    ],
+                    [   `$getNthWord`,
+                        `index, value`,
+                        `Returns the Nth word of a value. Ex. $getNthWord(3,abcdef abc xyz kuroro) = xyz`,
+                    ],
+                    [   `$getValuePosition`,
+                        `index, valueToCheck, value`,
+                        `Returns the position of the index occurences of the valueToCheck in a given value. Ex. $getValuePosition(2,kuroro,and kuroro will kuroro or kuroro) = 17`,
+                    ],
+                    [   `$getValueLength`,
+                        `value`,
+                        `Returns the length of the value. Ex. $getValueLength(and kuroro will kuroro or kuroro) = 32`,
+                    ],
+                    [   `$getPushedValue`,
+                        `index, valueToPush, value`,
+                        `Returns the value after the valueToPush is combined at the given index with the value. $getPushedValue(3,d,abcefg) = abcdefg`,
+                    ],
+                    [   `$getRemovedValue`,
+                        `index, valueToRemove, value`,
+                        `Returns the value after the valueToRemove is removed at the given index occurence from the value. $getRemovedValue(2,abc,abcdefg_abcdefg) = abcdefg_defg`,
+                    ],
+                ],
+                Mathematical_Operations: [
+                    [   `$random`,
+                        `min, max`,
+                        `A random number between min and max. Ex. $random(2,5)`,
+                    ],
+                    [   `$seedRandom`,
+                        `seed, min, max`,
+                        `A random number between min and max using a seed. Ex. $random(42, 2,5)`,
+                    ],
+                    [   `$simplex`,
+                        `seed, x, y`,
+                        `A simplex noise value at the given coordinates. Ex. $simplex(42, 0.5, 0.5)`,
+                    ],
+                    [   `$formatTime`,
+                        `seconds`,
+                        `A formatted time. Ex. $formatTime(60)`,
+                    ],
+                    [   `$add`,
+                        `value1, value2, ... , valueN`,
+                        `Sums all given values. Ex. $add(2,5,8) = 15`,
+                    ],
+                    [   `$subtract`,
+                        `value1, value2, ... , valueN`,
+                        `Subtracts subsequent values from the first. Ex. $subtract(2,5,1) = -4`,
+                    ],
+                    [   `$multiply`,
+                        `value1, value2, ... , valueN`,
+                        `Multiplies all given values. Ex. $multiply(2,5,6,7) = 420`,
+                    ],
+                    [   `$divide`,
+                        `value1, value2, ... , valueN`,
+                        `Divides first value by subsequent values. Ex. $divide(2,4,1) = 0.5`,
+                    ],
+                    [   `$modulo`,
+                        `value1, value2`,
+                        `modulo gives the remaining of a division`,
+                    ],
+                    [   `$round`,
+                        `value`,
+                        `Rounds a number to the nearest value at specified precision (including tens, hundreds). Ex. $round(1.2) = 1 `,
+                    ],
+                    [   `$floor`,
+                        `value`,
+                        `Rounds a number down to the specified precision. (including tens, hundreds)Ex. $floor(12.34,-1 ) = 12.3`,
+                    ],
+                    [   `$ceil`,
+                        `value`,
+                        `Rounds a number up to the specified precision. (including tens, hundreds)Ex. $ceil(56.78,1) = 60`,
+                    ],
+                    [   `$pow`,
+                        `value1, value2`,
+                        `Calculates the power of a base raised to an exponent. Ex. $pow(3,2) = 9`,
+                    ],
+                    [   `$root`,
+                        `value1, value2`,
+                        `Calculates the nth root of a number. Ex. $root(8,3) = 2`,
+                    ],
+                    [   `$exp`,
+                        `value`,
+                        `Calculates Euler's number raised to the power of x. Ex. $exp(1) = 2.718...`,
+                    ],
+                    [   `$log`,
+                        `value1, value2`,
+                        `Calculates the logarithm of a number with optional base. Ex. $log(100,10) = 2`,
+                    ],
+                    [   `$abs`,
+                        `value`,
+                        `Returns the absolute value of a number. Ex. $abs(-4.5) = 4.5`,
+                    ],
+                    [   `$tanh`,
+                        `value`,
+                        `Calculates hyperbolic tangent of a number.`,
+                    ],
+                    [   `$max`,
+                        `value1, value2, ... , valueN`,
+                        `Returns the largest value among the given arguments. Ex. $max(9,2,15) = 15`,
+                    ],
+                    [   `$min`,
+                        `value1, value2, ... , valueN`,
+                        `Returns the smallest value among the given arguments. Ex. $min(1,2,3,4,5) = 1`,
+                    ],
+                    [   `$radian`,
+                        `value`,
+                        `Returns an angle as radian. Ex. $radian(90) = π/2 ≈ 1.5707...`,
+                    ],
+                    [   `$sin`,
+                        `value`,
+                        `Calculates sin of a number.`,
+                    ],
+                    [   `$cos`,
+                        `value`,
+                        `Calculates cos of a number.`,
+                    ],
+                    [   `$tan`,
+                        `value`,
+                        `Calculates tangent of a number.`,
+                    ],
+                    [   `$atan2`,
+                        `y, x`,
+                        `Returns angle in radians from y/x.`,
+                    ],
+                ],
+                Miscellaneous: [
+                    [   `$getDay`,
+                        `None`,
+                        `Gives the day count of your world back. Ex. /chat @a The day count of this world is $getDay()`,
+                    ],
+                    [   `$getHour`,
+                        `None`,
+                        `Gives the hour count of your world back. Ex. /chat @a The hour count of this world is $getHour()`,
+                    ],
+                    [   `$getDate`,
+                        `year/month/day/dayweek/hour/minute/second/millisecond/unixms, year month day hour minute second millisecond`,
+                        `Returns the date in UTC as number when provided with the time component to check for and the date to check from (first and second parameters). If the second parameter is empty, then it will return using the current date in UTC. Ex. $getDate(hour) will return today's hour, $getDate(year,2014 4 1) will return 2014, $getDate(unixms) will return today's date in unix milliseconds.`,
+                    ],
+                ],
+            };
+            
+            let section_html = `
+                <table class='function_table' cellspacing="0">
+            `;
+            for (const key of Object.keys(function_table)) {
+                const section = function_table[key].toSorted(function(a, b) {
+                    return a[0].localeCompare(b[0]);
+                })
+                section_html += `
+                    <thead>
+                        <tr>
+                            <th class='function_header' colspan="3"><button onclick="function_table_collapse(this)">></button>` + key.toString().split("_").join(" ") + `</th>
+                        </tr>
+                    </thead>
+                    <tbody class='functions_table_hidden'>
+                        <tr>
+                            <th><%= t('Function') %></th>
+                            <th><%= t('Arguments') %></th>
+                            <th><%= t('Returns') %></th>
+                        </tr>
+                `;
+                
+                for (const function_name of Object.keys(section)) {
+                    section_html += `
+                        <tr>
+                            <td class='function_name'>` + section[function_name][0] + `</td>
+                            <td>` + section[function_name][1] + `</td>
+                            <td>` + section[function_name][2] + `</td>
+                        </tr>
+                    `;
+                }
+                section_html += `</tbody>`;
+            }
+            section_html += '</table>';
+            document.getElementById('functions_table_wrapper').innerHTML += section_html;
+        }
+
+        function function_table_collapse(el) {
+            const table_body = el.parentElement.parentElement.parentElement.nextElementSibling;
+            const el_with_scrollbar = document.querySelector('.command_block_tab_content');
+
+            console.log(el_with_scrollbar.scrollTop + el.getBoundingClientRect().top)
+            if (table_body.className === 'functions_table_hidden') {
+                table_body.className = "";
+                el.innerHTML = 'v';
+                el_with_scrollbar.scrollTop = el.getBoundingClientRect().top + el_with_scrollbar.scrollTop - el_with_scrollbar.getBoundingClientRect().top;
+            } else {
+                table_body.className = "functions_table_hidden";
+                el.innerHTML = '>';
+            }
+        }
     </script>
     <script src="/<%= assetPath('vendor.js') %>"></script>
     <script src="/<%= assetPath('app.js') %>"   ></script>

@@ -345,6 +345,11 @@ class BaseTerrain  {
     if (!this.sector.settings['isBloodEnabled']) return
     this.setEffectLevel("blood", this.getEffectLevel("blood") + 1)
   }
+  
+  setBlood(lvl) {
+    if (!this.sector.settings['isBloodEnabled']) return
+    this.setEffectLevel("blood", Math.max(Math.min(parseInt(lvl),4),0))
+  }
 
   isOnFire() {
     return false

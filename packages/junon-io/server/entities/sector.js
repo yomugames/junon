@@ -2766,27 +2766,36 @@ initSettings(entities) {
     const corpseType = Mobs[klassName].getType()
     const caller = options.player
 
-    let x = options.x
-    let y = options.y
+    let x = options.x * Constants.tileSize + Constants.tileSize / 2
+    let y = options.y * Constants.tileSize + Constants.tileSize / 2
 
-    if (this.getCorpseCount() > 200) {
+    if (this.isCorpseLimitExceeded()) {
       return
     }
 
     if (caller && caller.isPlayer()) {
-      x = options.x || caller.getX() + caller.getRandomOffset(Constants.tileSize * 2)
-      y = options.y || caller.getY() + caller.getRandomOffset(Constants.tileSize * 2)
+      x = options.x * Constants.tileSize + Constants.tileSize / 2 || caller.getX() + caller.getRandomOffset(Constants.tileSize * 2)
+      y = options.y * Constants.tileSize + Constants.tileSize / 2 || caller.getY() + caller.getRandomOffset(Constants.tileSize * 2)
     } else {
       let firstPlayer = this.getFirstPlayer()
-      x = options.x || firstPlayer.getX() + caller.getRandomOffset(Constants.tileSize * 2)
-      y = options.y || firstPlayer.getY() + caller.getRandomOffset(Constants.tileSize * 2)
+      x = options.x * Constants.tileSize + Constants.tileSize / 2 || firstPlayer.getX() + caller.getRandomOffset(Constants.tileSize * 2)
+      y = options.y * Constants.tileSize + Constants.tileSize / 2 || firstPlayer.getY() + caller.getRandomOffset(Constants.tileSize * 2)
     }
+    console.log(options.x, options.y, caller.getX(),caller.getY())
 
     new Corpse(this, { x: x, y: y, type: corpseType, name: options.name })
   }
 
+  isCorpseLimitExceeded() {
+    return this.getCorpseCount() > this.getMaxCorpseCount()
+  }
+
   getCorpseCount() {
     return Object.keys(this.corpses).length
+  }
+  
+  getMaxCorpseCount() {
+    return 200
   }
 
   getFirstPlayer() {

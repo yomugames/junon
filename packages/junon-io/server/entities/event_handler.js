@@ -8,6 +8,8 @@ const Helper = require('../../common/helper')
 const Constants = require('../../common/constants.json')
 const EntityGroup = require("./entity_group")
 const Perlin = require("../util/perlin")
+const { indexOf } = require("lodash")
+const helper = require("../../common/helper")
 
 class EventHandler {
   constructor(sector) {
@@ -359,9 +361,14 @@ class EventHandler {
 
   getInventoryItemCount(entityId, typeName) {
     let player = this.getPlayer(entityId)
-    if (!player) return 0
+    if (player) {
+      return player.getInventoryItemCount(typeName)
+    }
 
-    return player.getInventoryItemCount(typeName)
+    let entity = this.game.getEntity(entityId)
+    if (!entity) return 0
+
+    return entity.getInventoryItemCount(typeName)
   }
 
   getContent(entityId) {
@@ -540,12 +547,17 @@ class EventHandler {
   }
 
   getName(entityId) {
-    const entity = this.game.getEntity(entityId)
+    let player = this.getPlayer(entityId)
+    if (player) {
+      return player.name
+    }
+
+    let entity = this.game.getEntity(entityId)
     if (entity) {
       return entity.name
-    } else {
-      return undefined
     }
+
+    return undefined
   }
 
   getTeamColor(playerId) {
@@ -777,25 +789,25 @@ class EventHandler {
   getY(entityId) {
     let player = this.getPlayer(entityId)
     if (player) {
-      return player.getY() / 32
+      return player.getY() / Constants.tileSize
     }
 
     let entity = this.game.getEntity(entityId)
     if (!entity) return 0
 
-    return entity.getY() / 32
+    return entity.getY() / Constants.tileSize
   }
 
   getX(entityId) {
     let player = this.getPlayer(entityId)
     if (player) {
-      return player.getX() / 32
+      return player.getX() / Constants.tileSize
     }
 
     let entity = this.game.getEntity(entityId)
     if (!entity) return 0
 
-    return entity.getX() / 32
+    return entity.getX() / Constants.tileSize
   }
 
   getRow(entityId) {
@@ -844,7 +856,7 @@ class EventHandler {
   }
 
   getBuildingType(entityId) {
-    let entity = this.game.getEntity(entityId)
+    let entity = this.game.getEntity(entityId) || this.game.getEntity(this.getPlayerId(entityId))
     
     if (!entity) return ""
     
@@ -857,6 +869,10 @@ class EventHandler {
     }
     
     return entity.type || ""
+  }
+
+  getEntityType(entityId) {
+    return this.getBuildingType(entityId)
   }
 
   hasEffect(entityId, effectName) {
@@ -1379,6 +1395,100 @@ class EventHandler {
     return letter
   }
 
+  getValuePosition(...values) {
+    if (values.length < 3) return undefined;
+    let returnIndex = 0;
+    let index = 0;
+    let targetIndex = parseInt(values[0]);
+    let value = values[1].toString();
+    let string = values[2].toString();
+    while (index < targetIndex) {
+      returnIndex = string.indexOf(value, returnIndex) + value.length;
+      index += 1;
+    }
+    return returnIndex - value.length + 1;
+  }
+
+  getValueLength(...values) {
+    if (values.length === 0) return 0;
+    let string = values[0].toString().length;
+    return string;
+  }
+
+  getPushedValue(...values) {
+    if (values.length < 3) return undefined;
+    let index = parseInt(values[0]);
+    let value = values[1].toString();
+    let string = values[2].toString();
+    return string.slice(0, index) + value + string.slice(index);
+  }
+
+  getRemovedValue(...values) {
+    if (values.length < 3) return undefined;
+    let value = values[1].toString();
+    let string = values[2].toString();
+    let startIndex = this.getValuePosition(...values) - 1;
+    return string.slice(0,startIndex) + string.slice(startIndex + value.length);
+  }
+
+  getDate(...values) {
+    if (values.length === 0) return undefined;
+    let component = values[0].toString();
+    const acceptedvalues = [
+      'year',
+      'month',
+      'day',
+      'dayweek',
+      'hour',
+      'minute',
+      'second',
+      'millisecond',
+      'unixms'
+    ];
+    if (acceptedvalues.indexOf(component) == -1) {
+      return undefined;
+    }
+    if (values.length > 1 && isNaN(Number(values[1].toString().split(" ").join("")))) {
+      return undefined;
+    }
+    const translatedvalue = [
+      'getUTCFullYear',
+      'getUTCMonth',
+      'getUTCDate',
+      'getUTCDay',
+      'getUTCHours',
+      'getUTCMinutes',
+      'getUTCSeconds',
+      'getUTCMilliseconds',
+      'getTime'
+    ];
+    let finaldate = new Date();
+    if (values.length > 1) {
+      let customdate = values[1].toString().split(' ');
+      customdate = customdate.map(Number);
+      if (customdate.length == 1) {
+        finaldate = new Date(customdate[0]);
+      }else{
+        while (customdate.length<7) {
+          customdate[customdate.length] = 0;
+        }
+        finaldate = new Date(Date.UTC(customdate[0], customdate[1] - 1, customdate[2], customdate[3], customdate[4], customdate[5], customdate[6]));
+      }
+    }
+    let finalcomponent = acceptedvalues.indexOf(component)
+    if (translatedvalue[finalcomponent] === 'getUTCMonth') {
+      return finaldate[translatedvalue[finalcomponent]]() + 1;
+    }
+    return finaldate[translatedvalue[finalcomponent]]();
+  }
+
+  getEntityDistance(entityId, entityId2) {
+    const entity_coords = [this.getX(entityId), this.getY(entityId)];
+    const entity2_coords = [this.getX(entityId2), this.getY(entityId2)];
+
+    return helper.distance(entity_coords[0], entity_coords[1], entity2_coords[0], entity2_coords[1]);
+  }
+
   isVariableInvalid(key) {
     return key.match(/[^a-zA-Z0-9_$]/)
   }
@@ -1468,6 +1578,7 @@ class EventHandler {
       "$isLoggedIn": true,
       "$getEquipId": true,
       "$getBuildingType": true,
+      "$getEntityType": true,
       "$getDay": true,
       "$getHour": true,
       "$getContent": true,
@@ -1486,7 +1597,13 @@ class EventHandler {
       "$getState": true,
       "$getNthLetter": true,
       "$getNthWord": true,
-      "$if": true
+      "$if": true,
+      "$getValuePosition": true,
+      "$getValueLength": true,
+      "$getPushedValue": true,
+      "$getRemovedValue": true,
+      "$getDate": true,
+      "$getEntityDistance": true,
     }
   }
 
@@ -1514,136 +1631,57 @@ class EventHandler {
   }
 
   interpolateFunctions(result) {
-    let chars = result.split("");
-    let functionBuffer = "";
-    let resultBuffer = "";
-    let padepth = 0;
-    let startCheckingEven = false;
+  let previousResult;
+  let safetyCounter = 0;
+  const maxIterations = 100;
 
-    for (var i = 0; i < chars.length; i++) {
-      let char = chars[i];
-      let isEndOfString = i === chars.length - 1;
-
-      if (startCheckingEven) {
-      if (char === '(') padepth++;
-      if (char === ')') padepth--;
-    }
-      if (isEndOfString) {
-        if (functionBuffer.length > 0) {
-          functionBuffer += char;
-          let evaluated = this.parseAndEvalExpression(functionBuffer);
-          functionBuffer = "";
-          resultBuffer += evaluated;
-        } else {
-          resultBuffer += char;
-        }
-      } else if (char === " ") {
-        if (functionBuffer.length > 0 && padepth === 0) {
-          let evaluated = this.parseAndEvalExpression(functionBuffer);
-          functionBuffer = "";
-          resultBuffer += evaluated + char;
-          startCheckingEven = false
-        } else if (functionBuffer.length > 0 && padepth > 0) {
-          functionBuffer += char;
-        } else {
-          resultBuffer += char;
-        }
-      } else if (functionBuffer.length > 0 || char === "$") {
-        startCheckingEven = true
-        functionBuffer += char;
-      } else {
-        resultBuffer += char;
-      }
-    }
-
-    return resultBuffer;
+  while (result.includes('$') && result !== previousResult && safetyCounter < maxIterations) {
+    previousResult = result;
+    result = this.parseAndEvalExpression(result);
+    safetyCounter++;
   }
 
-  parseAndEvalExpression(expression) {
-    if (!expression) return "";
+  return result;
+}
 
-    let stack = [];
-    let characters = expression.split("");
-    let keyword = "";
+parseAndEvalExpression(expression) {
+  if (!expression || !expression.includes('$')) return expression;
 
-    for (var i = 0; i < characters.length; i++) {
-      let character = characters[i];
-      
-      if (character === '(') {
-        let dollarIndex = keyword.lastIndexOf('$');
-        if (dollarIndex !== -1) {
-          let textPrefix = keyword.substring(0, dollarIndex);
-          let actualFuncName = keyword.substring(dollarIndex);
-          if (textPrefix) {
-            stack.push(textPrefix);
-          }
-          stack.push(actualFuncName);
-        } else {
-          stack.push(keyword);
-        }
-        stack.push("(");
-        keyword = "";
-      } else if (character === ",") {
-        if (keyword) {
-          stack.push(this.cleanArgument(keyword));
-          keyword = "";
-        }
-      } else if (character === ")") {
-        if (keyword) {
-          stack.push(this.cleanArgument(keyword));
-          keyword = "";
-        }
+  let innermostFuncRegex = /(\$[a-zA-Z0-9_]+)\(([^()]*?)\)/;
+  let match = expression.match(innermostFuncRegex);
 
-        let args = [];
-        let arg;
-        let isFuncFound = false;
-        
-        while (!isFuncFound && stack.length > 0) {
-          arg = stack.pop();
-
-          if (arg === "(") {
-            isFuncFound = true;
-            arg = stack.pop(); 
-            args.unshift(arg);
-          } else {
-            args.unshift(arg);
-          }
-        }
-
-        if (isFuncFound) {
-          let funcName = args.shift();
-          if (this.hasFunction(funcName)) {
-            let finalizedArgs = args.map(a => this.cleanArgument(a));
-            let result = this.runFunction(funcName, finalizedArgs);
-            stack.push(result);
-          } else {
-            stack.push(`${funcName}(${args.join(",")})`);
-          }
-        }
-      } else {
-        keyword += character;
-      }
-    }
-
-    if (keyword) {
-      stack.push(this.cleanArgument(keyword));
-    }
-
-    return stack.map(token => typeof token === 'object' ? JSON.stringify(token) : String(token)).join("");
+  if (!match) {
+    return expression; 
   }
 
-  cleanArgument(arg) {
-    if (typeof arg !== 'string') return arg;
-    let trimmed = arg.trim();
+  let fullMatchedText = match[0];
+  let funcName = match[1];
+  let rawArgs = match[2];
 
-    if (!trimmed) return "";
-
-    if (/^[\d\s]+$/.test(trimmed)) {
-      return trimmed.replace(/\s+/g, "");
+  if (this.hasFunction(funcName)) {
+    let finalizedArgs = [];
+    if (rawArgs.trim() !== "") {
+      finalizedArgs = rawArgs.split(',').map(arg => this.cleanArgument(arg));
     }
 
-    return trimmed;
+    let evaluatedResult = this.runFunction(funcName, finalizedArgs);
+
+    if (typeof evaluatedResult === 'object' && evaluatedResult !== null) {
+      evaluatedResult = JSON.stringify(evaluatedResult);
+    } else {
+      evaluatedResult = String(evaluatedResult);
+    }
+
+    return expression.replace(fullMatchedText, evaluatedResult);
   }
+  return expression.replace(fullMatchedText, `INVALID_${funcName.substring(1)}`);
+}
+
+cleanArgument(...args) {
+  let arg = args[0];
+  if (typeof arg !== 'string') return arg;
+  return arg.trim();
+}
 
   interpolate(value, params, options = {}) {
     let result = value.trim()
@@ -1668,7 +1706,6 @@ class EventHandler {
   }
 
   importFromCommandBlock(commandBlock) {
-    // from the command block
     this.triggers = {}
 
     commandBlock.triggers.forEach((trigger) => {

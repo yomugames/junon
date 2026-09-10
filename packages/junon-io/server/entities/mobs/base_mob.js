@@ -1223,6 +1223,8 @@ this.setNameColor(data.nameColor)
     this.consumeDrunk()
     this.consumeSpin()
     this.consumeFear()
+    this.consumeHaste()
+    this.consumeInvisible()
 
     if (this.isKnocked) return
     if (this.isPilot) return

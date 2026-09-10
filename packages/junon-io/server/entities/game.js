@@ -1726,6 +1726,7 @@ async setGameMode(gameMode) {
         } else {
           this.gameInfo["memory"] = null
         }
+        this.gameInfo["isLightingCustom"] = this.isLightingCustom
 
         if (player.getSentHour() === null ||
             player.getSentHour() !== this.sector.getHour()) {
@@ -1739,6 +1740,9 @@ async setGameMode(gameMode) {
 
         if (player.isCameraMode()) {
           this.gameInfo["camera"] = player.getCamera().toJson()
+        }
+        if (this.playerArrows) {
+        this.gameInfo["arrowList"] = JSON.stringify(this.playerArrows[player.name]||{})
         }
 
         this.getSocketUtil().emit(player.socket, "GameState", this.gameInfo)

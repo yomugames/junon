@@ -64,7 +64,7 @@ Equipments.forType = (type) => {
   return Equipments[klassName]
 }
 
-const craftExcludeList = ["Bayonet", "Kukri", "Syringe", "StunBaton", "MolotovCocktail", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "PlasmaGun", "PlasmaBlade", "SquidStaff", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit", "ImperialSpecialForcesArmor", "Dynamite", "ShockGrenade"]
+const craftExcludeList = ["Bayonet", "Kukri", "Syringe", "StunBaton", "Grenade", "PoisonGrenade", "BloodBottle", "CombatArmor", "WaterBottle", "NameTag", "SpaceSuit", "BlueEnergySword", "GreenEnergySword", "RedEnergySword", "PlasmaGun", "PlasmaBlade", "SquidStaff", "Radio", "AssassinsKnife", "SantaHat", "HazmatSuit", "PoliceSuit", "PrisonerSuit", "LabCoat", "CultistSuit", "ImperialSpecialForcesArmor", "Dynamite", "ShockGrenade"]
 
 Equipments.getList = () => {
   return Object.values(Equipments).filter((klass) => {

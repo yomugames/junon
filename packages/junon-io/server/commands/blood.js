@@ -6,7 +6,8 @@ class Blood extends BaseCommand {
             "Spawns blood splatters onto a surface",
             "/blood add [entity_id]",
             "/blood decrease [entity_id]",
-            "ex: /blood add 1234"
+            "/blood set [entity_id] [level]",
+            "ex: /blood set 1234 2"
         ]
     }
     allowOwnerOnly() {
@@ -31,7 +32,10 @@ class Blood extends BaseCommand {
                 entities[entity].addBlood()
             } else if (subcommand == "decrease") {
                 entities[entity].clean()
-            } else {
+            } else if (subcommand == "set") {
+            entities[entity].setBlood(args[2] || 0)
+            }
+            else {
                 caller.showChatError(`Subcommand ${subcommand} not found`)
                 return
             }

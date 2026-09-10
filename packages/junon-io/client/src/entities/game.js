@@ -37,6 +37,7 @@ const uuidv4 = require('uuid/v4')
 const Trigger = require("../menus/command_blocks/trigger")
 const ActionValue = require("../menus/command_blocks/action_value")
 const Comparison = require("../menus/command_blocks/comparison")
+const client_helper = require("./../util/client_helper")
 
 class Game {
   constructor(main) {
@@ -92,6 +93,9 @@ class Game {
     this.energyBar = document.querySelector('.energy_stat')
     this.errorContent = document.querySelector('#error_menu_content')
     this.errorTitle = document.querySelector('#error_title')
+    this.captionCenter = document.querySelector('#caption_center')
+    this.captionFooter = document.querySelector('#caption_footer')
+    this.arrowContainer = document.querySelector('#arrow_container')
     this.shipStatSpeed = document.querySelector('.ship_stat_speed')
     this.shipStatHealth = document.querySelector('.ship_stat_health')
     this.shipStatShield = document.querySelector('.ship_stat_shield')
@@ -1456,14 +1460,17 @@ class Game {
   openInGameMenu() {
     document.querySelector("#welcome_container").classList.add("in_game")
     document.querySelector("#welcome_container").style.display = 'block'
+    document.querySelector("#arrow_container").style.visibility = "hidden"
 
     this.main.showMainMenu()
     this.hideActionTooltip()
     this.hideGameHuds()
+    this.closeEntityMenu()
   }
 
   closeInGameMenu() {
     this.main.onBackMainMenuBtnClick()
+    document.querySelector("#arrow_container").style.visibility = "visible"
 
     document.querySelector("#welcome_container").classList.remove("in_game")
     document.querySelector("#welcome_container").style.display = 'none'
@@ -2867,38 +2874,63 @@ class Game {
 
   displayError(msg, options = {}) {
     msg = i18n.t(msg)
-
-    if (!this.errorFadeOutTween) {
-      this.errorFadeInTween = ClientHelper.getFadeTween(this.errorContent.parentElement, 0, 1, 0)
-      this.errorFadeInTween.start()
-    } else {
-
-    }
-
-    this.errorContent.parentElement.style.display = 'block'
+console.log(options)
 
     let textContent
     if (options.isTitle) {
       textContent = this.errorTitle
+    } else if (options.isFooter) {
+      textContent = this.captionFooter
+      if (this.footerFadeOutTween) {this.footerFadeOutTween.stop()}
+      this.footerFadeInTween = ClientHelper.getFadeTween(textContent, parseFloat(textContent.style.opacity), 1, 0)
+      this.footerFadeInTween.start()
+
+    } else if (options.isCenter) {
+      textContent = this.captionCenter
+      if (this.centerFadeOutTween) {this.centerFadeOutTween.stop()}
+      this.centerFadeInTween = ClientHelper.getFadeTween(textContent, parseFloat(textContent.style.opacity), 1, 0)
+      this.centerFadeInTween.start()
+    
     } else {
       textContent = this.errorContent
     }
 
-    textContent.innerText = msg
-    textContent.className = ""
+    if (textContent == this.errorContent || textContent == this.errorTitle) {
+      if (!this.errorFadeOutTween) {
+        this.errorFadeInTween = ClientHelper.getFadeTween(this.errorContent.parentElement, 0, 1, 0)
+        this.errorFadeInTween.start()
+      } else {
+        this.errorFadeOutTween.stop()
+        this.errorFadeInTween = ClientHelper.getFadeTween(this.errorContent.parentElement, parseFloat(this.errorContent.parentElement.style.opacity), 1, 0)
+        this.errorFadeInTween.start()
+      }
+      this.errorContent.parentElement.style.display = 'block'
+    }
 
-    if (options.isTitle) {
+    textContent.className = ""
+    textContent.style.cssText = 'pointer-events: none !important; user-select: none !important; -webkit-user-select: none !important;';
+    textContent.ondragstart = () => false;
+
+
+    if (options.isTitle && !options.isWarning && !options.isSuccess) {
       if (options.color) {
         textContent.style.color = options.color
       } else {
         textContent.style.color = "yellow"
       }
     }
+    let messageToWrite = msg
+    if (msg.split("")[0] == "§") {
+      let NewColor = msg.split(" ")[0].slice(1)
+      textContent.style.color = NewColor
+      messageToWrite = msg.substring(msg.indexOf(" ") + 1); 
+    }
+    textContent.innerText = messageToWrite
 
     if (options.size) {
       textContent.style.fontSize = options.size + "px"
     } else {
-      if (options.isTitle) {
+      if (options.isTitle || options.isCenter) {
         textContent.style.fontSize = "60px"
       } else {
         textContent.style.fontSize = "30px"
@@ -2913,26 +2945,61 @@ class Game {
       textContent.classList.add("success")
     }
 
-    if (options.transparent) {
+    if (options.transparent && !options.success && !options.warning) {
       textContent.classList.add("transparent")
     }
 
-    if (this.errorFadeOutTween) {
-      // reset it
-      this.errorFadeOutTween.stop()
+    if (textContent == this.errorContent || textContent == this.errorTitle) {
+      if (this.errorFadeOutTween) {
+        this.errorFadeOutTween.stop()
+      }
+      
+      this.errorFadeOutTween = ClientHelper.getFadeTween(this.errorContent.parentElement, 1, 0, 5000)
+      this.errorFadeOutTween.start()
+      
+      this.errorFadeOutTween.onStop(() => {
+        this.errorFadeOutTween = null
+      })
+
+      this.errorFadeOutTween.onComplete(() => {
+        this.errorFadeOutTween = null
+        this.errorContent.innerText = ""
+        this.errorTitle.innerText = ""
+      })
+    } else if (textContent == this.captionFooter) {
+      if (this.footerFadeOutTween) {
+        this.footerFadeOutTween.stop()
+      }
+
+      this.footerFadeOutTween = ClientHelper.getFadeTween(textContent, 1, 0, 5000)
+      this.footerFadeOutTween.start()
+
+      this.footerFadeOutTween.onStop(() => {
+        this.footerFadeOutTween = null
+      })
+
+      this.footerFadeOutTween.onComplete(() => {
+        this.footerFadeOutTween = null
+        this.captionFooter.innerText = ""
+      })
+    } else if (textContent == this.captionCenter) {
+      if (this.centerFadeOutTween) {
+        this.centerFadeOutTween.stop()
+      }
+
+      this.centerFadeOutTween = ClientHelper.getFadeTween(textContent, 1, 0, 5000)
+      this.centerFadeOutTween.start()
+
+      this.centerFadeOutTween.onStop(() => {
+        this.centerFadeOutTween = null
+      })
+
+      this.centerFadeOutTween.onComplete(() => {
+        this.centerFadeOutTween = null
+        this.captionCenter.innerText = ""
+      })
     }
-
-    this.errorFadeOutTween = ClientHelper.getFadeTween(this.errorContent.parentElement, 1, 0, 5000)
-    this.errorFadeOutTween.start()
-    this.errorFadeOutTween.onStop(() => {
-      this.errorFadeOutTween = null
-    })
-
-    this.errorFadeOutTween.onComplete(() => {
-      this.errorFadeOutTween = null
-      this.errorContent.innerText = ""
-      this.errorTitle.innerText = ""
-    })
+    
   }
 
   isPvP() {
@@ -3159,7 +3226,18 @@ class Game {
   }
 
   onSyncWithServer(data) {
+    let PrevLighting = this.isLightingCustom
+    this.isLightingCustom = data.isLightingCustom
+    if (this.isLightingCustom == 0) {
+      this.isLightingCustom = null
+    }
+    if (PrevLighting != this.isLightingCustom) {
+      this.sector.lightManager.setDarkness(this.hour)
+    }
+    
     this.timestamp = data.timestamp
+
+    this.arrowList = data.arrowList
 
     this.markPacketTick()
     this.recordUpstreamRate()
@@ -3179,6 +3257,143 @@ class Game {
       this.renderDay(data)
     }
   }
+  
+  isColor(strColor) {
+  const s = new Option().style
+  s.color = strColor
+  return s.color !== ''
+}
+
+
+  setArrows() {
+    let NewArrows = JSON.parse(this.arrowList || "{}")
+
+    for (const [key, value] of Object.entries(NewArrows)) {
+      if (!document.querySelector('#setarrowcommand'+key)) {
+        this.createPlayerArrow(this.player,key)
+      }
+      let entityFoundById = this.sector.getEntity(value.pointTo)
+      if (entityFoundById) {
+      this.updatePlayerArrow(this.player,entityFoundById.getX(),entityFoundById.getY(),document.querySelector('#setarrowcommand'+key),value.color||"#ffffff",value.tooltip||"",value.size||"24px",value.isbg||"true")
+    } else {
+      document.querySelector('#setarrowcommand'+key).style.opacity = "0"
+    }
+    }
+    document.querySelectorAll('#arrow_container > div').forEach((div, index) => {
+      if (!NewArrows[parseInt(div.id.slice(15))] && !document.getElementById(div.id).endTween) {
+        
+        if (document.getElementById(div.id).startTween) {document.getElementById(div.id).startTween.stop()}
+document.getElementById(div.id).endTween = ClientHelper.getFadeTween(document.getElementById(div.id), 1, 0, 0)
+document.getElementById(div.id).endTween.start()
+document.getElementById(div.id).endTween.onComplete(() => {
+        document.getElementById(div.id).remove()
+})
+
+      }
+    });
+  }
+
+createPlayerArrow(player,arrowId) {
+    let arrow = document.createElement('div')
+    arrow.className = 'setarrowcommand'
+    arrow.id = 'setarrowcommand'+arrowId
+
+  arrow.startTween = ClientHelper.getFadeTween(arrow, 0, 1, 0)
+  arrow.startTween.start()
+
+    let tooltip = document.createElement('div')
+    tooltip.className = 'arrow-tooltip'
+    arrow.appendChild(tooltip)
+
+    let container = document.getElementById('arrow_container') || document.body
+    container.appendChild(arrow)
+
+    let screenX = window.innerWidth / 2
+    let screenY = window.innerHeight / 2
+
+    arrow.style.transform = `translate3d(${screenX}px, ${screenY}px, 0) rotate(${0}deg)`
+  }
+updatePlayerArrow(player, targetX, targetY, arrow,arrowColor,arrowText,TarrowSize,bgEnabled) {
+let realColor = arrowColor
+if (this.isColor(arrowColor)) {
+  realColor = arrowColor
+} else realColor = "#ffffff"
+
+let arrowSize = TarrowSize
+if (!arrowSize || !parseInt(arrowSize)) {
+  arrowSize = "24"
+}
+
+  arrow.style.width = parseInt(arrowSize)+"px"
+  arrow.style.height = parseInt(arrowSize)+"px"
+  document.querySelector("#"+arrow.id+' .arrow-tooltip').style.fontSize = parseInt(parseInt(arrowSize)*0.625)+"px"
+  arrow.style.setProperty("--arrow-inset",parseInt(parseInt(arrowSize)*0.28)+"px")
+
+if (bgEnabled == "false" || bgEnabled == "False" || bgEnabled == false || arrowText == "") {
+  document.querySelector("#"+arrow.id+' .arrow-tooltip').style.backgroundColor = "rgba(0,0,0,0)"
+} else {
+  document.querySelector("#"+arrow.id+' .arrow-tooltip').style.backgroundColor = "rgba(0,0,0,0.8)"
+}
+
+    arrow.style.display = 'block'
+document.querySelector("#"+arrow.id+' .arrow-tooltip').innerText = arrowText || ""
+document.querySelector("#"+arrow.id+' .arrow-tooltip').style.color = realColor
+
+    let screenX = window.innerWidth / 2
+    let screenY = window.innerHeight / 2
+
+    let playerElement = player.el || player.spriteEl || document.querySelector('.player') 
+    
+    if (playerElement) {
+        let rect = playerElement.getBoundingClientRect()
+        screenX = rect.left + (rect.width / 2)
+        screenY = rect.top + (rect.height / 2)
+    } else {
+        let canvas = document.getElementById('game-canvas') || document.querySelector('canvas')
+        if (canvas) {
+            let rect = canvas.getBoundingClientRect()
+            screenX = rect.left + (rect.width / 2)
+            screenY = rect.top + (rect.height / 2)
+        }
+    }
+
+    let worldPlayerX = player.getX ? player.getX() : player.x
+    let worldPlayerY = player.getY ? player.getY() : player.y
+
+    let deltaX = targetX - worldPlayerX
+    let deltaY = targetY - worldPlayerY
+    let angle = Math.atan2(deltaY, deltaX) 
+
+    let offsetRadius = 70
+    let offsetX = Math.cos(angle) * offsetRadius
+    let offsetY = Math.sin(angle) * offsetRadius
+
+    let halfArrowSize = 12 
+
+    let targetXPos = screenX + offsetX - halfArrowSize
+    let targetYPos = screenY + offsetY - halfArrowSize
+    let targetDegrees = angle * (180 / Math.PI)
+
+    if (arrow.currentX === undefined) arrow.currentX = targetXPos
+    if (arrow.currentY === undefined) arrow.currentY = targetYPos
+    if (arrow.currentDeg === undefined) arrow.currentDeg = targetDegrees
+
+    const ease = 0.5
+
+    let diffDeg = targetDegrees - arrow.currentDeg
+    while (diffDeg < -180) diffDeg += 360
+    while (diffDeg > 180) diffDeg -= 360
+
+    arrow.currentX += (targetXPos - arrow.currentX) * ease
+    arrow.currentY += (targetYPos - arrow.currentY) * ease
+    arrow.currentDeg += diffDeg * ease
+
+    arrow.style.transform = `translate3d(${arrow.currentX}px, ${arrow.currentY}px, 0) rotate(${arrow.currentDeg}deg)`
+arrow.style.setProperty('--arrow-rotation', arrow.currentDeg+"deg");
+arrow.style.setProperty('--arrow-color',realColor)
+}
+
+
 
   onUpdateStats(data) {
     if (!this.player) return
@@ -3322,7 +3537,6 @@ class Game {
 
   renderHour(data) {
     if (!data.hasOwnProperty("hour")) return
-
     if (this.hour !== data.hour) {
       this.hour = data.hour
       this.onHourChanged()
@@ -3720,6 +3934,7 @@ class Game {
     this.renderInventory(data)
     this.onEquipIndexChanged(data)
 
+    
     this.mapMenu.reinit()
   }
 
@@ -4446,6 +4661,8 @@ class Game {
 
       document.querySelector("#error_title").innerText = ""
       document.querySelector("#error_menu_content").innerText = ""
+      document.querySelector("#caption_footer").innerText = ""
+      document.querySelector("#caption_center").innerText = ""
 
       // reset scale
       this.gameLayer.scale.set(1)
@@ -4458,6 +4675,10 @@ class Game {
       Array.from(document.querySelectorAll(".modal_menu")).forEach((el) => {
         el.style.display = 'none'
       })
+      document.querySelectorAll('#arrow_container > div').forEach((div, index) => {
+        document.getElementById(div.id).remove()
+      });
+
 
       clearInterval(this.waveCountdownInterval)
 
@@ -4568,7 +4789,7 @@ class Game {
   }
 
   onErrorMessage(data) {
-    this.displayError(data.message, { warning: data.isWarning, success: data.isSuccess, transparent: data.isTransparent, color: data.color, size: data.size, isTitle: data.isTitle })
+    this.displayError(data.message, { warning: data.isWarning, success: data.isSuccess, transparent: data.isTransparent, color: data.color, size: data.size, isTitle: data.isTitle, isCenter:data.isCenter, isFooter:data.isFooter })
   }
 
   resetInventory() {
@@ -5212,6 +5433,8 @@ class Game {
       this.prevPlayerPosX = cameraFocusTarget.getX()
       this.prevPlayerPosY = cameraFocusTarget.getY()
     }
+
+    this.setArrows()
 
     this.applyMyInputs()
     this.sector.executeTurn()

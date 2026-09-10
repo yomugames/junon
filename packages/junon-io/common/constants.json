@@ -4034,7 +4034,7 @@
         "Beer": 1,
         "Cloth": 1
       },
-      "description": "Throw it to an area to create flames"
+      "description": "Throwable item that creates an area of flames"
     },
     "Grenade": {
       "parent": "Equipments.MeleeEquipment",
@@ -6010,7 +6010,7 @@
       "stats": {
         "health": 200,
         "count": 125,
-        "oxygenCapacity": 200,
+        "oxygenCapacity": 500,
         "clientResource": "oxygen"
       },
       "upgrade": {

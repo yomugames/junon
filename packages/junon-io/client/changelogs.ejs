@@ -13,52 +13,152 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimum-scale=1, width=device-width, height=device-height">
 
     <style>
-        body {
-            font-family: monospace;
+        
+        @font-face {
+            font-family: cc;
+            src: url(./../assets/images/cc.ttf);
+        }
+        @font-face {
+            font-family: PixelForce;
+            src: url(./../assets/images/PixelForce.ttf);
         }
 
-        p {
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        a {
-            display: block;
-        }
-
-        #partners a {
-            margin-left: 50px;
-
+        #parallaxBg {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    height: 200vh;
+    z-index: -1;
+    background-image: url(./../assets/images/background/menubg1.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    will-change: transform;
+    top: -70%;
         }
         
+        .update {
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(22, 28, 33, 0.85);
+            border: 3px solid #939fa7;
+            box-shadow: inset 0 0 25px rgb(222 216 255 / 20%);
+            border-radius: 4px;
+            padding: 15px;
+            position: relative;
+            margin: 0px 0px 20px 0px;
+        }
+        #changelogs {
+            font-family: "cc";
+            left: 50%;
+            position: relative;
+            transform: translateX(-50%);
+            width: 125vh;
+        }
+        #changelogs a {
+            color: #4c79a4;
+            display: block;
+            text-align: center;
+        }
+        #changelogs b {
+            color: gray;
+        }
+        #changelogs ul {
+    color: #cccccc;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgb(6 10 12 / 61%);
+    border-radius: 4px;
+    padding: 14px 25px 14px 25px;
+    position: relative;
+    margin: 10px 0px 0px 0px;
+        }
+        #changelogs li {
+            margin-bottom: 2px;
+            text-align: left;
+        }
+        #changelogs .datevercontainer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin: 0px 0px 7px 0px;
+            font-size: 1.25rem;
+            color: #ffffff;
+            text-align: center;
+            text-transform: uppercase;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+        #changelogs .date {
+            margin-right: auto;
+        }
+        #changelogs .version {
+            margin-left: auto;
+        }
+        #changelogs .title {
+            font-size: 1.95rem;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgb(255 255 255 / 50%);
+            margin: 15px 0px 0px 0px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        .bigTitle {
+            font-family:"PixelForce";
+        font-size: 3rem;
+        color: #ebf0ff;
+        text-shadow: 0 0 12px rgb(138 164 225 / 79%);
+        margin: 15px;
+        text-align: center;
+        text-transform: uppercase;
+        }
+        .startOfList {
+            font-size: 20px;
+            list-style-type: none;
+            margin: 0px 0px 5px 0px;
+            color: white;
+            text-align: left;
+        }
+
     </style>
 </head>
 
-<body >
+<body>
     <div id='changelogs'>
-        <h3>Junon.io - Changelogs</h3>
+        <h3 class="bigTitle">Junon.io - Changelogs</h3>
         <% for (let i = 0; i < changeLogs.length; i++) { %>
             <% let changeLog = changeLogs[i] %>
-            <div>
-                <p class='date'><%= changeLog.date %> - <%= changeLog.version %></p>
-                <% if (changeLog.content.features.length > 0) { %>
-                    <ul>
-                        <% for (let i = 0; i < changeLog.content.features.length; i++) { %>
-                            <% let feature = changeLog.content.features[i] %>
-                            <li><%= feature %></li>                    
-                        <% } %>
-                    </ul>
-                <% } %>
-                <% if (changeLog.content.bugs.length > 0) { %>
-                    <ul>
-                        <% for (let i = 0; i < changeLog.content.bugs.length; i++) { %>
-                            <% let bug = changeLog.content.bugs[i] %>
-                            <li><%= bug %></li>                    
-                        <% } %>
-                    </ul>
+            <div class="update">
+                <p class='datevercontainer'><span class="date"><%= changeLog.date %></span><span class="version"><%= changeLog.version %></span></p>
+                <p class='title'><%= changeLog.title %></p>
+                <% for (let category in changeLog.content) { %>
+                    <% if (Array.isArray(changeLog.content[category]) && changeLog.content[category].length > 0) { %>
+                        <ul>
+                            <li class="startOfList"><%= category.charAt(0).toUpperCase() + category.slice(1) %></li>
+                            <% for (let i = 0; i < changeLog.content[category].length; i++) { %>
+                                <li><%= changeLog.content[category][i] %></li>
+                            <% } %>
+                        </ul>
+                    <% } %>
                 <% } %>
             </div>
         <% } %>
     </div>
+    <div id="parallaxBg"></div>
 </body>
+
+<script>
+const parallaxBg = document.getElementById('parallaxBg');
+if (Math.round(Math.random()*1000) == 1) {
+    parallaxBg.style.backgroundImage = "url(./../assets/images/background/starmap_background.png)"
+}
+
+window.addEventListener('scroll', () => {
+    const scrollPosition = window.scrollY;
+    const yOffset = scrollPosition * 0.01;
+    
+    parallaxBg.style.transform = `translate3d(0, ${yOffset}px, 0)`;
+});
+    </script>
 </html>

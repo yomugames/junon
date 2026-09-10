@@ -9,7 +9,7 @@ class OG extends BaseBadge {
     }
 
     async isQualified(player) {
-        return await player.hasUserPlayed2Years()
+        return await player.hasUserPlayed5Years()
     }
 
     getImageUrl() {
@@ -17,7 +17,7 @@ class OG extends BaseBadge {
     }
 
     getDescription() {
-        return 'This badge is earned after playing for 2 years.'
+        return 'This badge is earned after playing for 5 years.'
     }
 
     getColor() {

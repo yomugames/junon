@@ -245,6 +245,8 @@ class Raid {
       this.spawnSapper()
     }
 
+    this.game.playRaidMusic()
+
     if (this.team) {
       this.team.forEachMember((player) => {
         this.eventManager.emitEvent(player, "Raid")
@@ -511,6 +513,8 @@ class Raid {
             mobGroup.remove()
           })
         }
+
+        this.game.stopRaidMusic()
       }
 
       return

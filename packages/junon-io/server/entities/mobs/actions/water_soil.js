@@ -6,9 +6,9 @@ class WaterSoil extends BaseAction {
   perform(options) {
     let bottle = this.planner.entity.getHandItem() 
     let seed = options.soil.getSeed()
-    if (seed) {
+    if (seed && !seed.isWatered) {
       seed.water()
-      bottle.instance.drain(20)
+      bottle.instance.drain(10)
     }
   }
 

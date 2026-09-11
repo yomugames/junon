@@ -115,7 +115,8 @@ class AtmMenu extends BaseMenu {
   }
 
   isNotAllowed() {
-    return this.game.isHardcore()
+    // return this.game.isHardcore()
+    return false
   }
 
   render() {

@@ -60,6 +60,12 @@ class Chunk {
   }
 
   cacheSpriteLayer(spriteLayer, group) {
+    let bounds = spriteLayer.getLocalBounds()
+    if (bounds.width <= 0 || bounds.height <= 0) {
+      spriteLayer.cacheAsBitmap = false
+      return
+    }
+
     spriteLayer.cacheAsBitmap = true
   }
 

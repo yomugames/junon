@@ -4,6 +4,7 @@ const Helper = require("./../../../common/helper")
 const BaseBuilding = require("./base_building")
 const Foods = require("./../foods/index")
 const ExceptionReporter = require('junon-common/exception_reporter')
+const CraftingRules = require("../crafting_rules")
 
 class Stove extends BaseBuilding {
 
@@ -26,7 +27,7 @@ class Stove extends BaseBuilding {
   canCraft(type) {
     if (this.isFull()) return false
 
-    return Foods.forType(type)
+    return CraftingRules.isStoveCraftable(type)
   }
 
   canBeCookedBy(item, user) {

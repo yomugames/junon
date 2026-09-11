@@ -4,6 +4,7 @@ const BaseBuilding = require("./base_building")
 const Foods = require("./../foods/index")
 const Ores = require("./../ores/index")
 const Equipments = require("./../equipments/index")
+const CraftingRules = require("../crafting_rules")
 
 class Brewery extends BaseBuilding {
 
@@ -18,9 +19,7 @@ class Brewery extends BaseBuilding {
   canCraft(type) {
     if (this.isFull()) return false
 
-    const templateList = [Foods.FirstAidKit, Foods.Antidote, Ores.NitroPowder, Equipments.Syringe]
-
-    return templateList.find((klass) => { klass.getType() === type })
+    return CraftingRules.isBreweryCraftable(type)
   }
 
   craft(item, inventoryInput) {

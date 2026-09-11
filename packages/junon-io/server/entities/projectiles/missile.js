@@ -15,6 +15,11 @@ class Missile extends CollidableProjectile {
     this.straightFireCounter = 3
     this.CLOSE_ENOUGH_DISTANCE = 32
     this.ARRIVE_COMPLETE_DISTANCE = 10
+    this.MAX_TRAVEL_DISTANCE_MULTIPLIER = 2
+    this.MAX_TURN_PER_UPDATE = 5
+
+    this.distanceTraveled = 0
+    this.maxTravelDistance = this.distanceToCover * this.MAX_TRAVEL_DISTANCE_MULTIPLIER
 
     this.shouldCreateExplosion = data.shouldCreateExplosion
     this.shouldAttackBuildings = data.shouldAttackBuildings
@@ -87,6 +92,12 @@ class Missile extends CollidableProjectile {
   }
 
   move() {
+    this.distanceTraveled += this.speed
+    if (this.distanceTraveled >= this.maxTravelDistance) {
+      this.remove()
+      return
+    }
+
     if (this.straightFireCounter) {
       this.straightFireCounter -= 1
     } else {
@@ -98,9 +109,7 @@ class Missile extends CollidableProjectile {
 
       let theta = 0
       if ((this.angle) !== targetDeg) {
-        const noise = Math.floor(Math.random() * 7)
-        const minTurn = 9
-        let turn = (minTurn + noise)
+        let turn = this.MAX_TURN_PER_UPDATE
         let delta = targetDeg - this.angle
         if (delta >  180) delta -= 2 * 180
         if (delta < -180) delta += 2 * 180
@@ -116,30 +125,34 @@ class Missile extends CollidableProjectile {
       }
 
       // missile going away
-      if (this.isAlmostHittingTarget && distance > this.prevDistance) {
-        if (this.destinationEntity && !this.destinationEntity.isDestroyed()) {
-          const damage = this.getDamage(this.destinationEntity)
-          this.destinationEntity.damage(damage, this)
-        }
+      // if (this.isAlmostHittingTarget && distance > this.prevDistance) {
+      //   if (this.destinationEntity && !this.destinationEntity.isDestroyed()) {
+      //     const damage = this.getDamage(this.destinationEntity)
+      //     this.destinationEntity.damage(damage, this)
+      //   }
 
-        this.onMoveComplete()
-        return
-      }
+      //   this.onMoveComplete()
+      //   return
+      // }
 
       if (distance < this.CLOSE_ENOUGH_DISTANCE) {
         // this.angle = targetAngle
         this.isAlmostHittingTarget = true
       }
 
-      if (distance <= this.ARRIVE_COMPLETE_DISTANCE) {
-        this.onMoveComplete()
-      }
+      // if (distance <= this.ARRIVE_COMPLETE_DISTANCE) {
+      //   this.onMoveComplete()
+      // }
 
       this.prevDistance = distance
     }
 
     this.body.velocity[0] = this.speed * Math.cos(this.getRadAngle())
     this.body.velocity[1] = this.speed * Math.sin(this.getRadAngle())
+  }
+
+  onMoveComplete() {
+    return
   }
 
   getAttackables() {

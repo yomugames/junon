@@ -57,12 +57,12 @@ class VendingMachine extends BaseBuilding {
       return { error: "Out of stock" }
     }
 
-    let purchaseHistory = this.getPurchaseHistory(customer, itemSold.type)
-    if (purchaseHistory) {
-      if (purchaseHistory.count >= 3) {
-        return { error: i18n.t(customer.locale,"BoughtTooMuch") }
-      }
-    }
+    // let purchaseHistory = this.getPurchaseHistory(customer, itemSold.type)
+    // if (purchaseHistory) {
+    //   if (purchaseHistory.count >= 3) {
+    //     return { error: i18n.t(customer.locale,"BoughtTooMuch") }
+    //   }
+    // }
 
     return {}
   }

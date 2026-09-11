@@ -2,6 +2,7 @@ const Constants = require('../../../common/constants.json')
 const Protocol = require('../../../common/util/protocol')
 const BaseBuilding = require("./base_building")
 const Ammos = require("./../ammos/index")
+const CraftingRules = require("../crafting_rules")
 
 class AmmoPrinter extends BaseBuilding {
 
@@ -16,7 +17,7 @@ class AmmoPrinter extends BaseBuilding {
   canCraft(type) {
     if (this.isFull()) return false
 
-    return Ammos.forType(type)
+    return CraftingRules.isAmmoPrinterCraftable(type)
   }
 
   craft(item, inventoryInput) {

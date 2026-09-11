@@ -9,7 +9,7 @@ class SquidLord extends HoverMob {
   constructor(sector, data) {
     super(sector, data)
 
-    this.MAX_BURST_COUNT = 8
+    this.MAX_BURST_COUNT = 3
     this.burstCount = 0
   }
 
@@ -60,17 +60,23 @@ class SquidLord extends HoverMob {
     if (Math.random() < 0.5) return
 
     this.burstCount += 1
+    for (let i = 0; i < 3; i++) {
+      this.shootProjectile()
+    }
+  }
 
+  shootProjectile() {
     let angleInRad = this.getAbsoluteRadAngle()
     let angleRandomizer = 20 - Math.floor(Math.random() * 40)
-    angleInRad = angleInRad + (angleRandomizer * Math.PI / 180)
+    let angleRandomizerInRad = angleRandomizer * Math.PI / 180
+    angleInRad = angleInRad + angleRandomizerInRad
 
     let sourcePoint = this.game.pointFromDistance(this.getX(), this.getY(), Constants.tileSize, angleInRad)
 
     const projectile = Projectiles.Bubble.build({
       weapon:        this,
       source:      { x: sourcePoint[0],         y: sourcePoint[1] },
-      destination: this.getShootTarget(this, this.getRadAngle(), Constants.tileSize * 20),
+      destination: this.getShootTarget(this, this.getRadAngle() + angleRandomizerInRad, Constants.tileSize * 20),
       ignoreObstacles: true
     })
   }

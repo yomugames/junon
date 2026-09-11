@@ -1,5 +1,6 @@
 const Storable = require('../../common/interfaces/storable')
 const Constants = require('../../common/constants')
+const CraftingRules = require('./crafting_rules')
 
 class Inventory {
   constructor(user, numItems) {
@@ -23,10 +24,10 @@ class Inventory {
     return false
   }
 
-  canCraft() {
+  canCraft(type) {
     if (this.isFull()) return false
 
-    return true
+    return CraftingRules.isRegularCraftable(type)
   }
 
   isBuildingStorage() {
@@ -43,8 +44,9 @@ class Inventory {
   craft(item, inventoryInput) {
     const isSuccessful = item.craft(inventoryInput)
     const isSandboxModeAndOwner = this.isSandboxMode() && this.user.isSectorOwner()
+    const hasRequirements = item.getConstants().requirements ? true : false
 
-    if (isSuccessful || isSandboxModeAndOwner) {
+    if (isSuccessful && hasRequirements || isSandboxModeAndOwner) {
       if (item.isOre() || item.isBar()) {
         let isAbleToStorInRegularInventory = this.store(item, Constants.regularInventoryBaseIndex)
         if (!isAbleToStorInRegularInventory) {

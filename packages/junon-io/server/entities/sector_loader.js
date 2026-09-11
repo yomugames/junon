@@ -338,6 +338,7 @@ class SectorLoader {
     for (let buildingId in this.pendingStores) {
       let pending = this.pendingStores[buildingId]
       let building = this.game.getEntity(buildingId)
+      if (!building || typeof building.storeAt !== "function") continue
 
       for (let index in pending) {
         let itemData = pending[index]

@@ -376,7 +376,7 @@ class Player extends BaseEntity {
   shouldShowStatusList(effect) {
     if (!this.isMe()) return false
 
-    let effects = ["rage", "fear", "poison", "stamina", "paralyze", "drunk", "miasma"]
+    let effects = ["rage", "fear", "poison", "stamina", "paralyze", "drunk", "miasma", "drug", "addiction"]
     return effects.indexOf(effect) !== -1
   }
 
@@ -497,6 +497,8 @@ class Player extends BaseEntity {
 
     this.setUid(data.uid)
     this.setHealth(data.health)
+    if (typeof data.maxHealth !== "undefined") this.maxHealth = data.maxHealth
+    if (typeof data.maxStamina !== "undefined") this.maxStamina = data.maxStamina
     this.setLevel(data.level)
     this.setRelativePosition(data)
     this.setEquipments(data)
@@ -513,6 +515,11 @@ class Player extends BaseEntity {
     this.setMounted(data.mounted)
     this.setIsHidden(data.isHidden)
     this.setViewDistance(data.viewDistance)
+
+    if (this.isMe()) {
+      this.game.updateHealthBar(this.health, this.getMaxHealth())
+      this.game.updateStaminaBar(this.stamina, this.getMaxStamina())
+    }
 
     // set angle after equipments setup
     if (!this.isMe()) {
@@ -1859,7 +1866,7 @@ class Player extends BaseEntity {
   }
 
   getMaxViewDistance() {
-    return this.viewDistance || Constants.fovViewDistance
+    return this.viewDistance || this.getFov() || Constants.fovViewDistance
   }
 
   displayLowStatusWarning(stat) {
@@ -1950,11 +1957,23 @@ Object.assign(Player.prototype, Destroyable.prototype, {
     }
   },
   getMaxHealth() {
+    if (this.maxHealth) return this.maxHealth
     if (this.game.sector.entityCustomStats[this.id]) {
       return this.game.sector.entityCustomStats[this.id].health
     }
     
     return 100
+  },
+  getFov() {
+    let fov
+    if (this.sector) {
+      if (this.sector.entityCustomStats[this.id]) {
+        fov = this.sector.entityCustomStats[this.id].fov
+      }
+    }
+
+    fov = fov || Constants.fovViewDistance
+    return fov
   }
 
 })
@@ -1990,6 +2009,7 @@ Object.assign(Player.prototype, Needs.prototype, {
     this.notifyLowStatus("oxygen")
   },
   getMaxStamina() {
+    if (this.maxStamina) return this.maxStamina
     if (this.game.isPvP()) return 300
     return Constants.Player.stamina
   },

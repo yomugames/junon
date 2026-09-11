@@ -337,6 +337,10 @@ class RemoteEventHandler {
     let building = player.game.getEntity(data.id)
     if (!building) return
     if (!building.isOwnedBy(player)) return
+    if (typeof building.handleThermalProcessorAction === "function" && data.action) {
+      building.handleThermalProcessorAction(player, data)
+      return
+    }
     if (data.hasOwnProperty("content") &&
         building.hasEditableContent()) {
       if (building.hasCategory("sign")) {

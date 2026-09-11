@@ -55,6 +55,7 @@ Destroyable.prototype = {
   },
 
   setHealth(newHealth) {
+    newHealth = Math.round(newHealth)
     const prevHealth = this.health
 
     if (newHealth < 0) { 

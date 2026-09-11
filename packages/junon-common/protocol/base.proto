@@ -176,6 +176,7 @@ message MessageWrapper {
     TriggerPlayerMenu TriggerPlayerMenu = 183;
     RevitalizerActivate RevitalizerActivate = 184;
     VendingPriceChange VendingPriceChange = 185;
+    Zoom Zoom = 186;
   }
 }
 
@@ -648,6 +649,7 @@ message EditBuilding {
   uint32 roleType = 7; 
   bool   isRoleEnabled = 8;
   bool   isCustomAccess = 9;
+  uint32 intensity = 10;
 }
 
 message TeamMemberAction {
@@ -1039,6 +1041,10 @@ message CameraFocusTarget {
 
 message SetAdmin {
   bool isAdminMode = 1;
+}
+
+message Zoom {
+  float level = 1;
 }
 
 message Camera {
@@ -1434,6 +1440,8 @@ message Player {
   bool isAngleLocked = 34;
   bool isHidden = 35;
   uint32 viewDistance = 36;
+  uint32 maxHealth = 37;
+  uint32 maxStamina = 38;
 }
 
 message DragTargetRef {
@@ -1524,6 +1532,9 @@ message Item {
 message ItemInstance {
   uint32 usage = 1;
   string content = 2;
+  string effectsJson = 3;
+  string drugTint = 4;
+  double duration = 5;
 }
 
 message Point {

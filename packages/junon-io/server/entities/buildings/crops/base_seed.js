@@ -24,13 +24,22 @@ class BaseSeed extends BaseDistribution {
       this.setHealth(this.getMaxHealth())
     }
 
-    let soilNetwork = this.getSoilNetwork()
-    if (soilNetwork) {
-      soilNetwork.removeUnplanted(this.getRow(), this.getCol())
-      if (!this.isCropHarvestable()) {
-        soilNetwork.setUnwatered(this.getRow(), this.getCol())
+    this.forEachSoilTile((soil, row, col) => {
+      let soilNetwork = soil.getSoilNetwork()
+      if (!soilNetwork) return
+
+      soilNetwork.removeUnplanted(row, col)
+      if (this.isCropHarvestable()) {
+        soilNetwork.removeUnwatered(row, col)
+        soilNetwork.setHarvestable(row, col)
+      } else if (!this.isWatered) {
+        soilNetwork.setUnwatered(row, col)
+        soilNetwork.removeHarvestable(row, col)
+      } else {
+        soilNetwork.removeUnwatered(row, col)
+        soilNetwork.removeHarvestable(row, col)
       }
-    }
+    })
 
     if (this.isPlacedByPlayerAction) {
       let placer = this.getPlacer()
@@ -49,6 +58,20 @@ class BaseSeed extends BaseDistribution {
     if (!soil) return null
 
     return soil.getSoilNetwork()
+  }
+
+  forEachSoilTile(callback) {
+    let startRow = this.getTopLeftRow()
+    let startCol = this.getTopLeftCol()
+    let rowCount = this.getRowCount()
+    let colCount = this.getColCount()
+
+    for (let row = startRow; row < startRow + rowCount; row++) {
+      for (let col = startCol; col < startCol + colCount; col++) {
+        let soil = this.container.platformMap.get(row, col)
+        if (soil && soil.hasCategory("soil")) callback(soil, row, col)
+      }
+    }
   }
 
   initDestroyable(initialHealth) {
@@ -79,14 +102,16 @@ class BaseSeed extends BaseDistribution {
   }
 
   onWateredChanged() {
-    let soilNetwork = this.getSoilNetwork()
-    if (soilNetwork) {
+    this.forEachSoilTile((soil, row, col) => {
+      let soilNetwork = soil.getSoilNetwork()
+      if (!soilNetwork) return
+
       if (this.isWatered) {
-        soilNetwork.removeUnwatered(this.getRow(), this.getCol())
+        soilNetwork.removeUnwatered(row, col)
       } else {
-        soilNetwork.setUnwatered(this.getRow(), this.getCol())
+        soilNetwork.setUnwatered(row, col)
       }
-    }
+    })
 
     this.onStateChanged("isWatered")
   }
@@ -109,7 +134,7 @@ class BaseSeed extends BaseDistribution {
     } else {
       if (item && item.isType("WaterBottle")) {
         this.water(user)
-        item.instance.drain(20)
+        item.instance.drain(10)
       }
     }
   }
@@ -149,7 +174,11 @@ class BaseSeed extends BaseDistribution {
       }
     }
 
-    this.createDrop()
+    if (this.getTypeName() === "RedSporeling" && Math.random() < 0.02) {
+      this.sector.spawnMob({ x: this.getCol() * 32, y: this.getRow() * 32, type: "Mushling", count: 1 })
+    } else {
+      this.createDrop()
+    }
     this.remove()
 
     if (user && user.isPlayer()) {
@@ -165,7 +194,7 @@ class BaseSeed extends BaseDistribution {
       yieldType: dropTypeName
     }
 
-    if (user.isPlayer()) {
+    if (user && user.isPlayer()) {
       data["player"] = user.getName()
     }
 
@@ -177,20 +206,27 @@ class BaseSeed extends BaseDistribution {
 
     mob.setHandItem(cropItem)
 
-    let seedCount = Math.floor(Math.random() * 3)
-    let seedItem = this.sector.createItem(this.getType(), { count: seedCount })
+    let seedCount = this.getSeedCount()
+    let seedItem = this.sector.createItem(this.getSeedType(), { count: seedCount })
 
-    mob.setExtraItem(seedItem)
+    if (seedCount >= 1) mob.setExtraItem(seedItem)
+
+    if (this.getConstants().isSporeling && Math.random() < 0.001) {
+      this.sector.spawnMob({ x: this.getCol() * 32, y: this.getRow() * 32, type: "GhostShroom", count: 1 })
+    }
 
     this.remove()
   }
 
   remove() {
-    let soilNetwork = this.getSoilNetwork()
-    if (soilNetwork) {
-      soilNetwork.setUnplanted(this.getRow(), this.getCol())
-      soilNetwork.removeHarvestable(this.getRow(), this.getCol())
-    }
+    this.forEachSoilTile((soil, row, col) => {
+      let soilNetwork = soil.getSoilNetwork()
+      if (!soilNetwork) return
+
+      soilNetwork.setUnplanted(row, col)
+      soilNetwork.removeUnwatered(row, col)
+      soilNetwork.removeHarvestable(row, col)
+    })
 
     super.remove()
   }
@@ -200,11 +236,44 @@ class BaseSeed extends BaseDistribution {
   }
 
   createDrop() {
-    this.sector.createDrop({ sector: this.sector, x: this.getX(), y: this.getY(), type: this.getItemDropType() })
+    const yieldCount = this.getYieldCount()
+    if (yieldCount > 0) this.sector.createDrop({ sector: this.sector, x: this.getX(), y: this.getY(), type: this.getItemDropType(), count: yieldCount })
 
     // 50 % chance to drop seed
-    let seedCount = Math.floor(Math.random() * 3) + 1
-    this.sector.createDrop({ sector: this.sector, x: this.getX(), y: this.getY(), type: this.getType(), count: seedCount })
+    let seedCount = this.getSeedCount()
+    if (seedCount > 0) this.sector.createDrop({ sector: this.sector, x: this.getX(), y: this.getY(), type: this.getSeedType(), count: seedCount })
+  }
+
+  
+  getSeedType() {
+    if (this.getConstants().seed) return Protocol.definition().BuildingType[this.getConstants().seed]
+    return this.getType()
+  }
+
+  getYieldCount() {
+    if (this.getConstants().yieldAmount) {
+      if (Array.isArray(this.getConstants().yieldAmount)) {
+        const randomIndex = Math.floor(Math.random() * this.getConstants().yieldAmount.length)
+        return this.getConstants().yieldAmount[randomIndex]
+      } else {
+        return this.getConstants().yieldAmount
+      }
+    } else {
+      return Math.floor(Math.random() * 3) + 1
+    }
+  }
+
+  getSeedCount() {
+    if (this.getConstants().seedAmount) {
+      if (Array.isArray(this.getConstants().seedAmount)) {
+        const randomIndex = Math.floor(Math.random() * this.getConstants().seedAmount.length)
+        return this.getConstants().seedAmount[randomIndex]
+      } else {
+        return this.getConstants().seedAmount
+      }
+    } else {
+      return Math.floor(Math.random() * 3) + 1
+    }
   }
 
   isCrop() {
@@ -232,13 +301,18 @@ class BaseSeed extends BaseDistribution {
   }
 
   onIsHarvestableChanged() {
-    let soilNetwork = this.getSoilNetwork()
-    if (soilNetwork) {
+    this.forEachSoilTile((soil, row, col) => {
+      let soilNetwork = soil.getSoilNetwork()
+      if (!soilNetwork) return
+
       if (this.isHarvestable) {
-        soilNetwork.removeUnwatered(this.getRow(), this.getCol())
-        soilNetwork.setHarvestable(this.getRow(), this.getCol())
+        soilNetwork.removeUnwatered(row, col)
+        soilNetwork.setHarvestable(row, col)
+      } else {
+        soilNetwork.removeHarvestable(row, col)
+        soilNetwork.setUnwatered(row, col)
       }
-    }
+    })
     this.onStateChanged("isHarvestable")
   }
 
@@ -249,6 +323,11 @@ class BaseSeed extends BaseDistribution {
     if (!isTenSecondInterval) return
 
     let growStep = this.isWatered ? 2 : 1
+
+    const platform = this.container.platformMap.get(this.getRow(), this.getCol())
+    let isOxygenatedPlatform = platform && platform.room && platform.room.isOxygenated
+    if (!isOxygenatedPlatform && this.sector.settings["isOxygenEnabled"]) growStep = 0
+    
     growStep = growStep * this.sector.buildSpeed
 
     if (this.hasEffect("miasma")) {

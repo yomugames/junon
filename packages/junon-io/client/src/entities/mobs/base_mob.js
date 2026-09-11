@@ -468,13 +468,13 @@ class BaseMob extends BaseEntity {
     }
   }
 
-  getMeleeChargeTween(targetPosition) {
+  getMeleeChargeTween(targetPosition, duration = 250) {
     let origX = this.getX()
     let origY = this.getY()
     let position = { x: origX, y: origY }
 
     const tween = new TWEEN.Tween(position)
-        .to(targetPosition, 250)
+        .to(targetPosition, duration)
         .easing(TWEEN.Easing.Quadratic.Out)
         .onUpdate(() => {
           this.sprite.position.x = position.x

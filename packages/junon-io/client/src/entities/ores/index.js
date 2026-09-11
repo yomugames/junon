@@ -20,6 +20,17 @@ Ores.SulfurOre = require("./sulfur_ore")
 Ores.Explosives = require("./explosives")
 Ores.Meteorite = require("./meteorite")
 Ores.SquidLordHeart = require("./squid_lord_heart")
+Ores.RedSpore = require("./red_spore")
+Ores.BrownSpore = require("./brown_spore")
+Ores.WhiteSpore = require("./white_spore")
+Ores.OrangeSpore = require("./orange_spore")
+Ores.YellowSpore = require("./yellow_spore")
+Ores.GreenSpore = require("./green_spore")
+Ores.BlueSpore = require("./blue_spore")
+Ores.PurpleSpore = require("./purple_spore")
+Ores.PinkSpore = require("./pink_spore")
+Ores.BlackSpore = require("./black_spore")
+
 
 Ores.forType = (type) => {
   const klassName = Helper.getTypeNameById(type)

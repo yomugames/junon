@@ -53,7 +53,7 @@ class EventManager {
 
   onDayNightChanged(dayCount) {
     let dayInterval = this.game.isPvP() ? 60 : 6
-    if (dayCount % dayInterval === 0) {
+    if (dayCount % dayInterval === 0 && dayCount >= 12) {
       this.createMeteorShowerEvent()
     }
   }

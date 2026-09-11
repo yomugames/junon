@@ -147,9 +147,7 @@ function compressMangle() {
     // (See https://github.com/wearefractal/vinyl for vinyl attributes and functions)
     var transformedFile = vinylFile.clone();
 
-    let filePath = vinylFile.history[0]
-    let tokens = filePath.split("/")
-    let fileName = tokens[tokens.length - 1]
+    let fileName = path.basename(vinylFile.history[0])
     let sourceMapFileName = fileName.replace(".js", vinylFile.revHash + ".js") + ".map"
 
     let build = {}
@@ -164,7 +162,7 @@ function compressMangle() {
 
     let result = Terser.minify_sync(build, options)
 
-    require("fs").writeFileSync(paths.dist + sourceMapFileName, result.map)
+    require("fs").writeFileSync(path.join(paths.dist, sourceMapFileName), result.map)
 
     // 2. set new contents
     // * contents can only be a Buffer, Stream, or null

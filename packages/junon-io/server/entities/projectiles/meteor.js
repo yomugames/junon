@@ -59,14 +59,18 @@ class Meteor extends BaseProjectile {
     })
 
     if (isNotPathBlocker) {
-      let chance = Math.random() < 0.2
+      let chance = Math.random() < 0.4
       if (chance) {
         let row = coords[0][0]
         let col = coords[0][1]
         let platform = this.sector.platformMap.get(row, col)
         if (platform) platform.remove()
-
-        new Terrains.MeteoriteAsteroid(this.sector, row, col)
+        
+        if (Math.random() < 0.8) {
+          new Terrains.Asteroid(this.sector, row, col)
+        } else {
+          new Terrains.MeteoriteAsteroid(this.sector, row, col)
+        }
       }
     }
   }

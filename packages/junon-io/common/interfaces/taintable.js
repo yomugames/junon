@@ -34,6 +34,10 @@ Taintable.prototype = {
   },
 
   setEffectLevel(effect, level, duration) {
+    if ((effect === "poison" || effect === "drunk") && level > 0 && typeof this.isImmuneTo === "function" && this.isImmuneTo(effect)) {
+      return
+    }
+
     const prevEffectLevel = this.getEffectLevel(effect)
 
     if (typeof this.effects === "undefined") {
@@ -103,7 +107,7 @@ Taintable.prototype = {
       this.defaultEffectDuration = {
         web: 2,
         paralyze: 5,
-        poison: 20,
+        poison: 90,
         fear: 15,
         miasma: 60,
         spin: 4,
@@ -112,7 +116,7 @@ Taintable.prototype = {
         haste: 15,
         rage: 60,
         smoke: Infinity,
-        fire: 2,
+        fire: 8,
       }
       this.effectDuration = {}      
     }

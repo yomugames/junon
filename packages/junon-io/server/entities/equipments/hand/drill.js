@@ -158,6 +158,10 @@ class Drill extends SurvivalTool {
   getDrillRate() {
     return 5
   }
+  
+  getMiningLevel() {
+    return this.getConstants().stats.miningLevel
+  }
 
   isMiningEquipment() {
     return true

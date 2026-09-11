@@ -243,6 +243,7 @@ class Raid {
       this.spawnDrone()
       this.spawnTrooper()
       this.spawnSapper()
+      this.spawnFirebat()
     }
 
     if (this.team) {
@@ -386,7 +387,7 @@ class Raid {
   }
 
   getDesiredMobCountTrooper() {
-    if (this.sector.getDayCount() < 15) return 0
+    if (this.sector.getDayCount() < 13) return 0
 
     if (this.game.isHardcore()) {
       let count = (this.sector.getDayCount() - 12) 
@@ -401,14 +402,29 @@ class Raid {
   }
 
   getDesiredMobCountSapper() {
-    if(this.sector.getDayCount() < 25) return 0
+    if (this.sector.getDayCount() < 25) return 0
 
-    if(this.game.isHardcore()) {
+    if (this.game.isHardcore()) {
       let count = (this.sector.getDayCount() - 18)
       return Math.min(10, count)
     }
 
-    if(this.team.getNumDaysAlive < 28) {
+    if (this.team.getNumDaysAlive() < 28) {
+      return 1
+    }
+
+    return Math.floor(Math.random() * 3) + 2
+  }
+
+  getDesiredMobCountFirebat() {
+    if (this.sector.getDayCount() < 18) return 0
+
+    if (this.game.isHardcore()) {
+      let count = (this.sector.getDayCount() - 18)
+      return Math.min(10, count)
+    }
+
+    if (this.team.getNumDaysAlive() < 33) {
       return 1
     }
 
@@ -480,6 +496,28 @@ class Raid {
       x: this.spawnGround.getX(),
       y: this.spawnGround.getY(),
       type: "Sapper",
+      level: level,
+      raid: this,
+      ignoreLimits: true
+    })
+  }
+
+  spawnFirebat() {
+    let mobCount = this.getDesiredMobCountFirebat()
+    if(mobCount === 0) return
+
+    let level = 0
+
+    if(this.game.isHardcore()) {
+      level = Math.floor((this.team.getNumDaysAlive() - 30) / 3)
+      level = Math.max(0, level)
+      level = Math.min(30, level)
+    }
+
+    this.sector.spawnMob({
+      x: this.spawnGround.getX(),
+      y: this.spawnGround.getY(),
+      type: "Firebat",
       level: level,
       raid: this,
       ignoreLimits: true

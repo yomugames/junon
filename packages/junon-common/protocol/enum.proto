@@ -284,6 +284,46 @@ enum BuildingType {
   ArmoredWindow = 290;
   Revitalizer = 291;
   Dispenser = 292;
+  RedMushroom = 293;
+  BrownMushroom = 294;
+  WhiteMushroom = 295;
+  MushroomSoup = 296;
+  RedSporeling = 297;
+  BrownSporeling = 298;
+  WhiteSporeling = 299;
+  RedSpore = 300;
+  BrownSpore = 301;
+  WhiteSpore = 302;
+  FusionSword = 303;
+  Sapling = 304;
+  OrangeMushroom = 305;
+  OrangeSporeling = 306;
+  OrangeSpore = 307;
+  YellowMushroom = 308;
+  YellowSporeling = 309;
+  YellowSpore = 310;
+  GreenMushroom = 311;
+  GreenSporeling = 312;
+  GreenSpore = 313;
+  BlueMushroom = 314;
+  BlueSporeling = 315;
+  BlueSpore = 316;
+  PurpleMushroom = 317;
+  PurpleSporeling = 318;
+  PurpleSpore = 319;
+  PinkMushroom = 320;
+  PinkSporeling = 321;
+  PinkSpore = 322;
+  BlackMushroom = 323;
+  BlackSporeling = 324;
+  BlackSpore = 325;
+  MiasmaGun = 326;
+  DrugStation = 327;
+  DrugBottle = 328;
+  Drug = 329;
+  PowerDrill = 330;
+  DrugVat = 331;
+  ThermalProcessor = 332;
 }
 
 enum TerrainType {
@@ -337,6 +377,7 @@ enum ProjectileType {
   MinigunBullet = 29;
   ShockGrenade = 30;
   Shockwave = 31;
+  MiasmaBullet = 32;
 }
 
 enum MobStatus {
@@ -436,6 +477,8 @@ enum MobType {
   Raven = 35;
   Car = 36;
   Sapper = 37;
+  Mushling = 38;
+  GhostShroom = 39;
 }
 
 enum EntityType {

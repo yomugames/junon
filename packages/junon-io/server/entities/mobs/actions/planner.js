@@ -150,8 +150,44 @@ class Planner {
     return this.getSoilNetwork((soilNetwork) => {
       let soilHasSeedType = seedsToStorageMap[soilNetwork.getSeedType()] ||
                             (handItem && handItem.getType() === soilNetwork.getSeedType())
-      return soilNetwork.getUnplantedCount() > 0 && soilHasSeedType
+      return soilNetwork.getUnplantedCount() > 0 &&
+             soilHasSeedType &&
+             this.getPlantingTarget(soilNetwork, soilNetwork.getSeedType())
     })
+  }
+
+  getPlantingTarget(soilNetwork, seedType) {
+    const buildingKlass = Item.getKlass(seedType)
+    if (!buildingKlass) return null
+
+    const widthInTiles = Math.ceil(buildingKlass.prototype.getWidth() / Constants.tileSize)
+    const heightInTiles = Math.ceil(buildingKlass.prototype.getHeight() / Constants.tileSize)
+
+    for (let key of soilNetwork.unplantedSet) {
+      const [row, col] = key.split("-").map(Number)
+      let hasSpace = true
+
+      for (let rowOffset = 0; rowOffset < heightInTiles && hasSpace; rowOffset++) {
+        for (let colOffset = 0; colOffset < widthInTiles; colOffset++) {
+          const tileKey = (row + rowOffset) + "-" + (col + colOffset)
+          if (!soilNetwork.unplantedSet.has(tileKey) || !soilNetwork.tiles[tileKey]) {
+            hasSpace = false
+            break
+          }
+        }
+      }
+
+      if (hasSpace) {
+        const soil = soilNetwork.tiles[key].entity
+        return {
+          soil: soil,
+          x: soil.getX() + ((widthInTiles - 1) * Constants.tileSize / 2),
+          y: soil.getY() + ((heightInTiles - 1) * Constants.tileSize / 2)
+        }
+      }
+    }
+
+    return null
   }
 
   getSoilNetwork(condition) {
@@ -655,16 +691,19 @@ class Planner {
 
   handlePlanting(soilNetwork, seedsToStorageMap) {
     let success
+    const plantingTarget = this.getPlantingTarget(soilNetwork, soilNetwork.getSeedType())
 
-    if (soilNetwork.getUnplantedCount() > 0) {
+    if (plantingTarget) {
       // plant seed
       if (this.hasSeed(soilNetwork)) {
         success = this.perform("SeekSoil", {
-          targetEntity: soilNetwork.getUnplantedSoil(),
+          targetEntity: plantingTarget.soil,
           onComplete: (soil) => {
             this.perform("PlantSeed", {
               soil: soil,
-              seed: this.entity.getHandItem()
+              seed: this.entity.getHandItem(),
+              x: plantingTarget.x,
+              y: plantingTarget.y
             })
             this.setRepeatTask("doPlantSeed")
           }

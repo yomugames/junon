@@ -12,6 +12,7 @@ Needs.prototype = {
     this.happiness = this.getMaxHappiness()
   },
   setStamina(stamina) {
+    stamina = Math.round(stamina)
     let prevStamina = this.stamina
 
     if (stamina > this.getMaxStamina()) {

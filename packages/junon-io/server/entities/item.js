@@ -44,21 +44,32 @@ class Item extends BaseTransientEntity {
 
     let usage
     let content
+    let serializedInstance
 
     if (options.instance && options.instance.constructor.name === "ItemInstance") {
       usage = options.instance.usage
       content = options.instance.content
+      serializedInstance = options.instance
       delete options["instance"]
+      if (!this.isEquipment()) {
+        options.instance = serializedInstance
+      }
     }
 
     this.initMaterializable(options.instance)
 
-    if (this.instance && content) {
-      this.instance.content = content
-      this.instance.usage = this.instance.getUsageCapacity()
+    if (serializedInstance && this.instance && this.instance !== serializedInstance) {
+      Object.assign(this.instance, serializedInstance)
     }
 
-    if (this.instance && usage) {
+    if (this.instance && content) {
+      this.instance.content = content
+      if (typeof this.instance.getUsageCapacity === "function") {
+        this.instance.usage = this.instance.getUsageCapacity()
+      }
+    }
+
+    if (this.instance && usage !== undefined) {
       this.instance.usage = usage
     }
   }
@@ -106,13 +117,19 @@ class Item extends BaseTransientEntity {
   }
 
   getReload() {
+    let reload
     if (!this.instance) {
       const klass = this.getKlass(this.type)
       if (!klass) return 1
-      return (klass.prototype.getReload() || 500) 
+      reload = klass.prototype.getReload() || 500
+    } else {
+      reload = this.instance.getReload() || 500
     }
 
-    return (this.instance.getReload() || 500) 
+    if (this.owner && typeof this.owner.getDrugPercentageModifier === "function") {
+      reload *= this.owner.getDrugPercentageModifier("Reload")
+    }
+    return reload
   }
 
   getCooldownInMilliseconds() {
@@ -165,6 +182,10 @@ class Item extends BaseTransientEntity {
   }
 
   isDrug() {
+    if (this.isSyringe()) {
+      return !!(this.instance && (this.instance.effects || this.instance.effectsJson))
+    }
+
     const klass = this.getKlass(this.type)
     if (!klass) return false
     return klass.prototype.hasCategory("drug")
@@ -204,6 +225,16 @@ class Item extends BaseTransientEntity {
     return klass && klass.prototype.getConstants().isFlower
   }
 
+  isDrugMaterial() {
+    let klass = this.getKlass(this.type)
+    return klass && klass.prototype.getConstants().isDrugMaterial
+  }
+
+  isDrugBottle() {
+    let klass = this.getKlass(this.type)
+    return klass && klass.prototype.getConstants().isDrugBottle
+  }
+
   isBottle() {
     const klass = this.getKlass(this.type)
     if (!klass) return false
@@ -238,14 +269,17 @@ class Item extends BaseTransientEntity {
   }
 
   initMaterializable(instance) {
-    if (!this.isEquipment()) return
     let klass = this.getKlass(this.type)
     if (!klass) return
-    if (klass.getConstants().isStackable) return
 
     if (instance) {
       this.instance = instance
-    } else {
+      if (typeof this.instance === "object" && !this.instance.onStorageChanged) {
+        Object.setPrototypeOf(this.instance, klass.prototype)
+      }
+      this.instance.game = this.game
+      this.instance.owner = this.owner
+    } else if (this.isEquipment() && !klass.prototype.getConstants().isStackable) {
       const klass = this.getKlass(this.type)
       this.instance = new klass(this, this.options)
     }
@@ -257,7 +291,7 @@ class Item extends BaseTransientEntity {
 
   setOwner(owner) {
     this.owner = owner
-    if (this.instance) {
+    if (this.instance && typeof this.instance.setOwner === "function") {
       this.instance.setOwner(owner)
     }
   }
@@ -300,6 +334,8 @@ class Item extends BaseTransientEntity {
     let klass = this.getKlass(type)
     if (!klass) return false
 
+    if (klass.prototype.getConstants().isDrugBottle) return false
+
     if (klass.prototype.getConstants().isStackable) {
       return true
     }
@@ -314,6 +350,11 @@ class Item extends BaseTransientEntity {
 
   use(player, targetEntity, options = {}) {
     let itemInstance = this.instance ? this.instance : this.getKlass(this.type)
+    let useItemContext = false
+    if (this.instance && typeof itemInstance.use !== 'function') {
+      itemInstance = this.getKlass(this.type).prototype
+      useItemContext = true
+    }
     if (!itemInstance) return
     if (!this.count) return
     
@@ -325,7 +366,9 @@ class Item extends BaseTransientEntity {
     }
 
     options.item = this
-    let isSuccessful = itemInstance.use(player, targetEntity, options)
+    let isSuccessful = useItemContext
+      ? itemInstance.use.call(this, player, targetEntity, options)
+      : itemInstance.use(player, targetEntity, options)
 
     if (this.isFireArmOrThrowable()) {
       if (isSuccessful) {
@@ -491,7 +534,7 @@ class Item extends BaseTransientEntity {
   }
 
   onStorageChanged(storage) {
-    if (this.instance) {
+    if (this.instance && typeof this.instance.onStorageChanged === "function") {
       this.instance.onStorageChanged(storage)
     }
   }

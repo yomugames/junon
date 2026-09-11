@@ -1,0 +1,46 @@
+{
+  "version": "v0.8.1.alpha",
+  "date": "September 10, 2026",
+  "title": "Mushroom and Drugs Update - Nurd",
+  "content": {
+    "bugs": [
+      "Fixed hostile mobs becoming passive when the sector is reloaded.",
+      "Fixed bypassing crafting stations.",
+      "Fixed windows and armored windows not being airtight.",
+      "Fixed ghost mobs, projects, and players being created from FOV mode.",
+      "Fixed vending machine and dispenser prices not saving.",
+      "Fixed turret attack permissions not saving.",
+      "Fixed tutorial power issue."
+    ],
+    "features": [
+      "Added 3 types of common and 7 types of rare mushrooms",
+      "Added drug station",
+      "Added thermal processor",
+      "Added drug vat",
+      "Added drug bottle",
+      "Added syringe to crafting menu",
+      "Added sapling (sprite by Wahlee)",
+      "Added miasma gun",
+      "Added mushroom soup",
+      "Added mushling & ghost shroom",
+      "Added power drill",
+      "Added fusion sword",
+      "Reworked homing missiles",
+      "Reworked all food items",
+      "Reworked and balanced bosses",
+      "Reworked crop system",
+      "Reworked some effects",
+      "Poison is now craftable",
+      "Meteorite can no longer be mined with survival tool and drill",
+      "Meteor showers can now create regular asteroids",
+      "Rearranged the craftable items in the equipments tab",
+      "/zoom command",
+      "Can now change FOV using /stat [entity] fov:[0-4096]"
+    ],
+    "Miscellaneous": [
+      "Changed some crafting recipes",
+      "Water bottle can now water twice the number of blocks",
+      "ATM is now enabled in hardcore mode"
+    ]
+  }
+}

@@ -160,7 +160,7 @@ class DrugVat extends BaseBuilding {
         return name
       }
 
-      let suffix = ["Max Health", "Max Stamina", "Strength", "Speed", "Reload", "Healing Rate", "Effect Duration", "Effect Potency", "Initial Potency", "View Distance"].indexOf(name) !== -1 ? "%" : ""
+      let suffix = ["Max Health", "Max Stamina", "Strength", "Speed", "Reload", "Healing Rate", "Effect Duration", "Effect Potency", "Initial Decaying Boost", "View Distance"].indexOf(name) !== -1 ? "%" : ""
       let sign = value > 0 ? "+" : ""
       return name + ": " + sign + value + suffix
     })

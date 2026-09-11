@@ -136,7 +136,7 @@ class ThermalProcessor extends BaseProcessor {
       let name = effect.effect
       let value = this.getEffectValue(effect)
       if (['Poison', 'Nausea', 'Poison Immunity', 'Nausea Immunity', 'Random Buff', 'Random Debuff'].indexOf(name) !== -1) return name
-      let suffix = ['Max Health', 'Max Stamina', 'Strength', 'Speed', 'Reload', 'Healing Rate', 'Effect Duration', 'Effect Potency', 'Initial Potency', 'View Distance'].indexOf(name) !== -1 ? '%' : ''
+      let suffix = ['Max Health', 'Max Stamina', 'Strength', 'Speed', 'Reload', 'Healing Rate', 'Effect Duration', 'Effect Potency', 'Initial Decaying Boost', 'View Distance'].indexOf(name) !== -1 ? '%' : ''
       let sign = value > 0 ? '+' : ''
       return name + ': ' + sign + value + suffix
     })

@@ -9,24 +9,24 @@ const RARITIES = {
 const LEVELS = ["Minor", "Moderate", "Major"]
 const VALUES = {
   positive: {
-    "Max Health": [25, 50, 100], "Max Stamina": [40, 80, 150], "Instant Healing": [25, 40, 75], "Delayed Healing": [30, 60, 120], Strength: [15, 30, 50], "Effect Duration": [30, 60, 100], "Effect Potency": [15, 30, 50], "Healing Rate": [15, 30, 50], Speed: [15, 30, 50], "Initial Potency": [75, 150, 250], Regeneration: [2, 7], "Stamina Regen": [1, 5], Reload: [-10, -25, -40], "View Distance": [15, 30, 50]
+    "Max Health": [25, 50, 100], "Max Stamina": [40, 80, 150], "Instant Healing": [25, 40, 75], "Delayed Healing": [30, 60, 120], Strength: [15, 30, 50], "Effect Duration": [30, 60, 100], "Effect Potency": [15, 30, 50], "Healing Rate": [15, 30, 50], Speed: [15, 30, 50], "Initial Decaying Boost": [75, 150, 250], Regeneration: [2, 7], "Stamina Regen": [1, 5], Reload: [-10, -25, -40], "View Distance": [15, 30, 50]
   },
   negative: {
-    "Max Health": [-25, -50, -75], "Max Stamina": [-20, -40, -60], "Instant Damage": [20, 40, 70], "Delayed Damage": [30, 60, 120], Strength: [-15, -30, -50], "Effect Duration": [-20, -40, -60], "Effect Potency": [-15, -30, -60], Speed: [-20, -40, -60], "Initial Potency": [-50, -100, -150], Regeneration: [-2, -5], "Stamina Regen": [-1, -4], Reload: [25, 50, 80], "View Distance": [-20, -40, -60]
+    "Max Health": [-25, -50, -75], "Max Stamina": [-20, -40, -60], "Instant Damage": [20, 40, 70], "Delayed Damage": [30, 60, 120], Strength: [-15, -30, -50], "Effect Duration": [-20, -40, -60], "Effect Potency": [-15, -30, -60], Speed: [-20, -40, -60], "Initial Decaying Boost": [-50, -100, -150], Regeneration: [-2, -5], "Stamina Regen": [-1, -4], Reload: [25, 50, 80], "View Distance": [-20, -40, -60]
   }
 }
 const COSTS = {
-  positive: { "Max Health": [2, 4, 7], "Max Stamina": [2, 4, 7], "Instant Healing": [3, 5, 8], "Delayed Healing": [2, 4, 7], Strength: [3, 5, 8], "Effect Duration": [2, 4, 7], "Effect Potency": [3, 5, 8], "Random Buff": [4], "Healing Rate": [2, 4, 7], "Poison Immunity": [6], "Nausea Immunity": [5], Speed: [3, 5, 8], "Initial Potency": [2, 4, 7], Regeneration: [4, 7], "Stamina Regen": [3, 6], Reload: [3, 5, 8], "View Distance": [2, 4, 6] },
-  negative: { "Max Health": [-2, -4, -7], "Max Stamina": [-2, -4, -7], "Instant Damage": [-3, -5, -8], "Delayed Damage": [-2, -4, -7], Strength: [-3, -5, -8], Nausea: [-6], Poison: [-10], "Effect Duration": [-2, -4, -7], "Effect Potency": [-3, -5, -8], "Random Debuff": [-5], Speed: [-3, -5, -8], "Initial Potency": [-2, -4, -7], Regeneration: [-4, -7], "Stamina Regen": [-3, -6], Reload: [-3, -5, -8], "View Distance": [-2, -4, -6] }
+  positive: { "Max Health": [2, 4, 7], "Max Stamina": [2, 4, 7], "Instant Healing": [3, 5, 8], "Delayed Healing": [2, 4, 7], Strength: [3, 5, 8], "Effect Duration": [2, 4, 7], "Effect Potency": [3, 5, 8], "Random Buff": [4], "Healing Rate": [2, 4, 7], "Poison Immunity": [6], "Nausea Immunity": [5], Speed: [3, 5, 8], "Initial Decaying Boost": [2, 4, 7], Regeneration: [4, 7], "Stamina Regen": [3, 6], Reload: [3, 5, 8], "View Distance": [2, 4, 6] },
+  negative: { "Max Health": [-2, -4, -7], "Max Stamina": [-2, -4, -7], "Instant Damage": [-3, -5, -8], "Delayed Damage": [-2, -4, -7], Strength: [-3, -5, -8], Nausea: [-6], Poison: [-10], "Effect Duration": [-2, -4, -7], "Effect Potency": [-3, -5, -8], "Random Debuff": [-5], Speed: [-3, -5, -8], "Initial Decaying Boost": [-2, -4, -7], Regeneration: [-4, -7], "Stamina Regen": [-3, -6], Reload: [-3, -5, -8], "View Distance": [-2, -4, -6] }
 }
 const BINARY = new Set(["Random Buff", "Poison Immunity", "Nausea Immunity", "Nausea", "Poison", "Random Debuff"])
 const POSITIVE_WEIGHTS = {
-  Offensive: { Strength: 10, Reload: 6, "Instant Healing": 2, Speed: 2, "Initial Potency": 2, "Effect Potency": 2 },
+  Offensive: { Strength: 10, Reload: 6, "Instant Healing": 2, Speed: 2, "Initial Decaying Boost": 2, "Effect Potency": 2 },
   Defensive: { "Max Health": 10, "Max Stamina": 2, "Poison Immunity": 4, "Nausea Immunity": 4, Regeneration: 3, "Delayed Healing": 2, "Healing Rate": 3 },
   Healing: { "Instant Healing": 5, "Delayed Healing": 4, "Healing Rate": 6, Regeneration: 6, "Max Health": 2, "Effect Duration": 2 },
-  Mobility: { Speed: 12, "Stamina Regen": 3, "Max Stamina": 3, "View Distance": 4, Reload: 5, "Initial Potency": 2 },
+  Mobility: { Speed: 12, "Stamina Regen": 3, "Max Stamina": 3, "View Distance": 4, Reload: 5, "Initial Decaying Boost": 2 },
   Stamina: { "Max Stamina": 5, "Stamina Regen": 5, Speed: 3, Reload: 3, "Delayed Healing": 5, "Effect Duration": 5 },
-  Utility: { "Effect Duration": 5, "Effect Potency": 5, "View Distance": 3, "Initial Potency": 6, "Random Buff": 3, "Poison Immunity": 3, "Nausea Immunity": 3 }
+  Utility: { "Effect Duration": 5, "Effect Potency": 5, "View Distance": 3, "Initial Decaying Boost": 6, "Random Buff": 3, "Poison Immunity": 3, "Nausea Immunity": 3 }
 }
 const NEGATIVE_WEIGHTS = {
   Offensive: { "Max Health": 3, "Max Stamina": 2, "Effect Duration": 2, Speed: 2, "Delayed Damage": 2, Regeneration: 1 },
@@ -34,7 +34,7 @@ const NEGATIVE_WEIGHTS = {
   Healing: { "Instant Damage": 2, "Delayed Damage": 2, "Effect Potency": 2, Speed: 2, "Max Stamina": 2 },
   Mobility: { "Max Health": 2, Speed: 2, "Stamina Regen": 2, "Max Stamina": 2, "Delayed Damage": 2 },
   Stamina: { "Max Health": 2, "Max Stamina": 2, Speed: 2, Reload: 2, "Instant Damage": 2 },
-  Utility: { "Effect Duration": 2, "Effect Potency": 2, "View Distance": 2, "Initial Potency": 2, "Random Debuff": 2, Nausea: 1, Poison: 1 }
+  Utility: { "Effect Duration": 2, "Effect Potency": 2, "View Distance": 2, "Initial Decaying Boost": 2, "Random Debuff": 2, Nausea: 1, Poison: 1 }
 }
 
 function hash(value) {
@@ -181,7 +181,7 @@ function effectTags(effects) {
   let tags = new Set()
   effects.forEach((effect) => {
     let name = effect.effect
-    if (["Strength", "Instant Damage", "Delayed Damage", "Reload", "Initial Potency"].indexOf(name) !== -1) tags.add("Offensive")
+    if (["Strength", "Instant Damage", "Delayed Damage", "Reload", "Initial Decaying Boost"].indexOf(name) !== -1) tags.add("Offensive")
     if (["Max Health", "Max Stamina", "Poison Immunity", "Nausea Immunity", "Regeneration"].indexOf(name) !== -1) tags.add("Defensive")
     if (["Instant Healing", "Delayed Healing", "Healing Rate", "Regeneration"].indexOf(name) !== -1) tags.add("Healing")
     if (["Speed", "View Distance"].indexOf(name) !== -1) tags.add("Mobility")

@@ -4053,10 +4053,10 @@ class Player extends BaseEntity {
   getActiveDrugEffect(name, applyModifiers = true) {
     if (!this.activeDrug || typeof this.activeDrug === "string") return 0
     let value = this.findDrugEffect(this.activeDrug.effects, name)
-    if (!applyModifiers || ["Effect Potency", "Initial Potency", "Effect Duration"].indexOf(name) !== -1) return value
+    if (!applyModifiers || ["Effect Potency", "Initial Decaying Boost", "Effect Duration"].indexOf(name) !== -1) return value
 
     let strength = this.findDrugEffect(this.activeDrug.effects, "Effect Potency")
-    let peak = this.findDrugEffect(this.activeDrug.effects, "Initial Potency")
+    let peak = this.findDrugEffect(this.activeDrug.effects, "Initial Decaying Boost")
     let remaining = Math.max(0, this.activeDrug.duration - ((this.game.timestamp - this.lastDrugConsumeTimestamp) / Constants.physicsTimeStep))
     let peakMultiplier = this.activeDrug.duration ? peak * remaining / this.activeDrug.duration : 0
     return value * (1 + strength / 100 + peakMultiplier / 100)

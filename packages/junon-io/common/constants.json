@@ -4267,7 +4267,7 @@
       "isDrugMaterial": true,
       "drugTint": "b405ff",
       "effects": {
-        "Initial Potency": 200,
+        "Initial Decaying Boost": 200,
         "Effect Potency": -80
       },
       "compatibility": {

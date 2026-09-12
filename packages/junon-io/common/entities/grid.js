@@ -797,7 +797,7 @@ class Grid {
 
     maxLength = maxLength || this.tileSize * this.ROW_COUNT // default is map width
 
-    if (x2 - x1 === 0) return obstacles
+    if (y2 - y1 === 0) return obstacles
 
     let slope = (y2 - y1) / (x2 - x1)
     let radian = Math.atan2(y2 - y1, x2 - x1)
@@ -825,7 +825,7 @@ class Grid {
     stepY = this.tileSize * directionY
     stepX = stepY / slope
     let stepDistance = Math.abs(stepX / Math.cos(radian))
-    let currRow = Math.floor(y1 / this.tileSize)
+    let currRow = Math.floor(x1 / this.tileSize)
     let maxYSteps = directionY === -1 ? currRow : this.ROW_COUNT - currRow
     let iteration = 0
     let extension = 0

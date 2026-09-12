@@ -1,3 +1,5 @@
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../../.env'), quiet: true })
+
 global.env = process.env.NODE_ENV || 'development'
 global.debugMode = env === 'development' ? true : false
 

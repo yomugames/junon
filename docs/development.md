@@ -57,6 +57,11 @@ such as `PORT`, `MATCHMAKER_PORT`, `REGION`, `NODE_NAME`, `IP_ADDRESS`, and
 `S3_BUCKET_NAME`. Sentry, Firebase, AWS, and production scaling require additional
 environment-specific credentials or metadata.
 
+The game server and matchmaker automatically load a root `.env` file before
+initializing configuration, including when their workspace scripts are run
+directly. Keep this file uncommitted. `direnv` remains useful when local setup
+requires `.envrc` shell logic beyond environment variables stored in `.env`.
+
 Do not invent placeholder production credentials to make local startup pass.
 Prefer focused tests for isolated code and report unavailable integrations.
 

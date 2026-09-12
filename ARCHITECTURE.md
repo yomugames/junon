@@ -100,6 +100,10 @@ Firebase, AWS, Sentry, DNS, and production host metadata are environment-specifi
 Development paths bypass or default some integrations; do not assume a successful
 local boot proves production integration behavior.
 
+The game server and matchmaker load the repository-root `.env` file at startup;
+the file is local-only and provides development configuration such as database
+credentials.
+
 ## Where to record change
 
 - Amend this file for package, dependency, contract, or runtime-topology changes.

@@ -95,10 +95,14 @@ new process globals require explicit justification in an execution plan.
 
 ## Runtime dependencies
 
-Local full-stack development requires Node.js 20.9.0, npm workspaces, and MySQL.
+Local full-stack development requires Node.js 26.4.0, npm workspaces, and MySQL.
 Firebase, AWS, Sentry, DNS, and production host metadata are environment-specific.
 Development paths bypass or default some integrations; do not assume a successful
 local boot proves production integration behavior.
+
+The game server and matchmaker load the repository-root `.env` file at startup;
+the file is local-only and provides development configuration such as database
+credentials.
 
 ## Where to record change
 

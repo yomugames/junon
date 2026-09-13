@@ -1,3 +1,5 @@
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../../.env'), quiet: true })
+
 global.env = process.env.NODE_ENV || 'development'
 global.pid = process.pid
 
@@ -60,6 +62,12 @@ global.i18n.init()
 global.appRoot = path.resolve(__dirname + '/../')
 
 debugMode = (env === 'development' || env === 'test') ? true : false
+
+// Firebase is an optional production integration. Local runs must not require
+// Application Default Credentials just because the machine has network access.
+if (debugMode && process.env.JUNON_USE_FIREBASE !== 'true') {
+  global.isOffline = true
+}
 
 if (debugMode) {
   let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
@@ -1127,7 +1135,22 @@ class Server {
     app.ws("/*", {
       maxPayloadLength: 16 * 1024 * 1024,
       idleTimeout: 120,
-      open: (ws, req) => {
+      upgrade: (res, req, context) => {
+        // ws.getRemoteAddress() is unreliable on this uWebSockets.js build -
+        // it returns an empty ArrayBuffer even when called synchronously in
+        // `open`, verified against v20.70.0. The HttpResponse's
+        // getRemoteAddress() still works correctly here, pre-upgrade, so
+        // capture it now and hand it to the WebSocket as user data; uWS
+        // merges that object's properties directly onto the resulting `ws`.
+        res.upgrade(
+          { remoteAddress: Helper.getSocketRemoteAddress(res) },
+          req.getHeader('sec-websocket-key'),
+          req.getHeader('sec-websocket-protocol'),
+          req.getHeader('sec-websocket-extensions'),
+          context
+        )
+      },
+      open: (ws) => {
         this.socketUtil.registerSocket(ws)
       },
       message: (ws, message, isBinary) => {

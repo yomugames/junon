@@ -2,15 +2,14 @@
 
 ## Prerequisites
 
-- Node.js 20.9.0 (declared by the root `.nvmrc`)
+- Node.js 26.4.0 (declared by the root `.nvmrc`)
 - npm with workspace support
 - MySQL for database-backed paths
 - system libraries required by native npm dependencies such as `sharp` and
   `uWebSockets.js`
 
-The `junon-io` and `junon-matchmaker` workspace `.nvmrc` files still declare
-Node.js 16.15.0. Treat them as legacy compatibility signals; use the root version
-for root workspace commands unless a package-specific regression requires Node 16.
+The workspace `.nvmrc` files match the root Node.js version, so workspace and
+root commands use the same runtime.
 
 ## Install and database setup
 
@@ -56,6 +55,16 @@ Runtime behavior depends on `NODE_ENV` and, depending on the service, variables
 such as `PORT`, `MATCHMAKER_PORT`, `REGION`, `NODE_NAME`, `IP_ADDRESS`, and
 `S3_BUCKET_NAME`. Sentry, Firebase, AWS, and production scaling require additional
 environment-specific credentials or metadata.
+
+The game server and matchmaker automatically load a root `.env` file before
+initializing configuration, including when their workspace scripts are run
+directly. Keep this file uncommitted. `direnv` remains useful when local setup
+requires `.envrc` shell logic beyond environment variables stored in `.env`.
+
+Firebase is disabled by default in `development` and `test`, so local startup
+does not need Google Application Default Credentials. To intentionally exercise
+Firebase in a credentialed local environment, set `JUNON_USE_FIREBASE=true` in
+your uncommitted `.env` file. Do not use that flag with placeholder credentials.
 
 Do not invent placeholder production credentials to make local startup pass.
 Prefer focused tests for isolated code and report unavailable integrations.

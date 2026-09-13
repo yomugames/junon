@@ -4,7 +4,7 @@ Junon.io is a co-op multiplayer survival game where your goal is to build your o
 
 Installation (linux)
 --------
-1. Install Node.js 20.9.0 (ideally using [nvm](https://github.com/nvm-sh/nvm) )
+1. Install Node.js 26.4.0 (ideally using [nvm](https://github.com/nvm-sh/nvm) )
 2. Install MySQL
 3. Install project dependencies
 

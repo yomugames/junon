@@ -1,10 +1,20 @@
-const admin = require('firebase-admin')
-const jwt = require('jsonwebtoken')
+const { applicationDefault, initializeApp } = require('firebase-admin/app')
+const { getAuth } = require('firebase-admin/auth')
+const { getDatabase } = require('firebase-admin/database')
 const Config = require("junon-common/config")
 const LOG = require('junon-common/logger')
 
+const admin = {
+  initializeApp,
+  credential: { applicationDefault },
+  database: getDatabase,
+  auth: getAuth
+}
+
 class FirebaseAdminHelper {
   static init() {
+    if (global.isOffline) return false
+
     if (!global.isFirebaseInitialized) {
       admin.initializeApp({
         credential: admin.credential.applicationDefault(),

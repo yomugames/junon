@@ -30,6 +30,16 @@ module.exports = {
     return klass
   },
   getSocketRemoteAddress(socket) {
+    // On WebSocket objects, getRemoteAddress() is unreliable on this
+    // uWebSockets.js build - it returns an empty ArrayBuffer even when
+    // called synchronously in the `open` handler (verified against
+    // v20.70.0). Callers relying on the WS remote address must instead
+    // capture it from the HttpResponse in the `upgrade` handler (where
+    // getRemoteAddress() still works) and hand it off as WebSocket user
+    // data, which uWS merges directly onto the socket as `remoteAddress`.
+    // Prefer that cached value here so we never touch the broken call.
+    if (socket.remoteAddress) return socket.remoteAddress
+
     let uint8Array = new Uint8Array(socket.getRemoteAddress())
     return [uint8Array[12], uint8Array[13], uint8Array[14], uint8Array[15]].join(".")
   },

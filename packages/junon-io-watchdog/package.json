@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.562.0",
-    "firebase-admin": "^8.12.1",
+    "firebase-admin": "^14.4.0",
     "junon-common": "*"
   },
   "author": "",

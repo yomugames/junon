@@ -2,15 +2,14 @@
 
 ## Prerequisites
 
-- Node.js 20.9.0 (declared by the root `.nvmrc`)
+- Node.js 26.4.0 (declared by the root `.nvmrc`)
 - npm with workspace support
 - MySQL for database-backed paths
 - system libraries required by native npm dependencies such as `sharp` and
   `uWebSockets.js`
 
-The `junon-io` and `junon-matchmaker` workspace `.nvmrc` files still declare
-Node.js 16.15.0. Treat them as legacy compatibility signals; use the root version
-for root workspace commands unless a package-specific regression requires Node 16.
+The workspace `.nvmrc` files match the root Node.js version, so workspace and
+root commands use the same runtime.
 
 ## Install and database setup
 

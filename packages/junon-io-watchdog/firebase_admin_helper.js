@@ -1,5 +1,12 @@
-const admin = require('firebase-admin')
+const { applicationDefault, initializeApp } = require('firebase-admin/app')
+const { getDatabase } = require('firebase-admin/database')
 const Config = require("junon-common/config")
+
+const admin = {
+  initializeApp,
+  credential: { applicationDefault },
+  database: getDatabase
+}
 
 class FirebaseAdminHelper {
   static init() {

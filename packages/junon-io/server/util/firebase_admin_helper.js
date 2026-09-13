@@ -1,6 +1,17 @@
-const admin = require('firebase-admin')
+const { applicationDefault, initializeApp } = require('firebase-admin/app')
+const { getAuth } = require('firebase-admin/auth')
+const { getDatabase, ServerValue } = require('firebase-admin/database')
 const Config = require("junon-common/config")
-const jwt = require('jsonwebtoken')
+
+const database = () => getDatabase()
+database.ServerValue = ServerValue
+
+const admin = {
+  initializeApp,
+  credential: { applicationDefault },
+  database,
+  auth: getAuth
+}
 
 class FirebaseAdminHelper {
   static init() {

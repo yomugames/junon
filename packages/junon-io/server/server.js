@@ -63,6 +63,12 @@ global.appRoot = path.resolve(__dirname + '/../')
 
 debugMode = (env === 'development' || env === 'test') ? true : false
 
+// Firebase is an optional production integration. Local runs must not require
+// Application Default Credentials just because the machine has network access.
+if (debugMode && process.env.JUNON_USE_FIREBASE !== 'true') {
+  global.isOffline = true
+}
+
 if (debugMode) {
   let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
   let protocolDirectory = nodeModulesPath + "/junon-common/protocol"

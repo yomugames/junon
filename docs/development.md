@@ -61,6 +61,11 @@ initializing configuration, including when their workspace scripts are run
 directly. Keep this file uncommitted. `direnv` remains useful when local setup
 requires `.envrc` shell logic beyond environment variables stored in `.env`.
 
+Firebase is disabled by default in `development` and `test`, so local startup
+does not need Google Application Default Credentials. To intentionally exercise
+Firebase in a credentialed local environment, set `JUNON_USE_FIREBASE=true` in
+your uncommitted `.env` file. Do not use that flag with placeholder credentials.
+
 Do not invent placeholder production credentials to make local startup pass.
 Prefer focused tests for isolated code and report unavailable integrations.
 

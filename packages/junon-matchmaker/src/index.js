@@ -3,6 +3,12 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../../../.e
 global.env = process.env.NODE_ENV || 'development'
 global.debugMode = env === 'development' ? true : false
 
+// Firebase is an optional production integration. Local runs must not require
+// Application Default Credentials just because the machine has network access.
+if (debugMode && process.env.JUNON_USE_FIREBASE !== 'true') {
+  global.isOffline = true
+}
+
 global.PLAYER_CAPACITY_PER_SECTOR = 5
 global.MAX_SECTORS_PER_SERVER = 8
 global.SERVER_COUNT_PER_NODE = env ==='staging' ? 2 : 4

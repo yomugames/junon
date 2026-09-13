@@ -13,6 +13,8 @@ const admin = {
 
 class FirebaseAdminHelper {
   static init() {
+    if (global.isOffline) return false
+
     if (!global.isFirebaseInitialized) {
       admin.initializeApp({
         credential: admin.credential.applicationDefault(),

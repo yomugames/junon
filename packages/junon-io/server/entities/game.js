@@ -884,6 +884,12 @@ class Game {
       }
     }
 
+    if (sectorData.metadata.timestamp) {
+      this.timestamp = sectorData.metadata.timestamp.toNumber()
+      this.hour = this.getHourFromTimestamp(this.timestamp)
+      this.isNight = this.hour < 6 || this.hour >= 18
+    }
+
     new Lobby(this, sectorData.metadata, sectorData.entities )
   }
 

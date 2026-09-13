@@ -250,7 +250,7 @@ class BaseBuilding extends BaseEntity {
       this.startConstruction(data.buildProgress)
     }
 
-    if (data.targets) {
+    if (data.hasOwnProperty("targets")) {
       this.targets = data.targets
     } else if (this.getDefaultTargets()) {
       this.targets = this.getDefaultTargets()
@@ -1664,7 +1664,7 @@ class BaseBuilding extends BaseEntity {
       this.clientMustDelete = true
       this.onStateChanged("clientMustDelete")
     }
-
+    
     this.removeStorageItems()
     this.invalidateRailFlowFields()
 

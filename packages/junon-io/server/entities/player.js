@@ -60,6 +60,7 @@ class Player extends BaseEntity {
     this.sessionId = socket.sessionId
     this.remoteAddress = Helper.getSocketRemoteAddress(socket)
     this.fingerprint = data.fingerprint
+    this.cameraZoom = 1
 
     if (this.sector.isZoomAllowed()) {
       this.screenWidth = this.socket.screenWidth
@@ -264,6 +265,17 @@ class Player extends BaseEntity {
   applyNonZoomScreenDimensions() {
     this.screenWidth  = Constants.tileSize * 40
     this.screenHeight = Constants.tileSize * 24
+  }
+
+  setCameraZoom(zoom) {
+    if (zoom <= 0) return
+
+    this.cameraZoom = Math.min(15, Math.max(zoom, 0.01))
+    this.getSocketUtil().emit(this.socket, "Zoom", { level: this.cameraZoom })
+  }
+
+  getCameraZoom() {
+    return this.cameraZoom
   }
 
   async queryBalance() {
@@ -627,9 +639,27 @@ class Player extends BaseEntity {
     if (data.effects) {
       for (let effectName in data.effects) {
         let level = data.effects[effectName]
-        if (level) {
+        if (level && effectName !== "addiction") {
           this.setEffectLevel(effectName, level)
         }
+      }
+    }
+
+    this.addictionLevel = data.addictionLevel || 0
+    let addictionLevel = data.effects && data.effects.addiction || 0
+    if (addictionLevel) {
+      this.addictionLevel = Math.max(this.addictionLevel, addictionLevel)
+      this.setAddictionEffect(addictionLevel)
+      if (data.addictionCreatedAt) {
+        this.setEffectCreatedAt("addiction", data.addictionCreatedAt)
+      }
+    }
+    if (data.activeDrugJson) {
+      try {
+        this.activeDrug = JSON.parse(data.activeDrugJson)
+        this.lastDrugConsumeTimestamp = data.lastDrugConsumeTimestamp
+      } catch (error) {
+        this.activeDrug = null
       }
     }
 
@@ -656,6 +686,9 @@ class Player extends BaseEntity {
 
   isImmuneTo(category) {
     if (this.isDestroyed() && category === 'miasma') return true
+
+    if (category === "poison" && this.getActiveDrugEffect("Poison Immunity", false)) return true
+    if (category === "drunk" && this.getActiveDrugEffect("Nausea Immunity", false)) return true
 
     return super.isImmuneTo(category)
   }
@@ -2014,8 +2047,10 @@ class Player extends BaseEntity {
 
   craft(data) {
     const storage = this.getStorage(data.storageId)
+    const craftingStorage = data.sourceStorageId ? this.getStorage(data.sourceStorageId) : storage
     if (storage.hasCategory("power_consumer") && !storage.isPowered) return
     if (!storage.isCraftingStorage()) return
+    if (!craftingStorage || !craftingStorage.canCraft(data.type)) return
     if (storage.isFull(data.type)) {
       this.showError("Inventory Full")
       return
@@ -2075,6 +2110,8 @@ class Player extends BaseEntity {
     // remember what client has created, so we only send deltas instead of full object json
     this.clientState = {
       buildings: {},
+      players: {},
+      mobs: {},
       chunkRegionPaths: {}
     }
   }
@@ -2939,6 +2976,7 @@ class Player extends BaseEntity {
 
   getDeltaJson(group, collection) {
     let result = {}
+    this.clientState[group] = this.clientState[group] || {}
 
     for (let id in collection) {
       let entity = collection[id]
@@ -3631,6 +3669,7 @@ class Player extends BaseEntity {
     }
 
     this.consumeDrug()
+    this.consumeAddiction()
     this.consumeItem()
     this.consumeFood()
     this.consumeFire()
@@ -3881,11 +3920,211 @@ class Player extends BaseEntity {
   consumeDrug() {
     if (!this.activeDrug) return
 
-    let drugInterval = Constants.physicsTimeStep * 8 // 8 seconds
+    let drugDuration = typeof this.activeDrug === "string" ? 8 : this.activeDrug.duration
+    let drugInterval = Constants.physicsTimeStep * drugDuration
     let drugIntervalReached = (this.game.timestamp - this.lastDrugConsumeTimestamp) > drugInterval
     if (drugIntervalReached) {
+      let delayedHealing = this.getActiveDrugEffect("Delayed Healing", false)
+      let delayedDamage = this.getActiveDrugEffect("Delayed Damage", false)
+      if (delayedHealing && !delayedDamage) this.setHealth(this.health + delayedHealing)
+      if (delayedDamage && !delayedHealing) this.setHealth(this.health - delayedDamage)
+      if (delayedDamage && delayedHealing) this.setHealth(this.health + delayedHealing - delayedDamage)
+      if (typeof this.activeDrug !== "string" && this.activeDrug.nauseaApplied) this.removeEffect("drunk")
+      if (typeof this.activeDrug !== "string" && this.activeDrug.poisonApplied) this.removeEffect("poison")
+      if (typeof this.activeDrug !== "string") this.removeEffect("drug")
       this.removeActiveDrug()
+      this.updateDrugMaximums()
+      this.updateDrugCameraZoom()
+      this.startAddiction()
+      return
     }
+
+    if (this.game.timestamp % Constants.physicsTimeStep === 0) {
+      let regeneration = this.getActiveDrugEffect("Regeneration")
+      let staminaRegen = this.getActiveDrugEffect("Stamina Regen")
+      if (regeneration) this.setHealth(this.health + regeneration)
+      if (staminaRegen) this.setStamina(this.stamina + staminaRegen)
+      this.updateDrugMaximums()
+      this.updateDrugCameraZoom()
+    }
+  }
+
+  activateDrug(item) {
+    this.removeAddiction()
+
+    let instance = item.instance || item
+    let effects = instance.effects
+    if (!effects && instance.effectsJson) {
+      try {
+        effects = JSON.parse(instance.effectsJson)
+      } catch (error) {
+        effects = []
+      }
+    }
+
+    effects = Array.isArray(effects) ? effects : Object.keys(effects || {}).map((effect) => {
+      return { effect: effect, value: effects[effect] }
+    })
+    effects = this.resolveDrugRandomEffects(effects)
+
+    let duration = instance.duration
+    if (!duration) {
+      let durationModifier = this.findDrugEffect(effects, "Effect Duration")
+      duration = 60 * (1 + (durationModifier || 0) / 100)
+    }
+
+    this.activeDrug = { effects: effects, duration: duration, nauseaApplied: false, poisonApplied: false }
+    this.lastDrugConsumeTimestamp = this.game.timestamp
+    let instantHealing = this.getActiveDrugEffect("Instant Healing", false)
+    let instantDamage = this.getActiveDrugEffect("Instant Damage", false)
+    if (instantHealing || instantDamage) this.setHealth(this.health + instantHealing - instantDamage)
+    this.updateDrugMaximums()
+    this.updateDrugCameraZoom()
+    this.setEffectLevel("drug", 1)
+
+    if (this.getActiveDrugEffect("Poison Immunity", false)) this.removeEffect("poison")
+    if (this.getActiveDrugEffect("Nausea Immunity", false)) this.removeEffect("drunk")
+
+    if (this.getActiveDrugEffect("Nausea", false) && !this.isImmuneTo("drunk")) {
+      this.setEffectLevel("drunk", 1)
+      this.activeDrug.nauseaApplied = true
+    }
+
+    if (this.getActiveDrugEffect("Poison", false) && !this.isImmuneTo("poison")) {
+      this.setEffectLevel("poison", 1)
+      this.activeDrug.poisonApplied = true
+    }
+  }
+
+  resolveDrugRandomEffects(effects) {
+    return effects.reduce((resolved, effect) => {
+      let name = typeof effect === "string" ? effect : effect.effect || effect.name || effect.type
+      if (name !== "Random Buff" && name !== "Random Debuff") {
+        resolved.push(effect)
+        return resolved
+      }
+
+      let pool = name === "Random Buff" ? this.getRandomDrugBuffPool() : this.getRandomDrugDebuffPool()
+      let selected = pool[Math.floor(Math.random() * pool.length)]
+      let multiplier = typeof effect === "object" && typeof effect.value === "number" ? effect.value : 1
+      resolved.push({ effect: selected.effect, value: selected.value * multiplier })
+      return resolved
+    }, [])
+  }
+
+  getRandomDrugBuffPool() {
+    return [
+      { effect: "Max Health", value: 75 },
+      { effect: "Max Stamina", value: 100 },
+      { effect: "Strength", value: 40 },
+      { effect: "Speed", value: 40 },
+      { effect: "Healing Rate", value: 50 },
+      { effect: "Regeneration", value: 8 },
+      { effect: "Stamina Regen", value: 5 }
+    ]
+  }
+
+  getRandomDrugDebuffPool() {
+    return [
+      { effect: "Max Health", value: -30 },
+      { effect: "Max Stamina", value: -30 },
+      { effect: "Strength", value: -20 },
+      { effect: "Speed", value: -20 },
+      { effect: "Reload", value: -20 },
+      { effect: "Stamina Regen", value: -2 }
+    ]
+  }
+
+  findDrugEffect(effects, name) {
+    if (!Array.isArray(effects)) return 0
+    let effect = effects.find((entry) => {
+      if (typeof entry === "string") return entry === name
+      if (!entry || typeof entry !== "object") return false
+      return (entry.effect || entry.name || entry.type) === name
+    })
+    if (typeof effect === "string") return 1
+    if (typeof effect === "number") return effect
+    if (!effect) return 0
+    if (typeof effect.value === "number") return effect.value
+    if (typeof effect.amount === "number") return effect.amount
+    return typeof effect[name] === "number" ? effect[name] : 0
+  }
+
+  getActiveDrugEffect(name, applyModifiers = true) {
+    if (!this.activeDrug || typeof this.activeDrug === "string") return 0
+    let value = this.findDrugEffect(this.activeDrug.effects, name)
+    if (!applyModifiers || ["Effect Potency", "Initial Decaying Boost", "Effect Duration"].indexOf(name) !== -1) return value
+
+    let strength = this.findDrugEffect(this.activeDrug.effects, "Effect Potency")
+    let peak = this.findDrugEffect(this.activeDrug.effects, "Initial Decaying Boost")
+    let remaining = Math.max(0, this.activeDrug.duration - ((this.game.timestamp - this.lastDrugConsumeTimestamp) / Constants.physicsTimeStep))
+    let peakMultiplier = this.activeDrug.duration ? peak * remaining / this.activeDrug.duration : 0
+    return value * (1 + strength / 100 + peakMultiplier / 100)
+  }
+
+  updateDrugCameraZoom() {
+    let viewDistance = 0
+    if (this.activeDrug && typeof this.activeDrug !== "string") {
+      viewDistance = this.getActiveDrugEffect("View Distance")
+    }
+    this.setCameraZoom(Math.max(0.01, 1 + viewDistance / 100))
+  }
+
+  startAddiction() {
+    this.addictionLevel = (this.addictionLevel || 0) + 1
+    this.setAddictionEffect(this.addictionLevel)
+  }
+
+  setAddictionEffect(level) {
+    if (!level) return
+
+    if (!this.effects) this.effects = {}
+    let hadAddiction = this.getEffectLevel("addiction") > 0
+    this.effects.addiction = level
+    if (!hadAddiction) {
+      this.setEffectCreatedAt("addiction", this.game.timestamp)
+      this.onEffectAdded("addiction")
+    } else {
+      this.onEffectLevelChanged("addiction", level)
+    }
+  }
+
+  removeAddiction() {
+    if (!this.effects || !this.getEffectLevel("addiction")) return
+
+    this.effects.addiction = 0
+    this.unsetEffectCreatedAt("addiction")
+    this.onEffectRemoved("addiction")
+  }
+
+  consumeAddiction() {
+    if (!this.getEffectLevel("addiction")) return
+
+    const isHungerInterval = this.game.timestamp % (Constants.physicsTimeStep * this.getHungerReduceInterval()) === 0
+    if (!isHungerInterval) return
+
+    const duration = this.addictionLevel * 60 * Constants.physicsTimeStep
+    const elapsed = this.game.timestamp - this.getEffectCreatedAt("addiction")
+    if (elapsed >= duration) {
+      this.removeAddiction()
+      this.addictionLevel = 0
+      return
+    }
+
+    this.setHealth(this.health - 2)
+  }
+
+  getDrugPercentageModifier(name) {
+    return 1 + this.getActiveDrugEffect(name) / 100
+  }
+
+  updateDrugMaximums() {
+    this.maxHealth = Math.round(this.getMaxHealth())
+    this.maxStamina = Math.round(this.getMaxStamina())
+    this.setHealth(this.health)
+    this.setStamina(this.stamina)
+    this.onStateChanged("maxHealth")
+    this.onStateChanged("maxStamina")
   }
 
   consumeItem() {
@@ -3923,7 +4162,7 @@ class Player extends BaseEntity {
     } else {
       if (this.activeFood.isFood()) {
         let foodValue = activeFoodKlass.prototype.getFoodValue()
-        let foodValuePerIncrement = Math.floor(foodValue / foodUsageIterationCount)
+        let foodValuePerIncrement = activeFoodKlass.prototype.getHealingValue()
 
         this.setHealth(this.getHealth() + foodValuePerIncrement)
       }
@@ -4196,7 +4435,8 @@ class Player extends BaseEntity {
     }
 
     if (this.game.isHardcore()) {
-      let notAllowedList = ["Atm"]
+      // let notAllowedList = ["Atm"]
+      let notAllowedList = []
       if (notAllowedList.indexOf(buildingKlass.name) !== -1) {
         return false
       }
@@ -5619,7 +5859,7 @@ class Player extends BaseEntity {
       multiplier -= 0.5
     }
 
-    return multiplier
+    return multiplier * this.getDrugPercentageModifier("Strength")
   }
 
   chat(data) {
@@ -5977,7 +6217,7 @@ class Player extends BaseEntity {
   }
 
   getMaxViewDistance() {
-    return this.viewDistance || Constants.fovViewDistance
+    return this.viewDistance || this.getFov() || Constants.fovViewDistance
   }
 
   setViewDistance(distance) {
@@ -6056,6 +6296,12 @@ Object.assign(Player.prototype, Movable.prototype, {
   getSpeed() {
     let speed = this.speed ? this.speed : Constants.Player.speed
 
+    const handEquipment = this.getHandEquipment()
+    const speedBonus = handEquipment && handEquipment.getConstants().stats.speedBonus
+    if (typeof speedBonus === "number") {
+      speed += speedBonus
+    }
+
     // apply buffs
 
     if (this.mounted && Protocol.definition().MobType[this.mounted.type] == "BioRaptor") {
@@ -6077,7 +6323,7 @@ Object.assign(Player.prototype, Movable.prototype, {
 
     speed = this.isLowStatus("stamina") ? speed / 2 : speed
 
-    return speed * Constants.globalSpeedMultiplier
+    return speed * this.getDrugPercentageModifier("Speed") * Constants.globalSpeedMultiplier
   },
   getTargetVelocityFromControls(controlKeys) {
     return this.getVelocityFromControls(controlKeys, this.getSpeed())
@@ -6238,14 +6484,35 @@ Object.assign(Player.prototype, Destroyable.prototype, {
 
     this.onStateChanged("health")
   },
+  setHealth(newHealth) {
+    if (newHealth > this.health) {
+      let healing = newHealth - this.health
+      newHealth = this.health + healing * this.getDrugPercentageModifier("Healing Rate")
+    }
+
+    Destroyable.prototype.setHealth.call(this, Math.round(newHealth))
+  },
   getMaxHealth() {
+    let maxHealth
     if (this.sector) {
       if (this.sector.entityCustomStats[this.id]) {
-        return this.sector.entityCustomStats[this.id].health
+        maxHealth = this.sector.entityCustomStats[this.id].health
       }
     }
 
-    return 100
+    maxHealth = maxHealth || 100
+    return Math.round(maxHealth * this.getDrugPercentageModifier("Max Health"))
+  },
+  getFov() {
+    let fov
+    if (this.sector) {
+      if (this.sector.entityCustomStats[this.id]) {
+        fov = this.sector.entityCustomStats[this.id].fov
+      }
+    }
+
+    fov = fov || Constants.fovViewDistance
+    return fov
   }
 })
 
@@ -6293,8 +6560,8 @@ Object.assign(Player.prototype, Needs.prototype, {
     this.game.triggerEvent("HungerChanged", data)
   },
   getMaxStamina() {
-    if (this.game.isPvP()) return 300
-    return Constants.Player.stamina
+    let maxStamina = this.game.isPvP() ? 300 : Constants.Player.stamina
+    return Math.round(maxStamina * this.getDrugPercentageModifier("Max Stamina"))
   },
   getMaxOxygen() {
     const armor = this.getArmorEquip()
@@ -6305,7 +6572,7 @@ Object.assign(Player.prototype, Needs.prototype, {
     }
   },
   onHungerZero() {
-    this.setHealth(this.health - 2)
+    this.setHealth(this.health - 5)
   }
 })
 

@@ -156,6 +156,11 @@ class BaseProjectile extends BaseEntity {
 
 
   remove() {
+    let currentChunk = this.getChunk()
+    if (currentChunk) {
+      this.chunksTraversed[currentChunk.id] = currentChunk
+    }
+
     super.remove()
     this.removeListeners()
     this.unregister()

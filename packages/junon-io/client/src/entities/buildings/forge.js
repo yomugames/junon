@@ -10,7 +10,7 @@ class Forge extends BaseBuilding {
   }
 
   openMenu() {
-    const templateList = [Equipments.SquidStaff, Equipments.PlasmaGun, Equipments.PlasmaBlade, Equipments.BlueEnergySword, Equipments.GreenEnergySword, Equipments.RedEnergySword, Equipments.SpaceSuit, Equipments.CombatArmor, Equipments.ImperialSpecialForcesArmor, Equipments.HazmatSuit, Equipments.PrisonerSuit, Equipments.PoliceSuit, Equipments.LabCoat, Equipments.CultistSuit]
+    const templateList = [Equipments.PowerDrill, Equipments.SquidStaff, Equipments.PlasmaGun, Equipments.PlasmaBlade, Equipments.BlueEnergySword, Equipments.GreenEnergySword, Equipments.RedEnergySword, Equipments.FusionSword, Equipments.SpaceSuit, Equipments.CombatArmor, Equipments.ImperialSpecialForcesArmor, Equipments.HazmatSuit, Equipments.PrisonerSuit, Equipments.PoliceSuit, Equipments.LabCoat, Equipments.CultistSuit]
 
     let options = {}
     if (!this.isPowered) {

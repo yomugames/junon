@@ -13,7 +13,7 @@ class BaseEquipment extends BaseEntity {
     this.user   = data.user
     this.content = data.instance ? data.instance.content : null
 
-    if (!this.getConstants().sprite) {
+    if (!this.getConstants().sprite || !this.getConstants().sprite.position && this.getConstants().isFireArm) {
       // if we dont have custom sprite positioning in constants.json
       this.repositionSprite()
     }
@@ -37,7 +37,7 @@ class BaseEquipment extends BaseEntity {
   }
 
   shouldShowUsage() {
-    return this.getConstants().shouldShowUsage
+    return this.getConstants().shouldShowUsage !== false
   }
 
   syncWithServer(data) {

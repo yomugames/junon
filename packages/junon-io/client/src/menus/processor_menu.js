@@ -1,6 +1,7 @@
 const SocketUtil = require("./../util/socket_util")
 const BaseMenu = require("./base_menu")
 const Item = require("./../entities/item")
+const Constants = require("./../../../common/constants.json")
 
 class ProcessorMenu extends BaseMenu {
   onMenuConstructed() {
@@ -20,8 +21,14 @@ class ProcessorMenu extends BaseMenu {
     super.close()
   }
 
-  onInventoryClick(event) {
-    this.retrieveInventorySlot(event)
+  onInventoryMouseUp(event) {
+    if (this.game.holdItemInventorySlot) return
+    const storageId = event.target.closest(".storage").dataset.storageId
+    if (parseInt(storageId) === Constants.inventoryStorageId) {
+      this.storeInventorySlot(event)
+    } else {
+      this.retrieveInventorySlot(event)
+    }
   }
 
   onInventoryChanged(data) {
@@ -35,7 +42,11 @@ class ProcessorMenu extends BaseMenu {
   updateStorageInventory(data) {
     super.updateStorageInventory(data)
 
-    if (this.progressBar) {
+    const isProcessorStorage = data.id === this.storageId
+    const entity = isProcessorStorage && this.storageId ? this.game.sector.getEntity(this.storageId) : null
+    if (entity && typeof entity.setInputStorage === "function" && data.inventory) entity.setInputStorage(data.inventory.storage)
+
+    if (isProcessorStorage && this.progressBar && typeof data.progress === "number") {
       const progressWidth =
         (data.progress / 100) * this.getProgressMaxWidth()
       this.progressBar.style.width = progressWidth + "px"
@@ -50,6 +61,10 @@ class ProcessorMenu extends BaseMenu {
     super.open()
   }
 
+  setDescription(description) {
+    this.el.querySelector(".menu_description").innerText = i18n.t(description)
+  }
+
   open(header, entity, description, shouldHideInput = false, footer = "", options = {}) {
     this.cleanup()
 
@@ -62,9 +77,12 @@ class ProcessorMenu extends BaseMenu {
       this.el.classList.remove("processor_output_only")
     }
 
-    // headers / text
+    Array.from(this.el.querySelectorAll(".input_inventory")).forEach((inputSlot) => {
+      inputSlot.style.display = shouldHideInput ? "none" : "inline-block"
+    })
+    this.el.querySelector(".processor_storage").dataset.storageId = this.storageId
     this.el.querySelector(".menu_main_header").innerText = i18n.t(header)
-    this.el.querySelector(".menu_description").innerText = i18n.t(description)
+    this.setDescription(description)
 
     if (options.disabled) {
       this.isDisabled = true
@@ -94,7 +112,6 @@ class ProcessorMenu extends BaseMenu {
 
       storageDiv.appendChild(slot)
       this.initInventorySlotListener(slot)
-      slot.addEventListener("click", this.onInventoryClick.bind(this), true)
 
       // insert progress bar between last input and output
       if (i === outputIndex - 1) {
@@ -124,6 +141,10 @@ class ProcessorMenu extends BaseMenu {
 
   cleanup() {
     const storageDiv = this.el.querySelector(".processor_storage")
+    const thermalControls = this.el.querySelector(".thermal_processor_controls")
+    if (thermalControls) {
+      thermalControls.remove()
+    }
     storageDiv.dataset.storageId = ""
     this.storageId = null
 

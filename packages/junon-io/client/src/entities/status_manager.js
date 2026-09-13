@@ -8,7 +8,7 @@ class StatusManager {
 
     this.statusSprites = {}
     this.statuses = {}
-    this.STATUS_EFFECT_LIST = ["poison", "oxygen", "hunger", "thirst", "stamina", "fear", "rage", "paralyze", "drunk", "miasma"]
+    this.STATUS_EFFECT_LIST = ["poison", "oxygen", "hunger", "thirst", "stamina", "fear", "rage", "paralyze", "drunk", "miasma", "drug", "addiction"]
 
     this.createStatusContainer()
   }

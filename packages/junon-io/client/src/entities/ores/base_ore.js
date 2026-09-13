@@ -42,8 +42,9 @@ class BaseOre extends BaseEntity {
 
   repositionSprite() {
     this.sprite.anchor.set(0)
-    this.sprite.position.x = 40
-    this.sprite.position.y = 10
+    const position = this.getConstants().sprite && this.getConstants().sprite.position
+    this.sprite.position.x = position ? position.x : 40
+    this.sprite.position.y = position ? position.y : 10
   }
 
   static build(game, data) {
@@ -52,6 +53,10 @@ class BaseOre extends BaseEntity {
 
   getType() {
     throw new Error("must implement BaseOre.getType")
+  }
+
+  getChildIndex() {
+    return 0
   }
 
 }

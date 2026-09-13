@@ -23,7 +23,7 @@ class SolarPanel extends BaseBuilding {
 
   getResourceProduction(name) {
     let production = super.getResourceProduction(name)
-    return name === "power" && this.game.isNight ? 2 * -production : production
+    return name === "power" && this.game.isNight && this.sector.hasShadowsEnabled() && !this.sector.isTutorial() ? 2 * -production : production
   }
 
   getType() {

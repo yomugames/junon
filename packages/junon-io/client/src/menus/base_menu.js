@@ -432,7 +432,8 @@ class BaseMenu {
       if (notAllowedList.indexOf(type) !== -1) {
         return false
       }
-    } else if (this.game.isHardcore() || this.game.isPeaceful()) {
+    // } else if (this.game.isHardcore() || this.game.isPeaceful()) {
+    } else if (this.game.isPeaceful()) {
       let notAllowedList = ["Atm"]
       notAllowedList = notAllowedList.map((name) => {
         return Protocol.definition().BuildingType[name]
@@ -592,7 +593,7 @@ class BaseMenu {
   storeInventorySlot(e) {
     if (this.game.isDragging) return
     if (this.game.main.isMobile) return
-    if (!this.game.storageMenu.isOpen()) return
+    if (!this.isOpen()) return
 
     if (this.game.isHoldItemDeletedRecently) {
       this.game.isHoldItemDeletedRecently = false

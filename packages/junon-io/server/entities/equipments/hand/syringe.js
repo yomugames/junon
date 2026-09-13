@@ -1,46 +1,49 @@
-const HandEquipment = require("./hand_equipment")
+const MeleeEquipment = require("./melee_equipment")
 
 const Protocol = require('../../../../common/util/protocol')
 const Constants = require("./../../../../common/constants.json")
 const Drainable = require("./../../../../common/interfaces/drainable")
 
-class Syringe extends HandEquipment {
+class Syringe extends MeleeEquipment {
 
   onEquipmentConstructed() {
-    this.initDrainable()
+    this.initDrainable(0)
   }
 
-  use(player, targetEntity) {
-//     super.use(player, targetEntity)
-// 
-//     if (this.isFull()) {
-//       this.inject(targetEntity)
-//     } else {
-//       this.draw(targetEntity)
-//     }
+  use(player, targetEntity, options = {}) {
+    const item = options.item || this.item
+    const instance = item && item.instance
+    if (!instance || instance.usage <= 0 || (!instance.effects && !instance.effectsJson)) return false
+
+    player.activateDrug(item)
+    return true
   }
 
-  inject(entity) {
-    if (!entity.isInjectable()) return
-
-    let sample = this.drainSample()
-    this.applySample(sample, entity)
+  isConsumable() {
+    return true
   }
 
-  applySample(sample, entity) {
-    if (entity.isInjectableContainer()) {
-      entity.setContent(sample)
-      return
-    }
+  // inject(entity) {
+  //   if (!entity.isInjectable()) return
 
-    switch(sample) {
-      case "Player":
-        entity.setHealth(entity.health + 5)
-        break
-      default:
-        // nothing
-    }
-  }
+  //   let sample = this.drainSample()
+  //   this.applySample(sample, entity)
+  // }
+
+  // applySample(sample, entity) {
+  //   if (entity.isInjectableContainer()) {
+  //     entity.setContent(sample)
+  //     return
+  //   }
+
+  //   switch(sample) {
+  //     case "Player":
+  //       entity.setHealth(entity.health + 5)
+  //       break
+  //     default:
+  //       // nothing
+  //   }
+  // }
 
   drainSample() {
     let sample = this.getContent()

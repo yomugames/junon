@@ -43,6 +43,10 @@ message Building {
   uint32 nameColor = 39;
   uint32 nameSize = 40;
   map<string,uint32> prices = 41;
+  string drugTint = 42;
+  bool isHeating = 43;
+  uint32 heatingIntensity = 44;
+  string drugEffectsJson = 45;
 }
 
 message Mob {

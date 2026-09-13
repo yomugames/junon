@@ -433,7 +433,11 @@ initSettings(entities) {
       }
     }
 
-    return true
+    return this.settings['isCraftingEnabled']
+  }
+
+  hasShadowsEnabled() {
+    return this.settings['isShadowsEnabled']
   }
 
   hasInfiniteAmmo() {
@@ -540,7 +544,7 @@ initSettings(entities) {
   }
 
   initDefaultSellables() {
-    let itemKlasses = [Ores.Sand, Ores.Wood, Buildings.CoffeeSeed, Buildings.WheatSeed, Buildings.PotatoSeed, Buildings.SunflowerSeed, Buildings.BlueSeed, Buildings.PoppySeed,Buildings.PumpkinSeed,Buildings.RiceSeed, Foods.Starberries, Foods.Fish, Mobs.Chicken, Mobs.Monkey, Mobs.Cat, Mobs.CleanBot, Mobs.Car, Equipments.CombatArmor, Equipments.SantaHat, Equipments.NameTag]
+    let itemKlasses = [Ores.Sand, Ores.Wood, Buildings.CoffeeSeed, Buildings.WheatSeed, Buildings.PotatoSeed, Buildings.SunflowerSeed, Buildings.BlueSeed, Buildings.PoppySeed,Buildings.PumpkinSeed,Buildings.RiceSeed, Buildings.Sapling, Foods.Starberries, Foods.Fish, Mobs.Chicken, Mobs.Monkey, Mobs.Cat, Mobs.CleanBot, Mobs.Car, Equipments.CombatArmor, Equipments.SantaHat, Equipments.NameTag]
     itemKlasses.forEach((klass) => {
       let group = klass.prototype.isMob() ? "mob" : "item"
       this.sellables[klass.prototype.getTypeName()] = { group: group, type: klass.prototype.getType(), cost: klass.getCost() }

@@ -34,6 +34,12 @@ class SurvivalTool extends MeleeEquipment {
       return false
     }
 
+    if (targetEntity.hasCategory("vending_machine") &&
+        !player.isSectorOwner() &&
+        !player.canAccessStorage(targetEntity)) {
+      return false
+    }
+
     let regionBuildPermission = player.getRegionBuildPermission(targetEntity.getX(),
                                                                 targetEntity.getY(),
                                                                 targetEntity.getRotatedWidth(),
@@ -59,6 +65,10 @@ class SurvivalTool extends MeleeEquipment {
     return 1
   }
 
+  getMiningLevel() {
+    return this.getConstants().stats.miningLevel
+  }
+
   hasMiningPrivilege(player) {
     if (player.sector.isLobby()) return true
     if (!player.getTeam()) return false
@@ -71,18 +81,31 @@ class SurvivalTool extends MeleeEquipment {
       player.showError("You dont have permission to mine asteroids")
       return
     }
+    let asteroidLevel = targetEntity.getConstants().requiredLevel
+    let toolLevel = this.getMiningLevel()
+    if (asteroidLevel && toolLevel < asteroidLevel) {
+      player.showError("You need a stronger tool to mine this")
+      return
+    }
 
-    targetEntity.damage(this.getDrillRate(), player)
+    targetEntity.setLastMinedHealth(targetEntity.health)
+
+    if (targetEntity.getConstants().defense) {
+      targetEntity.damage(this.getDrillRate() - targetEntity.getConstants().defense, player)
+    } else {
+      targetEntity.damage(this.getDrillRate(), player)
+    }
 
     // // extract every 3 times
     let increment = 5
     if (targetEntity.getLastMinedHealth() - targetEntity.getHealth() < increment) return
 
+    let dropCount = Math.max(1,Math.floor((targetEntity.getLastMinedHealth() - targetEntity.getHealth()) / increment))
     targetEntity.setLastMinedHealth(targetEntity.health)
 
     let dropType = targetEntity.getDropType()
 
-    let item = targetEntity.sector.createItem(dropType, {count: increment * this.sector.miningSpeed })
+    let item = targetEntity.sector.createItem(dropType, {count: increment * dropCount * this.sector.miningSpeed })
     let isStoredSuccessfully = player.inventory.store(item, Constants.regularInventoryBaseIndex)
     if (!isStoredSuccessfully) {
       isStoredSuccessfully = player.inventory.store(item, Constants.quickInventoryBaseIndex)
@@ -96,7 +119,7 @@ class SurvivalTool extends MeleeEquipment {
         player: player.getName(),
         remaining: targetEntity.health
       })
-      this.getSocketUtil().emit(player.getSocket(), "GainResource", { amount: increment * this.sector.miningSpeed, type: dropType })
+      this.getSocketUtil().emit(player.getSocket(), "GainResource", { amount: increment * dropCount * this.sector.miningSpeed, type: dropType })
     }
   }
 

@@ -28,6 +28,7 @@ Projectiles.Dynamite = require("./dynamite")
 Projectiles.MinigunBullet = require("./minigun_bullet")
 Projectiles.ShockGrenade = require("./shock_grenade")
 Projectiles.Shockwave = require("./shockwave")
+Projectiles.MiasmaBullet = require("./miasma_bullet")
 
 Projectiles.forType = (type) => {
   const klassName = Helper.getProjectileNameById(type) 

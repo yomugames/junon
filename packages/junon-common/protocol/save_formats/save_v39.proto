@@ -168,6 +168,11 @@ message Building {
   uint32 nameColor = 28;
   uint32 nameSize = 29;
   map<string,uint32> prices = 30;
+  uint32 targets = 31;
+  string drugEffectsJson = 32;
+  string drugTint = 33;
+  bool isHeating = 34;
+  uint32 heatingIntensity = 35;
 }
 
 message RaidRef {
@@ -212,6 +217,9 @@ message Pickup {
 message ItemInstance {
   uint32 usage = 1;
   string content = 2;
+  string effectsJson = 3;
+  string drugTint = 4;
+  double duration = 5;
 }
 
 message Mob {

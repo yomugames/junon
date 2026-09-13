@@ -182,9 +182,21 @@ class Corpse extends BaseEntity {
     let pickup = null
 
     let drop = mobKlass.prototype.getDrop()
+    let dropAmount = mobKlass.prototype.getConstants().dropAmount
+    let dropAmountMin = dropAmount ? mobKlass.prototype.getConstants().dropAmount[0] : 1
+    let dropAmountMax = dropAmount ? mobKlass.prototype.getConstants().dropAmount[1] : 3
+    let difference = dropAmountMax - dropAmountMin + 1
+    if (this.hasEffect("miasma") && Math.random() < 0.5) {
+      const randomSpore = Math.floor(Math.random() * 3 + 1)
+      dropAmountMin = 1
+      difference = 0
+      if (randomSpore == 1) drop = "RedSpore"
+      if (randomSpore == 2) drop = "BrownSpore"
+      if (randomSpore == 3) drop = "WhiteSpore"
+    }
     if (drop) {
       if (this.sector.isLobby() || Math.random() < 0.8) {
-        pickup = Pickup.createDrop({ sector: this.sector, x: dropPosition.x, y: dropPosition.y, type: drop })
+        pickup = Pickup.createDrop({ sector: this.sector, x: dropPosition.x, y: dropPosition.y, type: drop, count: Math.floor(Math.random() * difference + dropAmountMin)})
       }
     }
 
@@ -195,12 +207,25 @@ class Corpse extends BaseEntity {
 
   harvestToItem() {
     let mobKlass = this.sector.getMobKlassForType(this.type)
+    
     let drop = mobKlass.prototype.getDrop()
+    let dropAmount = mobKlass.prototype.getConstants().dropAmount
+    let dropAmountMin = dropAmount ? mobKlass.prototype.getConstants().dropAmount[0] : 1
+    let dropAmountMax = dropAmount ? mobKlass.prototype.getConstants().dropAmount[1] : 3
+    let difference = dropAmountMax - dropAmountMin + 1
+    if (this.hasEffect("miasma") && Math.random() < 0.15) {
+      const randomSpore = Math.floor(Math.random() * 3 + 1)
+      dropAmountMin = 1
+      difference = 0
+      if (randomSpore == 1) drop = "RedSpore"
+      if (randomSpore == 2) drop = "BrownSpore"
+      if (randomSpore == 3) drop = "WhiteSpore"
+    }
     let item
 
     if (drop) {
       if (Math.random() < 0.8) {
-        item = this.sector.createItem(drop)
+        item = this.sector.createItem(drop, {count: Math.floor(Math.random() * difference + dropAmountMin)})
       }
     }
 

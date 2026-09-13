@@ -8,8 +8,8 @@ class PlantSeed extends BaseAction {
 
     let data = {
       angle: -90,
-      x: options.soil.getX(),
-      y: options.soil.getY(),
+      x: options.x ?? options.soil.getX(),
+      y: options.y ?? options.soil.getY(),
       owner: this.planner.entity.getOwner()
     }
 

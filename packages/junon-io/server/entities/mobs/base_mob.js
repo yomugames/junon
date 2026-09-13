@@ -2408,6 +2408,12 @@ Object.assign(BaseMob.prototype, Destroyable.prototype, {
         if (actor.isPlayer()) {
           data["attackingPlayer"] = actor.name
           data["attackingPlayerRole"] = actor.getRoleName()
+
+          if (this.getTypeName() === "Mushling") {
+            if (Math.random() < 0.2) {
+              actor.addMiasma()
+            }
+          }
         } else if (actor.isMob()) {
           data["attackingMob"] = actor.id
         }
@@ -3018,7 +3024,7 @@ Object.assign(BaseMob.prototype, Attacker.prototype, {
       return []
     }
 
-    if (this.attackables) return this.attackables
+    if (this.attackables && this.attackables.length > 0) return this.attackables
 
     if (this.getConstants().attackGroups) {
       return this.getConstants().attackGroups

@@ -112,7 +112,14 @@ class BaseFood extends BaseTransientEntity {
     return this.getConstants().stats.food || 0
   }
 
+  getHealingValue() {
+    return this.getConstants().stats.healing || 0
+  }
+
   getFoodUsageTotalDuration() {
+    if (this.getConstants().stats.duration) {
+      return this.getConstants().stats.duration
+    }
     const foodValue = this.getFoodValue()
     if (foodValue >= 50) {
       return 15

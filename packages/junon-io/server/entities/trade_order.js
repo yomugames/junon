@@ -73,9 +73,9 @@ class TradeOrder {
       }
     } else if (this.isSoldBySlaveTrader()) {
       return this.customer.gold >= this.getTotalPurchaseCost();
-    } else if (entity.storage) {
+    } else if (entity && entity.storage && this.seller) {
       //for vending machines. ensure the item is stored, to prevent buying an item that doesn't exist
-      const itemExistsOnStorage = entity.storage[this.index].type === this.type
+      const itemExistsOnStorage = entity.storage[this.index] && entity.storage[this.index].type === this.type
       if (!itemExistsOnStorage) return false
       return this.customer.gold >= this.getTotalPurchaseCost()
     }
@@ -127,7 +127,8 @@ class TradeOrder {
       } else {
         return this.klass.getCost() * this.count
       }
-    } else if (this.seller.hasCategory("vending_machine") && this.seller.prices[this.entityId]) {
+    } else if (this.seller && this.seller.hasCategory("vending_machine") &&
+      this.seller.prices && Object.hasOwn(this.seller.prices, this.entityId)) {
       return this.seller.prices[this.entityId] * this.count
     } else {
       return this.klass.getCost() * this.count

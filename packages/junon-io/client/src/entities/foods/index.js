@@ -11,6 +11,16 @@ Foods.Raw.AnimalMeat = require("./animal_meat")
 Foods.Raw.Wheat = require("./wheat")
 Foods.Raw.Rice = require("./rice")
 Foods.Raw.Cabbage = require("./cabbage")
+Foods.Raw.RedMushroom = require("./red_mushroom")
+Foods.Raw.BrownMushroom = require("./brown_mushroom")
+Foods.Raw.WhiteMushroom = require("./white_mushroom")
+Foods.Raw.OrangeMushroom = require("./orange_mushroom")
+Foods.Raw.YellowMushroom = require("./yellow_mushroom")
+Foods.Raw.GreenMushroom = require("./green_mushroom")
+Foods.Raw.BlueMushroom = require("./blue_mushroom")
+Foods.Raw.PurpleMushroom = require("./purple_mushroom")
+Foods.Raw.PinkMushroom = require("./pink_mushroom")
+Foods.Raw.BlackMushroom = require("./black_mushroom")
 
 Foods.Cooked = {}
 Foods.Cooked.Potato = require("./potato")
@@ -31,12 +41,14 @@ Foods.Cooked.Pumpkin = require("./pumpkin")
 Foods.Cooked.Fish = require("./fish")
 Foods.Cooked.Nigiri = require("./nigiri")
 Foods.Cooked.PumpkinPie = require("./pumpkin_pie")
+Foods.Cooked.MushroomSoup = require("./mushroom_soup")
 
 Foods.Drugs = {}
 Foods.Drugs.FirstAidKit = require("./first_aid_kit")
 Foods.Drugs.Antidote = require("./antidote")
 Foods.Drugs.BloodPack = require("./blood_pack")
 Foods.Drugs.Stimpack = require("./stimpack")
+Foods.Drugs.Drug = require("./drug")
 
 
 Foods.forType = (type) => {

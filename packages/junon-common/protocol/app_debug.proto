@@ -49,6 +49,9 @@ message Building {
   Network soilNetwork = 56;
   uint32 nameColor = 57;
   uint32 nameSize = 58;
+  string drugTint = 59;
+  uint32 heatingIntensity = 60;
+  string drugEffectsJson = 61;
 }
 
 message Mob {

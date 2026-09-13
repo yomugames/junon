@@ -1061,6 +1061,71 @@
         "los": 640
       }
     },
+    "Mushling": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "isTamable": true,
+      "cost": {
+        "gold": 2000
+      },
+      "attackGroups": ["players", "mobs"],
+      "drop": ["RedMushroom"],
+      "dropAmount": [7, 10],
+      "immunity": ["miasma","poison"],
+      "sprite": {
+        "width": 64,
+        "height": 64
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -8
+        },
+        "width": 13,
+        "height": 6,
+        "rotation": 0
+      },
+      "stats": {
+        "speed": 4,
+        "reload": 1500,
+        "health": 150,
+        "damage": 10,
+        "range": 50,
+        "los": 320
+      }
+    },
+    "GhostShroom": {
+      "parent": "Mobs.BaseMob",
+      "hasBlood": true,
+      "isTamable": false,
+      "cost": {
+        "gold": 2000
+      },
+      "attackGroups": ["players"],
+      "drop": ["RedMushroom"],
+      "immunity": ["miasma","poison"],
+      "sprite": {
+        "width": 128,
+        "height": 160
+      },
+      "dizzySprite": {
+        "position": {
+          "x": 0,
+          "y": -8
+        },
+        "width": 13,
+        "height": 6,
+        "rotation": 0
+      },
+      "stats": {
+        "speed": 7,
+        "reload": 100,
+        "health": 150,
+        "damage": 8,
+        "range": 80,
+        "los": 1536
+      }
+    },
     "Spider": {
       "parent": "Mobs.BaseMob",
       "hasBlood": true,
@@ -1736,9 +1801,9 @@
       "drop": "SquidLordHeart",
       "stats": {
         "speed": 6,
-        "reload": 300,
+        "reload": 1000,
         "health": 2000,
-        "damage": 25,
+        "damage": 10,
         "range": 512,
         "los": 1024
       },
@@ -1760,7 +1825,7 @@
     "Drone": {
       "parent": "Mobs.BaseMob",
       "stats": {
-        "speed": 12,
+        "speed": 7,
         "reload": 500,
         "health": 50,
         "damage": 20,
@@ -1792,9 +1857,9 @@
       "height": 96,
       "stats": {
         "speed": 4,
-        "reload": 250,
+        "reload": 1000,
         "health": 1500,
-        "damage": 25,
+        "damage": 15,
         "range": 512,
         "los": 1024
       },
@@ -1880,7 +1945,7 @@
       },
       "stats": {
         "liquidCapacity": 10,
-        "health": 100
+        "health": 1000
       }
     },
     "FiberSeed": {
@@ -1888,24 +1953,33 @@
       "cost": {
         "gold": 25
       },
+      "stats": {
+        "health": 300
+      },
       "yield": "PlantFiber",
-      "description": "Plant on soil to grow fiber"
+      "description": "Plant on soil to grow fiber. Only grows in oxygenated areas."
     },
     "CabbageSeed": {
       "parent": "Crops.BaseSeed",
       "cost": {
         "gold": 30
       },
+      "stats": {
+        "health": 500
+      },
       "yield": "Cabbage",
-      "description": "Plant on soil to grow cabbage"
+      "description": "Plant on soil to grow cabbage. Only grows in oxygenated areas."
     },
     "PotatoSeed": {
       "parent": "Crops.BaseSeed",
       "cost": {
         "gold": 25
       },
+      "stats": {
+        "health": 500
+      },
       "yield": "Potato",
-      "description": "Plant on soil to grow potato"
+      "description": "Plant on soil to grow potato. Only grows in oxygenated areas."
     },
     "CoffeeSeed": {
       "parent": "Crops.BaseSeed",
@@ -1913,10 +1987,10 @@
         "gold": 100
       },
       "stats": {
-        "health": 100
+        "health": 350
       },
       "yield": "CoffeeBean",
-      "description": "Plant on soil to grow coffee"
+      "description": "Plant on soil to grow coffee. Only grows in oxygenated areas."
     },
     "SunflowerSeed": {
       "parent": "Crops.BaseSeed",
@@ -1929,9 +2003,9 @@
         "gold": 200
       },
       "stats": {
-        "health": 100
+        "health": 300
       },
-      "description": "Plant on soil to grow Sunflower"
+      "description": "Plant on soil to grow Sunflower. Only grows in oxygenated areas."
     },
     "BlueSeed": {
       "parent": "Crops.BaseSeed",
@@ -1944,9 +2018,9 @@
         "gold": 200
       },
       "stats": {
-        "health": 100
+        "health": 300
       },
-      "description": "Plant on soil to grow Blue Lotus"
+      "description": "Plant on soil to grow Blue Lotus. Only grows in oxygenated areas."
     },
     "PoppySeed": {
       "parent": "Crops.BaseSeed",
@@ -1959,24 +2033,24 @@
         "gold": 200
       },
       "stats": {
-        "health": 100
+        "health": 300
       },
-      "description": "Plant on soil to grow Poppy"
+      "description": "Plant on soil to grow Poppy. Only grows in oxygenated areas."
     },
     "PumpkinSeed": {
       "parent": "Crops.BaseSeed",
       "cost": {
         "gold": 500
       },
+      "stats": {
+        "health": 500
+      },
       "sprite": {
         "width": 33,
         "height": 33
       },
-      "stats": {
-        "health": 90
-      },
       "yield": "Pumpkin",
-      "description": "Plant on soil to grow pumpkin"
+      "description": "Plant on soil to grow pumpkin. Only grows in oxygenated areas."
     },
     "WheatSeed": {
       "parent": "Crops.BaseSeed",
@@ -1985,9 +2059,9 @@
       },
       "yield": "Wheat",
       "stats": {
-        "health": 150
+        "health": 300
       },
-      "description": "Plant on soil to grow wheat"
+      "description": "Plant on soil to grow wheat. Only grows in oxygenated areas."
     },
     "RiceSeed": {
       "parent": "Crops.BaseSeed",
@@ -1996,13 +2070,226 @@
       },
       "yield": "Rice",
       "stats": {
-        "health": 150
+        "health": 500
       },
       "sprite": {
         "width": 28,
         "height": 28
       },
-      "description": "Plant on soil to grow rice"
+      "description": "Plant on soil to grow rice. Only grows in oxygenated areas."
+    },
+    "RedSporeling": {
+      "parent": "Crops.BaseSeed",
+      "isSporeling": true,
+      "cost": {
+        "gold": 30
+      },
+      "yield": "RedMushroom",
+      "yieldAmount": [1],
+      "seed": "RedSpore",
+      "seedAmount": [0, 0, 0, 0, 0, 1],
+      "stats": {
+        "health": 300
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "description": "Plant on soil to grow red mushroom. Only grows in oxygenated areas."
+    },
+    "BrownSporeling": {
+      "parent": "Crops.BaseSeed",
+      "isSporeling": true,
+      "cost": {
+        "gold": 30
+      },
+      "yield": "BrownMushroom",
+      "yieldAmount": [1],
+      "seed": "BrownSpore",
+      "seedAmount": [0, 0, 0, 0, 0, 1],
+      "stats": {
+        "health": 300
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "description": "Plant on soil to grow brown mushroom. Only grows in oxygenated areas."
+    },
+    "WhiteSporeling": {
+      "parent": "Crops.BaseSeed",
+      "isSporeling": true,
+      "cost": {
+        "gold": 30
+      },
+      "yield": "WhiteMushroom",
+      "yieldAmount": [1],
+      "seed": "WhiteSpore",
+      "seedAmount": [0, 0, 0, 0, 0, 1],
+      "stats": {
+        "health": 300
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "description": "Plant on soil to grow white mushroom. Only grows in oxygenated areas."
+    },
+    "OrangeSporeling": {
+      "parent": "Crops.BaseSeed",
+      "isSporeling": true,
+      "cost": {
+        "gold": 30
+      },
+      "yield": "OrangeMushroom",
+      "yieldAmount": [1],
+      "seed": "OrangeSpore",
+      "seedAmount": [0, 0, 0, 0, 0, 1],
+      "stats": {
+        "health": 300
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "description": "Plant on soil to grow orange mushroom. Only grows in oxygenated areas."
+    },
+    "YellowSporeling": {
+      "parent": "Crops.BaseSeed",
+      "isSporeling": true,
+      "cost": {
+        "gold": 30
+      },
+      "yield": "YellowMushroom",
+      "yieldAmount": [1],
+      "seed": "YellowSpore",
+      "seedAmount": [0, 0, 0, 0, 0, 1],
+      "stats": {
+        "health": 300
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "description": "Plant on soil to grow yellow mushroom. Only grows in oxygenated areas."
+    },
+    "GreenSporeling": {
+      "parent": "Crops.BaseSeed",
+      "isSporeling": true,
+      "cost": {
+        "gold": 30
+      },
+      "yield": "GreenMushroom",
+      "yieldAmount": [1],
+      "seed": "GreenSpore",
+      "seedAmount": [0, 0, 0, 0, 0, 1],
+      "stats": {
+        "health": 300
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "description": "Plant on soil to grow green mushroom. Only grows in oxygenated areas."
+    },
+    "BlueSporeling": {
+      "parent": "Crops.BaseSeed",
+      "isSporeling": true,
+      "cost": {
+        "gold": 30
+      },
+      "yield": "BlueMushroom",
+      "yieldAmount": [1],
+      "seed": "BlueSpore",
+      "seedAmount": [0, 0, 0, 0, 0, 1],
+      "stats": {
+        "health": 300
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "description": "Plant on soil to grow blue mushroom. Only grows in oxygenated areas."
+    },
+    "PurpleSporeling": {
+      "parent": "Crops.BaseSeed",
+      "isSporeling": true,
+      "cost": {
+        "gold": 30
+      },
+      "yield": "PurpleMushroom",
+      "yieldAmount": [1],
+      "seed": "PurpleSpore",
+      "seedAmount": [0, 0, 0, 0, 0, 1],
+      "stats": {
+        "health": 300
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "description": "Plant on soil to grow purple mushroom. Only grows in oxygenated areas."
+    },
+    "PinkSporeling": {
+      "parent": "Crops.BaseSeed",
+      "isSporeling": true,
+      "cost": {
+        "gold": 30
+      },
+      "yield": "PinkMushroom",
+      "yieldAmount": [1],
+      "seed": "PinkSpore",
+      "seedAmount": [0, 0, 0, 0, 0, 1],
+      "stats": {
+        "health": 300
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "description": "Plant on soil to grow pink mushroom. Only grows in oxygenated areas."
+    },
+    "BlackSporeling": {
+      "parent": "Crops.BaseSeed",
+      "isSporeling": true,
+      "cost": {
+        "gold": 30
+      },
+      "yield": "BlackMushroom",
+      "yieldAmount": [1],
+      "seed": "BlackSpore",
+      "seedAmount": [0, 0, 0, 0, 0, 1],
+      "stats": {
+        "health": 300
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "description": "Plant on soil to grow black mushroom. Only grows in oxygenated areas."
+    },
+    "Sapling": {
+      "parent": "Crops.BaseSeed",
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 250
+      },
+      "sprite": {
+        "width": 64,
+        "height": 64
+      },
+      "stats": {
+        "health": 650,
+        "spread": 15
+      },
+      "yield": "Wood",
+      "yieldAmount": [3, 4, 5],
+      "seedAmount": [1, 1, 2],
+      "storageCount": 1,
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "description": "Plant on soil to grow sapling. Only grows in oxygenated areas."
     }
   },
   "Projectiles": {
@@ -2222,6 +2509,19 @@
       "damage": 40,
       "categories": {"distance_dependent_width": true}
     },
+    "MiasmaBullet": {
+      "width": 16,
+      "height": 16,
+      "minWidth": 16,
+      "maxWidth": 32,
+      "maxRadialExpansion": 32,
+      "sprite": {
+        "width": 32,
+        "height": 32
+      },
+      "speed": 5,
+      "damage": 1
+    },
     "MinigunBullet": {
       "width": 10,
       "height": 12,
@@ -2238,7 +2538,7 @@
     "Missile": {
       "width": 32,
       "height": 32,
-      "speed": 25,
+      "speed": 28,
       "damage": 20
     }
   },
@@ -2480,6 +2780,9 @@
         "health": 100
       },
       "upgrade": {},
+      "requirements": {
+        "RedMushroom": 3
+      },
       "description": "Ingredient for crafting poisonous items or cure"
     },
     "SquidLordHeart": {
@@ -2546,6 +2849,237 @@
       },
       "upgrade": {},
       "description": "Ice ore"
+    },
+    "RedSpore": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "sprite": {
+        "position": {
+          "x": 30,
+          "y": 4
+        },
+        "width":32,
+        "height": 32,
+        "rotation": 0
+      },
+      "yield": "RedSporeling",
+      "tint": "ff0000",
+      "upgrade": {},
+      "description": "Plant in a sapling to spread mushrooms to nearby soil."
+    },
+    "BrownSpore": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32,
+        "position": {
+          "x": 28,
+          "y": 4
+        }
+      },
+      "yield": "BrownSporeling",
+      "tint": "8B4513",
+      "upgrade": {},
+      "description": "Plant in a sapling to spread mushrooms to nearby soil."
+    },
+    "WhiteSpore": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32,
+        "position": {
+          "x": 30,
+          "y": 4
+        }
+      },
+      "yield": "WhiteSporeling",
+      "tint": "ffffff",
+      "upgrade": {},
+      "description": "Plant in a sapling to spread mushrooms to nearby soil."
+    },
+        "OrangeSpore": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32,
+        "position": {
+          "x": 30,
+          "y": 4
+        }
+      },
+      "yield": "OrangeSporeling",
+      "tint": "ffa500",
+      "upgrade": {},
+      "description": "Plant in a sapling to spread mushrooms to nearby soil."
+    },
+    "YellowSpore": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32,
+        "position": {
+          "x": 30,
+          "y": 4
+        }
+      },
+      "yield": "YellowSporeling",
+      "tint": "ffff00",
+      "upgrade": {},
+      "description": "Plant in a sapling to spread mushrooms to nearby soil."
+    },
+    "GreenSpore": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32,
+        "position": {
+          "x": 30,
+          "y": 4
+        }
+      },
+      "yield": "GreenSporeling",
+      "tint": "008000",
+      "upgrade": {},
+      "description": "Plant in a sapling to spread mushrooms to nearby soil."
+    },
+    "BlueSpore": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32,
+        "position": {
+          "x": 30,
+          "y": 4
+        }
+      },
+      "yield": "BlueSporeling",
+      "tint": "0571ff",
+      "upgrade": {},
+      "description": "Plant in a sapling to spread mushrooms to nearby soil."
+    },
+    "PurpleSpore": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32,
+        "position": {
+          "x": 30,
+          "y": 4
+        }
+      },
+      "yield": "PurpleSporeling",
+      "tint": "b405ff",
+      "upgrade": {},
+      "description": "Plant in a sapling to spread mushrooms to nearby soil."
+    },
+    "PinkSpore": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32,
+        "position": {
+          "x": 30,
+          "y": 4
+        }
+      },
+      "yield": "PinkSporeling",
+      "tint": "ff8fff",
+      "upgrade": {},
+      "description": "Plant in a sapling to spread mushrooms to nearby soil."
+    },
+    "BlackSpore": {
+      "width": 32,
+      "height": 32,
+      "cost": {
+        "gold": 10
+      },
+      "stats": {
+        "health": 100,
+        "speed": 5
+      },
+      "sprite": {
+        "width": 32,
+        "height": 32,
+        "position": {
+          "x": 30,
+          "y": 4
+        }
+      },
+      "yield": "BlackSporeling",
+      "tint": "353535",
+      "upgrade": {},
+      "description": "Plant in a sapling to spread mushrooms to nearby soil."
     },
     "IronOre": {
       "width": 20,
@@ -2691,7 +3225,7 @@
       "stats": {
       },
       "requirements": {
-        "CopperOre": 10,
+        "CopperOre": 3,
         "Explosives": 1
       },
       "upgrade": {},
@@ -2849,7 +3383,9 @@
         "gold": 15
       },
       "stats": {
-        "food": 25
+        "food": 25,
+        "healing": 8,
+        "duration": 5
       },
       "requirements": {
         "Gel": 1
@@ -2864,7 +3400,9 @@
         "gold": 10
       },
       "stats": {
-        "food": 5
+        "food": 5,
+        "healing": 0,
+        "duration": 5
       },
       "isIngredient": true,
       "upgrade": {},
@@ -2885,7 +3423,9 @@
         "rotation": 0
       },
       "stats": {
-        "food": 15
+        "food": 15,
+        "healing": -3,
+        "duration": 5
       },
       "upgrade": {},
       "description": "Raw Alien Meat. Cook to eat."
@@ -2905,7 +3445,9 @@
         "rotation": 0
       },
       "stats": {
-        "food": 25
+        "food": 10,
+        "healing": -5,
+        "duration": 5
       },
       "upgrade": {},
       "description": "Raw Human Meat. Do not eat."
@@ -2925,7 +3467,9 @@
         "rotation": 0
       },
       "stats": {
-        "food": 25
+        "food": 15,
+        "healing": 0,
+        "duration": 5
       },
       "upgrade": {},
       "description": "Raw Animal Meat. Tasty if cooked."
@@ -2944,7 +3488,9 @@
         "gold": 300
       },
       "stats": {
-        "food": 25
+        "food": 25,
+        "healing": 8,
+        "duration": 5
       },
       "requirements": {
         "AnimalMeat": 1,
@@ -2969,7 +3515,9 @@
         "gold": 250
       },
       "stats": {
-        "food": 25
+        "food": 15,
+        "healing": 5,
+        "duration": 5
       },
       "requirements": {
         "Wheat": 1
@@ -2991,7 +3539,9 @@
         "gold": 500
       },
       "stats": {
-        "food": 50
+        "food": 50,
+        "healing": 10,
+        "duration": 10
       },
       "requirements": {
         "PlantFiber": 5,
@@ -3014,7 +3564,9 @@
         }
       },
       "stats": {
-        "food": 100
+        "food": 100,
+        "healing": 20,
+        "duration": 15
       },
       "requirements": {
         "Gel": 2,
@@ -3031,7 +3583,9 @@
         "gold": 300
       },
       "stats": {
-        "food": 50
+        "food": 50,
+        "healing": 10,
+        "duration": 10
       },
       "sprite": {
         "position": {
@@ -3062,7 +3616,9 @@
         "rotation": 0
       },
       "stats": {
-        "food":45
+        "food":10,
+        "healing": 0,
+        "duration": 5
       },
       "upgrade": {},
       "description": "A nice plump cabbage. A miracle it was able to grow here."
@@ -3082,7 +3638,9 @@
         "rotation": 0
       },
       "stats": {
-        "food": 40
+        "food": 5,
+        "healing": 0,
+        "duration": 5
       },
       "upgrade": {},
       "description": "Staple food for survival."
@@ -3103,7 +3661,9 @@
       },
       "isEdible": false,
       "stats": {
-        "food": 10
+        "food": 10,
+        "healing": 0,
+        "duration": 5
       },
       "upgrade": {},
       "description": "Raw wheat. For making bread"
@@ -3124,7 +3684,9 @@
       },
       "isEdible": false,
       "stats": {
-        "food": 10
+        "food": 10,
+        "healing": 0,
+        "duration": 5
       },
       "upgrade": {},
       "description": "A bag of rice."
@@ -3137,7 +3699,9 @@
       },
       "isIngredient": true,
       "stats": {
-        "food": 10
+        "food": 5,
+        "healing": 0,
+        "duration": 5
       },
       "sprite": {
         "position": {
@@ -3158,7 +3722,9 @@
       },
       "isIngredient": true,
       "stats": {
-        "food": 70
+        "food": 40,
+        "healing": 13,
+        "duration": 7
       },
       "sprite": {
         "position": {
@@ -3181,7 +3747,9 @@
         "gold": 200
       },
       "stats": {
-        "food": 50
+        "food": 50,
+        "healing": 10,
+        "duration": 10
       },
       "sprite": {
         "position": {
@@ -3211,7 +3779,9 @@
         "rotation": 0
       },
       "stats": {
-        "food": 30
+        "food": 10,
+        "healing": 0,
+        "duration": 5
       },
       "upgrade": {},
       "description": "Orange pumpkin."
@@ -3227,7 +3797,9 @@
         "anchor": 0.5
       },
       "stats": {
-        "food": 75
+        "food": 60,
+        "healing": 15,
+        "duration": 10
       },
       "requirements": {
         "Bowl": 1,
@@ -3248,7 +3820,9 @@
         "anchor": 0.5
       },
       "stats": {
-        "food": 40
+        "food": 40,
+        "healing": 14,
+        "duration": 7
       },
       "requirements": {
         "Bowl": 1,
@@ -3268,7 +3842,9 @@
         "anchor": 0.5
       },
       "stats": {
-        "food": 50
+        "food": 50,
+        "healing": 14,
+        "duration": 10
       },
       "requirements": {
         "Bowl": 1,
@@ -3285,7 +3861,9 @@
         "gold": 200
       },
       "stats": {
-        "food": 25
+        "food": 25,
+        "healing": 8,
+        "duration": 7
       },
       "sprite": {
         "position": {
@@ -3309,7 +3887,9 @@
       },
       "stats": {
         "food": 50,
-        "health": 25
+        "health": 25,
+        "healing": 10,
+        "duration": 10
       },
       "sprite": {
         "position": {
@@ -3337,7 +3917,9 @@
       },
       "stats": {
         "food": 80,
-        "health": 20
+        "health": 20,
+        "healing": 16,
+        "duration": 15
       },
       "requirements": {
         "Pumpkin": 2,
@@ -3354,8 +3936,10 @@
         "gold": 500
       },
       "stats": {
-        "food": 40,
-        "health": 30
+        "food": 15,
+        "health": 30,
+        "healing": 5,
+        "duration": 5
       },
       "sprite": {
         "position": {
@@ -3378,11 +3962,459 @@
         "anchor": 0.5
       },
       "stats": {
-        "food": 40,
-        "health": 30
+        "food": 10,
+        "health": 30,
+        "healing": 0,
+        "duration": 5
       },
       "upgrade": {},
       "description": "A yummy fish, used in lots of dishes. I wonder where that trader got it from?"
+    },
+    "RedMushroom": {
+      "width": 24,
+      "height": 24,
+      "isDrugMaterial": true,
+      "drugTint": "ff0000",
+      "effects": {
+        "Max Health": 50,
+        "Max Stamina": -40
+      },
+      "compatibility": {
+        "BrownMushroom": 90,
+        "WhiteMushroom": 85,
+        "OrangeMushroom": 55,
+        "YellowMushroom": 60,
+        "GreenMushroom": 90,
+        "BlueMushroom": 90,
+        "PurpleMushroom": 15,
+        "PinkMushroom": 85,
+        "BlackMushroom": 50
+      },
+      "isIngredient": false,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 25,
+          "y": 5
+        },
+        "width": 32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food": 5,
+        "healing": 0,
+        "duration": 5
+      },
+      "upgrade": {},
+      "description": "Might be poisonous"
+    },
+    "BrownMushroom": {
+      "width": 24,
+      "height": 24,
+      "isDrugMaterial": true,
+      "drugTint": "8B4513",
+      "effects": {
+        "Max Stamina": 50,
+        "Delayed Healing": 50,
+        "Nausea": 1
+      },
+      "compatibility": {
+        "RedMushroom": 90,
+        "WhiteMushroom": 50,
+        "OrangeMushroom": 10,
+        "YellowMushroom": 85,
+        "GreenMushroom": 90,
+        "BlueMushroom": 90,
+        "PurpleMushroom": 55,
+        "PinkMushroom": 85,
+        "BlackMushroom": 10
+      },
+      "isIngredient": true,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 25,
+          "y": 5
+        },
+        "width": 32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food": 5,
+        "healing": 0,
+        "duration": 5
+      },
+      "upgrade": {},
+      "description": "Makes you nauseous, but it's delicious when cooked"
+    },
+    "WhiteMushroom": {
+      "width": 24,
+      "height": 24,
+      "isDrugMaterial": true,
+      "drugTint": "ffffff",
+      "effects": {
+        "Effect Duration": 100,
+        "Effect Potency": -30
+      },
+      "compatibility": {
+        "RedMushroom": 85,
+        "BrownMushroom": 50,
+        "OrangeMushroom": 90,
+        "YellowMushroom": 85,
+        "GreenMushroom": 55,
+        "BlueMushroom": 90,
+        "PurpleMushroom": 90,
+        "PinkMushroom": 90,
+        "BlackMushroom": 55
+      },
+      "isIngredient": true,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 25,
+          "y": 5
+        },
+        "width": 32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food": 5,
+        "healing": 0,
+        "duration": 5
+      },
+      "upgrade": {},
+      "description": "Tastes bland"
+    },
+    "OrangeMushroom": {
+      "width": 24,
+      "height": 24,
+      "isDrugMaterial": true,
+      "drugTint": "ffa500",
+      "effects": {
+        "Strength": 35,
+        "Delayed Damage": 60
+      },
+      "compatibility": {
+        "RedMushroom": 55,
+        "BrownMushroom": 10,
+        "WhiteMushroom": 90,
+        "YellowMushroom": 90,
+        "GreenMushroom": 10,
+        "BlueMushroom": 55,
+        "PurpleMushroom": 85,
+        "PinkMushroom": 10,
+        "BlackMushroom": 90
+      },
+      "isIngredient": true,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 25,
+          "y": 5
+        },
+        "width": 32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food": 5,
+        "healing": 0,
+        "duration": 5
+      },
+      "upgrade": {},
+      "description": "Rare mushroom that can produce various effects."
+    },
+    "YellowMushroom": {
+      "width": 24,
+      "height": 24,
+      "isDrugMaterial": true,
+      "drugTint": "ffff00",
+      "effects": {
+        "Random Buff": 1,
+        "Random Debuff": 1
+      },
+      "compatibility": {
+        "RedMushroom": 60,
+        "BrownMushroom": 85,
+        "WhiteMushroom": 85,
+        "OrangeMushroom": 90,
+        "GreenMushroom": 50,
+        "BlueMushroom": 90,
+        "PurpleMushroom": 5,
+        "PinkMushroom": 85,
+        "BlackMushroom": 50
+      },
+      "isIngredient": true,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 25,
+          "y": 5
+        },
+        "width": 32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food": 5,
+        "healing": 0,
+        "duration": 5
+      },
+      "upgrade": {},
+      "description": "Rare mushroom that can produce various effects."
+    },
+    "GreenMushroom": {
+      "width": 24,
+      "height": 24,
+      "isDrugMaterial": true,
+      "drugTint": "008000",
+      "effects": {
+        "Healing Rate": 40,
+        "Poison Immunity": 1,
+        "Nausea Immunity": 1,
+        "Max Health": -20,
+        "Speed": -20
+      },
+      "compatibility": {
+        "RedMushroom": 90,
+        "BrownMushroom": 90,
+        "WhiteMushroom": 55,
+        "OrangeMushroom": 10,
+        "YellowMushroom": 50,
+        "BlueMushroom": 90,
+        "PurpleMushroom": 55,
+        "PinkMushroom": 90,
+        "BlackMushroom": 5
+      },
+      "isIngredient": true,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 25,
+          "y": 5
+        },
+        "width": 32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food": 5,
+        "healing": 0,
+        "duration": 5
+      },
+      "upgrade": {},
+      "description": "Rare mushroom that can produce various effects."
+    },
+    "BlueMushroom": {
+      "width": 24,
+      "height": 24,
+      "isDrugMaterial": true,
+      "drugTint": "0571ff",
+      "effects": {
+        "Effect Potency": 30,
+        "Effect Duration": -50
+      },
+      "compatibility": {
+        "RedMushroom": 90,
+        "BrownMushroom": 90,
+        "WhiteMushroom": 90,
+        "OrangeMushroom": 55,
+        "YellowMushroom": 90,
+        "GreenMushroom": 90,
+        "PurpleMushroom": 95,
+        "PinkMushroom": 55,
+        "BlackMushroom": 90
+      },
+      "isIngredient": true,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 25,
+          "y": 5
+        },
+        "width": 32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food": 5,
+        "healing": 0,
+        "duration": 5
+      },
+      "upgrade": {},
+      "description": "Rare mushroom that can produce various effects."
+    },
+    "PurpleMushroom": {
+      "width": 24,
+      "height": 24,
+      "isDrugMaterial": true,
+      "drugTint": "b405ff",
+      "effects": {
+        "Initial Decaying Boost": 200,
+        "Effect Potency": -80
+      },
+      "compatibility": {
+        "RedMushroom": 15,
+        "BrownMushroom": 55,
+        "WhiteMushroom": 90,
+        "OrangeMushroom": 85,
+        "YellowMushroom": 5,
+        "GreenMushroom": 55,
+        "BlueMushroom": 95,
+        "PinkMushroom": 55,
+        "BlackMushroom": 90
+      },
+      "isIngredient": true,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 25,
+          "y": 5
+        },
+        "width": 32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food": 5,
+        "healing": 0,
+        "duration": 5
+      },
+      "upgrade": {},
+      "description": "Rare mushroom that can produce various effects."
+    },
+    "PinkMushroom": {
+      "width": 24,
+      "height": 24,
+      "isDrugMaterial": true,
+      "drugTint": "ff8fff",
+      "effects": {
+        "Healing Rate": 25,
+        "Regeneration": 5,
+        "Stamina Regen": 3,
+        "Strength": -20
+      },
+      "compatibility": {
+        "RedMushroom": 85,
+        "BrownMushroom": 85,
+        "WhiteMushroom": 90,
+        "OrangeMushroom": 10,
+        "YellowMushroom": 85,
+        "GreenMushroom": 90,
+        "BlueMushroom": 55,
+        "PurpleMushroom": 55,
+        "BlackMushroom": 55
+      },
+      "isIngredient": true,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 25,
+          "y": 5
+        },
+        "width": 32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food": 5,
+        "healing": 0,
+        "duration": 5
+      },
+      "upgrade": {},
+      "description": "Rare mushroom that can produce various effects."
+    },
+    "BlackMushroom": {
+      "width": 24,
+      "height": 24,
+      "isDrugMaterial": true,
+      "drugTint": "353535",
+      "effects": {
+        "Max Health": 100,
+        "Strength": 50,
+        "Reload": 40,
+        "Speed": -40,
+        "Max Stamina": -50,
+        "Stamina Regen": -2
+      },
+      "compatibility": {
+        "RedMushroom": 50,
+        "BrownMushroom": 10,
+        "WhiteMushroom": 55,
+        "OrangeMushroom": 90,
+        "YellowMushroom": 50,
+        "GreenMushroom": 5,
+        "BlueMushroom": 90,
+        "PurpleMushroom": 90,
+        "PinkMushroom": 55
+      },
+      "isIngredient": true,
+      "cost": {
+        "gold": 50
+      },
+      "sprite": {
+        "position": {
+          "x": 25,
+          "y": 5
+        },
+        "width": 32,
+        "height": 32,
+        "rotation": 0
+      },
+      "stats": {
+        "food": 5,
+        "healing": 0,
+        "duration": 5
+      },
+      "upgrade": {},
+      "description": "Rare mushroom that can produce various effects."
+    },
+    "MushroomSoup": {
+      "width": 32,
+      "height": 32,
+      "isCooked": true,
+      "cost": {
+        "gold": 200
+      },
+      "sprite": {
+        "anchor": 0.5,
+        "width": 32,
+        "height": 32
+      },
+      "stats": {
+        "food": 55,
+        "healing": 14,
+        "duration": 10
+      },
+      "requirements": {
+        "Bowl": 1,
+        "BrownMushroom": 1,
+        "WhiteMushroom": 1,
+        "PlantFiber": 1
+      },
+      "upgrade": {},
+      "description": "Delicious soup that's cooked with mushrooms."
     },
     "Antidote": {
       "width": 24,
@@ -3410,6 +4442,34 @@
       },
       "upgrade": {},
       "description": "Cures poison"
+    },
+    "Drug": {
+      "width": 24,
+      "height": 24,
+      "cost": {
+        "gold": 15
+      },
+      "isStackable": false,
+      "isEdible": false,
+      "isDrugBottle": true,
+      "categories": {"drug": true},
+      "sprite": {
+        "width": 48,
+        "height": 48,
+        "position": {
+          "x": 45,
+          "y": 0
+        },
+        "rotation": 35
+      },
+      "stats": {
+        "food": 0,
+        "health": 100,
+        "reload": 3000
+      },
+      "requirements": {},
+      "upgrade": {},
+      "description": "Drug"
     },
     "BloodPack": {
       "width": 24,
@@ -3520,16 +4580,19 @@
       }
     },
     "Syringe": {
-      "parent": "Equipments.BaseEquipment",
-      "isWeapon": true,
+      "parent": "Equipments.MeleeEquipment",
+      "shouldShowUsage": false,
       "cost": {
         "gold": 30
       },
       "stats": {
         "range": 250,
-        "liquidCapacity": 100
+        "liquidCapacity": 8
       },
-      "description": "[Deprecated]"
+      "requirements": {
+        "Glass": 4
+      },
+      "description": "One-time use drug container. Stores small amounts of liquid."
     },
     "Lighter": {
       "parent": "Equipments.MeleeEquipment",
@@ -3596,6 +4659,32 @@
       "parent": "Equipments.Bottle",
       "description": "Contains Blood"
     },
+    "DrugBottle": {
+      "parent": "Equipments.MeleeEquipment",
+      "isDrugBottle": true,
+      "cost": {
+        "gold": 15
+      },
+      "shouldShowUsage": false,
+      "isUnbreakable": true,
+      "shouldNotRemoveOnBreak": true,
+      "isAnimatable": true,
+      "sprite": {
+        "width": 48,
+        "height": 48,
+        "position": {
+          "x": 45,
+          "y": 30
+        },
+        "rotation": 35
+      },
+      "stats": {
+      },
+      "requirements": {
+        "Glass": 6
+      },
+      "description": "Used to store drugs"
+    },
     "Bowl": {
       "parent": "Equipments.MeleeEquipment",
       "width": 32,
@@ -3638,7 +4727,8 @@
       "stats": {
         "damage": 2,
         "range": 250,
-        "meleeRange": 48
+        "meleeRange": 48,
+        "miningLevel": 1
       },
       "requirements": {
         "IronBar": 25,
@@ -3656,7 +4746,8 @@
       "stats": {
         "damage": 5,
         "range": 250,
-        "meleeRange": 48
+        "meleeRange": 32,
+        "miningLevel": 1
       },
       "requirements": {
         "IronBar": 20,
@@ -3664,6 +4755,38 @@
         "Wire": 5
       },
       "description": "Mines Asteroids faster. Damage 5"
+    },
+    "PowerDrill": {
+      "parent": "Equipments.MeleeEquipment",
+      "isAnimatable": true,
+      "isWeapon": true,
+      "cost": {
+        "gold": 600
+      },
+      "stats": {
+        "damage": 8,
+        "range": 250,
+        "usageCapacity": 500,
+        "meleeRange": 32,
+        "speedBonus": -4,
+        "miningLevel": 2
+      },
+      "sprite": {
+        "width": 64,
+        "height": 48,
+        "position": {
+          "x": 40,
+          "y": 35
+        }
+      },
+      "requirements": {
+        "Drill": 1,
+        "Explosives": 40,
+        "IronBar": 150,
+        "CircuitBoard": 35,
+        "Wire": 15
+      },
+      "description": "Can mine Meteorite."
     },
     "Deconstructor": {
       "parent": "Equipments.RangeEquipment",
@@ -3780,6 +4903,37 @@
         "Meteorite": 50
       },
       "description": "Concentrated Energy Shot weapon"
+    },
+    "MiasmaGun": {
+      "parent": "Equipments.RangeEquipment",
+      "isWeapon": true,
+      "isFireArm": true,
+      "cost": {
+        "gold": 1000
+      },
+      "projectileBiasByY": 5,
+      "projectileBarrelLength": 2.8,
+      "stats": {
+        "damage": 1,
+        "range": 384,
+        "reload": 150,
+        "usageCapacity": 1500,
+        "burstCount": 2,
+        "burstTimeout": 50,
+        "spreadAngle": 20
+      },
+      "sprite": {
+        "width": 80,
+        "height": 40,
+        "anchor": 0
+      },
+      "requirements": {
+        "IronBar": 40,
+        "RedMushroom": 10,
+        "RedSpore": 5,
+        "FlameThrower": 1
+      },
+      "description": "Shoots gas that spread miasma"
     },
     "AssaultRifle": {
       "parent": "Equipments.RangeEquipment",
@@ -4385,6 +5539,40 @@
     },
     "RedEnergySword": {
       "parent": "Equipments.BlueEnergySword"
+    },
+    "FusionSword": {
+      "parent": "Equipments.MeleeEquipment",
+      "isWeapon": true,
+      "cost": {
+        "gold": 6000
+      },
+      "categories": {"melee_damage": true},
+      "sprite": {
+        "width": 128,
+        "height": 32,
+        "position": {
+          "x": 56,
+          "y": 5
+        },
+        "anchor": 0,
+        "rotation": 90
+      },
+      "concurrentTargetCount": 5,
+      "isAnimatable": true,
+      "stats": {
+        "damage": 30,
+        "range": 64,
+        "attackRadius": 64,
+        "meleeRange": 64
+      },
+      "requirements": {
+        "BlueEnergySword": 1,
+        "RedEnergySword": 1,
+        "GreenEnergySword": 1,
+        "IronBar": 150,
+        "Meteorite": 40
+      },
+      "description": "An energy-based sword that slices up to 5 enemies."
     },
     "StunBaton": {
       "parent": "Equipments.MeleeEquipment",
@@ -5422,6 +6610,7 @@
       "width": 32,
       "height": 32,
       "categories": {"wall": true, "custom_colors": true, "melee_resistant":false},
+      "isAirtight": true,
       "cost": {
         "gold": 50
       },
@@ -5443,6 +6632,7 @@
       "width": 32,
       "height": 32,
       "categories": {"wall": true, "custom_colors": true, "melee_resistant":false},
+      "isAirtight": true,
       "cost": {
         "gold": 50
       },
@@ -6102,6 +7292,30 @@
       },
       "description": "Stores liquid."
     },
+    "DrugVat": {
+      "width": 64,
+      "height": 64,
+      "cost": {
+        "gold": 250
+      },
+      "categories": {"liquid_tank": true},
+      "isInteractable": true,
+      "isBottleFillable": true,
+      "requirements": {
+        "IronBar": 40,
+        "Glass": 15,
+        "LiquidPipe": 5
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "liquidCapacity": 200,
+        "clientResource": "liquid"
+      },
+      "upgrade": {
+      },
+      "description": "Stores drugs."
+    },
     "SmallOxygenTank": {
       "width": 32,
       "height": 32,
@@ -6257,6 +7471,70 @@
         "count": "+25"
       },
       "description": "Mines Ores underground automatically"
+    },
+    "DrugStation": {
+      "parent": "Buildings.BaseProcessor",
+      "storageCount": 3,
+      "width": 64,
+      "height": 96,
+      "hasMenu": true,
+      "menuDescription": "Input Drug Bottle and Material",
+      "energy": 100,
+      "cost": {
+        "gold": 500
+      },
+      "categories": {"producer":true},
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "requirements": {
+        "IronBar": 80,
+        "CircuitBoard": 25,
+        "Glass": 10,
+        "DrugBottle": 1
+      },
+      "stats": {
+        "health": 150,
+        "count": 125,
+        "processingRate": 10,
+        "powerConsumption": 200
+      },
+      "description": "Can be used to create drugs"
+    },
+    "ThermalProcessor": {
+      "parent": "Buildings.BaseProcessor",
+      "storageCount": 1,
+      "width": 64,
+      "height": 32,
+      "hasMenu": true,
+      "menuDescription": "Insert Drug to heat",
+      "energy": 100,
+      "hasFillBar": true,
+      "isLightSource": true,
+      "isLightPersistent": true,
+      "lightColor": "#ffa400",
+      "lightRadius": 3,
+      "cost": {
+        "gold": 500
+      },
+      "categories": {"producer":true,"fuel_consumer":true},
+      "isInteractable": true,
+      "showInteractTooltip": true,
+      "requirements": {
+        "IronBar": 50,
+        "CircuitBoard": 20,
+        "Glass": 15,
+        "FuelPipe": 5
+      },
+      "stats": {
+        "health": 100,
+        "count": 125,
+        "processingRate": 5,
+        "powerConsumption": 200,
+        "fuelConsumption": 2,
+        "fuelCapacity": 100,
+        "clientResource": "fuel"
+      },
+      "description": "Can be used to heat drugs"
     },
     "EscapePod": {
       "width": 32,
@@ -6953,7 +8231,7 @@
         "gold": 50
       },
       "requirements": {
-        "IronBar": 5
+        "IronBar": 2
       },
       "stats": {
         "health": 250,
@@ -7438,7 +8716,7 @@
       "hasFillBar": true,
       "stats": {
         "reload": 500,
-        "damage": 5,
+        "damage": 10,
         "health": 150,
         "range": 480,
         "powerConsumption": 500,
@@ -7581,6 +8859,7 @@
       "isLightBlocker": true,
       "categories": {"wall":true,"astreoid":true},
       "health": 25,
+      "requiredLevel": 1,
       "isAirtight": true,
       "minimapColor": "#2b1e14"
     },
@@ -7592,6 +8871,7 @@
       "parent": "Terrains.Asteroid",
       "label": "Iron Ore",
       "health": 100,
+      "requiredLevel": 1,
       "minimapColor": "#2b1e14"
     },
     "MeteoriteAsteroid": {
@@ -7599,6 +8879,8 @@
       "description": "Meteorite Asteroid",
       "label": "Meteorite",
       "health": 20,
+      "requiredLevel": 2,
+      "defense": 5,
       "minimapColor": "#2b1e14"
     },
     "SteelAsteroid": {
@@ -7611,6 +8893,7 @@
       "description": "Copper Asteroid",
       "label": "Copper Ore",
       "health": 100,
+      "requiredLevel": 1,
       "minimapColor": "#2b1e14"
     }
   },

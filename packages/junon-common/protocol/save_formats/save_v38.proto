@@ -211,6 +211,9 @@ message Pickup {
 message ItemInstance {
   uint32 usage = 1;
   string content = 2;
+  string effectsJson = 3;
+  string drugTint = 4;
+  double duration = 5;
 }
 
 message Mob {

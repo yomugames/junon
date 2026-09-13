@@ -12,7 +12,7 @@ class ChemistryStation extends BaseBuilding {
   }
 
   openMenu() {
-    const templateList = Foods.getDrugs().concat([Ores.Explosives])
+    const templateList = Foods.getDrugs().concat([Ores.Explosives].concat(Ores.Poison))
 
     let options = {}
     if (!this.isPowered) {

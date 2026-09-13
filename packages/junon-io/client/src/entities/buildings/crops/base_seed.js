@@ -77,27 +77,39 @@ class BaseSeed extends BaseBuilding {
     }
   }
 
-  onIsWateredChanged() {
-    let platform = this.getStandingPlatform()
-    if (!platform) return
+  getStandingPlatforms() {
+    const platforms = []
+    const startRow = this.getTopLeftRow()
+    const startCol = this.getTopLeftCol()
+    const rowCount = Math.ceil(this.getRotatedHeight() / Constants.tileSize)
+    const colCount = Math.ceil(this.getRotatedWidth() / Constants.tileSize)
 
-    if (this.isWatered) {
-      platform.applyTint(0x999999)
-    } else {
-      platform.applyTint(0xffffff)
+    for (let row = startRow; row < startRow + rowCount; row++) {
+      for (let col = startCol; col < startCol + colCount; col++) {
+        const platform = this.getContainer().platformMap.get(row, col)
+        if (platform) platforms.push(platform)
+      }
     }
 
-    platform.updateChunkSprite()
+    return platforms
+  }
+
+  onIsWateredChanged() {
+    const tint = this.isWatered ? 0x999999 : 0xffffff
+
+    this.getStandingPlatforms().forEach((platform) => {
+      platform.applyTint(tint)
+      platform.updateChunkSprite()
+    })
   }
 
   remove() {
     super.remove()
 
-    let platform = this.getStandingPlatform()
-    if (!platform) return
-
-    if(platform.constructor.name === "Soil") platform.applyTint(0xffffff)
-    platform.updateChunkSprite()
+    this.getStandingPlatforms().forEach((platform) => {
+      if (platform.constructor.name === "Soil") platform.applyTint(0xffffff)
+      platform.updateChunkSprite()
+    })
   }
 
   getMatureSpritePath() {

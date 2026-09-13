@@ -1,0 +1,38 @@
+
+> client:build
+> npm run client:build --workspace packages/junon-io
+
+
+> junon-io@1.0.0 client:build
+> gulp build
+
+'cat' is not recognized as an internal or external command,
+operable program or batch file.
+Error: Command failed: cat C:\Users\joyw0\Downloads\cmder\junon\node_modules/junon-common/protocol/enum.proto C:\Users\joyw0\Downloads\cmder\junon\node_modules/junon-common/protocol/base.proto C:\Users\joyw0\Downloads\cmder\junon\node_modules/junon-common/protocol/app.proto
+'cat' is not recognized as an internal or external command,
+operable program or batch file.
+
+    at checkExecSyncError (node:child_process:890:11)
+    at Object.execSync (node:child_process:962:15)
+    at Object.<anonymous> (C:\Users\joyw0\Downloads\cmder\junon\packages\junon-io\gulpfile.js:34:56)
+    at Module._compile (node:internal/modules/cjs/loader:1241:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1295:10)
+    at Module.load (node:internal/modules/cjs/loader:1091:32)
+    at Module._load (node:internal/modules/cjs/loader:938:12)
+    at Module.require (node:internal/modules/cjs/loader:1115:19)
+    at require (node:internal/modules/helpers:130:18) {
+  status: 1,
+  signal: null,
+  output: [
+    null,
+    <Buffer >,
+    <Buffer 27 63 61 74 27 20 69 73 20 6e 6f 74 20 72 65 63 6f 67 6e 69 7a 65 64 20 61 73 20 61 6e 20 69 6e 74 65 72 6e 61 6c 20 6f 72 20 65 78 74 65 72 6e 61 6c ... 44 more bytes>
+  ],
+  pid: 9880,
+  stdout: <Buffer >,
+  stderr: <Buffer 27 63 61 74 27 20 69 73 20 6e 6f 74 20 72 65 63 6f 67 6e 69 7a 65 64 20 61 73 20 61 6e 20 69 6e 74 65 72 6e 61 6c 20 6f 72 20 65 78 74 65 72 6e 61 6c ... 44 more bytes>
+}
+npm ERR! Lifecycle script `client:build` failed with error: 
+npm ERR! Error: command failed 
+npm ERR!   in workspace: junon-io@1.0.0 
+npm ERR!   at location: C:\Users\joyw0\Downloads\cmder\junon\packages\junon-io 

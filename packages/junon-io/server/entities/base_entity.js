@@ -1452,7 +1452,7 @@ class BaseEntity extends BaseTransientEntity {
       if (accumulatedTime >= poisonDuration) {
         this.removeEffect("poison")
       } else if(isThreeSecondInterval) {
-        this.setHealth(this.health - 10)
+        this.setHealth(this.health - 5)
       }
     }
 
@@ -1772,7 +1772,7 @@ if (isFiveSecondInterval) {
   }
 
   applyFireDamage() {
-    this.setHealth(this.health - 1)
+    this.setHealth(this.health - 3)
   }
 
   canSpreadFire() {

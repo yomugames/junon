@@ -108,6 +108,9 @@ class Stat extends BaseCommand {
       this.modifyStat(stat, keyValueMap, caller)
       if(stat.usage != null && entity.instance.usage != null) entity.instance.setUsage(stat.usage)
       this.sector.setCustomEntityStat(entity.id, stat)
+      if (entity.isPlayer() && Object.prototype.hasOwnProperty.call(keyValueMap, "fov") && this.sector.isFovMode()) {
+        entity.assignFov()
+      }
       caller.showChatSuccess(this.formatEntityStat(entity))
     }
   }
@@ -118,9 +121,10 @@ class Stat extends BaseCommand {
         let value
         if (keyValueMap[key] && keyValueMap[key][0] === '*') {
           // multiplier
-          value = stat[key] * parseInt(keyValueMap[key].slice(1))
+          let multiplier = key === "fov" ? Number(keyValueMap[key].slice(1)) : parseInt(keyValueMap[key].slice(1))
+          value = stat[key] * multiplier
         } else {
-          value = parseInt(keyValueMap[key])
+          value = key === "fov" ? Number(keyValueMap[key]) : parseInt(keyValueMap[key])
         }
         
         if (this.isStatValid(key, value)) {
@@ -147,6 +151,10 @@ class Stat extends BaseCommand {
       return "[1-10000]"
     } else if (key === 'usage') {
       return "[0-10000]"
+    } else if (key === 'spread') {
+      return "[0-100]"
+    }  else if (key === 'fov') {
+      return "[0-4096]"
     }
   }
 
@@ -168,6 +176,10 @@ class Stat extends BaseCommand {
         return parseInt(value) >= 1 && parseInt(value) <= 10000
       case 'usage':
         return parseInt(value) >= 0 && parseInt(value) <= 10000
+      case 'spread':
+        return parseInt(value) >= 0 && parseInt(value) <= 100
+      case 'fov':
+        return Number.isFinite(value) && value >= 0 && value <= 4096
       default: return;
     }
   }
@@ -207,7 +219,12 @@ class Stat extends BaseCommand {
       return {
         health: buildingKlass.prototype.getMaxHealth(),
         damage: buildingKlass.prototype.getDamage(),
-        range: buildingKlass.prototype.getAttackRange()
+        range: buildingKlass.prototype.getAttackRange(),
+      }
+    } else if (buildingType === Protocol.definition().BuildingType.Sapling) {
+      return {
+        health: buildingKlass.prototype.getMaxHealth(),
+        spread: buildingKlass.prototype.getSpread()
       }
     } else {
       return {
@@ -254,7 +271,8 @@ class Stat extends BaseCommand {
       }
     } else if (entity.isPlayer()) {
       return {
-        health: entity.getMaxHealth()
+        health: entity.getMaxHealth(),
+        fov: entity.getFov()
       }
     }
   }
@@ -288,6 +306,14 @@ class Stat extends BaseCommand {
                `damage:${klass.prototype.getDamage()} ` + 
                `range:${klass.prototype.getAttackRange()}`
       }
+    } else if (type === Protocol.definition().BuildingType.Sapling) {
+      if (this.sector.buildingCustomStats[type]) {
+        return `health:${this.sector.buildingCustomStats[type].health} ` +
+               `spread:${this.sector.buildingCustomStats[type].spread}`
+      } else {
+        return `health:${klass.prototype.getMaxHealth()} ` +
+               `spread:${klass.prototype.getSpread()}`
+      }
     } else {
       if (this.sector.buildingCustomStats[type]) {
         return `health:${this.sector.buildingCustomStats[type].health} `
@@ -319,6 +345,7 @@ class Stat extends BaseCommand {
     if (this.sector.entityCustomStats[entity.id]) {
       if (entity.isPlayer()) {
         stats['health'] = this.sector.entityCustomStats[entity.id].health
+        stats['fov'] = this.sector.entityCustomStats[entity.id].fov
       } else if (entity.isMob()) {
         stats['health'] = this.sector.entityCustomStats[entity.id].health
         stats['damage'] = this.sector.entityCustomStats[entity.id].damage
@@ -353,6 +380,7 @@ class Stat extends BaseCommand {
         }
       } else if (entity.isPlayer()) {
         stats['health'] = entity.getMaxHealth()
+        stats['fov'] = entity.getFov()
       } else if (entity.isWeapon()) {
         stats['damage'] = entity.getDamage()
         stats['range'] = entity.getAttackRange()

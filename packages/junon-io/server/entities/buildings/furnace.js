@@ -2,6 +2,7 @@ const Constants = require('../../../common/constants.json')
 const Protocol = require('../../../common/util/protocol')
 const BaseBuilding = require("./base_building")
 const Bars = require("./../bars/index")
+const CraftingRules = require("../crafting_rules")
 
 class Furnace extends BaseBuilding {
 
@@ -24,7 +25,7 @@ class Furnace extends BaseBuilding {
   canCraft(type) {
     if (this.isFull()) return false
 
-    return Bars.forType(type) || type === Protocol.definition().BuildingType.Bottle
+    return CraftingRules.isFurnaceCraftable(type)
   }
 
   craft(item, inventoryInput) {

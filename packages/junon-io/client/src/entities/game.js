@@ -928,6 +928,10 @@ class Game {
     this.initAdditionalLibraries()
   }
 
+  onZoom(data) {
+    this.zoom(data.level)
+  }
+
   initAdditionalLibraries() {
     if (this.isInitialAdminSetup && this.isAdminMode) {
       this.isInitialAdminSetup = false
@@ -1424,7 +1428,8 @@ class Game {
         cb()
       })
 
-    let tempAssets = ['armored_window_icon.png', 'armored_window_base.png', 'armored_window.png','window_icon.png', 'window_base.png', 'window.png','circuit_board_printer.png','neon_sign.png', 'small_wood_table.png', 'displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png', 'pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png', 'deconstructor.png', 'blue_laser.png', 'keypad_door.png', 'keypad_door_lower.png', 'keypad_door_upper.png', 'unbreakable_wall.png', 'sapper.png', 'sapper_corpse.png', 'dynamite.png', 'miasma_gate.png', "solid_texture2.png", "simplex_texture.png", "cabbage_seed.png", "cabbage_plant.png", "cabbage.png", "3dwall-0.png", "3dwall-1.png", "3dwall-2.png", "3dwall-3.png", "3dwall-4.png", "3dwall-5.png", "3dwall-6.png", "3dwall-7.png", "3dwall-8.png", "3dwall-9.png", "3dwall-10.png", "3dwall-11.png", "3dwall-12.png", "3dwall-13.png", "shotgun_reskin.png",  "ak47.png", "bolt_action_rifle.png", "minigun.png", "flame_thrower_reskin.png", "grenade_launcher.png", "uzi2.png", "player_hands_hold.png", "player_hands_hold_heavy.png", "player_hands_hold_launcher.png", "small_airlock_upper.png", "small_airlock_lower.png", "small_airlock.png", "heavy_rifle.png", "shock_grenade.png", "bayonet.png", "kukri.png", "blue.png", "revitalizer.png", "revitalizer_base.png", "revitalizer_core.png", "revitalizer_beam.png", "dispenser.png"]
+    let tempAssets = ['armored_window_icon.png', 'armored_window_base.png', 'armored_window.png','window_icon.png', 'window_base.png', 'window.png','circuit_board_printer.png','neon_sign.png', 'small_wood_table.png', 'displacement_map.png', 'squid_lord_heart.png', 'squid_staff.png', 'fries.png', 'energy_drink.png', 'alien_juice.png', 'rocket_launcher.png', 'scar_17_by_px.png', 'bowl_by_px.png', 'potato_soup_by_px.png', 'miso_soup_by_px.png', 'slime_broth_by_px.png', 'bomber_turret_by_px.png', 'firebat.png', 'plasma_blade.png', 'raven.png', 'starberries.png', 'car.png', 'bricks_texture.png', 'checker_texture.png', 'noise_texture.png', 'x_texture.png', 'xchecker_texture.png', 'nihonshu.png', 'pumpkin.png', 'pumpkin_plant.png', 'pumpkin_seed.png', 'rice.png', 'rice_plant.png', 'rice_seed.png', 'fish.png', 'nigiri.png', 'katana_reskin.png', 'pumpkin_pie.png', 'imperial_special_forces_armor.png', 'deconstructor.png', 'blue_laser.png', 'keypad_door.png', 'keypad_door_lower.png', 'keypad_door_upper.png', 'unbreakable_wall.png', 'sapper.png', 'sapper_corpse.png', 'dynamite.png', 'miasma_gate.png', "solid_texture2.png", "simplex_texture.png", "cabbage_seed.png", "cabbage_plant.png", "cabbage.png", "3dwall-0.png", "3dwall-1.png", "3dwall-2.png", "3dwall-3.png", "3dwall-4.png", "3dwall-5.png", "3dwall-6.png", "3dwall-7.png", "3dwall-8.png", "3dwall-9.png", "3dwall-10.png", "3dwall-11.png", "3dwall-12.png", "3dwall-13.png", "shotgun_reskin.png",  "ak47.png", "bolt_action_rifle.png", "minigun.png", "flame_thrower_reskin.png", "grenade_launcher.png", "uzi2.png", "player_hands_hold.png", "player_hands_hold_heavy.png", "player_hands_hold_launcher.png", "small_airlock_upper.png", "small_airlock_lower.png", "small_airlock.png", "heavy_rifle.png", "shock_grenade.png", "bayonet.png", "kukri.png", "blue.png", "revitalizer.png", "revitalizer_base.png", "revitalizer_core.png", "revitalizer_beam.png", "dispenser.png", "red_mushroom.png",
+      "brown_mushroom.png", "white_mushroom.png", "mushroom_soup.png", "red_sporeling.png", "brown_sporeling.png", "white_sporeling.png", "red_mushroom_plant.png", "brown_mushroom_plant.png", "white_mushroom_plant.png", "mushling.png", "red_spore.png", "brown_spore.png", "white_spore.png", "orange_mushroom.png", "orange_spore.png", "orange_mushroom_plant.png", "orange_sporeling.png", "yellow_mushroom.png", "yellow_spore.png", "yellow_mushroom_plant.png", "yellow_sporeling.png", "green_mushroom.png", "green_spore.png", "green_mushroom_plant.png", "green_sporeling.png", "blue_mushroom.png", "blue_spore.png", "blue_mushroom_plant.png", "blue_sporeling.png", "purple_mushroom.png", "purple_spore.png", "purple_mushroom_plant.png", "purple_sporeling.png", "pink_mushroom.png", "pink_spore.png", "pink_mushroom_plant.png", "pink_sporeling.png", "black_mushroom.png", "black_spore.png", "black_mushroom_plant.png", "black_sporeling.png", "fusion_sword.png", "sapling.png", "sapling_mature.png", "ghost_shroom.png", "ghost_shroom_corpse.png", "miasma_gun.png", "drug_station.png", "drug_bottle_empty.png", "drug_bottle_full.png", "drug_status.png", "drug_effect.png", "addiction_status.png", "addiction_effect.png", "power_drill.png", "thermal_processor.png", "thermal_processor_off.png", "drug_vat.png", "drug_vat_base.png", "drug_vat_lid.png", "drug_vat_liquid.png", "syringe_empty.png", "syringe_full.png"]
     tempAssets.forEach((asset) => {
       console.log(`Loaded ${asset}:`)
       PIXI.Texture.addToCache(PIXI.Texture.fromImage('/assets/images/' + asset), asset)
@@ -1513,6 +1518,7 @@ class Game {
     SocketUtil.on("SetTutorialIndex", this.onSetTutorialIndex.bind(this))
     SocketUtil.on("Pong", this.onPong.bind(this))
     SocketUtil.on("SetAdmin", this.onSetAdmin.bind(this))
+    SocketUtil.on("Zoom", this.onZoom.bind(this))
     SocketUtil.on("Event", this.onEvent.bind(this))
     SocketUtil.on("UpdateStats", this.onUpdateStats.bind(this))
     SocketUtil.on("BreakBuilding", this.onBreakBuilding.bind(this))
@@ -1727,6 +1733,9 @@ class Game {
       this.sector.setBuildingCustomStats(data.type, data.stats)
     } else if (data.group === 'entities') {
       this.sector.setEntityCustomStats(data.type, data.stats)
+      if (this.player && data.type === this.player.id && data.stats.fov != null && this.sector.isFovMode()) {
+        this.sector.lightManager.applyFov()
+      }
     } else if (data.group === 'items') {
       this.sector.setItemCustomStats(data.type, data.stats)
     }
@@ -3638,7 +3647,7 @@ arrow.style.setProperty('--arrow-color',realColor)
           this.removeItemUsageFor(this.mobilePrimaryActionBtn)
           return
         }
-        if (equipmentKlass.prototype.isUnbreakable() && !equipmentKlass.prototype.shouldShowUsage()) {
+        if (!equipmentKlass.prototype.shouldShowUsage()) {
           this.removeItemUsageFor(this.mobilePrimaryActionBtn)
           return
         }
@@ -3667,6 +3676,46 @@ arrow.style.setProperty('--arrow-color',realColor)
     imgSrc = "/assets/images/" + Item.getSpritePath(type)
 
     return imgSrc
+  }
+
+  tintInventoryImage(img, src, tint) {
+    tint = typeof tint === "string" ? tint.replace(/^#/, "") : tint
+    if (!tint || !/^[0-9a-f]{6}$/i.test(tint)) {
+      img.style.filter = ""
+      img.src = src
+      return
+    }
+
+    this.tintedInventoryImages = this.tintedInventoryImages || {}
+    let cacheKey = src + ":" + tint
+    if (this.tintedInventoryImages[cacheKey]) {
+      img.style.filter = ""
+      img.src = this.tintedInventoryImages[cacheKey]
+      return
+    }
+
+    img.onload = () => {
+      let canvas = document.createElement("canvas")
+      canvas.width = img.naturalWidth
+      canvas.height = img.naturalHeight
+      let context = canvas.getContext("2d")
+      context.drawImage(img, 0, 0)
+      let imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+      let red = parseInt(tint.substr(0, 2), 16) / 255
+      let green = parseInt(tint.substr(2, 2), 16) / 255
+      let blue = parseInt(tint.substr(4, 2), 16) / 255
+      for (let index = 0; index < imageData.data.length; index += 4) {
+        imageData.data[index] *= red
+        imageData.data[index + 1] *= green
+        imageData.data[index + 2] *= blue
+      }
+      context.putImageData(imageData, 0, 0)
+      this.tintedInventoryImages[cacheKey] = canvas.toDataURL()
+      img.onload = null
+      img.src = this.tintedInventoryImages[cacheKey]
+    }
+    img.style.filter = ""
+    img.src = src
   }
 
   createHoldItemInventorySlot() {
@@ -3744,14 +3793,33 @@ arrow.style.setProperty('--arrow-color',realColor)
   }
 
   renderInventorySlot(inventorySlot, data) {
-    inventorySlot.querySelector("img").src = this.getImageSrcForItemType(data.type)
+    let image = inventorySlot.querySelector("img")
+    let imageSrc = this.getImageSrcForItemType(data.type)
+    if (Item.isSyringe(data)) {
+      let instance = data.instance
+      let hasEffects = instance && (instance.effects || instance.effectsJson)
+      imageSrc = "/assets/images/" + (hasEffects ? "syringe_full.png" : "syringe_empty.png")
+    }
+    let itemKlass = Item.getKlass(data.type)
+    let inventoryImageStyle = itemKlass.prototype.getInventoryImageStyle ? itemKlass.prototype.getInventoryImageStyle() : {}
+    image.style.width = inventoryImageStyle.width || "75%"
+    image.style.height = inventoryImageStyle.height || "75%"
+    image.style.transform = inventoryImageStyle.transform || "translate(-50%, -50%)"
+    let drugTint = data.instance && data.instance.drugTint
+    if (!drugTint && itemKlass && itemKlass.getType() === Protocol.definition().BuildingType.Drug) {
+      drugTint = data.drugTint
+    }
+    if (Item.isSyringe(data) && drugTint) {
+      drugTint = this.getWeakenedTint(drugTint)
+    }
+    this.tintInventoryImage(image, imageSrc, drugTint)
     if (data.id) {
       inventorySlot.dataset.id = data.id
     }
     inventorySlot.dataset.type = data.type
 
     inventorySlot.dataset.content = data.count === 1 ? "" : data.count
-    inventorySlot.dataset.special = data.instance ? data.instance.content : ""
+    inventorySlot.dataset.special = data.instance ? data.instance.content || data.instance.description : ""
 
     // show item count in primary action btn
     if (this.isMobile() && inventorySlot.dataset.id === this.mobilePrimaryActionBtn.dataset.id) {
@@ -3771,8 +3839,25 @@ arrow.style.setProperty('--arrow-color',realColor)
     }
   }
 
+  getWeakenedTint(tint) {
+    tint = typeof tint === "string" ? tint.replace(/^#/, "") : tint
+    if (!tint || !/^[0-9a-f]{6}$/i.test(tint)) return tint
+
+    let color = parseInt(tint, 16)
+    let red = (color >> 16) & 0xff
+    let green = (color >> 8) & 0xff
+    let blue = color & 0xff
+    red = Math.round(red + (255 - red) * 0.35)
+    green = Math.round(green + (255 - green) * 0.35)
+    blue = Math.round(blue + (255 - blue) * 0.35)
+    return [red, green, blue].map((channel) => channel.toString(16).padStart(2, "0")).join("")
+  }
+
   resetInventorySlot(inventorySlot) {
-    inventorySlot.querySelector("img").src = ""
+    let image = inventorySlot.querySelector("img")
+    image.onload = null
+    image.style.filter = ""
+    image.src = ""
     inventorySlot.dataset.id = ""
     inventorySlot.dataset.type = ""
     inventorySlot.dataset.content = ""
@@ -3795,7 +3880,13 @@ arrow.style.setProperty('--arrow-color',realColor)
   renderInventorySlotUsage(inventorySlot, usage) {
     let equipmentKlass = Equipments.forType(inventorySlot.dataset.type)
     if (!equipmentKlass) return
-    if (equipmentKlass.prototype.isUnbreakable() && !equipmentKlass.prototype.shouldShowUsage()) return
+    if (!equipmentKlass.prototype.shouldShowUsage()) {
+      this.removeInventorySlotUsage(inventorySlot)
+      if (this.isMobile() && inventorySlot.dataset.id === this.mobilePrimaryActionBtn.dataset.id) {
+        this.removeItemUsageFor(this.mobilePrimaryActionBtn)
+      }
+      return
+    }
 
     let maxUsage;
     if(this.sector.entityCustomStats[inventorySlot.dataset.id]) maxUsage = this.sector.entityCustomStats[inventorySlot.dataset.id].capacity

@@ -1136,6 +1136,12 @@ class Server {
       maxPayloadLength: 16 * 1024 * 1024,
       idleTimeout: 120,
       open: (ws, req) => {
+        // Must read the remote address synchronously here, before any async
+        // work runs: uWS's getRemoteAddress() points at native stack memory
+        // that is invalidated once this handler returns, so reading it later
+        // (message/close handlers, setTimeout, async continuations) would
+        // otherwise yield a detached/empty buffer.
+        Helper.cacheSocketRemoteAddress(ws)
         this.socketUtil.registerSocket(ws)
       },
       message: (ws, message, isBinary) => {

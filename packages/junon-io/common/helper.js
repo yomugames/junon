@@ -30,8 +30,28 @@ module.exports = {
     return klass
   },
   getSocketRemoteAddress(socket) {
+    // uWebSockets.js's getRemoteAddress() returns an ArrayBuffer pointing
+    // directly at internal C++ stack memory, which is only valid for the
+    // native call that invoked the current JS callback. Reading it again
+    // later (a subsequent message/close handler, a setTimeout, an async
+    // continuation) sees that memory already freed, returning a 0-length
+    // buffer. Callers that need the address outside that first callback
+    // must have primed it earlier via cacheSocketRemoteAddress(), whose
+    // cached value is reused here.
+    if (socket.remoteAddress) return socket.remoteAddress
+
     let uint8Array = new Uint8Array(socket.getRemoteAddress())
     return [uint8Array[12], uint8Array[13], uint8Array[14], uint8Array[15]].join(".")
+  },
+  // Must be called synchronously within the callback that first hands us the
+  // socket (e.g. a WS `open` handler), before any async work runs, so the
+  // native buffer backing getRemoteAddress() is still valid. Stores the
+  // result on the socket so later getSocketRemoteAddress() calls - from a
+  // message/close handler, a setTimeout, an async continuation - don't have
+  // to touch the (by-then invalidated) native memory again.
+  cacheSocketRemoteAddress(socket) {
+    socket.remoteAddress = this.getSocketRemoteAddress(socket)
+    return socket.remoteAddress
   },
   getRowColFromCoord(coord) {
     let rowCol = coord.split("-")

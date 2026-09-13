@@ -235,6 +235,7 @@ class WorldSerializer {
 
   static async deleteLocally(sectorUid) {
     const sector = await SectorModel.findOne({ where: { uid: sectorUid } })
+    if (!sector) return
     await sector.update({ data: null })
   }
 

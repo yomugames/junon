@@ -1135,13 +1135,22 @@ class Server {
     app.ws("/*", {
       maxPayloadLength: 16 * 1024 * 1024,
       idleTimeout: 120,
-      open: (ws, req) => {
-        // Must read the remote address synchronously here, before any async
-        // work runs: uWS's getRemoteAddress() points at native stack memory
-        // that is invalidated once this handler returns, so reading it later
-        // (message/close handlers, setTimeout, async continuations) would
-        // otherwise yield a detached/empty buffer.
-        Helper.cacheSocketRemoteAddress(ws)
+      upgrade: (res, req, context) => {
+        // ws.getRemoteAddress() is unreliable on this uWebSockets.js build -
+        // it returns an empty ArrayBuffer even when called synchronously in
+        // `open`, verified against v20.70.0. The HttpResponse's
+        // getRemoteAddress() still works correctly here, pre-upgrade, so
+        // capture it now and hand it to the WebSocket as user data; uWS
+        // merges that object's properties directly onto the resulting `ws`.
+        res.upgrade(
+          { remoteAddress: Helper.getSocketRemoteAddress(res) },
+          req.getHeader('sec-websocket-key'),
+          req.getHeader('sec-websocket-protocol'),
+          req.getHeader('sec-websocket-extensions'),
+          context
+        )
+      },
+      open: (ws) => {
         this.socketUtil.registerSocket(ws)
       },
       message: (ws, message, isBinary) => {

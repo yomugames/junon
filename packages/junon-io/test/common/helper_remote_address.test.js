@@ -1,62 +1,58 @@
 const Helper = require('../../common/helper')
 
-// Simulates uWebSockets.js's real behavior: getRemoteAddress() returns an
-// ArrayBuffer that points directly at internal C++ stack memory. That memory
-// is only valid for the duration of the native call that invoked the JS
-// callback (e.g. the `open` handler). Any read attempted after that stack
-// frame has unwound - a later `message`/`close` handler, a setTimeout, or an
-// async function continuation - observes a detached/zero-length ArrayBuffer.
-function createMockUwsSocket(ip) {
-  const octets = ip.split('.').map(Number)
-  const validBuffer = new ArrayBuffer(16)
-  new Uint8Array(validBuffer).set(octets, 12)
-
-  let callCount = 0
+// On this uWebSockets.js build (verified against v20.70.0), WebSocket's
+// getRemoteAddress() returns an empty ArrayBuffer - even when called
+// synchronously inside the `open` handler. The fix is to capture the
+// address from the HttpResponse in the `upgrade` handler (where
+// getRemoteAddress() still works correctly) and hand it off as WebSocket
+// user data, which uWS merges directly onto the socket as `remoteAddress`.
+// getSocketRemoteAddress() must prefer that pre-populated value and never
+// fall back to the broken call on a WebSocket.
+function createMockUwsWebSocket() {
   return {
     getRemoteAddress() {
-      callCount += 1
-      // Only the very first (synchronous, same-stack-frame) call sees valid
-      // native memory. Every subsequent call sees it already freed.
-      return callCount === 1 ? validBuffer : new ArrayBuffer(0)
+      return new ArrayBuffer(0)
+    }
+  }
+}
+
+function createMockUwsHttpResponse(ip) {
+  const octets = ip.split('.').map(Number)
+  const buffer = new ArrayBuffer(16)
+  new Uint8Array(buffer).set(octets, 12)
+
+  return {
+    getRemoteAddress() {
+      return buffer
     }
   }
 }
 
 test('getSocketRemoteAddress does not mutate the socket', () => {
-  const socket = createMockUwsSocket('203.0.113.42')
+  const res = createMockUwsHttpResponse('203.0.113.42')
 
-  expect(Helper.getSocketRemoteAddress(socket)).toBe('203.0.113.42')
-  expect(socket.remoteAddress).toBeUndefined()
+  expect(Helper.getSocketRemoteAddress(res)).toBe('203.0.113.42')
+  expect(res.remoteAddress).toBeUndefined()
 })
 
-test('getSocketRemoteAddress stays correct when read again after the socket open handler returns, provided the address was cached during open', () => {
-  const socket = createMockUwsSocket('203.0.113.42')
+test('getSocketRemoteAddress reads the HttpResponse remote address during upgrade', () => {
+  const res = createMockUwsHttpResponse('203.0.113.42')
 
-  // Must happen synchronously in the WS `open` handler, while uWS's native
-  // buffer backing getRemoteAddress() is still valid.
-  expect(Helper.cacheSocketRemoteAddress(socket)).toBe('203.0.113.42')
-
-  // A later read - e.g. triggered from a `message` handler once a player
-  // sends a join request - happens after uWS has already reclaimed the
-  // stack memory backing the ArrayBuffer, and must still resolve correctly.
-  expect(Helper.getSocketRemoteAddress(socket)).toBe('203.0.113.42')
+  expect(Helper.getSocketRemoteAddress(res)).toBe('203.0.113.42')
 })
 
-test('getSocketRemoteAddress stays correct when read inside a later async callback, provided the address was cached up front', async () => {
-  const socket = createMockUwsSocket('198.51.100.7')
+test('getSocketRemoteAddress prefers a pre-populated remoteAddress over the (broken) WebSocket call', () => {
+  const ws = createMockUwsWebSocket()
 
-  expect(Helper.cacheSocketRemoteAddress(socket)).toBe('198.51.100.7')
+  // Simulates uWS merging the `upgrade` handler's userData - captured from
+  // the HttpResponse - directly onto the WebSocket object.
+  ws.remoteAddress = '203.0.113.42'
 
-  await new Promise(resolve => setTimeout(resolve, 0))
-
-  expect(Helper.getSocketRemoteAddress(socket)).toBe('198.51.100.7')
+  expect(Helper.getSocketRemoteAddress(ws)).toBe('203.0.113.42')
 })
 
-test('without caching up front, a later read observes the invalidated native buffer', () => {
-  const socket = createMockUwsSocket('203.0.113.42')
+test('without a pre-populated remoteAddress, a WebSocket read observes the broken empty buffer', () => {
+  const ws = createMockUwsWebSocket()
 
-  // Nothing primed the cache during `open`, so a later read - the bug this
-  // guards against - re-touches uWS's already-freed native memory.
-  expect(Helper.getSocketRemoteAddress(socket)).toBe('203.0.113.42')
-  expect(Helper.getSocketRemoteAddress(socket)).not.toBe('203.0.113.42')
+  expect(Helper.getSocketRemoteAddress(ws)).not.toBe('203.0.113.42')
 })

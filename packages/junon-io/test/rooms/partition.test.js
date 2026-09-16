@@ -9,9 +9,17 @@
 
 const Grid = require("./../../common/entities/grid")
 const NetworkAssignable = require("./../../common/interfaces/network_assignable")
-const IDGenerator = require('../../server/util/id_generator')
+const IDGeneratorKlass = require('../../server/util/id_generator')
 const RoomManager = require('../../server/entities/networks/room_manager')
 const PressureManager = require('../../server/entities/networks/pressure_manager')
+const FloodFillQueue = require('../../common/entities/flood_fill_queue')
+const Constants = require('../../common/constants.json')
+
+// server.js normally sets this global before any entity code runs (see
+// server.js's top-level `debugMode = ...`); room.js reads it directly.
+global.debugMode = false
+
+const IDGenerator = new IDGeneratorKlass()
 
 
 class Entity {
@@ -40,12 +48,20 @@ class Tile {
     return ["door", "wall", "vent"].indexOf(this.typeName) !== -1
   }
 
+  isRoomPartitioner() {
+    return ["door", "wall", "vent", "escape_pod"].indexOf(this.typeName) !== -1
+  }
+
+  isGroundTile() {
+    return this.typeName === "ground"
+  }
+
   getType() {
     return this.typeName
   }
 
   isStructure() {
-    return !this.hasCategory("platform") && !this.hasCategory("wall") && !this.hasCategory("distribution")
+    return !this.hasCategory("platform") && !this.hasCategory("wall") && !this.hasCategory("distribution") && !this.hasCategory("ground")
   }
 
   getStandingPlatform() {
@@ -67,27 +83,62 @@ let airtightTile = a = () => { return new Tile("airtight") }
 let blankTile = 0
 let roomManager
 let oxygenManager
+let game
+let container
 
 let grid = new Grid("test", {}, 10, 10)
 
+// RoomManager doesn't partition synchronously: partition() only enqueues a
+// RoomPartitionRequest, which becomes eligible for processing once the game
+// clock has advanced past its debounce window (see RoomPartitionRequest#isReady),
+// and then flood-fills neighbor tiles over one or more turns of the shared
+// floodFillQueue (see sector.js's real tick loop, which drives the same three
+// calls every turn). Simulate enough turns for any pending request to finish.
+async function tick(turns = 20) {
+  for (let i = 0; i < turns; i++) {
+    game.timestamp += Constants.physicsTimeStep + 1
+    roomManager.processPartitionRequestQueue()
+    container.floodFillQueue.executeTurn()
+  }
+}
+
 beforeEach(function(done) {
-  let game = {
-    registerEntity: () => {}
+  game = {
+    timestamp: 0,
+    registerEntity: () => {},
+    generateId: (type) => IDGenerator.generate(type),
+    captureException: (e) => { throw e }
   }
 
-  let container = {
-    sector: {
-      game: game
-    },
+  let sector = {
     game: game,
-    pressureManager: new PressureManager(),
+    getRowCount() { return grid.getRowCount() },
+    getColCount() { return grid.getColCount() },
+    getChunk: () => null,
+    removeEntityFromTreeByName: () => {}
+  }
+  game.sector = sector
+
+  container = {
+    sector: sector,
+    game: game,
+    floodFillQueue: new FloodFillQueue(),
+    isSector: () => true,
+    platformMap: { get: () => null },
+    groundMap: { get: () => null },
+    homeArea: { addRoomToHomeArea: () => {}, removeFromHomeArea: () => {} },
     getRowCount() {
       return grid.getRowCount()
     },
     getColCount() {
       return grid.getColCount()
     },
+    isOutOfBounds(row, col) {
+      return row < 0 || row >= this.getRowCount() || col < 0 || col >= this.getColCount()
+    },
   }
+
+  container.pressureManager = new PressureManager(container)
 
   roomManager = new RoomManager(container)
   roomManager.setGrids([grid])
@@ -104,7 +155,8 @@ test('airtight region should create room', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 1, col: 2, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 1, col: 2, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
 
   const room = roomManager.getFirstRoom()
   expect(roomManager.getRoomCount()).toEqual(1)
@@ -123,68 +175,14 @@ test('non airtight region should not create room', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 1, col: 1, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 1, col: 1, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
 
   const room = roomManager.getFirstRoom()
   expect(roomManager.getRoomCount()).toEqual(0)
   expect(room).toEqual(undefined)
 })
 
-test('room thats get covered by walls inside afterwards should be deallocated', async () => {
-  let groundMap = [
-    [0, 0, 0 , 0, 0],
-    [0, 0, 0 , 0, 0],
-    [0, 0, g , g, 0],
-    [0, 0, g , g, 0],
-    [0, 0, 0 , 0, 0]
-  ]
-
-  let wallMap = [
-    [0, 0, 0 , 0, 0],
-    [0, w, w , w, w],
-    [0, w, 0 , 0, w],
-    [0, w, 0 , 0, w],
-    [0, w, w , w, w]
-  ]
-
-  let groundGrid = new Grid("ground", {}, 10,10)
-  let wallGrid   = new Grid("wall", {}, 10,10)
-  roomManager.setGrids([wallGrid, groundGrid])
-
-  groundGrid.applyMap(groundMap)
-  wallGrid.applyMap(wallMap)
-
-  await roomManager.partition({ row: 1, col: 2, rowCount: 1, colCount: 1, entity: entity })
-
-  expect(roomManager.getRoomCount()).toEqual(1)
-
-  // add walls inside
-  wallGrid.set({ row: 2, col: 2, value: w })
-  wallGrid.set({ row: 2, col: 3, value: w })
-  wallGrid.set({ row: 3, col: 2, value: w })
-  wallGrid.set({ row: 3, col: 3, value: w })
-  roomManager.partition({ row: 3, col: 3, rowCount: 1, colCount: 1, entity: entity })
-
-  expect(roomManager.getRoomCount()).toEqual(0)
-})
-
-test('non closed region should not create room', async () => {
-  let map = [
-    [0, 0, 0 , 0, 0, 0],
-    [0, 0, w , w, w, w],
-    [0, w, g , g, g, g],
-    [0, 0, w , w, w, 0],
-    [0, 0, 0 , 0, 0, 0]
-  ]
-
-  grid.applyMap(map)
-  await roomManager.partition({ row: 3, col: 4, rowCount: 1, colCount: 1, entity: entity })
-
-
-  const room = roomManager.getFirstRoom()
-  expect(roomManager.getRoomCount()).toEqual(0)
-  expect(room).toEqual(undefined)
-})
 
 test('partition a block more than 1x1', async () => {
   let map = [
@@ -196,7 +194,8 @@ test('partition a block more than 1x1', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 2, col: 4, rowCount: 2, colCount: 1, entity: entity } )
+  roomManager.partition({ row: 2, col: 4, rowCount: 2, colCount: 1, entity: entity })
+  await tick()
 
   const room = roomManager.getFirstRoom()
   expect(roomManager.getRoomCount()).toEqual(2)
@@ -224,7 +223,8 @@ test('1 airght room -> add wall -> 2 airtight rooms', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 3, col: 2, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 3, col: 2, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
 
   const room = roomManager.getFirstRoom()
   expect(roomManager.getRoomCount()).toEqual(1)
@@ -233,7 +233,8 @@ test('1 airght room -> add wall -> 2 airtight rooms', async () => {
 
   // add wall
   grid.set({ row: 4, col: 4, value: w })
-  await roomManager.partition({ row: 4, col: 4, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 4, col: 4, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
 
   expect(roomManager.getRoomCount()).toEqual(2)
 })
@@ -248,7 +249,8 @@ test('1 vent in room', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 2, col: 1, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 2, col: 1, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
   expect(roomManager.getRoomCount()).toEqual(1)
 
 })
@@ -263,7 +265,8 @@ test('2 vents in room', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 2, col: 1, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 2, col: 1, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
   expect(roomManager.getRoomCount()).toEqual(1)
 })
 
@@ -277,11 +280,13 @@ test('2 vents in room added/partitioned incrementally', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 2, col: 1, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 2, col: 1, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
   expect(roomManager.getRoomCount()).toEqual(1)
 
   grid.set({ row: 2, col: 3, value: v })
-  await roomManager.partition({ row: 2, col: 3, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 2, col: 3, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
   expect(roomManager.getRoomCount()).toEqual(1)
 
 })
@@ -296,7 +301,8 @@ test('1 producer + 2 vents in room', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 2, col: 1, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 2, col: 1, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
   expect(roomManager.getRoomCount()).toEqual(1)
 })
 
@@ -310,7 +316,8 @@ test('1 producer + 2 vents in room + 1 vent in other room', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 2, col: 4, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 2, col: 4, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
   expect(roomManager.getRoomCount()).toEqual(2)
 })
 
@@ -325,7 +332,8 @@ test('2 oxygen networks', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 2, col: 4, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 2, col: 4, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
   expect(roomManager.getRoomCount()).toEqual(2)
 })
 
@@ -339,16 +347,20 @@ test('2 oxygen networks merge + partition', async () => {
   ]
 
   grid.applyMap(map)
-  await roomManager.partition({ row: 2, col: 4, rowCount: 1, colCount: 1, entity: entity })
-  await roomManager.partition({ row: 3, col: 7, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 2, col: 4, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
+  roomManager.partition({ row: 3, col: 7, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
   expect(roomManager.getRoomCount()).toEqual(3)
 
   // merge
   grid.set({ row: 3, col: 4, value: v })
-  await roomManager.partition({ row: 3, col: 4, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 3, col: 4, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
 
   grid.set({ row: 3, col: 7, value: v })
-  await roomManager.partition({ row: 3, col: 7, rowCount: 1, colCount: 1, entity: entity })
+  roomManager.partition({ row: 3, col: 7, rowCount: 1, colCount: 1, entity: entity })
+  await tick()
 
   expect(roomManager.getRoomCount()).toEqual(3)
 

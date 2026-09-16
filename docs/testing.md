@@ -61,6 +61,19 @@ npm run client:build
 - Test contract boundaries and compatibility, not private implementation details.
 - Place tests near the existing subsystem directory under `test/`.
 - Do not weaken or skip an existing assertion merely to make a change pass.
+- Many `common/interfaces/*.js` mixins ship default stub methods (e.g.
+  `bounding_box.js#getX` throws, `container.js#onComponentAdded` is a no-op)
+  that share a name with the override a test fixture needs to supply. If the
+  fixture class defines that method in its own body and then does
+  `Object.assign(Fixture.prototype, Mixin.prototype)`, the mixin's stub wins
+  and silently shadows the fixture's real implementation. Apply overrides in
+  the same `Object.assign` call, after the mixin, e.g.:
+  ```js
+  Object.assign(Fixture.prototype, Mixin.prototype, {
+    getX() { return this.x },
+    getY() { return this.y }
+  })
+  ```
 
 ## Reporting
 

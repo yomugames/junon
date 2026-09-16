@@ -9,6 +9,33 @@ const PressureManager = require('../../server/entities/networks/pressure_manager
 const PressureNetwork = require('../../server/entities/networks/pressure_network')
 const Pressurable    = require('../../common/interfaces/pressurable')
 const PressureSealer = require('../../common/interfaces/pressure_sealer')
+const NetworkAssignable = require('../../common/interfaces/network_assignable')
+const FloodFillQueue = require('../../common/entities/flood_fill_queue')
+const IDGenerator = require('../../server/util/id_generator')
+
+// NetworkManager (PressureManager's base class) reads container.game.sector and
+// container.floodFillQueue.getQueue() during construction, even though
+// PressureManager itself overrides all of the network-traversal logic that
+// would otherwise use them. Network (the base class of PressureNetwork) also
+// calls manager.game.generateId() when allocating a new network. Build a
+// minimal container/game pair that satisfies just those contracts.
+function createContainer() {
+  let idGenerator = new IDGenerator()
+
+  let game = {
+    generateId(type) {
+      return idGenerator.generate(type)
+    }
+  }
+  let sector = { game }
+  game.sector = sector
+
+  return {
+    game,
+    sector,
+    floodFillQueue: new FloodFillQueue()
+  }
+}
 
 // mock class
 let uuid = 1
@@ -21,12 +48,40 @@ class Room {
     this.setPressureManager(pressureManager)
   }
 
+  getId() {
+    return this.id
+  }
+
   addDoor(door) {
     this.addPressureSealer(door)  
   }
 }
 
-Object.assign(Room.prototype, Pressurable.prototype, {
+Object.assign(Room.prototype, Pressurable.prototype, NetworkAssignable.prototype, {
+  // PressureManager#getNeighbors calls the real Room class's
+  // getNeighborReachableRooms(), which walks room.js's door-hit bookkeeping.
+  // This mock doesn't model that structure, so bridge it onto the generic
+  // Pressurable#getNeighborMembers() traversal (neighbors reachable through
+  // currently-open sealers), which is the same semantic for this test's purposes.
+  getNeighborReachableRooms() {
+    return this.getNeighborMembers()
+  },
+
+  // PressureNetwork#hasPressure() (see pressure_network.js) asks each member
+  // room whether it is airtight and free of an exposed vacuum door, mirroring
+  // room.js's isAirtightAndSealed()/getDoorWithVacuum(). This mock has no tile
+  // geometry to be "airtight" about, so it only models the vacuum-door half.
+  isAirtightAndSealed() {
+    return !this.getDoorWithVacuum()
+  },
+
+  getDoorWithVacuum() {
+    return this.getPressureSealers().find((door) => door.hasVacuum(this))
+  },
+
+  getPressureSealers() {
+    return Object.values(this.sealers)
+  }
 })
 
 class Door {
@@ -46,15 +101,19 @@ class Door {
 }
 
 Object.assign(Door.prototype, PressureSealer.prototype, {
+  // Mirrors the real Airlock#hasVacuum/getVacuumTiles: a door only exposes
+  // vacuum while it is actually open (see airlock.js's `if (noPlatform) return
+  // this.isOpen`) - linking to vacuum alone just marks it as structurally
+  // leading to unsealed space.
   hasVacuum() {
-    return this.vacuum
+    return this.vacuum && this.isOpen
   }
 })
 
 let pressureManager
 
 beforeEach(() => {
-  pressureManager = new PressureManager()
+  pressureManager = new PressureManager(createContainer())
 });
 
 test('a room has no pressureNetwork by default', () => {
@@ -69,17 +128,24 @@ test('a room with door with vacuum should not be pressurized', () => {
   room.addDoor(door)
 
   door.open()
-  expect(room.pressureNetwork.isPressurized).toEqual(false)
+  expect(room.pressureNetwork.hasPressure()).toEqual(false)
 
   door.close()
-  expect(room.pressureNetwork.isPressurized).toEqual(true)
+  expect(room.pressureNetwork.hasPressure()).toEqual(true)
 })
 
 /*
-  bef: (A|B)|(C|D)|(E-@)
-  aft: (A|B).(C|D)|(E.@)
+  A-B-C-D-E chained through doors, E also bordering vacuum.
+
+  NOTE: PressureNetwork used to track a parent/children subnetwork hierarchy
+  (see the still-present but now-unused server/entities/networks/sub_network.js),
+  which this test originally asserted on. That hierarchy has since been removed
+  from PressureNetwork (it now only exposes hasPressure(), computed on demand -
+  see pressure_network.js), so there is no `.parent`/`.children` to assert on
+  any more. Rewritten to assert on network membership/count instead, which is
+  still real, current behavior.
 */
-test('children count of parentSubNetwork should be correct on partition', () => {
+test('opening a chain of doors merges rooms into one network, closing repartitions it', () => {
   let roomA = new Room(pressureManager)
   let roomB = new Room(pressureManager)
   let doorAB = new Door()
@@ -109,13 +175,18 @@ test('children count of parentSubNetwork should be correct on partition', () => 
   doorBC.open()
   doorE.open()
   doorDE.open()
-  expect(pressureManager.getNetworkCount()).toEqual(3)
 
-  let parentSubNetwork = roomA.pressureNetwork.parent
-  expect(Object.values(parentSubNetwork.children).length).toEqual(3)
+  // fully connected chain: every room ends up in the same single network
+  expect(pressureManager.getNetworkCount()).toEqual(1)
+  expect(roomA.pressureNetwork).toBe(roomE.pressureNetwork)
 
   doorBC.close()
-  expect(Object.values(parentSubNetwork.children).length).toEqual(2)
+
+  // closing the B-C link partitions the chain into two networks again
+  expect(pressureManager.getNetworkCount()).toEqual(2)
+  expect(roomA.pressureNetwork).toBe(roomB.pressureNetwork)
+  expect(roomC.pressureNetwork).toBe(roomE.pressureNetwork)
+  expect(roomA.pressureNetwork).not.toBe(roomC.pressureNetwork)
 })
 
 test('3 door with same rooms with vacuum. open 3, close 1 should not be pressurized', () => {
@@ -138,7 +209,7 @@ test('3 door with same rooms with vacuum. open 3, close 1 should not be pressuri
   doorC.open()
 
   doorA.close()
-  expect(room.pressureNetwork.isPressurized).toEqual(false)
+  expect(room.pressureNetwork.hasPressure()).toEqual(false)
 })
 
 
@@ -158,25 +229,25 @@ test('2 connected rooms with vacuum should not be pressurized', () => {
 
   door.open()
 
-  expect(roomA.pressureNetwork.isPressurized).toEqual(true)
-  expect(roomB.pressureNetwork.isPressurized).toEqual(true)
+  expect(roomA.pressureNetwork.hasPressure()).toEqual(true)
+  expect(roomB.pressureNetwork.hasPressure()).toEqual(true)
   expect(pressureManager.getNetworkCount()).toEqual(1)
 
   doorWithVacuum.open()
 
-  expect(roomA.pressureNetwork.isPressurized).toEqual(false)
-  expect(roomB.pressureNetwork.isPressurized).toEqual(false)
+  expect(roomA.pressureNetwork.hasPressure()).toEqual(false)
+  expect(roomB.pressureNetwork.hasPressure()).toEqual(false)
 
   door.close()
 
-  expect(roomA.pressureNetwork.isPressurized).toEqual(true)
-  expect(roomB.pressureNetwork.isPressurized).toEqual(false)
+  expect(roomA.pressureNetwork.hasPressure()).toEqual(true)
+  expect(roomB.pressureNetwork.hasPressure()).toEqual(false)
 
   expect(pressureManager.getNetworkCount()).toEqual(2)
 
   door.open()
-  expect(roomA.pressureNetwork.isPressurized).toEqual(false)
-  expect(roomB.pressureNetwork.isPressurized).toEqual(false)
+  expect(roomA.pressureNetwork.hasPressure()).toEqual(false)
+  expect(roomB.pressureNetwork.hasPressure()).toEqual(false)
 })
 
 test('(A-B-C)-(D-E-F)-(G-H) multiple parents, multiple subnetworks', () => {
@@ -240,17 +311,17 @@ test('(A-B-C)-(D-E-F)-(G-H) multiple parents, multiple subnetworks', () => {
   doorDE.open()
   doorBC.open()
 
-  expect(roomB.pressureNetwork.isPressurized).toEqual(false)
-  expect(roomC.pressureNetwork.isPressurized).toEqual(false)
-  expect(roomD.pressureNetwork.isPressurized).toEqual(false)
-  expect(roomE.pressureNetwork.isPressurized).toEqual(false)
+  expect(roomB.pressureNetwork.hasPressure()).toEqual(false)
+  expect(roomC.pressureNetwork.hasPressure()).toEqual(false)
+  expect(roomD.pressureNetwork.hasPressure()).toEqual(false)
+  expect(roomE.pressureNetwork.hasPressure()).toEqual(false)
 
   doorCD.close()
 
-  expect(roomB.pressureNetwork.isPressurized).toEqual(false)
-  expect(roomC.pressureNetwork.isPressurized).toEqual(false)
-  expect(roomD.pressureNetwork.isPressurized).toEqual(true)
-  expect(roomE.pressureNetwork.isPressurized).toEqual(true)
+  expect(roomB.pressureNetwork.hasPressure()).toEqual(false)
+  expect(roomC.pressureNetwork.hasPressure()).toEqual(false)
+  expect(roomD.pressureNetwork.hasPressure()).toEqual(true)
+  expect(roomE.pressureNetwork.hasPressure()).toEqual(true)
 })
 
 test('A->B->C->vacuum) should not be pressurized + room partition', () => {
@@ -272,15 +343,15 @@ test('A->B->C->vacuum) should not be pressurized + room partition', () => {
   doorBC.open()
   doorC.open()
 
-  expect(roomA.pressureNetwork.isPressurized).toEqual(false)
-  expect(roomB.pressureNetwork.isPressurized).toEqual(false)
-  expect(roomC.pressureNetwork.isPressurized).toEqual(false)
+  expect(roomA.pressureNetwork.hasPressure()).toEqual(false)
+  expect(roomB.pressureNetwork.hasPressure()).toEqual(false)
+  expect(roomC.pressureNetwork.hasPressure()).toEqual(false)
 
   doorBC.close()
 
-  expect(roomA.pressureNetwork.isPressurized).toEqual(true)
-  expect(roomB.pressureNetwork.isPressurized).toEqual(true)
-  expect(roomC.pressureNetwork.isPressurized).toEqual(false)
+  expect(roomA.pressureNetwork.hasPressure()).toEqual(true)
+  expect(roomB.pressureNetwork.hasPressure()).toEqual(true)
+  expect(roomC.pressureNetwork.hasPressure()).toEqual(false)
 })
 
 test('(A->B)->(C->D)->vacuum) should not be pressurized + subnetwork partition', () => {

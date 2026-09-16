@@ -66,13 +66,11 @@ let airtightTile = a = () => { return new Tile("airtight") }
 
 let blankTile = 0
 let roomManager
-let oxygenManager 
+let oxygenManager
 
-  let grid = new Grid("test", container, 10,10)
+let grid = new Grid("test", {}, 10, 10)
 
 beforeEach(function(done) {
-  let container = {}
-
   let game = {
     registerEntity: () => {}
   }

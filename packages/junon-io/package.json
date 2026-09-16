@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "test": "jest",
     "clean": "rm -rf dist && mkdir dist",
     "start": "node --max_old_space_size=2000 --expose-gc --inspect=127.0.0.1:0 server/server.js",
     "dev": "nodemon server/server.js",

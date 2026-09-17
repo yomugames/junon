@@ -1,147 +1,185 @@
 // common/constants.json: Control { up: 1, down: 2, left: 4, right: 8, space: 16 }
 const CONTROL = { up: 1, down: 2, left: 4, right: 8, space: 16 }
 
-const MELEE_RANGE = 48 // Equipments.SurvivalTool stats.meleeRange (common/constants.json)
-// stay well inside the real range so client-side position prediction drift
-// never puts the *server-authoritative* distance just outside it
-const SAFE_RANGE = MELEE_RANGE * 0.6
-// re-engage movement only once well outside SAFE_RANGE, so standing right at
-// the boundary doesn't flip-flop between phases every check
-const DISENGAGE_RANGE = SAFE_RANGE * 1.8
+// Melee does NOT hit everything within meleeRange of the player.
+// getMeleeTargets() (server/entities/base_entity.js) builds a circle *centred
+// meleeRange pixels ahead* of the player along its facing angle, with radius
+// attackRadius || tileSize, and hits whatever overlaps that circle:
+//
+//     player                     circle centre
+//       o - - - - - - - - - - - - - -( 48 )- - - - - - - - -
+//       |<-- dead zone -->|<--------- hittable --------->|
+//       0                 16                            80
+//
+// so for a SurvivalTool (meleeRange 48, no attackRadius, so radius =
+// tileSize 32) the reachable band is ~16..80px: an annulus, not a disc.
+// Standing *too close* whiffs just as reliably as standing too far. That is
+// the trap the first version of this helper fell into - it closed to
+// meleeRange * 0.6 and any overshoot from there pushed the mob into the dead
+// zone right in front of the player.
+const MELEE_RANGE = 48 // Equipments.SurvivalTool stats.meleeRange
+const ATTACK_RADIUS = 32 // Constants.tileSize, the default when attackRadius is unset
+const HIT_MIN = MELEE_RANGE - ATTACK_RADIUS // 16
+const HIT_MAX = MELEE_RANGE + ATTACK_RADIUS // 80
+// aim for the middle of the band, so drift in either direction still connects
+const ENGAGE_RANGE = MELEE_RANGE
+// when a mob has shoved the player into the dead zone, back out only just far
+// enough to swing again. Retreating all the way to ENGAGE_RANGE overshot past
+// HIT_MAX and started another approach, so the player spent the fight pacing
+// in and out instead of hitting.
+const REENGAGE_RANGE = HIT_MIN + 12 // 28
 
-function computeDelta(mobId) {
-  const mob = window.game.sector.mobs[mobId]
-  if (!mob || !window.player) return { alive: false }
+// The whole fight runs inside the page, in one evaluate, and this is the
+// point of the whole file rather than a micro-optimisation.
+//
+// The server treats controlKeys as a persistent "held" state: it keeps moving
+// the player every tick using the last value it received until a *different*
+// value arrives (server/entities/player.js: updateInput()), exactly like a
+// real held key. So "stop walking" is a message that has to arrive, and until
+// it does the player is still moving at ~280px/s.
+//
+// Driving that from Node - even with page.waitForFunction() polling the
+// distance inside the browser - overshoots, because only the *decision* is
+// made in the browser: the resulting setControlKeys(0) still has to cross back
+// over IPC. That round trip was measured at 100-300ms here, which is 30-80px
+// of extra walking, and the hittable band is only 64px wide. A traced run
+// went 119px -> 66px -> 10px between samples and ended up inside the dead
+// zone with the mob shoving against the player, where hits land only by
+// accident. Braking in-page instead stops within a frame of the band being
+// reached, so the player reliably ends the approach where its weapon can
+// actually reach.
+//
+// Everything below therefore runs on the page's own clock, against the real
+// client objects (inputController, applyMyInputs, globalMouseMoveHandler), and
+// Node only awaits the verdict.
+function fightInPage({ id, timeoutMs, hitMin, hitMax, engageRange, reengageRange, control }) {
+  const game = window.game
+  const inputController = game.inputController
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  const deadline = performance.now() + timeoutMs
 
-  return {
-    alive: true,
-    dx: mob.getX() - window.player.getX(),
-    dy: mob.getY() - window.player.getY()
+  // The client's own game loop calls applyMyInputs() every frame
+  // (client/src/entities/game.js: updateGame), and with the space bit held
+  // that re-fires performAction() -> act() -> emit("Act") each frame, throttled
+  // by canAct()'s 200ms cooldown. So holding space keeps swinging by itself;
+  // this only has to set the state, not drive individual swings. controlKeys is
+  // only ever mutated by real key/mouse events (input_controller.js), never
+  // recomputed per frame, so assigning it directly really does mean "held".
+  const setKeys = (bits) => {
+    inputController.controlKeys = bits
+    inputController.pressedKey = 0
+    game.applyMyInputs()
   }
-}
 
-async function readState(page, mobId) {
-  return page.evaluate(computeDelta, mobId)
-}
-
-// The server treats controlKeys as a persistent "held" state - it keeps
-// moving the player every tick based on the last value it received until a
-// *different* value arrives (server/entities/player.js: updateInput() ->
-// this.controlKeys = data.controlKeys), exactly like a real held key.
-//
-// A naive Node-side loop ("read position, decide, wait ~100ms, repeat")
-// assumes each round trip is fast. In this environment - three Node
-// processes, a full browser and a gulp watcher sharing one box - a single
-// page.evaluate() round trip measured 2-3 real seconds, not the ~100ms
-// intended. Since the player keeps moving the whole time a direction is
-// held, checking in from Node every "100ms" actually meant checking in
-// every 2-3 real seconds, overshooting the target by hundreds of pixels
-// every single time.
-//
-// page.waitForFunction() sidesteps this: the predicate polls *inside* the
-// browser (no Node round trip per check), so "is it time to stop" is
-// answered on the page's own clock instead of however long IPC happens to
-// take. Node only gets involved at actual phase transitions (start/stop
-// moving, start/stop attacking).
-async function setControlKeys(page, bitmask) {
-  await page.evaluate((bits) => {
-    window.game.inputController.controlKeys = bits
-    window.game.inputController.pressedKey = 0
-    window.game.applyMyInputs()
-  }, bitmask)
-}
-
-// Melee hits land on whatever is inside a circle offset *in front of the
-// player, along its current facing angle* (server/entities/base_entity.js:
-// getMeleeTargets() - the passed-in target id is only a hint, real
-// resolution is purely geometric) - not wherever the player is walking.
-// Facing is normally driven by mouse position (client/src/entities/
-// input_controller.js: globalMouseMoveHandler() -> atan2(relativeY,
-// relativeX) -> player.setAngle() + SocketUtil.emit("PlayerTarget", ...)).
-// Since the player is always screen-centered, a delta in world space is
-// already the same vector globalMouseMoveHandler expects relative to
-// screen center, so a synthetic mouse-move event pointed at the mob drives
-// the same real code (client prediction + server sync) a real mouse would.
-async function faceTarget(page, dx, dy) {
-  await page.evaluate(({ dx, dy }) => {
-    const inputController = window.game.inputController
-    const pixelRatio = window.game.getPixelRatio()
+  // Melee resolves off the player's facing angle, not off what it is walking
+  // toward, and not off the entity id the client sends - the id in emit("Act")
+  // is only a hint, and getMeleeTargets() re-resolves purely geometrically.
+  // Facing is normally driven by the mouse (input_controller.js:
+  // globalMouseMoveHandler -> atan2 -> player.setAngle() + emit("PlayerTarget")).
+  // The player is always screen-centred, so a world-space delta is already the
+  // vector that handler expects relative to screen centre - a synthetic
+  // mouse-move pointed at the mob drives exactly the code a real mouse would.
+  const face = (dx, dy) => {
+    const pixelRatio = game.getPixelRatio()
     const canvas = inputController.canvas
-    const clientX = (canvas.width / 2 + dx) / pixelRatio
-    const clientY = (canvas.height / 2 + dy) / pixelRatio
-    inputController.globalMouseMoveHandler({ clientX, clientY })
-  }, { dx, dy })
-}
+    inputController.globalMouseMoveHandler({
+      clientX: (canvas.width / 2 + dx) / pixelRatio,
+      clientY: (canvas.height / 2 + dy) / pixelRatio
+    })
+  }
 
-function directionBits(dx, dy, threshold) {
-  let bits = 0
-  if (dx > threshold) bits |= CONTROL.right
-  else if (dx < -threshold) bits |= CONTROL.left
-  if (dy > threshold) bits |= CONTROL.down
-  else if (dy < -threshold) bits |= CONTROL.up
-  return bits
-}
+  const delta = () => {
+    const mob = game.sector.mobs[id]
+    if (!mob || !window.player) return null
 
-// Melee combat ignores the clicked/hovered target entirely and auto-hits
-// whatever is within the weapon's own range and facing cone - so unlike
-// mining/building, there is no shortcut around real proximity or aim. This
-// alternates two phases - close the distance, then stand and attack -
-// re-facing the mob at each transition, and lets the browser's own clock
-// (via waitForFunction) decide when a phase is done instead of guessing a
-// duration from Node.
-async function moveTowardAndAttack(page, mobId, { timeoutMs = 20_000 } = {}) {
-  const deadline = Date.now() + timeoutMs
+    const dx = mob.getX() - window.player.getX()
+    const dy = mob.getY() - window.player.getY()
+    return { dx, dy, distance: Math.hypot(dx, dy) }
+  }
 
-  try {
-    while (Date.now() < deadline) {
-      const state = await readState(page, mobId)
-      if (!state.alive) return true
+  const bitsToward = (dx, dy, threshold) => {
+    let bits = 0
+    if (dx > threshold) bits |= control.right
+    else if (dx < -threshold) bits |= control.left
+    if (dy > threshold) bits |= control.down
+    else if (dy < -threshold) bits |= control.up
+    return bits
+  }
 
-      await faceTarget(page, state.dx, state.dy)
-      const remaining = Math.max(deadline - Date.now(), 0)
-      if (remaining === 0) break
+  // walk while `shouldKeepGoing` holds, braking the moment it stops holding
+  const walk = async (bits, shouldKeepGoing) => {
+    setKeys(bits)
 
-      const distance = Math.hypot(state.dx, state.dy)
-      // re-face/re-evaluate at least this often even if the phase's exit
-      // condition never triggers, so a slowly-drifting mob doesn't go stale
-      const phaseTimeout = Math.min(remaining, 3_000)
+    try {
+      while (performance.now() < deadline) {
+        const current = delta()
+        if (!current) return null
+        if (!shouldKeepGoing(current.distance)) return current
+        await sleep(16)
+      }
 
-      if (distance > SAFE_RANGE) {
-        const bits = directionBits(state.dx, state.dy, SAFE_RANGE / 2)
-        await setControlKeys(page, bits)
+      return delta()
+    } finally {
+      setKeys(0)
+    }
+  }
 
-        await page.waitForFunction(
-          ({ id, range }) => {
-            const mob = window.game.sector.mobs[id]
-            if (!mob || !window.player) return true // dead/gone counts as "done"
-            const dx = mob.getX() - window.player.getX()
-            const dy = mob.getY() - window.player.getY()
-            return Math.hypot(dx, dy) <= range
-          },
-          { id: mobId, range: SAFE_RANGE },
-          { timeout: phaseTimeout, polling: 50 }
-        ).catch(() => {}) // timeout just means "re-evaluate from the top"
+  const run = async () => {
+    while (performance.now() < deadline) {
+      const state = delta()
+      if (!state) return true // mob gone from the synced registry == killed
+
+      face(state.dx, state.dy)
+
+      if (state.distance > hitMax) {
+        // close the distance, stopping mid-band rather than walking into the mob
+        await walk(
+          bitsToward(state.dx, state.dy, engageRange / 2),
+          (distance) => distance > engageRange
+        )
+      } else if (state.distance < hitMin) {
+        // too close to swing: a mob that closes in to attack (Brood range 32)
+        // can shove the player into its own dead zone, so back out of it
+        await walk(
+          bitsToward(-state.dx, -state.dy, 0),
+          (distance) => distance < reengageRange
+        )
       } else {
-        await setControlKeys(page, CONTROL.space)
+        setKeys(control.space)
 
-        await page.waitForFunction(
-          ({ id, range }) => {
-            const mob = window.game.sector.mobs[id]
-            if (!mob || !window.player) return true
-            const dx = mob.getX() - window.player.getX()
-            const dy = mob.getY() - window.player.getY()
-            return Math.hypot(dx, dy) > range
-          },
-          { id: mobId, range: DISENGAGE_RANGE },
-          { timeout: phaseTimeout, polling: 50 }
-        ).catch(() => {})
+        try {
+          // hold the swing until the mob dies or leaves the band, re-aiming as
+          // it moves. ~5 swings at 2 damage on a 200ms cooldown kills a Brood,
+          // so this normally resolves in about a second.
+          while (performance.now() < deadline) {
+            const current = delta()
+            if (!current) return true
+            if (current.distance < hitMin || current.distance > hitMax) break
+            face(current.dx, current.dy)
+            await sleep(50)
+          }
+        } finally {
+          setKeys(0)
+        }
       }
     }
 
-    return false
-  } finally {
-    await setControlKeys(page, 0)
+    return !delta()
   }
+
+  return run().finally(() => setKeys(0))
+}
+
+async function moveTowardAndAttack(page, mobId, { timeoutMs = 20_000 } = {}) {
+  return page.evaluate(fightInPage, {
+    id: mobId,
+    timeoutMs,
+    hitMin: HIT_MIN,
+    hitMax: HIT_MAX,
+    engageRange: ENGAGE_RANGE,
+    reengageRange: REENGAGE_RANGE,
+    control: CONTROL
+  })
 }
 
 module.exports = { moveTowardAndAttack }

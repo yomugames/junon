@@ -19,6 +19,13 @@ const GAME_SERVER_DEV_PORT = 8001
 // dynamically, so a random high port avoids both that collision and reusing
 // a port still being released by this harness's own previous run
 const GAME_WEBSOCKET_PORT = 20_000 + Math.floor(Math.random() * 20_000)
+// The harness sets up scenarios by attaching to the game server's V8 inspector
+// over the Chrome DevTools Protocol (see support/server_console.js), which is
+// how it reaches real server-side game state without the game shipping any
+// test-only debug hooks. `npm start` already runs the server under --inspect;
+// this just pins a known port instead of the default 9229, which a stray
+// node --inspect (or a previous run still shutting down) may already hold.
+const INSPECT_PORT = 40_000 + Math.floor(Math.random() * 10_000)
 const CLIENT_BUNDLE = path.join(IO_DIR, 'client/dist/app.js')
 
 function waitForPort(port, host, timeoutMs) {
@@ -87,7 +94,7 @@ module.exports = async () => {
   })
   await waitForFile(CLIENT_BUNDLE, 120_000)
 
-  const gameServer = spawnProcess('game-server', 'node', ['server/server.js'], {
+  const gameServer = spawnProcess('game-server', 'node', [`--inspect=127.0.0.1:${INSPECT_PORT}`, 'server/server.js'], {
     cwd: IO_DIR,
     env: {
       ...process.env,
@@ -105,6 +112,11 @@ module.exports = async () => {
     }
   })
   await waitForPort(GAME_SERVER_DEV_PORT, '127.0.0.1', 30_000)
+  await waitForPort(INSPECT_PORT, '127.0.0.1', 30_000)
+
+  // test workers are spawned after globalSetup and inherit this process's env,
+  // which is how support/server_console.js finds the inspector
+  process.env.JUNON_E2E_INSPECT_PORT = String(INSPECT_PORT)
 
   return async () => {
     for (const child of [gameServer, gulp, matchmaker]) {

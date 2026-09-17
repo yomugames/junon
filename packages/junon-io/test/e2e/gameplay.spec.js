@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test')
 const { createNewColonyAndJoin } = require('./support/join')
-const { teleportToSafeGround, spawnMob } = require('./support/scenario')
+const { setupMeleeArena, readMob } = require('./support/scenario')
 const { moveTowardAndAttack } = require('./support/combat')
 
 test.describe('gameplay', () => {
@@ -16,18 +16,7 @@ test.describe('gameplay', () => {
     expect(joined.hasSector).toBe(true)
   })
 
-  // Known flaky in CPU-constrained environments: a single page.evaluate()
-  // round trip was measured at 2-3 real seconds on a 4-core sandbox running
-  // the matchmaker, game server, gulp watcher and browser at once, and since
-  // the server treats movement as "held until told otherwise"
-  // (server/entities/player.js: updateInput()), that's enough time for the
-  // player to overshoot the mob by hundreds of pixels between checks - even
-  // with page.waitForFunction() polling inside the browser instead of from
-  // Node. Likely reliable on a normal dev machine or a less contended CI
-  // runner; needs either more headroom or a movement approach that doesn't
-  // depend on real-time browser polling (e.g. small server-side position
-  // nudges via the same debug hook used for teleportToSafeGround).
-  test.fixme('walks up to a hostile mob and kills it in melee', async ({ page }) => {
+  test('walks up to a hostile mob and kills it in melee', async ({ page }) => {
     await createNewColonyAndJoin(page)
 
     // every new player spawns holding a SurvivalTool (server/entities/
@@ -35,30 +24,25 @@ test.describe('gameplay', () => {
     // which doubles as a melee weapon (extends MeleeEquipment), so no extra
     // setup is needed to fight
 
-    // the fixed test-mode spawn point can land right at a coastline (see
-    // support/scenario.js), so move to a tile the map generator itself
-    // classifies as solid ground before trying to walk anywhere
-    const spawnPos = await teleportToSafeGround(page)
-    await page.waitForFunction(
-      ({ row, col }) => window.player.getRow() === row && window.player.getCol() === col,
-      spawnPos,
-      { timeout: 10_000 }
-    )
-
     // Brood (common/constants.json Mobs.Brood: health 10, damage 2, speed 2)
-    // is deliberately weak and slow - the starting SurvivalTool only deals 2
-    // damage per hit (Equipments.SurvivalTool stats.damage) and moves much
-    // slower than the player (Constants.Player speed 8), so a tankier/faster
-    // hostile mob could kill the player or simply outrun it. Tamable mobs
-    // like Chicken flee once approached, which defeats a "walk up and fight"
-    // scenario entirely. Dropped a few tiles away so the player has to close
-    // the distance, like a real encounter.
-    const [mobId] = await spawnMob(page, {
-      row: spawnPos.row,
-      col: spawnPos.col + 3,
-      type: 'brood'
-    })
-    expect(mobId).toBeTruthy()
+    // is deliberately weak and slow - the starting SurvivalTool deals 2 damage
+    // a hit on a 200ms cooldown, so the fight is ~5 swings, and a tankier or
+    // faster hostile could kill the player or simply outrun it.
+    //
+    // Both fighters are placed on a verified obstacle-free strip of ground a
+    // few tiles apart rather than at the raw spawn point: terrain is random
+    // per sector, and a mob dropped blindly near spawn can end up behind a
+    // rock, in a plant patch or across water, which blocks the walk and the
+    // melee line of sight. See support/scenario.js.
+    const arena = await setupMeleeArena(page, { span: 4, mobType: 'Brood' })
+
+    expect(arena.error).toBeUndefined()
+    expect(arena.mob).toBeTruthy()
+    // a mob the melee raycast can't see can never be hit, so fail on that
+    // directly instead of swinging at it for the whole timeout
+    expect(arena.isObstructed).toBe(false)
+
+    const mobId = arena.mob.id
 
     // wait for the server to broadcast the new mob into the client's synced
     // entity registry (client/src/entities/sector.js: this.mobs)
@@ -71,5 +55,8 @@ test.describe('gameplay', () => {
     const killed = await moveTowardAndAttack(page, mobId, { timeoutMs: 20_000 })
 
     expect(killed).toBe(true)
+    // the fight loop reads the client's synced view of the mob, so confirm the
+    // kill against the server's own state rather than trusting that
+    expect(await readMob(page, mobId)).toEqual({ alive: false })
   })
 })

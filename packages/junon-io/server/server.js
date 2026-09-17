@@ -699,11 +699,7 @@ class Server {
     let changeLogs         = this.fetchChangeLogs().reverse()
 
     app.get('/debug/:message', (req, res) => {
-      // getMainGame() assumes a single active game, which breaks once more
-      // than one sector exists on the process at once (e.g. a test harness
-      // creating a fresh colony per test) - an explicit sectorId disambiguates
-      let game = req.query.sectorId ? this.getGame(req.query.sectorId) : this.getMainGame()
-      let result = game.runCommand(req.params.message, req.query)
+      let result = this.getMainGame().runCommand(req.params.message, req.query)
       res.send({ result: result })
     })
 

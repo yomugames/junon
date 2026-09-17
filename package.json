@@ -5,6 +5,7 @@
     "client": "npm run client --workspace packages/junon-io",
     "serveronly": "npm run dev --workspace packages/junon-io",
     "matchmaker": "npm run start --workspace packages/junon-matchmaker",
+    "test": "npm run test --workspace packages/junon-io",
     "client:build": "npm run client:build --workspace packages/junon-io",
     "db:setup": "npm run db:setup --workspace packages/junon-common"
   },
@@ -22,6 +23,6 @@
     "form-data": "4.0.6"
   },
   "allowScripts": {
-    "sqlite3@5.1.7": true
+    "sqlite3@6.0.1": true
   }
 }

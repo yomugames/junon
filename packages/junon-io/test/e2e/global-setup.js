@@ -80,7 +80,18 @@ function spawnProcess(name, command, args, opts) {
 // like local dev: `npm run matchmaker` + `npm run serveronly`) plus a gulp
 // watcher for the real browser client, so Playwright drives the actual game
 // end to end instead of a stubbed/mocked stack.
-module.exports = async () => {
+module.exports = async (config) => {
+  // resolved by playwright.config.js (defaults to /tmp/junon-io-e2e). Printed
+  // up front so it's known before anything fails, and again on the way out
+  // with whatever was actually produced - videos in particular are only kept
+  // on a passing run when JUNON_E2E_VIDEO is set, and a path scrolled off the
+  // top of a noisy boot log is no use.
+  const outputDir = (config && config.projects && config.projects[0] && config.projects[0].outputDir) ||
+                    process.env.JUNON_E2E_OUTPUT_DIR ||
+                    '/tmp/junon-io-e2e'
+
+  console.log(`[e2e] artifacts (video/trace/screenshots): ${outputDir}`)
+
   fs.rmSync(CLIENT_BUNDLE, { force: true })
 
   const matchmaker = spawnProcess('matchmaker', 'node', ['src/index.js'], {
@@ -122,5 +133,38 @@ module.exports = async () => {
     for (const child of [gameServer, gulp, matchmaker]) {
       child.kill('SIGTERM')
     }
+
+    reportArtifacts(outputDir)
   }
+}
+
+function reportArtifacts(outputDir) {
+  const artifacts = listFilesRecursive(outputDir)
+    // .last-run.json is playwright's own bookkeeping, not something to go look at
+    .filter((file) => path.basename(file) !== '.last-run.json')
+
+  if (artifacts.length === 0) {
+    console.log(`[e2e] artifacts: ${outputDir} (none kept - runs that pass keep nothing unless JUNON_E2E_VIDEO=on)`)
+    return
+  }
+
+  console.log(`[e2e] artifacts in ${outputDir}:`)
+  for (const file of artifacts) {
+    const sizeKb = Math.round(fs.statSync(file).size / 1024)
+    console.log(`[e2e]   ${file} (${sizeKb}KB)`)
+  }
+}
+
+function listFilesRecursive(dir) {
+  let entries
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true })
+  } catch (err) {
+    return [] // never let artifact reporting fail a run
+  }
+
+  return entries.flatMap((entry) => {
+    const full = path.join(dir, entry.name)
+    return entry.isDirectory() ? listFilesRecursive(full) : [full]
+  })
 }

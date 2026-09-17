@@ -1217,12 +1217,29 @@ async setGameMode(gameMode) {
         }
         break
       case "spawnMob":
-        let x = sector.randomSpawnPos()
-        let y = sector.randomSpawnPos()
-        sector.spawnMob({ x: x, y: y, type: "BioRaptor", count: count })
+        // optional row/col/type let test harnesses (see junon-io/test/e2e)
+        // place a specific mob deterministically instead of at a random spot
+        let hasPosition = query && query.row !== undefined && query.col !== undefined
+        let x = hasPosition ? (parseInt(query.col) * Constants.tileSize + Constants.tileSize / 2) : sector.randomSpawnPos()
+        let y = hasPosition ? (parseInt(query.row) * Constants.tileSize + Constants.tileSize / 2) : sector.randomSpawnPos()
+        let mobType = (query && query.type) || "BioRaptor"
+        let spawnedMobs = sector.spawnMob({ x: x, y: y, type: mobType, count: count })
+        result = spawnedMobs.map((mob) => mob.id)
         break
       case "removeMobs":
         sector.removeAllMobs()
+        break
+      case "teleportToSafeGround":
+        // the fixed test-mode spawn point (server/entities/sector.js:
+        // findNewTeamSpawn, {row: 96, col: 4}) is only guaranteed to exist -
+        // not to be dry land, since terrain is still randomly generated per
+        // sector. Test harnesses that need to walk the player around (see
+        // junon-io/test/e2e) use this to land on a tile guaranteed to be
+        // solid ground instead of risking open water just off spawn.
+        let player = sector.getFirstPlayer()
+        let ground = sector.findRandomGround()
+        player.repositionTo(ground.getX(), ground.getY())
+        result = { row: player.getRow(), col: player.getCol() }
         break
       default:
     }
@@ -1853,7 +1870,7 @@ async setGameMode(gameMode) {
   }
 
   sendSectorInfoToMatchmaker() {
-    if (env === 'test') return
+    if (global.isMatchmakerDisabledForTest) return
     if (this.isRemoved) return
 
     this.sendToMatchmaker({ event: "SectorUpdated", data: this.getSectorData() })

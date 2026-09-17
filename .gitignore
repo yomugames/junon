@@ -8,5 +8,7 @@ packages/junon-io/client/assets/screenshots
 packages/junon-io/Dockerfile
 packages/junon-io/deploy_server.sh
 packages/junon-io/deploy/
+packages/junon-io/test-results/
+packages/junon-io/playwright-report/
 .env
 .env*

@@ -580,7 +580,12 @@ class Main {
       return regionData.id === this.region
     })
 
-    return regionData.name
+    // this.region can be a region not present in the fetched region list
+    // (e.g. "localhost" for local dev/test), which used to throw here and
+    // abort Game.onJoinGame partway through - crucially before it reached
+    // the PlayerReady emit, silently breaking chunk subscriptions for the
+    // rest of the session
+    return regionData ? regionData.name : this.region
   }
 
   getObjectPool() {

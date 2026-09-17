@@ -235,6 +235,10 @@ class WorldSerializer {
 
   static async deleteLocally(sectorUid) {
     const sector = await SectorModel.findOne({ where: { uid: sectorUid } })
+    // anonymously-created sectors (global.isOffline, e.g. tutorial/test
+    // colonies) never got a SectorModel row in the first place - nothing to
+    // clean up
+    if (!sector) return
     await sector.update({ data: null })
   }
 

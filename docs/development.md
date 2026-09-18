@@ -47,24 +47,49 @@ npm ls <package>
 The lockfile is `lockfileVersion` 2. `npm install` preserves that; do not let a
 tool rewrite it to 3 as an incidental part of an unrelated change.
 
-### firebase is held on 7 by the browserify client build
+### firebase: scoped packages, held on the 7-era line
 
-`firebase` stays on `^7.15.5`. It is the last major whose browser entry points
-are CommonJS, and the client bundle is built by browserify, which cannot parse
-ESM.
+The client does not depend on the `firebase` umbrella. It depends on the three
+scoped packages it actually uses, pinned to the versions `firebase@7.24.0`
+resolved:
 
-The client uses the v8 namespaced API - `firebase.initializeApp`,
-`firebase.auth()`, `firebase.database()`, `firebase.auth.GoogleAuthProvider` -
-from `client/src/util/firebase_client_helper.js`, off the `window.firebase`
-set in `client/src/vendor.js`. firebase 9 removed that API and replaced it
-with `firebase/compat/*`, which preserves it exactly, so the source change is
-three `require` lines plus a `.default` for the CommonJS interop.
+```
+"@firebase/app": "0.6.11"
+"@firebase/auth": "0.15.0"
+"@firebase/database": "0.6.13"
+```
 
-The blocker is resolution, not the API. Every `firebase/compat/*` and
-`@firebase/*-compat` package declares `main` as CommonJS but `browser` as ESM,
-and browserify prefers `browser`, so the bundle fails with `'import' and
-'export' may appear only with 'sourceType: module'`. Three routes were tried
-and none is contained:
+`client/src/vendor.js` requires those directly. The umbrella's `firebase/app`
+was only `@firebase/app` plus a `registerVersion("firebase", "7.24.0", "app")`
+call, and vendor.js keeps that call so the SDK still reports the same version
+string. `firebase.SDK_VERSION` is unaffected either way - it is baked into
+`@firebase/app` (7.20.0), not set by the umbrella.
+
+The umbrella pulled analytics, firestore, functions, installations, messaging,
+performance, remote-config and storage into the tree for code the bundle never
+loaded. firestore and functions were the last two high advisories in the
+repository, both through an old `node-fetch`. Dropping the umbrella removed
+them along with six moderates. The shipped bundle barely changed - 314 bytes -
+which is the direct evidence that none of it was ever bundled.
+
+Verify a change here against the built artifact, not just the build exit code.
+Firebase is off in `development` and `test` (`server.js` sets `global.isOffline`
+unless `JUNON_USE_FIREBASE=true`), so neither Jest nor the e2e suite exercises
+sign-in; a broken namespace would still let every suite pass. Load the built
+vendor bundle in a browser and confirm `window.firebase` still carries
+`initializeApp`, `apps`, `auth()`, `database()` and
+`auth.GoogleAuthProvider` / `auth.FacebookAuthProvider` - the surface
+`client/src/util/firebase_client_helper.js` uses.
+
+#### Why not firebase 9+
+
+Moving to a current major is blocked by the client build, not by the API.
+firebase 9 removed the namespaced API but `firebase/compat/*` restores it
+exactly, so the source change is small. The problem is resolution: every
+`firebase/compat/*` and `@firebase/*-compat` package declares `main` as
+CommonJS but `browser` as ESM, browserify prefers `browser`, and browserify
+cannot parse ESM - the bundle fails with `'import' and 'export' may appear only
+with 'sourceType: module'`. Three routes were tried and none is contained:
 
 | Attempt | Result |
 | --- | --- |
@@ -76,17 +101,13 @@ Clearing it needs an ESM-to-CommonJS transform (`esmify`, or `babelify` with
 `@babel/preset-env`) applied with `global: true` to the vendor bundle, which
 changes how every other vendor package is processed - pixi.js, @sentry/browser,
 protobufjs, howler, @fingerprintjs/fingerprintjs. That is a build-pipeline
-change, not a dependency bump, and no test covers what it would put at risk:
-`server.js` sets `global.isOffline` in `development` and `test` unless
-`JUNON_USE_FIREBASE=true`, so neither Jest nor the e2e suite exercises sign-in.
+change rather than a dependency bump.
 
-Three of the four advisories this leaves open are unreachable from the shipped
-client. `@firebase/firestore`, `@firebase/functions` and their `node-fetch` are
-not bundled: `vendor.js` takes only app, auth and database, and `node-fetch`
-appears zero times in the built bundle, with the sole `firestore` string being
-a component-name lookup table inside `@firebase/app`. The fourth,
-`_authTokenSyncURL` manipulation in the SDK itself, does reach auth and is a
-real exposure that the transform work above would have to clear.
+What staying on this line still carries is moderate, not high: `@firebase/util`
+and the packages that depend on it (`@firebase/app`, `@firebase/component`,
+`@firebase/database`) carry an uncontrolled-resource-consumption advisory, and
+GHSA-3wf4-68gx-mph8 (`_authTokenSyncURL`, moderate, `<10.9.0`) applies to the
+range. `@firebase/auth` itself carries no advisory.
 
 ### protobufjs is pinned below 8.2.0
 

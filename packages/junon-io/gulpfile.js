@@ -259,13 +259,16 @@ function vendor(cb) {
 }
 
 function copyExternalLibs() {
-  let file = gulp.src(['./client/src/lib/**'])
+  let file = gulp.src(['./client/src/lib/**'], { encoding: false })
                    .pipe(gulp.dest(paths.dist))
   return file;
 }
 
 function copyAssets(cb) {
-  let file = gulp.src(['./client/assets/**/*.*'])
+  // `encoding: false` keeps vinyl from decoding files as UTF-8 (gulp 5 /
+  // vinyl-fs 4 made that the default). Without it every non-ASCII byte in a
+  // png/jpg/mp3/ttf is rewritten as U+FFFD and the asset is unusable.
+  let file = gulp.src(['./client/assets/**/*.*'], { encoding: false })
                    .pipe(gulp.dest(paths.dist + "assets"))
   return file;
 }

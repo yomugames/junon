@@ -1,7 +1,6 @@
 const BaseCommand = require("./base_command")
 const Constants = require("../../common/constants")
 const Protocol = require('../../common/util/protocol')
-const { setting } = require(".")
 
 class Spectate extends BaseCommand {
   getUsage() {

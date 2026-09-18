@@ -41,7 +41,7 @@ class Grid {
     for (var row = 0; row < map.length; row++) {
       let rowSection = map[row]
       for(var col = 0; col < rowSection.length; col++) {
-        entity = map[row][col]
+        let entity = map[row][col]
         if (typeof entity === "function") {
           this.mapData[row][col] = entity()
         } else {

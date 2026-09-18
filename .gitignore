@@ -8,5 +8,11 @@ packages/junon-io/client/assets/screenshots
 packages/junon-io/Dockerfile
 packages/junon-io/deploy_server.sh
 packages/junon-io/deploy/
+# e2e artifacts (video/trace/screenshots) default to /tmp/junon-io-e2e - see
+# packages/junon-io/playwright.config.js. These two only catch the cases that
+# would still write into the repo: JUNON_E2E_OUTPUT_DIR pointed back here, or
+# playwright's html reporter being switched on.
+packages/junon-io/test-results/
+packages/junon-io/playwright-report/
 .env
 .env*

@@ -1,5 +1,20 @@
 {
   "saveFormatVersion": 38,
+  "test": {
+    "googleAnalyticsId": "",
+    "matchmakerUrl": "http://localhost:3000/",
+    "matchmakerWebsocketUrl": "ws://localhost:3000/",
+    "matchmakerGameServerWebsocketUrl": "ws://localhost:2095/",
+    "firebase": {
+      "apiKey": "AIzaSyDj8y3h2TCaWdAJ_6bjskf-7V0-y2Z1I1U",
+      "authDomain": "junon-dfd53.firebaseapp.com",
+      "databaseURL": "https://junon-dfd53.firebaseio.com",
+      "projectId": "junon-dfd53",
+      "storageBucket": "",
+      "messagingSenderId": "497331755585",
+      "appId": "1:497331755585:web:241453fe17be5b31"
+    }
+  },
   "development": {
     "googleAnalyticsId": "",
     "matchmakerUrl": "http://localhost:3000/",

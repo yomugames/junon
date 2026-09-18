@@ -1,7 +1,10 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../../.env'), quiet: true })
 
 global.env = process.env.NODE_ENV || 'development'
-global.debugMode = env === 'development' ? true : false
+// Mirrors junon-io/server/server.js: NODE_ENV=test needs the same debug
+// behavior as development (sqlite db, non-SSL port 3000, no Firebase/AWS
+// credentials required) so it can run in Jest and E2E test harnesses alike.
+global.debugMode = (env === 'development' || env === 'test') ? true : false
 
 // Firebase is an optional production integration. Local runs must not require
 // Application Default Credentials just because the machine has network access.
@@ -103,6 +106,18 @@ class MatchmakerServer {
   }
 
   async run() {
+    if (env === 'test') {
+      // sqlite :memory: (see db/config.js) starts with no schema at all -
+      // real MySQL gets its schema from db/migrations, but that never runs
+      // against the in-memory db, so queries like IpBan.findOne would 404 on
+      // a missing table instead of just returning no rows.
+      // sequelize.sync() (global, association-aware) fails here with a
+      // "cyclic dependency" toposort error over the sectors<->users FK loop;
+      // syncing each already-required model independently sidesteps that
+      // since sqlite doesn't enforce FK target existence at CREATE TABLE time
+      await Promise.all(Object.values(sequelize.models).map((model) => model.sync()))
+    }
+
      // this.topColonies = JSON.parse(require("fs").readFileSync('top_sectors.json', 'utf8'))
     this.periodicallyFetchTopSectors()
     this.periodicallyScaleNodes()

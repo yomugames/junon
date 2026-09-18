@@ -61,6 +61,14 @@ class BaseMenu {
   }
 
   onInventoryMouseDown(e) {
+    // isHoldItemDeletedRecently only ever means "the hold item disappeared
+    // partway through the click currently in progress", and that can only
+    // happen after this point. Anything left over from an earlier click - a
+    // hold item thrown onto the ground, say, where no mouseup on a slot
+    // followed to consume it - would otherwise sit armed and eat this click's
+    // store instead.
+    this.game.isHoldItemDeletedRecently = false
+
     const storageId = e.target.closest(".storage").dataset.storageId
     const index = e.target.closest(".inventory_slot").dataset.index
 

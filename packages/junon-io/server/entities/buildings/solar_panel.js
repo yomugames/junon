@@ -21,11 +21,6 @@ class SolarPanel extends BaseBuilding {
     return "Buildings.SolarPanel"
   }
 
-  getResourceProduction(name) {
-    let production = super.getResourceProduction(name)
-    return name === "power" && this.game.isNight ? 2 * -production : production
-  }
-
   getType() {
     return Protocol.definition().BuildingType.SolarPanel
   }

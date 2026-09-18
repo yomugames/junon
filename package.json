@@ -5,6 +5,7 @@
     "client": "npm run client --workspace packages/junon-io",
     "serveronly": "npm run dev --workspace packages/junon-io",
     "matchmaker": "npm run start --workspace packages/junon-matchmaker",
+    "test": "npm run test --workspace packages/junon-io",
     "client:build": "npm run client:build --workspace packages/junon-io",
     "db:setup": "npm run db:setup --workspace packages/junon-common"
   },
@@ -16,9 +17,13 @@
   },
   "dependencies": {
     "perlin-noise": "^0.0.1",
-    "sharp": "^0.33.1"
+    "sharp": "^0.35.4"
   },
   "overrides": {
-    "form-data": "4.0.6"
+    "@grpc/proto-loader": "^0.8.1",
+    "uuid": "^11.1.1"
+  },
+  "allowScripts": {
+    "sqlite3@6.0.1": true
   }
 }

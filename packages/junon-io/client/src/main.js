@@ -16,7 +16,7 @@ const ExceptionReporter = require("./util/exception_reporter")
 const ClientHelper = require("./util/client_helper")
 const isMobile = require('ismobilejs')
 const Cookies = require("js-cookie")
-const uuidv4 = require('uuid/v4')
+const { v4: uuidv4 } = require('uuid')
 const FirebaseClientHelper = require('./util/firebase_client_helper')
 const Polyglot = require('node-polyglot')
 const japaneseTranslationMap = require("../../common/translations/ja")
@@ -580,7 +580,12 @@ class Main {
       return regionData.id === this.region
     })
 
-    return regionData.name
+    // this.region can be a region not present in the fetched region list
+    // (e.g. "localhost" for local dev/test), which used to throw here and
+    // abort Game.onJoinGame partway through - crucially before it reached
+    // the PlayerReady emit, silently breaking chunk subscriptions for the
+    // rest of the session
+    return regionData ? regionData.name : this.region
   }
 
   getObjectPool() {

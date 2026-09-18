@@ -4,7 +4,6 @@ global.debugMode = env === 'development' ? true : false
 const PlayerBot = require("./../bots/player_bot")
 const Config = require("junon-common/config")
 const LOG = require("junon-common/logger")
-const request = require("request")
 global.allBots = []
 
 const sleep = (ms) => {
@@ -16,26 +15,20 @@ const region = env === 'development' ? 'localhost' : 'nyc1'
 const getGameServersList = () => {
   let matchmakerServersUrl = Config[env].matchmakerUrl + "server_status"
 
-  return new Promise((resolve, reject) => {
-    request({
-      method: 'get',
-      url: matchmakerServersUrl,
-      json: true
-    }, (err, res, body) => {
-      if (err) {
-        console.log("unable to get gameServer list..")
-        resolve({})
-      } else {
-        let data = body
-        if (data.error) {
-          console.log(data.error)
-          return
-        }
-
-        resolve(data)
+  return fetch(matchmakerServersUrl)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) {
+        console.log(data.error)
+        return {}
       }
+
+      return data
     })
-  })
+    .catch(() => {
+      console.log("unable to get gameServer list..")
+      return {}
+    })
 }
 
 const createBots = async (count) => {

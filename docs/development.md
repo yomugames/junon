@@ -25,6 +25,58 @@ The existing development default assumes a local MySQL root user; use the
 supported environment configuration for non-default credentials and never commit
 real credentials.
 
+## Dependencies
+
+`npm audit` is expected to run clean of critical advisories. Several entries in
+the workspace manifests are declared but never required (they only widened the
+vulnerable surface), so before upgrading a flagged package, check whether
+anything imports it at all - removing a dead entry is preferable to bumping it.
+
+Adding an entry to the root `overrides` block is not enough on its own. npm
+keeps the resolution already recorded in `package-lock.json` and reports the
+stale copy as `invalid` rather than re-resolving it, which is how a previous
+`form-data` override sat in `package.json` without ever taking effect. After
+editing `overrides`, delete the affected `node_modules/<pkg>` entries from
+`package-lock.json` (and the matching nodes under its `dependencies` tree) and
+re-run `npm install`, then confirm with:
+
+```sh
+npm ls <package>
+```
+
+The lockfile is `lockfileVersion` 2. `npm install` preserves that; do not let a
+tool rewrite it to 3 as an incidental part of an unrelated change.
+
+### protobufjs is pinned below 8.2.0
+
+`protobufjs` must stay on `^7.6.6`. The wire protocol sends partial updates -
+a message names only the fields that changed - and both sides decide what to
+apply with `data.hasOwnProperty(field)`, in roughly 90 places
+(`Player#updateInput`, `RemoteEventHandler`, `BaseBuilding#applyData`, the
+client's `syncWithServer` paths).
+
+proto3 gives plain scalars implicit presence, so a field set to `0`, `false` or
+`""` is indistinguishable on the wire from an absent one. protobufjs
+historically serialised any own property regardless of value, which is what
+makes those presence checks work. From 8.2.0 it implements proto3 presence
+properly, and every one of those checks silently takes the "field absent"
+branch for a value that changed *to* zero. Observed boundaries against this
+repository's schema:
+
+| Version | Behaviour |
+| --- | --- |
+| `<= 8.0.3` | `{controlKeys: 0}` encodes to `08 00`, decodes with an own property |
+| `8.2.0` - `8.6.5` | still encoded, but decode no longer sets an own property |
+| `>= 8.6.6` | the field is not encoded at all |
+
+`8.0.0` - `8.6.5` also carries a high-severity advisory, so `^7.6.6` is the only
+range that is both patched and compatible.
+
+`test/protocol/field_presence.test.js` pins this. If it fails after a dependency
+change, protobufjs moved - before it can land, every presence-checked field
+needs explicit `optional` presence in `packages/junon-common/protocol/*.proto`,
+which is a protocol change affecting client and server together.
+
 ## Run modes
 
 ```sh

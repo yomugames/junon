@@ -258,9 +258,7 @@ class Server {
   initExceptionReporter() {
     ExceptionReporter.init(process.env["JUNON_SERVER_SENTRY_DSN"])
 
-    Sentry.configureScope(scope => {
-      scope.setExtra('host', this.getHost())
-    })
+    Sentry.getCurrentScope().setExtra('host', this.getHost())
   }
 
   getSystemdServiceIndex() {

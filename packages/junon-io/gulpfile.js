@@ -14,6 +14,7 @@ let gulp = require('gulp'),
   process = require('process'),
   rename = require('gulp-rename'),
   pump = require('pump'),
+  babelify = require('babelify'),
   Terser = require("terser"),
   japaneseTranslationMap = require('./common/translations/ja'),
   englishTranslationMap = require('./common/translations/en'),
@@ -80,6 +81,31 @@ const terserOptions = {
   safari10: true
 }
 
+// Browserify's bundled acorn parser can't read newer syntax (e.g. the ES2021
+// `??=`/`??` operators uuid's browser build uses in v1.js/v6.js/v7.js), so
+// `require()`-ing a vendor package that ships it fails before bundling even
+// starts. Rather than transform every vendor file (which would also touch
+// pixi.js, @sentry/browser, protobufjs, howler, @fingerprintjs/fingerprintjs -
+// see docs/development.md's firebase section for why that's a much bigger,
+// riskier change), transpile just the offending syntax in the specific
+// packages that need it. Add another entry to `only` if a future vendor
+// dependency hits the same parse error.
+let legacySyntaxTransform = babelify.configure({
+  only: [/node_modules\/uuid\//],
+  babelrc: false,
+  configFile: false,
+  presets: [],
+  plugins: [
+    '@babel/plugin-transform-logical-assignment-operators',
+    '@babel/plugin-transform-nullish-coalescing-operator',
+  ]
+})
+// `global: true` is a browserify transform flag (applies the transform to
+// node_modules too, which browserify skips by default) - it must be passed
+// to `.transform()`, not into babelify.configure()'s options, or babel
+// itself chokes on the unrecognized `global` key.
+let legacySyntaxTransformOpts = { global: true }
+
 let buildPaths = (isProduction) => {
   let paths = {
     entry: './client/src/main.js',
@@ -128,7 +154,7 @@ function watchFiles(cb) {
 
 function productionBrowserify(cb) {
   pump([
-    browserify({ entries: [paths.entry] }).external(serverLibraries).bundle(),
+    browserify({ entries: [paths.entry] }).external(serverLibraries).transform(legacySyntaxTransform, legacySyntaxTransformOpts).bundle(),
     source('app.js'),
     buffer(),
     rev(),
@@ -204,6 +230,7 @@ function developmentBrowserify() {
   */
   return browserify({ entries: [paths.entry], debug: true })
       .external(serverLibraries)
+      .transform(legacySyntaxTransform, legacySyntaxTransformOpts)
       .bundle()
       .on('error', function (e) {
         console.error(e)
@@ -218,7 +245,7 @@ function developmentBrowserify() {
 
 function vendor(cb) {
   pump([
-    browserify({ entries: paths.vendor }).bundle(),
+    browserify({ entries: paths.vendor }).transform(legacySyntaxTransform, legacySyntaxTransformOpts).bundle(),
     source('vendor.js'),
     buffer(),
     gulpif(isProduction, rev()),

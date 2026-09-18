@@ -73,25 +73,15 @@ test.describe('escape pod storage', () => {
     // --- put back: the same click on the player's side of the same menu stores
     // it into the container instead (base_menu.js#storeInventorySlot)
     //
-    // Clicked more than once on purpose. storeInventorySlot() opens with
-    //
-    //   if (this.game.isHoldItemDeletedRecently) {
-    //     this.game.isHoldItemDeletedRecently = false
-    //     return
-    //   }
-    //
-    // and that flag is already true before the player has touched anything:
-    // Game#deleteHoldItemInventorySlot() sets it during the reset that runs on
-    // the way into a game and nothing else ever clears it. So the first attempt
-    // in a session to move an item from the inventory into a container is
-    // silently swallowed, and only the second one is sent. That is what a real
-    // player hits too (they click again); retrying here means this test still
-    // passes once that flag is fixed, instead of encoding the quirk.
+    // Deliberately a single click. storeInventorySlot() bails out when
+    // game.isHoldItemDeletedRecently is set, and that flag used to be armed
+    // before the player had touched anything, so the first store of a session
+    // was swallowed and only a second click went through. Asserting on one
+    // click is what keeps that from coming back.
+    await page.click(PLAYER_SLOT(potato.index))
+
     await expect
-      .poll(async () => {
-        await page.click(PLAYER_SLOT(potato.index))
-        return (await readStorage(page, pod.id)).items
-      }, { timeout: 10_000 })
+      .poll(async () => (await readStorage(page, pod.id)).items, { timeout: 10_000 })
       .toEqual(
         expect.arrayContaining([
           expect.objectContaining({ type: 'Potato', count: 5 }),

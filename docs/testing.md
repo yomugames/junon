@@ -26,15 +26,18 @@ From the repository root, run one focused suite:
 npm exec --workspace packages/junon-io -- jest test/pressure/pressure.test.js --runInBand
 ```
 
-Run the ordinary test tree while excluding explicitly heavy suites:
+Run the ordinary test tree while excluding explicitly heavy suites. The flag
+*replaces* the config's list rather than adding to it, so `/node_modules/` and
+`/test/e2e/` have to be repeated or Jest will pick up the Playwright specs and
+fail on them:
 
 ```sh
 npm exec --workspace packages/junon-io -- jest test --runInBand \
-  --testPathIgnorePatterns=/load_testing/ /memleak/
+  --testPathIgnorePatterns=/node_modules/ /test/e2e/ /load_testing/ /memleak/
 ```
 
-Run all discovered Jest tests only when the environment and task justify the
-heavier checks:
+Run all discovered Jest tests, `load_testing` and `memleak` included, only when
+the environment and task justify the heavier checks:
 
 ```sh
 npm exec --workspace packages/junon-io -- jest test --runInBand
@@ -125,10 +128,6 @@ server really applied the change instead of the client having predicted it.
   `sector.groundMap`, the client puts foreground tiles (asteroids, rocks) on
   `sector.map` and walkable ground on `sector.groundMap`. The client has no
   `isMineable()`; it keys mining off `isForegroundTile()`.
-- `Game#isHoldItemDeletedRecently` is already true before a player touches
-  anything, and `storeInventorySlot()` consumes it as an early return, so the
-  first attempt in a session to move an item from the inventory into a container
-  is silently dropped. `storage.spec.js` retries rather than encoding the quirk.
 - A mouse-down *toggles* mining mode. Mining also does not stop when a tile runs
   out - `player.mineTarget` still points at the removed entity until the cursor
   moves off it - so a second dig started without moving the cursor switches

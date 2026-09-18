@@ -3682,12 +3682,19 @@ arrow.style.setProperty('--arrow-color',realColor)
   }
 
   deleteHoldItemInventorySlot() {
-    if (this.holdItemInventorySlot) {
-      if (this.holdItemInventorySlot.parentElement) {
-        this.holdItemInventorySlot.parentElement.removeChild(this.holdItemInventorySlot)
-      }
-      this.holdItemInventorySlot = null
+    // Nothing to delete means nothing to suppress. isHoldItemDeletedRecently
+    // exists to swallow the store that would otherwise follow a click whose
+    // hold item vanished mid-click (see BaseMenu#storeInventorySlot), so
+    // setting it here unconditionally armed that guard in cases where no such
+    // click was in flight - notably removeDataFromPreviousGame(), which runs on
+    // the way into every game, leaving the very first store of a session to be
+    // dropped silently.
+    if (!this.holdItemInventorySlot) return
+
+    if (this.holdItemInventorySlot.parentElement) {
+      this.holdItemInventorySlot.parentElement.removeChild(this.holdItemInventorySlot)
     }
+    this.holdItemInventorySlot = null
 
     this.isHoldItemDeletedRecently = true
   }

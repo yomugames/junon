@@ -47,6 +47,47 @@ npm ls <package>
 The lockfile is `lockfileVersion` 2. `npm install` preserves that; do not let a
 tool rewrite it to 3 as an incidental part of an unrelated change.
 
+### firebase is held on 7 by the browserify client build
+
+`firebase` stays on `^7.15.5`. It is the last major whose browser entry points
+are CommonJS, and the client bundle is built by browserify, which cannot parse
+ESM.
+
+The client uses the v8 namespaced API - `firebase.initializeApp`,
+`firebase.auth()`, `firebase.database()`, `firebase.auth.GoogleAuthProvider` -
+from `client/src/util/firebase_client_helper.js`, off the `window.firebase`
+set in `client/src/vendor.js`. firebase 9 removed that API and replaced it
+with `firebase/compat/*`, which preserves it exactly, so the source change is
+three `require` lines plus a `.default` for the CommonJS interop.
+
+The blocker is resolution, not the API. Every `firebase/compat/*` and
+`@firebase/*-compat` package declares `main` as CommonJS but `browser` as ESM,
+and browserify prefers `browser`, so the bundle fails with `'import' and
+'export' may appear only with 'sourceType: module'`. Three routes were tried
+and none is contained:
+
+| Attempt | Result |
+| --- | --- |
+| `require("firebase/compat/app")` | resolves to `dist/esm/index.esm.js`, parse error |
+| the prebuilt UMD bundles (`firebase/firebase-app-compat.js`) | re-enters the same chain via `require('@firebase/app-compat')` |
+| a custom `resolve` for firebase ids in the browserify options | browserify applies the `browser` field independently of `resolve`; app, auth and database all still fail |
+
+Clearing it needs an ESM-to-CommonJS transform (`esmify`, or `babelify` with
+`@babel/preset-env`) applied with `global: true` to the vendor bundle, which
+changes how every other vendor package is processed - pixi.js, @sentry/browser,
+protobufjs, howler, @fingerprintjs/fingerprintjs. That is a build-pipeline
+change, not a dependency bump, and no test covers what it would put at risk:
+`server.js` sets `global.isOffline` in `development` and `test` unless
+`JUNON_USE_FIREBASE=true`, so neither Jest nor the e2e suite exercises sign-in.
+
+Three of the four advisories this leaves open are unreachable from the shipped
+client. `@firebase/firestore`, `@firebase/functions` and their `node-fetch` are
+not bundled: `vendor.js` takes only app, auth and database, and `node-fetch`
+appears zero times in the built bundle, with the sole `firestore` string being
+a component-name lookup table inside `@firebase/app`. The fourth,
+`_authTokenSyncURL` manipulation in the SDK itself, does reach auth and is a
+real exposure that the transform work above would have to clear.
+
 ### protobufjs is pinned below 8.2.0
 
 `protobufjs` must stay on `^7.6.6`. The wire protocol sends partial updates -

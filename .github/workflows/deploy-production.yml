@@ -62,7 +62,7 @@ jobs:
         run: |
           SENTRY_RELEASE="junon-io@$(git rev-parse --short=7 HEAD)"
           npm exec --workspace packages/junon-io -- sentry-cli releases --org "$SENTRY_ORG" new --finalize --project "$SENTRY_PROJECT" "$SENTRY_RELEASE"
-          npm exec --workspace packages/junon-io -- sentry-cli releases --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" files "$SENTRY_RELEASE" upload-sourcemaps --ignore-file packages/junon-io/.sourcemapignore --no-rewrite packages/junon-io/dist
+          npm exec --workspace packages/junon-io -- sentry-cli sourcemaps upload --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" --release "$SENTRY_RELEASE" --ignore-file packages/junon-io/.sourcemapignore --no-rewrite packages/junon-io/dist
 
       - name: Deploy client files
         run: rsync -rI --delete --exclude='*.map' packages/junon-io/dist/ "root@$CLIENT_HOST:$CLIENT_PATH"

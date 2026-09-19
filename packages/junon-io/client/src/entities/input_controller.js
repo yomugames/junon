@@ -41,9 +41,10 @@ class InputController {
     this.joystick.on("end", this.onJoystickEnd.bind(this))
   }
 
-  onJoystickMove(event, data) {
+  onJoystickMove(event) {
     this.idle = false
-    this.moveAngle = 360 - data.angle.degree
+    this.moveAngle = 360 - event.data.angle.degree
+    // data now embedded in event param
 
     this.player.setAngle(this.moveAngle)
   }

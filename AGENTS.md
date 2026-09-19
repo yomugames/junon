@@ -64,14 +64,21 @@ npm run server
 npm run client:build
 ```
 
-Tests currently have no root npm alias. Run a focused Jest file through the game
-workspace, for example:
+Run a focused Jest file through the game workspace, for example:
 
 ```sh
 npm exec --workspace packages/junon-io -- jest test/pressure/pressure.test.js --runInBand
 ```
 
-See `docs/testing.md` for caveats and broader commands.
+`npm test` runs the whole Jest tree, including the slow `load_testing` and
+`memleak` suites. The Playwright end-to-end suite is separate and boots the real
+matchmaker, game server and browser client:
+
+```sh
+npm run test:e2e --workspace packages/junon-io
+```
+
+See `docs/testing.md` for caveats, the e2e harness, and broader commands.
 
 ## Change workflow
 

@@ -27,6 +27,43 @@ class PressureManager extends NetworkManager {
     })
   }
 
+  // Base NetworkManager#allocateNetwork only assigns the single room in
+  // `options` to the resulting network (via the base, non-flood-filling
+  // assignNetwork), whether that network is brand new or an existing neighbor
+  // network being joined. That's correct for grid/tile-based networks, where
+  // buildings are placed one tile at a time and neighbors get/keep their own
+  // network independently. Rooms are different: opening a door can instantly
+  // connect this room to other rooms that are *also* newly reachable through
+  // it (e.g. a room several doors away that had no network of its own yet, or
+  // a whole separate branch that only now became reachable) - those need to
+  // join too, via the same flood-fill already used by partition() below,
+  // otherwise they're left with no pressureNetwork at all.
+  allocateNetwork(options) {
+    if (this.isAllocationDisabled) return
+
+    const neighbors = this.getNeighbors(options)
+    const availableNetworks = this.getAvailableNetworks(neighbors)
+
+    if (availableNetworks.length > 1) {
+      this.merge(options)
+    } else if (availableNetworks.length === 1) {
+      this.assignNetworks(options.room, availableNetworks[0])
+    } else {
+      this.createNewNetworkFor(options)
+    }
+  }
+
+  createNewNetworkFor(options) {
+    let klass = this.getNetworkKlass()
+    let newNetwork = new klass(this)
+
+    this.assignNetworks(options.room, newNetwork)
+    this.networks[newNetwork.id] = newNetwork
+    this.onNetworkCreated()
+
+    return newNetwork
+  }
+
   partition(options) {
     if (this.isAllocationDisabled) return
       

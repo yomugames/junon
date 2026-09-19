@@ -1,24 +1,19 @@
-const request = require('request')
-
 const sendToServer = (message, queryOptions) => {
-  let payload = {
-    url: "http://localhost:8000/debug/" + message
-  }
+  let url = new URL("http://localhost:8000/debug/" + message)
 
   if (queryOptions) {
-    payload.qs = queryOptions
+    for (let key in queryOptions) {
+      url.searchParams.set(key, queryOptions[key])
+    }
   }
 
-  return new Promise((resolve, reject) => {
-    request.get(payload, (err, res, body) => {
-      if (err) { 
-        console.log(err) 
-        reject(err)
-      } else {
-        resolve(JSON.parse(body).result)
-      }
+  return fetch(url)
+    .then((res) => res.text())
+    .then((body) => JSON.parse(body).result)
+    .catch((err) => {
+      console.log(err)
+      throw err
     })
-  })
 }
 
 module.exports = sendToServer

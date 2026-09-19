@@ -7,18 +7,14 @@ class BetterDedupe {
     this.pastStacktraceHashes  = {}
   }
 
-  setupOnce(addGlobalEventProcessor, getCurrentHub) {
-    addGlobalEventProcessor((event) => {
-      const self = getCurrentHub().getIntegration(BetterDedupe);
-      if (self) {
-        if (self._shouldDropEvent(event)) {
-          return null
-        }
-        this.registerEvent(event)
-      }
+  processEvent(event) {
+    if (this._shouldDropEvent(event)) {
+      return null
+    }
 
-      return event
-    });
+    this.registerEvent(event)
+
+    return event
   }
 
   registerEvent(event) {

@@ -182,12 +182,14 @@ EditCommandBlock {
   }
 
   toJson() {
-    return {
+    const json = {
       isEnabled: this.isEnabled,
-      triggers: this.triggers.map((trigger) => {
-        return trigger.toJson()
-      })
+      triggers: this.triggers.map((trigger) => trigger.toJson())
     }
+
+    console.log(JSON.stringify(json, null, 2))
+
+    return json
   }
 
 }

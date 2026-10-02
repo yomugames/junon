@@ -1,0 +1,241 @@
+# Outcome
+
+Junon ships as an Electron desktop game that is offline-first: a player can
+create, play, save, and reload worlds with no network access and no hosted
+services. Any player can optionally open their world to friends for co-op
+("listen server", Minecraft style); friends join by address and port.
+
+Acceptance criteria:
+
+- The desktop app starts and plays a world with networking disabled, and with no
+  MySQL, Firebase, AWS/S3, Sentry, or matchmaker configuration present.
+- Worlds are stored as files under the Electron user-data directory and survive
+  app restarts; the game autosaves and saves on quit.
+- A host can open a running world for co-op; a second client on the LAN (or
+  reachable via port forwarding / an overlay VPN) can join, play, leave, and
+  rejoin with its character intact.
+- A save file from the hosted game (any supported `save_vN` format) can be
+  imported. The importer picks which team they own and which saved character
+  they play as, can switch characters later, and no account ids from the
+  hosted game remain in the imported world.
+- PvP and minigame modes are gone from the product and the codebase.
+
+## Context
+
+- Architecture today: browser client -> matchmaker -> authoritative game server,
+  with MySQL, Firebase, and S3 behind both services. See
+  [ARCHITECTURE.md](../../../ARCHITECTURE.md).
+- Core design: keep the authoritative game server and run it on the host's
+  machine. Singleplayer is a local server bound to `127.0.0.1`; hosting binds
+  it to `0.0.0.0`. Minecraft's integrated server works the same way. The
+  simulation, commands, AI, and protobuf wire protocol keep working as they are.
+- Integration points to replace:
+  - S3 world storage: `packages/junon-common/world_serializer.js` (`upload`,
+    `readFile`, `listSectors`, `existsRemotely`) and
+    `packages/junon-io/server/entities/game.js` (`getS3`, `putObject`,
+    `deleteObject`); plus `server/util/s3_client.js` and the tasks under
+    `server/util/tasks/`.
+  - Firebase identity: `idToken` -> `server.getUidFromRequest` in
+    `game.js` `performJoinGame` and `resumeIdToken`; client-side
+    `client/src/util/firebase_client_helper.js`, `menus/user_profile_menu.js`.
+  - MySQL/Sequelize models used by the server: `SectorModel`, `User`, `IpBan`,
+    `Favorite` (`server/server.js`), sector bans/votes/friends via
+    `junon-common/db/`.
+  - Matchmaker coupling: the calls guarded by `global.isMatchmakerDisabledForTest`
+    in `server/server.js`, and client `components/game_explorer.js`,
+    `components/pvp_explorer.js`.
+  - Existing offline seam: `global.isOffline` (`server/server.js`), already
+    checked in about 20 places.
+- Save compatibility: saves are gzip-compressed protobuf `SaveState` messages
+  with versioned schemas `save_v7` .. `save_v39` in
+  `packages/junon-common/protocol/save_formats/`. Characters are keyed by
+  account uid (`Entities.playerDataMap`, `Player.uid`, `PlayerData.uid`), and
+  teams record `creatorUid`, `leaderUid`, and a `LeaderRef` (player entity id).
+  Old uids are Firebase uids. `OwnerRef` on buildings, mobs, and corpses holds
+  an entity id, not a uid, so team-owned structures don't depend on accounts.
+- PvP/minigame code is spread through the codebase: `isPvP()`/`isMiniGame()`
+  have about 164 call sites across `server/`, `client/src/`, and `common/`, and there
+  are dedicated modules (`server/entities/minigames/`,
+  `server/entities/minigame_objectives.js`, `server/commands/endround.js`,
+  `junon-matchmaker/src/minigame.js`).
+
+## Progress
+
+- [x] 2026-09-28: Mapped external integrations and agreed on scope (see Decisions).
+- [ ] Phase 1: Server runs standalone with local storage and local identity.
+- [ ] Phase 2: Save import with team selection and owner character switching.
+- [ ] Phase 3: PvP and minigames removed.
+- [ ] Phase 4: Local menus replace the matchmaker UI.
+- [ ] Phase 5: Electron shell runs client and server process.
+- [ ] Phase 6: Co-op hosting and joining.
+- [ ] Phase 7: Singleplayer behavior (pause, autosave, save on quit).
+- [ ] Phase 8: Remove hosted-service packages and dependencies; update docs.
+- [ ] Phase 9: Packaging.
+
+## Implementation
+
+The browser build and `npm run serveronly` must keep working through Phase 4,
+so the existing Jest and Playwright suites can still validate each step.
+
+### Phase 1: standalone server
+
+1. Add a world-storage module with a filesystem backend rooted at a
+   configurable saves directory (env/CLI argument; Electron passes
+   `app.getPath('userData')/saves`). Route every S3 read/write/list/delete in
+   `world_serializer.js` and `game.js` through it. Keep file contents
+   byte-compatible with what was uploaded to S3 (gzip'd `SaveState`).
+2. Replace the world list in the database with metadata read from save headers
+   (`save_header.proto`) plus a small JSON index for display fields (last
+   played, thumbnail path).
+3. Replace Firebase identity with a local profile: a UUID generated by the client
+   once and persisted with a display name. The join payload sends it in place of
+   `idToken`. The server keys characters by it.
+4. Turn `isMatchmakerDisabledForTest` into a proper standalone mode (it is no
+   longer test-only). Default Sentry and prom-client to off.
+5. Drop the server's MySQL dependency. Move per-world bans into the world save or
+   a JSON file next to it. Global accounts, favorites, votes, and friends go away.
+
+### Phase 2: import old saves
+
+1. Import accepts a `.sav` file (gzip'd protobuf, any supported version), runs
+   it through the existing version upgrade path in `world_serializer.js`, and
+   writes it into the saves directory under a new local world id.
+2. Replace hosted-game identity while keeping characters:
+   - Give every saved character a new opaque local id (`imported-<n>`) and
+     rewrite it everywhere the old Firebase uid appears: `Player.uid`,
+     `PlayerData.uid`, `playerDataMap` keys, team `creatorUid`/`leaderUid`, and
+     uid-keyed team maps (`deeds`, and `permissions` if its keys are uids;
+     confirm against `server/entities/team.js`). No Firebase uid remains, and
+     characters keep their inventory, position, and stats. `OwnerRef` holds
+     entity ids and is left unchanged.
+3. The importer picks a team. The import dialog lists the save's teams (name,
+   creator name, member count, building count). The chosen team's
+   `creatorUid`/`leaderUid` are set to the local profile UUID and `creatorName`
+   to the profile name, making the importer its owner. The save does not
+   record which team belonged to the hosted world's creator (that lived in
+   MySQL), so the choice is made here rather than guessed.
+4. The owner can switch between characters. In an imported world, the owner
+   can choose which saved character they play as (or a fresh one) at import
+   time, and switch later from an in-game menu:
+   - The list shows saved characters that no connected player is controlling.
+   - Switching saves the current character back into `playerDataMap` under its
+     `imported-<n>` id (or a new one if it was a fresh character), rebinds the
+     chosen character's id to the owner's profile UUID, and resumes it through
+     the existing `resumeFromSaveFile` path in `server/entities/game.js`.
+   - This is an owner-only server command. It validates that the target is
+     unbound and belongs to this world; guests cannot use it.
+   - Guests join as fresh characters by default. Letting the owner hand a
+     saved character to a guest is a later option, not in scope for Phase 2.
+5. Reject PvP/minigame saves (`Metadata.gameMode`) with a clear message.
+6. Provide an operator-side export script that downloads a sector's save from the
+   existing S3 bucket, so players can request their old worlds before hosted
+   infrastructure is shut down. Keep it outside the desktop app.
+
+### Phase 3: remove PvP and minigames
+
+1. Make the modes unreachable first: remove creation paths and menu entries, and
+   have the importer reject them (Phase 2).
+2. Delete `server/entities/minigames/`, `minigame_objectives.js`, round/endround
+   commands, `pvp_explorer.js`, and matchmaker minigame handling.
+3. Remove `isPvP()`/`isMiniGame()` branches module by module, keeping the
+   non-PvP path. Run the focused Jest suites after each module.
+4. Leave wire/save schema fields in place. Keep enum values and field numbers
+   so that old saves still decode.
+
+### Phase 4: local menus
+
+Replace `game_explorer.js` with New world / Load world / Import / Host / Join
+(address:port) menus. Remove the account, friends, favorites, voting, event
+badge, and ban-appeal UI.
+
+### Phase 5: Electron shell
+
+1. New workspace package `packages/junon-desktop`. The main process serves the
+   built client over a custom `app://` protocol. Use `contextIsolation: true`,
+   no `nodeIntegration`, and a narrow preload API (start/stop server, list/
+   import worlds, profile).
+2. Run the game server in a separate process (`utilityProcess.fork`), not in the
+   main process, because the server relies on process globals and init order.
+3. Native modules: move the server socket layer from `uWebSockets.js` to `ws`
+   (already a dependency) because uWS only ships Node-ABI binaries. Rebuild or
+   remove `sharp` (`server/entities/sector.js`).
+
+### Phase 6: co-op
+
+1. "Open to LAN" rebinds the running server to `0.0.0.0:<port>` and shows the
+   host's LAN address. Optional join password is checked in `performJoinGame`.
+2. The host is the world owner/admin. Guests are untrusted network input, and
+   the server stays authoritative.
+3. On connect, check the protocol hash and show a clear version-mismatch error.
+4. When the host quits: save, notify guests, then close.
+
+### Phase 7: singleplayer behavior
+
+Pause the simulation when the menu is open with a single local player, autosave
+on an interval, and flush a save on `before-quit` before exiting.
+
+### Phase 8: cleanup
+
+Remove `junon-matchmaker`, `junon-io-watchdog`, `junon-common/db` and its
+migrations, `aws-sdk`, `firebase*`, `mysql`/`mysql2`/`sequelize`, and the
+S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
+`docs/deployment.md`, and `docs/testing.md`. Point the e2e harness at a local server.
+
+### Phase 9: packaging
+
+`electron-builder` for Windows, macOS, and Linux; code signing and notarization.
+
+## Validation
+
+- Per phase: focused Jest suites under `packages/junon-io/test/` for the
+  touched subsystems (see [docs/testing.md](../../testing.md)).
+- Phase 1: with no `.env`, no MySQL, and no network, `npm run serveronly` +
+  `npm run client` can create a world, save it, restart, and reload it.
+- Phase 2: a Jest test round-trips a fixture save from an older format version
+  through import. It asserts that no hosted-game uid remains, that the chosen
+  team's creator/leader is the local profile, that characters keep inventory
+  and position, and that buildings and terrain are preserved. A second test
+  switches the owner between two saved characters and asserts that both
+  characters' state survives a save/reload.
+- Phase 6: two clients (two Electron instances or Electron + browser) on one
+  machine and across a LAN can join, play, disconnect, and resume.
+- Playwright e2e suite green against the standalone server.
+
+## Decisions
+
+- 2026-09-28: Listen-server model that reuses the existing authoritative server.
+  Alternative considered: rewrite as peer-to-peer or client-authoritative
+  netcode. Rejected because the server is already authoritative and
+  self-contained, and a rewrite would touch all gameplay code.
+- 2026-09-28: Remove PvP and minigames entirely rather than porting them to
+  local modes.
+- 2026-09-28: Steam distribution/networking is out of scope. Internet co-op is
+  direct IP (port forwarding or an overlay VPN such as Tailscale/ZeroTier).
+  Not ruled out for the future; no transport abstraction is built for it now.
+- 2026-09-28: Hosted-game saves must be importable. The on-disk save format stays
+  the existing versioned protobuf `SaveState`. On import, Firebase uids are
+  replaced with opaque local ids, the importer picks the team they own, and the
+  owner can switch between saved characters. Alternatives considered: dropping
+  all saved characters (loses inventories), and inferring the owner team from
+  building counts (can guess wrong because the save doesn't record the creator).
+- 2026-09-28: Game server runs in a separate process from the Electron main
+  process, because of process globals and so a server crash does not take down the UI.
+
+## Discoveries and risks
+
+- `uWebSockets.js` is expected not to load under Electron's ABI. The plan
+  replaces it with `ws`. Throughput is not a concern at co-op player counts.
+- Character switching creates a new despawn/resume path for a live player.
+  Check that it doesn't duplicate items (a save racing the switch) or leave a
+  stale entity for the previous character. Cover it with the Phase 2 test.
+- PvP/minigame removal touches about 164 call sites. Doing it after standalone
+  mode works (Phase 3) keeps regressions attributable.
+- Join-time identity is self-asserted (local UUID). A guest could impersonate
+  another guest's character if they learn the UUID. This is acceptable for
+  friends-only co-op; the optional join password limits exposure.
+- Rollback: phases 1-4 keep the browser build working, so each phase can be
+  reverted independently until Phase 8 removes the hosted services.
+
+## Result
+
+Not started.

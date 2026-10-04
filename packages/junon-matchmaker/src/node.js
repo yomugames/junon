@@ -151,12 +151,6 @@ class Node {
 
   getAvailableServer(options = {}) {
     if (this.isMarkedForRemoval) return null
-
-    // schedule minigames on minigame nodes only
-    if (!debugMode && env !== 'staging') {
-      if (!options.isMiniGame && this.isMiniGame()) return null
-      if (options.isMiniGame && !this.isMiniGame()) return null
-    }
       
     let result
 

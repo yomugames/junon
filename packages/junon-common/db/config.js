@@ -19,15 +19,14 @@ module.exports = {
     "dialect": "sqlite",
     "logging": false
   },
-  // Standalone (offline desktop / listen-server) mode has no database. Until
-  // the remaining hosted-only model calls are removed (see
-  // docs/exec-plans/active/electron-offline-coop.md), an empty in-memory
-  // sqlite db stands in for MySQL so those calls find no rows and no-op.
+  // Standalone (offline desktop / listen-server) mode uses a sqlite file in
+  // place of MySQL, next to the world saves and shared by every world in that
+  // directory - the same tables and models as hosted servers.
   "standalone": {
     "username": null,
     "password": null,
     "database": null,
-    "storage": ":memory:",
+    "storage": process.env['JUNON_SAVES_DIR'] ? require('path').join(process.env['JUNON_SAVES_DIR'], 'junon.sqlite') : null,
     "dialect": "sqlite",
     "logging": false
   },

@@ -15,10 +15,8 @@
     "protobufjs": "^7.6.6",
     "sequelize": "^6.37.8",
     "sequelize-cli": "^6.6.5",
+    "sqlite3": "^6.0.1",
     "winston": "^2.3.1"
-  },
-  "devDependencies": {
-    "sqlite3": "^6.0.1"
   },
   "repository": {
     "type": "git",

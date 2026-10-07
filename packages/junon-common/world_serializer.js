@@ -279,6 +279,9 @@ class WorldSerializer {
   // every entity in the save
   static async getSaveMetadata(sectorUid) {
     try {
+      let hasSave = await this.hasCloudSavedData(sectorUid)
+      if (!hasSave) return null
+
       let compressed = await this.readFile(sectorUid)
       if (!compressed) return null
       let buffer = await this.decompressGzip(compressed)

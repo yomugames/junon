@@ -268,7 +268,9 @@ class Player extends BaseEntity {
 
   async queryBalance() {
     if (!this.isLoggedIn()) return
-    if (!this.game.isMiniGame()) return
+    // hosted servers only answered in minigames, so survival players saw their
+    // balance only after a transaction; standalone answers when the ATM opens
+    if (!this.game.isMiniGame() && env !== 'standalone') return
 
     let user = await User.findOne({ where: { uid: this.uid } })
     if (!user) return

@@ -1,7 +1,8 @@
 // Boots the real game server with NODE_ENV=standalone - no matchmaker, MySQL,
 // Firebase or S3 - and checks the offline world lifecycle: a new world is
-// generated, stopping the server saves it to the saves directory, and the next
-// start loads that save instead of generating a new map.
+// generated and registered in the saves directory's sqlite database, stopping
+// the server saves it, and the next start loads that save instead of
+// generating a new map.
 const { spawn } = require('child_process')
 const fs = require('fs')
 const net = require('net')
@@ -9,6 +10,7 @@ const os = require('os')
 const path = require('path')
 const zlib = require('zlib')
 const protobuf = require('protobufjs')
+const sqlite3 = require('sqlite3')
 
 const SERVER_PATH = path.resolve(__dirname, '../../server/server.js')
 const SAVE_HEADER_PROTO = path.join(path.dirname(require.resolve('junon-common/world_serializer')), 'protocol/save_formats/save_header.proto')
@@ -66,6 +68,16 @@ function canConnect(host, port) {
   })
 }
 
+function queryDatabase(sql) {
+  return new Promise((resolve, reject) => {
+    const db = new sqlite3.Database(path.join(savesDir, 'junon.sqlite'), sqlite3.OPEN_READONLY)
+    db.all(sql, (error, rows) => {
+      db.close()
+      error ? reject(error) : resolve(rows)
+    })
+  })
+}
+
 function readSaveHeader() {
   const compressed = fs.readFileSync(path.join(savesDir, 'testWorld1', 'sector.sav'))
   const SaveState = protobuf.loadSync(SAVE_HEADER_PROTO).lookupType('app.SaveState')
@@ -88,7 +100,13 @@ test('generates a new world, saves it on shutdown and loads the save on the next
   expect(header.name).toEqual('TestColony')
   expect(header.gameMode).toEqual('peaceful')
 
-  // name and mode now come from the save, not from the launcher
+  // registered like a hosted sector row, owned by the launching profile
+  expect(await queryDatabase('select uid, name, gameMode, creatorUid from sectors')).toEqual([
+    { uid: 'testWorld1', name: 'TestColony', gameMode: 'peaceful', creatorUid: 'ownerProfile123' }
+  ])
+  expect(await queryDatabase('select uid from users')).toEqual([{ uid: 'ownerProfile123' }])
+
+  // name and mode now come from the registry, not from the launcher
   server = startServer({ JUNON_WORLD_NAME: 'Ignored', JUNON_GAME_MODE: 'survival' })
   await waitForOutput(server, 'Standalone world ready: testWorld1')
   expect(server.output).toContain('Save data found')

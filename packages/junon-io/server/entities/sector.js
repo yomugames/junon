@@ -103,7 +103,9 @@ class Sector {
 
     let sectorModel = this.game.sectorModel
     if (sectorModel) {
-      this.createdAt = (new Date(sectorModel.createdAt).getTime()) / 1000
+      // whole seconds: the wire field is an integer, and sqlite (unlike MySQL
+      // DATETIME) keeps milliseconds
+      this.createdAt = Math.floor(new Date(sectorModel.createdAt).getTime() / 1000)
     }
 
     this.initVariables()

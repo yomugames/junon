@@ -2251,12 +2251,15 @@ async setGameMode(gameMode) {
         return
       }
 
+      let user = await User.findOne({ where: { uid: uid } })
+
       if (!this.isValidLocalUsername(data.username)) {
-        // no usable name sent: a returning character keeps its saved name
+        // no usable name sent: a returning player keeps their name
         let existingPlayer = this.getPlayerByUID(uid)
         let playerData = this.getPlayerData(uid)
         data.username = (existingPlayer && existingPlayer.getName()) ||
                         (playerData && playerData.name) ||
+                        (user && user.username) ||
                         await this.generateUniqueUsername()
       }
 
@@ -2264,6 +2267,14 @@ async setGameMode(gameMode) {
       if (isNameUsedByOtherPlayer) {
         this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
         return
+      }
+
+      // the profile's users row backs account features (ATM balance, badges)
+      // the same way an account's row does on hosted servers
+      if (!user) {
+        await User.create({ uid: uid, username: data.username, gold: 0 })
+      } else if (user.username !== data.username) {
+        await user.update({ username: data.username })
       }
     } else if (data.idToken) {
       uid = await this.server.getUidFromRequest(data.idToken, data.uid)

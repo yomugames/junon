@@ -335,10 +335,24 @@ plan), you join it as a new character.
 
 The server autosaves every three minutes and saves on `SIGINT`/`SIGTERM`. In
 this mode an unhandled promise rejection is logged instead of crashing the
-world. Standalone still uses an empty in-memory SQLite database as a stand-in
-for the remaining hosted-only model calls (`junon-common/db/config.js`), so
-features backed by MySQL rows do nothing in this mode. That includes the ATM
-account balance, badges, votes, favorites, sector bans and screenshots.
+world.
+
+Standalone uses a SQLite file, `<JUNON_SAVES_DIR>/junon.sqlite`, in place of
+MySQL. It has the same models and tables, and is shared by every world in that
+saves directory:
+- **`sectors`** is the world registry (name, game mode, owner). A world without
+  a row is registered on first start from its save header, or from
+  `JUNON_WORLD_NAME`/`JUNON_GAME_MODE` if it has no save yet.
+- **`users`** has one row per local profile, created when that profile first
+  joins. It backs account features such as the ATM balance, which is
+  therefore per profile and shared across worlds, like the hosted account.
+  Balances from the hosted game can't be imported, because they were only ever
+  in MySQL.
+
+The schema comes from the models (`junon-common/db/standalone_schema.js`), not
+from `db/migrations`, which are MySQL-only. Missing tables and newly added
+columns are created at startup. Renaming or removing a column needs an explicit
+standalone step.
 
 ## Configuration and integrations
 

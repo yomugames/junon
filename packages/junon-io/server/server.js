@@ -37,6 +37,7 @@ const User = require("junon-common/db/user")
 const IpBan = require("junon-common/db/ip_ban")
 const Favorite = require("junon-common/db/favorite")
 const sequelize = require("junon-common/db/sequelize")
+const syncStandaloneSchema = require("junon-common/db/standalone_schema")
 const Item = require("./entities/item")
 const base64id = require('base64id')
 
@@ -151,7 +152,13 @@ class Server {
   }
 
   async run() {
-    if (env === 'test' || isStandalone) {
+    if (isStandalone) {
+      // the sqlite file lives in the saves directory (junon-common/db/config.js)
+      fs.mkdirSync(WorldSerializer.getSavesDirectory(), { recursive: true })
+      await syncStandaloneSchema(sequelize)
+    }
+
+    if (env === 'test') {
       // sqlite :memory: (see junon-common/db/config.js) starts with no schema
       // at all - real MySQL gets its schema from db/migrations, which never
       // runs against the in-memory db, so any real query would 404 on a
@@ -238,9 +245,11 @@ class Server {
   }
 
   // The launcher (desktop shell, or a developer running serveronly) picks the
-  // world. A world without a save file yet is generated fresh; otherwise its
-  // name and game mode come from the save, since there is no sector database
-  // row to supply them as on hosted servers.
+  // world. As on hosted servers, the sectors table is the world registry
+  // (there the matchmaker creates the row): it holds the world's name, game
+  // mode and owner. A world without a row - new, or a save copied in from the
+  // hosted game - is registered from its save header, owned by the launching
+  // profile.
   async loadStandaloneWorld() {
     let worldId = process.env.JUNON_WORLD_ID
     if (!worldId) {
@@ -248,24 +257,34 @@ class Server {
       process.exit(1)
     }
 
-    // the local profile that owns the world. Required: Team#isSectorOwner
-    // compares against it, and an unset owner would match every team saved
-    // without a creator.
+    // Required: Team#isSectorOwner compares teams against the world owner, and
+    // an unset owner would match every team saved without a creator
     let ownerUid = process.env.JUNON_OWNER_UID
     if (!ownerUid) {
       LOG.error("JUNON_OWNER_UID is not defined. Unable to run standalone server.")
       process.exit(1)
     }
 
-    let metadata = await WorldSerializer.getSaveMetadata(worldId)
-    let name = metadata ? metadata.name : process.env.JUNON_WORLD_NAME
-    let gameMode = metadata ? metadata.gameMode : process.env.JUNON_GAME_MODE
+    await User.findOrCreate({ where: { uid: ownerUid }, defaults: { gold: 0 } })
+
+    let sectorModel = await SectorModel.findOne({ where: { uid: worldId } })
+    if (!sectorModel) {
+      let metadata = await WorldSerializer.getSaveMetadata(worldId)
+      await SectorModel.createOne({
+        uid: worldId,
+        name: metadata ? metadata.name : process.env.JUNON_WORLD_NAME,
+        gameMode: (metadata && metadata.gameMode) || process.env.JUNON_GAME_MODE || 'survival',
+        creatorUid: ownerUid
+      })
+    }
+
+    sectorModel = await this.findSectorWithAttributers(worldId)
 
     let result = await this.createGame({
       creatorIp: "127.0.0.1",
-      creatorUid: ownerUid,
-      sectorData: { id: worldId, name: name },
-      gameMode: gameMode || 'survival'
+      creatorUid: sectorModel.creatorUid,
+      sectorData: { id: worldId, name: sectorModel.name, sectorModel: sectorModel, origSectorUid: sectorModel.dataValues.uid },
+      gameMode: sectorModel.gameMode
     })
 
     if (!result.createdGame) {

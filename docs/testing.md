@@ -52,6 +52,10 @@ npm run client:build
 
 ## End-to-end tests
 
+Playwright's own Chromium must be installed once per machine
+(`npm exec --workspace packages/junon-io -- playwright install chromium`).
+Without it, every e2e test fails to launch a browser.
+
 ### What they run
 
 `test/e2e/global-setup.js` boots the real stack as separate processes, the same

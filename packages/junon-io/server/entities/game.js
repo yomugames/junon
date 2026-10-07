@@ -28,7 +28,6 @@ const WorldSerializer = require("junon-common/world_serializer")
 const SaveImporter = require("junon-common/save_importer")
 const ObjectPool = require("../../common/entities/object_pool")
 const TileHit = require("./tile_hit")
-const FirebaseAdminHelper = require("../util/firebase_admin_helper")
 const Sentry = require('@sentry/node')
 const AWS = require('aws-sdk')
 const bucketName = process.env.S3_BUCKET_NAME || "junon"
@@ -53,7 +52,6 @@ class Game {
       this.sectorUid  = this.id   = sectorIdAndName.id
       this.sectorName = this.name = sectorIdAndName.name
     } else {
-      this.origSectorUid = sectorData.origSectorUid
       this.sectorUid  = this.id   = sectorData.id
 
       let sectorName
@@ -88,28 +86,24 @@ class Game {
     this.needs = {}
     this.commandQueue = []
 
-    this.pendingMatchmakerChecks = {}
     this.disconnectedPlayers = {}
     this.teams = {}
     this.colonies = {}
     this.players = {}
     this.entities = {}
     this.reservedSpots = {}
-    this.leavingPlayers = {}
     this.sessionResumptionRequests = {}
     this.commands = {}
     this.timers = {}
     this.sidebars = {}
 
     this.gameInfo = {} // to be sent to gamestate msg
-    this.characterRestarts = {}
 
     this.leaderboard = []
     this.leaderboardChanged = false
     this.TREE_SPAWN_PERCENTAGE = 1
     this.tickHighCount = 0
     this.memoryHighCount = 0
-    this.leavingPlayerCount = 0
 
     this.populationLabel = "empty"
 
@@ -121,10 +115,6 @@ class Game {
 
   setCreatorUid(uid) {
     this.creatorUid = uid
-  }
-
-  addCharacterRestart(player) {
-    this.characterRestarts[player.getUid()] = this.timestamp
   }
 
   hasKit(name) {
@@ -470,15 +460,9 @@ class Game {
 
     this.language = options.language || "en"
 
-    this._isMiniGame = options.isMiniGame
-
     await this.initSector(options)
 
     this.initCommands()
-  }
-
-  isMiniGame() {
-    return this._isMiniGame
   }
 
   getObjectivesBySelector(selector) {
@@ -543,10 +527,6 @@ class Game {
     if (this.gameReadyCallback) {
       this.gameReadyCallback()
       this.gameReadyCallback = null
-    }
-
-    if (this.isPvP()) {
-      FirebaseAdminHelper.setPvPSector(this.sector.uid)
     }
   }
 
@@ -684,56 +664,6 @@ class Game {
     this.disconnectedPlayers[player.id] = player
   }
 
-  cleanupLeavingPlayers() {
-    if (this.leavingPlayerCount > 0)
-
-    for (let id in this.leavingPlayers) {
-      let leaveTimestamp = this.leavingPlayers[id]
-      let duration = this.timestamp - leaveTimestamp
-      if (duration > (Constants.physicsTimeStep * 5)) {
-        let player = this.players[id]
-        this.removeLeavingPlayer(player)
-        player.remove()
-      }
-    }
-  }
-
-  cleanupCharacterRestarts() {
-    if (!this.isPvP()) return
-
-    const isOneMinuteInterval = this.timestamp % (Constants.physicsTimeStep * 60) === 0
-    if (!isOneMinuteInterval) return
-
-    for (let uid in this.characterRestarts) {
-      let timestamp = this.characterRestarts[uid]
-      let duration = this.timestamp - timestamp
-      let fiveMinutes = Constants.physicsTimeStep * 60 * 5
-      if (duration > fiveMinutes) {
-        delete this.characterRestarts[uid]
-      }
-    }
-  }
-
-  cleanupPlayerDataMap() {
-    // !!!IMPORTANT, only on PVP do we want to cleanup playerDataMap
-    // in co-op they should be permanent since they hold admin playerData, ownership, etc.
-    if (!this.isPvP()) return
-
-    const isOneMinuteInterval = this.timestamp % (Constants.physicsTimeStep * 60) === 0
-    if (!isOneMinuteInterval) return
-
-    for (let id in this.playerDataMap) {
-      let playerData = this.playerDataMap[id]
-      let aliveDuration = this.timestamp - playerData.createTimestamp
-      let oneDay = Constants.physicsTimeStep * 60 * 60 * 24
-      let shouldExpire = aliveDuration > oneDay
-      if (shouldExpire) {
-        playerData.removeOwnerships()
-        playerData.remove()
-      }
-    }
-  }
-
   cleanupReservedSpots() {
     const isOneSecondInterval = this.timestamp % Constants.physicsTimeStep === 0
     if (!isOneSecondInterval) return
@@ -775,7 +705,6 @@ class Game {
   onPlayerReconnected(player, oldSocketId) {
     LOG.info(player.name + " reconnected ")
 
-    delete this.leavingPlayers[player.id]
     player.resetDisconnection()
     delete this.disconnectedPlayers[player.id]
 
@@ -923,7 +852,6 @@ class Game {
 
   canBeSaved() {
     if (this.isTutorial) return false
-    if (this.isMiniGame()) return false
     if (this.isRemoved) return false
 
     return true
@@ -946,8 +874,8 @@ class Game {
   async initSector(options = {}) {
     let gameMode = options.gameMode
 
-    let rowCount = gameMode === 'pvp' ? 512 : options.rowCount
-    let colCount = gameMode === 'pvp' ? 512 : options.colCount
+    let rowCount = options.rowCount
+    let colCount = options.colCount
 
     if (env === 'test') {
       this.initSurvivalSector({ rowCount: rowCount, colCount: colCount, uid: this.sectorUid, name: this.sectorName })
@@ -965,7 +893,7 @@ class Game {
       return
     }
 
-    let isNewGame = !options.isBootSector && !options.isMiniGame
+    let isNewGame = !options.isBootSector
     if (false && isNewGame) {
        let compressed = require("fs").readFileSync("/Users/reg/gamedev/junon/sector.sav.gz")
       // let compressed = require("fs").readFileSync("/Users/reg/gamedev/junon/junon-io/amongus_3.sav.gz")
@@ -980,7 +908,7 @@ class Game {
       return
     }
 
-    let uid = this.isMiniGame() ? this.origSectorUid : this.sectorUid
+    let uid = this.sectorUid
 
     let hasCloudSavedData = await WorldSerializer.hasCloudSavedData(uid)
     if (!hasCloudSavedData) {
@@ -1030,22 +958,8 @@ class Game {
     return this.isSurvival() || this.isHardcore()
   }
 
-  addLeavingPlayer(player) {
-    this.leavingPlayers[player.getId()] = this.timestamp
-    this.leavingPlayerCount = Object.keys(this.leavingPlayers).length
-  }
-
-  removeLeavingPlayer(player) {
-    delete this.leavingPlayers[player.getId()]
-    this.leavingPlayerCount = Object.keys(this.leavingPlayers).length
-  }
-
   getGameMode() {
     return this.gameMode || "default"
-  }
-
-  isPvP() {
-    return this.gameMode === 'pvp'
   }
 
   triggerEvent(eventName, params = {}) {
@@ -1117,17 +1031,11 @@ class Game {
   }
 
 
+  // rounds are started by command blocks (a timer named RoundStartTimer)
   onRoundStarted() {
-    this.sendToMatchmaker({ event: "RoundStarted", data: this.getSectorData() })
     this.forEachPlayer((player) => {
       this.getSocketUtil().emit(player.socket, "RoundStarted", {})
     })
-  }
-
-  onRoundEnded() {
-    if (!this.isMiniGame()) return
-
-    this.remove()
   }
 
   isHardcore() {
@@ -1143,8 +1051,6 @@ class Game {
   }
 
 async setGameMode(gameMode) {
-  if (this.isMiniGame()) return
-
   let allowedGameModes = ['peaceful', 'survival', 'hardcore']
   if (allowedGameModes.indexOf(gameMode) === -1) return
   if (this.gameMode === gameMode) return
@@ -1281,13 +1187,6 @@ async setGameMode(gameMode) {
     this.forEachPlayer((player) => {
       player.onHourChanged(this.hour)
     })
-
-    if (this.isMiniGame()) {
-      if (this.sector.eventHandler.isRoundStarted) {
-        // in case first one didnt reach matchmaker. send it again
-        this.onRoundStarted()
-      }
-    }
   }
 
   forEachPlayer(cb) {
@@ -1320,7 +1219,6 @@ async setGameMode(gameMode) {
     this.calculateHour()
 
     if (this.shouldPause) {
-      this.sector.safeExecuteTurn(this.sector.voteManager)
       this.forEachPlayer((player) => {
         player.executeOnPause()
       })
@@ -1414,7 +1312,6 @@ async setGameMode(gameMode) {
   }
 
   canBeShutdown() {
-    if (this.isPvP()) return false
     // a standalone server exists to host this one world; it stays loaded with
     // nobody connected and is saved and stopped when the process exits
     if (env === 'standalone') return false
@@ -1472,7 +1369,7 @@ async setGameMode(gameMode) {
     if (this.isPreparingRemoval) return
     this.isPreparingRemoval = true
 
-    if (this.isTutorial || this.isMiniGame()) {
+    if (this.isTutorial) {
       this.remove()
       return
     }
@@ -1542,10 +1439,6 @@ async setGameMode(gameMode) {
     let sectorData = this.getSectorData()
 
     this.sendToMatchmaker({ event: "SectorRemoved", data: sectorData })
-
-    if (this.isPvP()) {
-      await FirebaseAdminHelper.removePvPSector(this.sector.uid)
-    }
 
 
     this.cleanup()
@@ -1829,9 +1722,6 @@ async setGameMode(gameMode) {
     this.cleanupPlayers()
     this.cleanupReservedSpots()
     this.cleanupTeamIpBlacklist()
-    this.cleanupPlayerDataMap()
-    this.cleanupLeavingPlayers()
-    this.cleanupCharacterRestarts()
   }
 
   getBuilding(data) {
@@ -2178,48 +2068,7 @@ async setGameMode(gameMode) {
       return
     }
 
-    if (this.isPvP()) {
-      if (this.getPlayerCount() >= 50) {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "Server is full" })
-        return
-      }
-    }
-
-    if (this.isMiniGame()) {
-      if (this.sector.eventHandler.isRoundStarted &&
-          !this.sector.miniGame.canAcceptPlayersMidGame()) {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "Round already started" })
-        return
-      }
-
-      let ipAddress = Helper.getSocketRemoteAddress(socket)
-      let requestId = base64id.generateId()
-      this.pendingMatchmakerChecks[requestId] = { socket: socket, data: data }
-      let options = {
-        playerRemoteAddress: ipAddress,
-        fingerprint: data.fingerprint,
-        requestId: requestId,
-        gameId: this.id
-      }
-      this.sendToMatchmaker({ event: "CanPlayerJoin", data: options })
-      return
-    }
-
     await this.performJoinGame(socket, data)
-  }
-
-  async onCanPlayerJoinResponse(requestId, canJoin) {
-    let data = this.pendingMatchmakerChecks[requestId]
-    if (!data) return
-
-    delete this.pendingMatchmakerChecks[requestId]
-
-    if (!canJoin && !debugMode) {
-      this.getSocketUtil().emit(data.socket, "CantJoin", { message: "Already in another game" })
-      return
-    }
-
-    await this.performJoinGame(data.socket, data.data)
   }
 
   initScenes() {
@@ -2398,24 +2247,16 @@ async setGameMode(gameMode) {
           playerData.data.name = data.username
         }
 
-        if (data.isNewTeam && this.isPvP()) {
-          let team = playerData.getTeam()
-          team.removeOfflineMember(playerData.data)
-          delete playerData.data["team"]
-          let loadedPlayer = this.resumeFromSaveFile(socket, playerData, data.idToken)
-          if (loadedPlayer) return
-        } else {
-          let team = playerData.getTeam()
+        let team = playerData.getTeam()
 
-          if (team && team.isBanned(Helper.getSocketRemoteAddress(socket), uid)) {
-            this.getSocketUtil().emit(socket, "CantJoin", { message: "Previously kicked or banned from the team. Unable to join" })
-            return
-          }
+        if (team && team.isBanned(Helper.getSocketRemoteAddress(socket), uid)) {
+          this.getSocketUtil().emit(socket, "CantJoin", { message: "Previously kicked or banned from the team. Unable to join" })
+          return
+        }
 
-          let loadedPlayer = this.resumeFromSaveFile(socket, playerData, data.idToken)
-          if (loadedPlayer) {
-            return
-          }
+        let loadedPlayer = this.resumeFromSaveFile(socket, playerData, data.idToken)
+        if (loadedPlayer) {
+          return
         }
       }
 
@@ -2551,7 +2392,6 @@ async setGameMode(gameMode) {
       version: this.getVersion(),
       day: this.sector.getDayCount(),
       hour: this.sector.getHour(),
-      isMiniGame: this.isMiniGame(),
       sidebar: this.sidebars[player.getId()],
       objectives: player.objectives,
       dialogueMap: this.dialogueMap
@@ -2567,14 +2407,6 @@ async setGameMode(gameMode) {
       if (hasUpvoted) {
         payload['hasUpvoted'] = true
       }
-    }
-
-    if (this.isMiniGame() && this.sector.miniGame.shouldSendFullMap()) {
-      payload['fullMap'] = { chunks: [] }
-      this.sector.forEachChunk((chunk) => {
-        let chunkData = chunk.getAllData(true)
-        payload['fullMap']['chunks'].push(chunkData)
-      })
     }
 
     this.getSocketUtil().emit(player.getSocket(), "JoinGame", payload)
@@ -2786,17 +2618,8 @@ async setGameMode(gameMode) {
 
     let team = playerData.getTeam()
     if (!team) {
-      if (this.isPvP()) {
-        delete playerData.data["team"]
-      } else {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "Team not found in save file." })
-        return null
-      }
-    } else {
-      if (team.isFull() && this.isPvP()) {
-        this.getSocketUtil().emit(socket, "TeamFull", { team: team })
-        return
-      }
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "Team not found in save file." })
+      return null
     }
 
     let loadedPlayer = this.resumeFromSaveFile(socket, playerData, idToken)
@@ -2846,10 +2669,6 @@ async setGameMode(gameMode) {
       language: this.language
     }
 
-    if (this.isMiniGame()) {
-      data['canAcceptPlayersMidGame'] = this.sector.miniGame.canAcceptPlayersMidGame()
-    }
-
     if (this.isTutorial) {
       data["isTutorial"] = true
     }
@@ -2874,10 +2693,6 @@ async setGameMode(gameMode) {
   }
 
   getMaxPlayers() {
-    if (this.isMiniGame()) {
-      return this.sector.miniGame.getMaxPlayers()
-    }
-
     return 20
   }
 

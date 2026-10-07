@@ -6,9 +6,7 @@ const Protocol = require("./../../common/util/protocol")
 const Config = require("junon-common/config")
 const Game = require("./entities/game")
 const GameExplorer = require("./components/game_explorer")
-const PvPExplorer = require("./components/pvp_explorer")
 const SettingsMenu = require("./components/settings_menu")
-const MiniGameDetailsMenu = require("./components/minigame_details_menu")
 const BanManager = require("./components/ban_manager")
 const EventBadgeManager = require("./components/event_badge_manager")
 const GameConnection = require("./components/game_connection")
@@ -131,7 +129,6 @@ class Main {
     }
 
     document.getElementById("language_select").value = window.language
-    document.querySelector(".minigame_chat_language_select").value = window.language
 
     window.isForeignLanguage = language !== 'en'
 
@@ -215,41 +212,6 @@ class Main {
       return
     }
 
-    let miniGame = this.getUrlParam().get("minigame")
-    if (miniGame) {
-      let miniGameId = miniGame.split("-")[1]
-      if (this.gameExplorer.getMiniGame(miniGameId)) {
-        this.hideMenus()
-        this.showBackMainBtn()
-
-        this.miniGameDetailsMenu.open({ gameId: miniGameId })
-        return
-      }
-    }
-
-    let game = this.getUrlParam().get("game")
-    let isImposterMode = this.isImposterMode()
-    if (isImposterMode) {
-      this.hideMenus()
-      let miniGameId = debugMode ? "eWC1CfZymRExY" : "Ap9OYBkw3dQvJ"
-
-      this.miniGameDetailsMenu.open({ gameId: miniGameId })
-      return
-    }
-
-    if (game) {
-      let miniGameId = game.split("-")[1]
-      if (this.gameExplorer.getMiniGame(miniGameId)) {
-        this.hideMenus()
-        document.querySelector(".main_menu_navigator").style.marginTop = '10px'
-        document.querySelector("#changelogs").style.display = 'none'
-        // document.querySelector("#more_io_games").style.display = 'block'
-
-        this.miniGameDetailsMenu.open({ gameId: miniGameId })
-        return
-      }
-    }
-
     let nav = this.getUrlParam().get("nav")
     if (nav) {
       let tab = document.querySelector(".colony_filter_tab[data-tab='" + nav + "']")
@@ -302,7 +264,6 @@ class Main {
     this.initAuthentication()
     this.initRegionTabContent()
     this.initServerAnnouncement()
-    this.renderImposterMode()
     this.hideUchu()
 
     this.parseInviteLink()
@@ -312,7 +273,6 @@ class Main {
       this.determineRegion(() => {
         this.gameExplorer.init(() => {
           this.initGame()
-          this.initMiniGameMenu()
           this.initSettingsMenu()
           this.initBanManagerMenu()
 
@@ -350,9 +310,16 @@ class Main {
     this.mobileDetect()
     this.initListeners()
     this.initGame()
-    this.initMiniGameMenu()
     this.initSettingsMenu()
     this.initBanManagerMenu()
+  }
+
+  initProjectilePools() {
+    let projectileKlasses = Projectiles.getList()
+    projectileKlasses.forEach((klass) => {
+      let projectileName = Helper.getProjectileNameById(klass.getType())
+      ObjectPool.create(projectileName, klass)
+    })
   }
 
   isStandalone() {
@@ -364,24 +331,6 @@ class Main {
 
     document.querySelector("#connecting_message").style.display = 'none'
     this.requestGame(url)
-  }
-
-  renderImposterMode() {
-    if (this.isImposterMode()) {
-      document.querySelector("body").classList.add("imposter_mode")
-      document.querySelector("#authentication_container").style.display = 'none'
-      document.querySelector("#changelogs").style.display = 'none'
-      document.querySelector("#total_online_count").style.display = 'none'
-      document.querySelector("#privacy_link").style.display = 'none'
-      document.querySelector("#rules_link").style.display = 'none'
-
-      if (this.getUrlParam().get("impy")) {
-        this.impy = true
-        document.querySelector(".minigame_poster").src = "/assets/images/background/imposter_bg_2.jpg"
-      } else {
-        document.querySelector(".minigame_poster").src = "/assets/images/background/imposter_bg.jpg"
-      }
-    }
   }
 
   initGameUI() {
@@ -587,19 +536,9 @@ class Main {
       container.querySelector(".game_invite_screenshot").src = src
     }
 
-    let miniGameMatch = teamEntry.data.sectorId.match(/mini-(.*)-/)
-    if (miniGameMatch) {
-      let gameId = miniGameMatch[1]
-      let miniGameData = this.gameExplorer.miniGames[gameId]
-      if (miniGameData) {
-        container.querySelector(".game_invite_name").innerText = miniGameData.name
-        container.querySelector(".game_invite_container .game_invite_day_count").style.display = 'none'
-      }
-    } else {
-      container.querySelector(".game_invite_name").innerText = teamEntry.getName()
-      container.querySelector(".game_invite_container .team_days_alive").innerText = teamEntry.getDayCount()
-      container.querySelector(".game_invite_container .game_invite_day_count").style.display = 'block'
-    }
+    container.querySelector(".game_invite_name").innerText = teamEntry.getName()
+    container.querySelector(".game_invite_container .team_days_alive").innerText = teamEntry.getDayCount()
+    container.querySelector(".game_invite_container .game_invite_day_count").style.display = 'block'
 
     container.querySelector(".game_invite_container .team_member_count").innerText = teamEntry.getMemberCount() + " / 10"
 
@@ -614,6 +553,7 @@ class Main {
     this.isGameInitialized = true
 
     if (this.isStandalone()) {
+      this.initProjectilePools()
       this.joinStandaloneWorld()
       return
     }
@@ -663,11 +603,7 @@ class Main {
     if (!this.isSectorListPopulated) return
     if (!this.isGameInitialized) return
 
-    let projectileKlasses = Projectiles.getList()
-    projectileKlasses.forEach((klass) => {
-      let projectileName = Helper.getProjectileNameById(klass.getType())
-      ObjectPool.create(projectileName, klass)
-    })
+    this.initProjectilePools()
 
 
     this.navigateViaUrlParam()
@@ -679,18 +615,10 @@ class Main {
     this.initSetupFinished = true
 
     if (!this.teamInviteEntryFound &&
-        !this.getUrlParam().get("nav") &&
-        !this.getUrlParam().get("game") &&
-        !this.getUrlParam().get("minigame")) {
+        !this.getUrlParam().get("nav")) {
       this.showHomeMenu()
     }
 
-  }
-
-  isImposterMode() {
-    return this.getUrlParam().get("game") &&
-           (this.getUrlParam().get("game") === 'FindtheImposter-Ap9OYBkw3dQvJ' ||
-            this.getUrlParam().get("game") === 'FindtheImposter-eWC1CfZymRExY' )
   }
 
   getSubdomain() {
@@ -805,15 +733,10 @@ class Main {
 
   initGameExplorer() {
     this.gameExplorer = new GameExplorer(this)
-    this.pvpExplorer = new PvPExplorer(this)
   }
 
   initSettingsMenu() {
     this.settingsMenu = new SettingsMenu(this)
-  }
-
-  initMiniGameMenu() {
-    this.miniGameDetailsMenu = new MiniGameDetailsMenu(this)
   }
 
   initBanManagerMenu() {
@@ -866,7 +789,6 @@ class Main {
         this.renderRegionSelectPlayerCount(data.onlineCountByRegion)
         document.querySelector("#total_online_count").innerText = data.totalOnlineCount + " " + i18n.t("PlayersOnline")
         this.serversByRegion = data.serversByRegion
-        this.gameExplorer.setMiniGames(data.miniGames)
 
         this.findBestRegion(this.serversByRegion, (region) => {
           if (!region) {
@@ -1453,9 +1375,6 @@ class Main {
     document.querySelector(".new_colony_menu_btn").addEventListener("click", this.onNewColonyMenuBtnClick.bind(this), true)
     document.querySelector(".tutorial_menu_btn").addEventListener("click", this.onTutorialMenuBtnClick.bind(this), true)
     document.querySelector(".default_play_btn").addEventListener("click", this.onDefaultPlayBtnClick.bind(this), true)
-    document.querySelector(".tower_defense_game_mode_entry").addEventListener("click", this.onTowerDefenseGameModeClick.bind(this), true)
-    document.querySelector(".bed_wars_game_mode_entry").addEventListener("click", this.onBedWarsGameModeClick.bind(this), true)
-    document.querySelector(".domination_game_mode_entry").addEventListener("click", this.onDominationGameModeClick.bind(this), true)
     document.querySelector(".home_user_action_container .settings_menu_btn").addEventListener("click", this.onSettingsMenuBtnClick.bind(this), true)
     document.querySelector(".main_menu .settings_menu_btn").addEventListener("click", this.onSettingsMenuBtnClick.bind(this), true)
     document.querySelector(".resume_menu_btn").addEventListener("click", this.onResumeMenuBtnClick.bind(this), true)
@@ -1465,8 +1384,6 @@ class Main {
     document.querySelector(".visibility_select").addEventListener("change", this.onGameVisibilitySelectChange.bind(this), true)
     document.querySelector("#language_select").addEventListener("change", this.onLanguageSelectChange.bind(this), true)
     document.querySelector(".rules_accept_btn").addEventListener("click", this.onRulesAcceptBtnClick.bind(this), true)
-    document.querySelector(".imposter_game_mode_entry").addEventListener("click", this.onImposterGameModeClick.bind(this), true)
-    document.querySelector(".invite_link_copy_btn").addEventListener("click", this.onCopyInviteLinkBtnCLick.bind(this), true)
     document.querySelector(".open_ban_list_btn").addEventListener("click", this.onOpenBanListClick.bind(this), true)
     document.querySelector(".open_event_badges_btn").addEventListener("click", this.onOpenEventBadgesMenu.bind(this), true)
 
@@ -1486,7 +1403,6 @@ class Main {
     this.hideBackMainBtn()
     this.hideNewGameMenu()
     this.hideGameInviteMenu()
-    this.miniGameDetailsMenu.hide()
     this.hideLoadGameSettings()
   }
 
@@ -1526,72 +1442,6 @@ class Main {
 
   onOpenEventBadgesMenu() {
     this.eventBadgeManager.open()
-  }
-
-  onCopyInviteLinkBtnCLick() {
-    let input = document.querySelector(".invite_link_input")
-
-    input.select()
-    input.setSelectionRange(0, 99999) /*For mobile devices*/
-
-    /* Copy the text inside the text field */
-    document.execCommand("copy")
-  }
-
-  onImposterGameModeClick() {
-    let id
-    if (env === 'development') {
-      id = "eWC1CfZymRExY"
-    } else if (env === 'production' || env === 'staging') {
-      id = "Ap9OYBkw3dQvJ"
-    }
-
-    this.hideMenus()
-    this.showBackMainBtn()
-
-    this.miniGameDetailsMenu.open({ gameId: id })
-  }
-
-  onTowerDefenseGameModeClick() {
-    let id
-    if (env === 'development') {
-      id = "vbj91eofmFCiu"
-    } else {
-      id = 'YcdqgbswlAqRi'
-    }
-
-    this.hideMenus()
-    this.showBackMainBtn()
-
-    this.miniGameDetailsMenu.open({ gameId: id })
-  }
-
-  onBedWarsGameModeClick() {
-    let id
-    if (env === 'development') {
-      id = "l8v7ezWMvnGeC"
-    } else if (env === 'production' || env === 'staging') {
-      id = "uLHpXWb2koXYe"
-    }
-
-    this.hideMenus()
-    this.showBackMainBtn()
-
-    this.miniGameDetailsMenu.open({ gameId: id })
-  }
-
-  onDominationGameModeClick() {
-    let id
-    if (env === 'development') {
-      id = "BPF0uFha5QLUr"
-    } else if (env === 'production' || env === 'staging') {
-      id = "PnGkJd5xZsb0v"
-    }
-
-    this.hideMenus()
-    this.showBackMainBtn()
-
-    this.miniGameDetailsMenu.open({ gameId: id })
   }
 
   onRulesAcceptBtnClick() {
@@ -1640,7 +1490,6 @@ class Main {
 
     if (this.settingsMenu) {
       this.settingsMenu.hide()
-      this.miniGameDetailsMenu.hide()
     }
 
     this.hideBackMainBtn()
@@ -1715,14 +1564,6 @@ class Main {
     return Object.keys(this.gameExplorer.sectorEntries).length === 0
   }
 
-  joinDominationMiniGame() {
-    if (debugMode) {
-      this.gameExplorer.joinMiniGame("BPF0uFha5QLUr")
-    } else {
-      this.gameExplorer.joinMiniGame("PnGkJd5xZsb0v")
-    }
-  }
-
   async onTutorialMenuBtnClick(e) {
     if (this.isJoinInProgress) return
     if (!this.isMatchmakerReady()) {
@@ -1755,41 +1596,6 @@ class Main {
         this.connectNewColonyGame(data.host, data.sectorId)
       }
     }
-  }
-
-  async joinMiniGame(miniGameId, options) {
-    let data = {
-      env: this.getEnvToSendToMatchmaker(),
-      region: this.region,
-      sessionId: this.sessionId,
-      miniGameId: miniGameId
-    }
-
-    let chatSelect = document.querySelector(".minigame_chat_language_select")
-    data.language = chatSelect.value
-
-    if (this.isLoggedIn()) {
-      let idToken = await this.getFirebaseIdToken()
-      data["idToken"] = idToken
-    }
-
-    if (options.prevMiniGameId) {
-      data.prevMiniGameId = options.prevMiniGameId
-    }
-
-    if (options.targetMiniGameId) {
-      data.targetMiniGameId = options.targetMiniGameId
-    }
-
-    if (options.isPrivate) {
-      data.isPrivate = true
-    }
-
-    if (options.hostPrivateGame) {
-      data.hostPrivateGame = true
-    }
-
-    this.sendToMatchmaker({ event: "JoinMiniGame", data: data })
   }
 
   async requestNewColonyFromMatchmaker(isTutorial = false) {
@@ -1882,15 +1688,7 @@ class Main {
     this.hideMainMenu()
     this.hideHomeMenu()
     this.gameExplorer.hide()
-    this.pvpExplorer.hide()
     this.hideGameInviteMenu()
-  }
-
-  onPvPModeMenuBtnClick(e) {
-    this.hideMenus()
-
-    this.showBackMainBtn()
-    this.pvpExplorer.show()
   }
 
   onLoadGameMenuBtnClick(e) {
@@ -1934,12 +1732,6 @@ class Main {
     window.history.replaceState(null, null, "?")
 
     this.game.displayHomePage()
-    if (this.impy) {
-      this.hideMenus()
-      let miniGameId = debugMode ? "eWC1CfZymRExY" : "Ap9OYBkw3dQvJ"
-
-      this.miniGameDetailsMenu.open({ gameId: miniGameId })
-    }
   }
 
   onGoogleLoginBtnClick() {

@@ -52,7 +52,7 @@ class EventManager {
   }
 
   onDayNightChanged(dayCount) {
-    let dayInterval = this.game.isPvP() ? 60 : 6
+    let dayInterval = 6
     if (dayCount % dayInterval === 0) {
       this.createMeteorShowerEvent()
     }
@@ -118,7 +118,6 @@ class EventManager {
 
   createRaidEvent() {
     if (!this.shouldAllowEvents()) return
-    if (this.game.isPvP()) return
     if (this.game.isPeaceful()) return
 
     if (this.game.isHardcore()) {
@@ -204,7 +203,6 @@ class EventManager {
 
   createTaxCollectorEvent() {
     if (!this.shouldAllowEvents()) return
-    if (this.game.isPvP()) return
     if (this.game.isPeaceful()) return
     if (this.game.isHardcore()) return
 

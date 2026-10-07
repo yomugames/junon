@@ -58,13 +58,7 @@ const Claim = require("./claim")
 const MobTaskQueue = require("./mob_task_queue")
 const SectorLoader = require("./sector_loader")
 const sequelize = require("junon-common/db/sequelize")
-const VoteManager = require("./vote_manager")
 const EventHandler = require("./event_handler")
-const MiniGameObjectives = require("./minigame_objectives")
-const FindTheImposter = require("./minigames/find_the_imposter")
-const BedWars = require("./minigames/bed_wars")
-const TowerDefense = require("./minigames/tower_defense")
-const Domination = require("./minigames/domination")
 const CommandBlock = require("../command_blocks/command_block")
 const PositionSearchRequest = require("./position_search_request")
 const Foods = require("./foods/index")
@@ -122,7 +116,6 @@ class Sector {
     this.initPathFinder()
     this.initLandManager()
     this.initPoolManager()
-    this.initVoteManager()
     this.initSectorLoader()
     this.initPrivacy()
     this.initEventHandler()
@@ -159,7 +152,6 @@ class Sector {
     this.initBuildLimits(entities)
     this.initKeyCodes(entities)
 
-    this.initObjectives()
 
     this.applyBlueprint(metadata.blueprintData)
     if (!entities) {
@@ -175,18 +167,6 @@ class Sector {
 
   getSocketUtil() {
     return this.game.server.socketUtil
-  }
-
-  initObjectives() {
-    if (debugMode) {
-      if (this.game.origSectorUid === "eWC1CfZymRExY") {
-        MiniGameObjectives.init(this)
-      }
-    } else {
-      if (this.game.origSectorUid === "Ap9OYBkw3dQvJ") {
-        MiniGameObjectives.init(this)
-      }
-    }
   }
 
   initBuildLimits(entities) {
@@ -297,19 +277,7 @@ class Sector {
     if (!this.commandBlock.isEnabled) return
     if (!this.canUseCommandBlocks()) return
 
-    if (this.isMiniGame()) {
-      if (!this.miniGame.shouldImportCommandBlock()) return
-    }
-
-    if (this.game.origSectorUid === "BPF0uFha5QLUr" ||
-        this.game.origSectorUid === "PnGkJd5xZsb0v") {
-      if (this.isMiniGame()) {
-        this.eventHandler.importFromCommandBlock(this.commandBlock)
-      }
-    } else {
-      this.eventHandler.importFromCommandBlock(this.commandBlock)
-    }
-
+    this.eventHandler.importFromCommandBlock(this.commandBlock)
   }
 
   findNewTeamSpawn(entities) {
@@ -366,10 +334,6 @@ class Sector {
         }
       ]
     }
-  }
-
-  getMiniGameObjectives() {
-    return MiniGameObjectives
   }
 
   isEquipmentStorage() {
@@ -429,12 +393,6 @@ initSettings(entities) {
 
 
   canBeCrafted(type) {
-    if (this.isMiniGame()) {
-      if (!this.miniGame.canCraftItem(type)) {
-        return false
-      }
-    }
-
     return true
   }
 
@@ -459,11 +417,7 @@ initSettings(entities) {
   }
 
   isFull() {
-    if (this.isMiniGame()) {
-      return this.getPlayerCount() > this.miniGame.getMaxPlayers()
-    } else {
-      return this.getPlayerCount() >= 20
-    }
+    return this.getPlayerCount() >= 20
   }
 
   getPlayerCount() {
@@ -570,54 +524,6 @@ initSettings(entities) {
 
   initEventHandler() {
     this.eventHandler = new EventHandler(this)
-
-    if (!this.isMiniGame()) return
-
-    if (debugMode) {
-      if (this.game.origSectorUid === "eWC1CfZymRExY") {
-        this.miniGame = new FindTheImposter()
-        this.miniGame.registerHandlers(this.eventHandler)
-      }
-
-      if (this.game.origSectorUid === "l8v7ezWMvnGeC") {
-        this.miniGame = new BedWars()
-        this.miniGame.registerHandlers(this.eventHandler)
-      }
-
-      if (this.game.origSectorUid === "vbj91eofmFCiu") {
-        this.miniGame = new TowerDefense()
-        this.miniGame.registerHandlers(this.eventHandler)
-      }
-
-      if (this.game.origSectorUid === "BPF0uFha5QLUr") {
-        this.miniGame = new Domination()
-        this.miniGame.registerHandlers(this.eventHandler)
-      }
-    } else {
-      if (this.game.origSectorUid === "Ap9OYBkw3dQvJ") {
-        this.miniGame = new FindTheImposter()
-        this.miniGame.registerHandlers(this.eventHandler)
-      }
-
-      if (this.game.origSectorUid === "uLHpXWb2koXYe") {
-        this.miniGame = new BedWars()
-        this.miniGame.registerHandlers(this.eventHandler)
-      }
-
-      if (this.game.origSectorUid === "YcdqgbswlAqRi") {
-        this.miniGame = new TowerDefense()
-        this.miniGame.registerHandlers(this.eventHandler)
-      }
-
-      if (this.game.origSectorUid === "PnGkJd5xZsb0v") {
-        this.miniGame = new Domination()
-        this.miniGame.registerHandlers(this.eventHandler)
-      }
-    }
-  }
-
-  isDominationMinigame() {
-    return this.game.origSectorUid === "BPF0uFha5QLUr"
   }
 
   showChatError(message) {
@@ -891,7 +797,7 @@ initSettings(entities) {
   
 
   canUseCommandBlocks() {
-    return this.isPeaceful() || this.isMiniGame()
+    return this.isPeaceful()
   }
 
   disableChunkInvalidations() {
@@ -903,7 +809,7 @@ initSettings(entities) {
   }
 
   isUpvotable() {
-    return !this.game.isPvP() && !this.isLobby()
+    return !this.isLobby()
   }
 
   onFinishedLoading() {
@@ -925,10 +831,7 @@ initSettings(entities) {
   initPrivacy() {
     let sectorModel = this.game.sectorModel
     if (sectorModel) {
-      if (!this.isMiniGame()) {
-        // minigame has its own privacy status. public by default
-        this.isPrivate = sectorModel.isPrivate
-      }
+      this.isPrivate = sectorModel.isPrivate
     }
   }
 
@@ -964,8 +867,6 @@ initSettings(entities) {
   }
 
   onVoteChanged() {
-    if (this.isMiniGame()) return
-
     // after 2 second.. sum total upvote/downvote from votes and cache values in sector..
     // prevent autoclicker spam sql
     clearTimeout(this.cacheVoteTimeout)
@@ -976,8 +877,6 @@ initSettings(entities) {
   }
 
   async cacheUpvotes() {
-    if (this.isMiniGame()) return
-
     try {
       let result = await Vote.findAll({
         attributes: [
@@ -1010,13 +909,7 @@ initSettings(entities) {
     }
   }
 
-  isMiniGame() {
-    return this.game.isMiniGame()
-  }
-
   initVotes() {
-    if (this.isMiniGame()) return
-
     this.upvoteCount = 0
     this.downvoteCount = 0
 
@@ -1034,8 +927,7 @@ initSettings(entities) {
 
   async initBans() {
     this.sectorBans = []
-    if (this.isMiniGame() || this.isTutorial()) {
-    } else {
+    if (!this.isTutorial()) {
       // standalone worlds have no sector row (and no database bans)
       let sectorModel = this.game.sectorModel
       if (!sectorModel) return
@@ -1054,8 +946,6 @@ initSettings(entities) {
   }
 
   async fetchSectorBans() {
-    if (this.isMiniGame()) return
-
     this.sectorBans = await SectorBan.findAll({ where: { sectorUid: this.getUid() } })
     this.sectorBans = this.sectorBans.map((sectorBan) => { return sectorBan.dataValues })
 
@@ -1138,9 +1028,6 @@ initSettings(entities) {
 
   onIsPrivateChanged() {
     this.game.sendSectorInfoToMatchmaker()
-    if (this.miniGame) {
-      this.miniGame.onIsPrivateChanged(this.isPrivate)
-    }
   }
 
   initOtherGrids() {
@@ -1548,7 +1435,6 @@ initSettings(entities) {
   }
 
   isZoomAllowed() {
-    if (this.game.isPvP()) return false
     return this.settings.isZoomAllowed
   }
 
@@ -1605,8 +1491,6 @@ initSettings(entities) {
   }
 
   async updateSectorModelDayCount() {
-    if (this.isMiniGame()) return
-
     let sectorModel = await SectorModel.findOne({
       where: { uid: this.getUid() }
     })
@@ -1731,17 +1615,6 @@ initSettings(entities) {
   initFuelManager() {
     this.fuelManager = new FuelManager(this)
     this.fuelManager.setGrids([this.structureMap, this.fuelDistributionMap])
-  }
-
-  initVoteManager() {
-    this.voteManager = new VoteManager(this)
-  }
-
-  addVote(player, data) {
-    this.voteManager.addVote({
-      sourcePlayerId: player.getId(),
-      targetPlayerId: data.targetPlayerId
-    })
   }
 
   addScene() {
@@ -2909,7 +2782,7 @@ initSettings(entities) {
   }
 
   getMaxMobCount() {
-    return this.isMiniGame() ? 150 : 50
+    return 50
   }
 
   spawnMobAtShip(x, y, targetPlayer) {
@@ -3262,7 +3135,7 @@ initSettings(entities) {
   }
 
   cleanupCorpses() {
-    if (this.game.isPeaceful() || this.game.isMiniGame()) return
+    if (this.game.isPeaceful()) return
 
     const isOneMinuteInterval = this.game.timestamp % (Constants.physicsTimeStep * 60) === 0
     if (!isOneMinuteInterval) return
@@ -3304,7 +3177,6 @@ initSettings(entities) {
 
   async addScreenshot(data, player) {
     if (global.isOffline && env !== 'standalone') return
-    if (this.isMiniGame()) return
 
     let imageData = data.imageData
     let position = data.position || 0
@@ -3337,7 +3209,6 @@ initSettings(entities) {
   }
 
   async removeScreenshot(screenshotId, player) {
-    if (this.isMiniGame()) return
 
     let sectorModel = await SectorModel.findOne({
       where: { uid: this.getUid() }

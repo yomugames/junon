@@ -336,23 +336,6 @@ class TradeMenu extends BaseMenu {
     this.seller = seller
     this.initPurchasables()
     this.renderPlayerSellables()
-    this.renderAdditionalTraderSellables()
-  }
-
-  renderAdditionalTraderSellables() {
-    let grenadeType = Protocol.definition().BuildingType.Grenade
-    let poisonGrenadeType = Protocol.definition().BuildingType.PoisonGrenade
-
-    let grenadeTradeItemRow = this.el.querySelector(".buy_trade_content .trade_item_row[data-type='" + grenadeType + "']")  
-    let poisonGrenadeTradeItemRow = this.el.querySelector(".buy_trade_content .trade_item_row[data-type='" + poisonGrenadeType + "']")  
-
-    if (this.game.isPvP()) {
-      if (!grenadeTradeItemRow) {
-        this.el.querySelector(".buy_trade_content").innerHTML += this.createTradeItem(Equipments.PoisonGrenade)
-        this.el.querySelector(".buy_trade_content").innerHTML += this.createTradeItem(Equipments.Grenade)
-      }
-    } else {
-    }
   }
 
   onInventoryChanged() {

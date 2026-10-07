@@ -431,16 +431,7 @@ class BaseMenu {
   }
 
   isBuildingAllowedInGame(type) {
-    if (this.game.isPvP()) {
-      let notAllowedList = ["Atm", "RailStop", "RailTrack", "Beacon"]
-      notAllowedList = notAllowedList.map((name) => {
-        return Protocol.definition().BuildingType[name]
-      })
-
-      if (notAllowedList.indexOf(type) !== -1) {
-        return false
-      }
-    } else if (this.game.isHardcore() || this.game.isPeaceful()) {
+    if (this.game.isHardcore() || this.game.isPeaceful()) {
       let notAllowedList = ["Atm"]
       notAllowedList = notAllowedList.map((name) => {
         return Protocol.definition().BuildingType[name]

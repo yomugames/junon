@@ -125,14 +125,9 @@ class Team extends BaseTransientEntity {
   }
 
   createDefaultRoles() {
-    if (this.game.isPvP()) {
-      this.createMemberRole()
-      this.createAdminRole()
-    } else {
-      this.createGuestRole()
-      this.createMemberRole()
-      this.createAdminRole()
-    }
+    this.createGuestRole()
+    this.createMemberRole()
+    this.createAdminRole()
   }
 
   createGuestRole() {
@@ -297,8 +292,6 @@ class Team extends BaseTransientEntity {
   }
 
   removeDeed(deed) {
-    if (this.game.isMiniGame()) return
-
     delete this.deeds[deed]
   }
 
@@ -565,9 +558,6 @@ class Team extends BaseTransientEntity {
   }
 
   async setPrivate(isPrivate) {
-    if (this.game.isPvP()) return
-    if (this.game.isMiniGame()) return
-
     this.isPrivate = isPrivate
     this.onTeamChanged()
 
@@ -603,8 +593,6 @@ class Team extends BaseTransientEntity {
         this.getSocketUtil().broadcast(this.game.getSocketIds(), "TeamUpdated", { team: this })
       }
     }
-
-    if (this.game.isMiniGame()) return
 
     if (this.isSectorOwner()) {
       // only for sector owner
@@ -642,15 +630,12 @@ class Team extends BaseTransientEntity {
   }
 
   shouldTeamNameChangeSectorName() {
-    if (this.game.isPvP()) return false
     if (!this.isSectorOwner()) return false
 
     return !this.sector.isLobby()
   }
 
   async updateDatabaseSectorName() {
-    if (this.game.isMiniGame()) return
-
     let sectorModel = await SectorModel.findOne({
       where: { uid: this.game.getSectorUid() }
     })
@@ -676,11 +661,7 @@ class Team extends BaseTransientEntity {
   }
 
   isFull() {
-    if (this.game.isPvP()) {
-      return this.getMemberCount() >= 5
-    } else {
-      return this.getMemberCount() >= 10
-    }
+    return this.getMemberCount() >= 10
   }
 
   canKick(user, member) {
@@ -713,17 +694,6 @@ class Team extends BaseTransientEntity {
       return
     }
 
-    if (this.game.sector.isDominationMinigame()) {
-      member.throwAllInventory()
-      this.removeMember(member)
-      member.createSelfTeam()
-      member.respawn()
-      member.showError("You got kicked from team " + this.name)
-      return
-    }
-
-    if (this.game.isMiniGame()) return
-
     let ip = member.getRemoteAddress()
     this.ipBlacklist[ip] = { timestamp: this.game.timestamp, type: 'kick' }
     let uid = member.getUid()
@@ -748,8 +718,6 @@ class Team extends BaseTransientEntity {
   }
 
   ban(memberId, user) {
-    if (this.game.isMiniGame()) return
-
     let member = this.members[memberId]
     if (!member) {
       return
@@ -773,9 +741,6 @@ class Team extends BaseTransientEntity {
   }
 
   async unban(banId, banner) {
-    if (this.game.isMiniGame()) return
-    if (this.game.isPvP()) return
-
     if (!this.isAllowedToUnban(banner)) return
 
     let result = await this.unbanInDatabase(this.sector, banId)
@@ -834,13 +799,6 @@ class Team extends BaseTransientEntity {
   }
 
   setRole(memberId, roleType, user) {
-    if (this.game.isPvP()) {
-      // disallow guest role
-      if (roleType === Team.GuestRoleType) {
-        return
-      }
-    }
-
     let offlineMember = this.offlineMembers[memberId]
     let onlineMember = this.members[memberId]
 
@@ -1102,27 +1060,8 @@ class Team extends BaseTransientEntity {
 
     // LOG.info(`${this.name} - ${this.id} remove member ${player.name}. getTotalMemberCount: ${this.getTotalMemberCount()}`)
 
-    if (this.leader === player) {
-      if (!this.hasPlayer(player) && this.game.isPvP()) {
-        this.chooseNewRandomleader()
-      }
-    }
-
     this.onMemberChanged()
     this.onMemberRemoved(player)
-  }
-
-  chooseNewRandomleader() {
-    let admin = this.getAdmins()[0]
-    if (admin) {
-      this.setLeader(admin)
-      return
-    }
-
-    let member = this.getMembers()[0]
-    if (member) {
-      this.setLeader(member)
-    }
   }
 
   isTameLimitReached(increment = 0) {
@@ -1151,7 +1090,6 @@ class Team extends BaseTransientEntity {
   }
 
   getSlaveLimit() {
-    if (this.game.isPvP()) return 3
     return debugMode ? 5 : 10
   }
 
@@ -1203,10 +1141,6 @@ class Team extends BaseTransientEntity {
     if (this.getTotalMemberCount() === 0) {
       let data = { clientMustDelete: true }
       this.onTeamChanged(data)
-
-      if (this.game.isPvP()) {
-        this.remove()
-      }
     } else if (this.getMemberCount() === 0) {
       let data = { clientMustDelete: true }
       this.onTeamChanged(data)

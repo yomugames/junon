@@ -88,15 +88,7 @@ class BaseBuilding extends BaseEntity {
       return false
     }
 
-    if (this.game.isPvP()) {
-      if (this.isOwnedBy(player)) {
-        return true
-      } else {
-        return this.hasCategory("platform") || this.hasCategory("pipe") || this.hasCategory("wire")
-      }
-    } else {
-      return this.isOwnedBy(player)
-    }
+    return this.isOwnedBy(player)
   }
 
   isRepairable() {
@@ -388,22 +380,6 @@ class BaseBuilding extends BaseEntity {
     this.onStateChanged("accessType")
   }
 
-  upgrade(player) {
-    if (!this.game.isPvP()) return
-    if (!this.getConstants().isUpgradable) return
-    if (this.level >= 1) return
-    if (!player.canAfford(this.getUpgradeCost())) {
-      player.showError("Not enough gold", { isWarning: true })
-      return
-    }
-
-    player.reduceGold(this.getUpgradeCost())
-
-    this.level = 1
-    this.setHealth(this.health * 2)
-    this.onStateChanged("level")
-  }
-
   isRolePermitted(roleType) {
     return (this.accessType >> roleType) % 2 === 1
   }
@@ -470,11 +446,7 @@ class BaseBuilding extends BaseEntity {
   }
 
   hasBuildProgress() {
-    if (!this.game.isPvP()) return false
-
-    if (this.hasCategory("instant_build")) return false
-
-    return this.isPathFindBlocker()
+    return false
   }
 
   isConstructionFinished() {
@@ -1769,11 +1741,7 @@ class BaseBuilding extends BaseEntity {
       return this.getConstants().isFlamable
     }
 
-    if (this.game.isPvP()) {
-      return this.isStructure() || this.hasCategory("crop")
-    } else {
-      return this.isStructure() || this.hasCategory("crop")
-    }
+    return this.isStructure() || this.hasCategory("crop")
   }
 
   onStateChanged(attribute) {

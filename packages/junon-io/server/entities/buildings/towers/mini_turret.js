@@ -74,9 +74,7 @@ class MiniTurret extends BaseTower {
   getDefaultTargets() {
     let result = 0
 
-    if (!this.game.isPvP()) {
-      result += (1 << Protocol.definition().AttackTargetType.Mob)
-    }
+    result += (1 << Protocol.definition().AttackTargetType.Mob)
 
     result += (1 << Protocol.definition().AttackTargetType.Player)
     

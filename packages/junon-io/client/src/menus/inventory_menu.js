@@ -57,7 +57,6 @@ class InventoryMenu extends BaseMenu {
   }
 
   onPlayerEquipmentDblClick(e) {
-    if (this.game.isMiniGame()) return
     let slot = e.target.closest(".equipment_slot")
     if (slot) {
       let type = parseInt(slot.dataset.type)

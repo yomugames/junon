@@ -11,10 +11,6 @@ class SuitStation extends BaseBuilding {
 
   // switch armors
   interact(user) {
-    if (this.game.isMiniGame() && this.game.sector.miniGame.name === 'find_the_imposter') {
-      return 
-    }
-
     if (!this.canBeInteracted(user)) {
       user.showError("That doesnt belong to you")
       return

@@ -727,11 +727,6 @@ class LightManager {
   }
 
   setDarkness(hour) {
-    if (this.game.isMiniGame()) {
-      this.setLightMapContainerAlpha(0.95)
-      this.setSkyBrightness(60)
-      return
-    }
     if (this.game.isLightingCustom) {
       this.setLightMapContainerAlpha((145-this.game.isLightingCustom)/100)
       this.setSkyBrightness(this.game.isLightingCustom)

@@ -66,31 +66,8 @@ class TerminalMenu extends BaseMenu {
   render() {
     this.el.querySelector(".terminal_chat_content").innerHTML = this.getChatContent()
 
-    if (this.game.isMiniGame() && this.isUserImposter()) {
-      if (!this.game.terminalMenu.isChoiceSubmitted) {
-        this.el.querySelector(".terminal_tab[data-tab='hack']").style.display = 'inline-block'
-      } else {
-        this.el.querySelector(".terminal_tab[data-tab='hack']").style.display = 'none'
-        this.selectTab("chat")
-      }
-    } else {
-      this.el.querySelector(".terminal_tab[data-tab='hack']").style.display = 'none'
-      this.selectTab("chat")
-    }
-  }
-
-  isUserImposter() {
-    let result = false
-    
-    for (let index in this.game.player.inventory) {
-      let item = this.game.player.inventory[index]
-      if (item.type === Protocol.definition().BuildingType.AssassinsKnife) {
-        result = true
-        break
-      }
-    }
-
-    return result
+    this.el.querySelector(".terminal_tab[data-tab='hack']").style.display = 'none'
+    this.selectTab("chat")
   }
 
 

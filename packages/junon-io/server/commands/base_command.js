@@ -53,7 +53,6 @@ class BaseCommand {
     // validate player can exec command
     if (this.isEnabled()) {
       if (player.isAdminMode) return true
-      if (this.game.isMiniGame()) return false
 
       if (this.isNonSandboxCommand()) return true
       if (!this.game.isPeaceful()) return false

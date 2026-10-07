@@ -1182,7 +1182,7 @@ this.setNameColor(data.nameColor)
       return
     }
 
-    if (this.game.isPvP() || this.isPet()) {
+    if (this.isPet()) {
       this.enterBasicWanderingMode()
       return
     }

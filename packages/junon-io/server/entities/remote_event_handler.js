@@ -53,7 +53,6 @@ class RemoteEventHandler {
     }
   }
   onSectorAction(player, data, socket) {
-    if (player.game.isPvP()) return
     if (data.action === 'favorite') {
       player.toggleFavorite(data.sectorId)
     } else if (data.action === 'upvote') {
@@ -124,20 +123,6 @@ class RemoteEventHandler {
       throw e
     }
   }
-  onStartRound(player, data, socket) {
-    if (!player.game.sector.miniGame) return
-    if (player.game.getPlayerCount() < player.game.sector.miniGame.getRequiredPlayerCount()) {
-      let count = player.game.sector.miniGame.getRequiredPlayerCount()
-      let message = i18n.t(player.locale, "NeededToStart", { count: count })
-      player.showError(message)
-      return
-    }
-    if (player.game.sector.eventHandler.isRoundStarting) return
-    player.game.addTimer({
-      name: "RoundStartTimer",
-      duration: 5
-    })
-  }
   async onGetBadges(player, data, socket) {
     let badges = await player.getBadges()
     this.getSocketUtil().emit(socket, "BadgesData", { badges: badges });
@@ -173,9 +158,6 @@ class RemoteEventHandler {
         chunkRegionPath: chunkRegionPath.toJson()
       })
     }
-  }
-  onSendVote(player, data, socket) {
-    player.sector.addVote(player, data)
   }
   onRequestChunkRegions(player, data, socket) {
     let chunkRow = parseInt(data.chunkId.split("-")[0])
@@ -397,10 +379,6 @@ class RemoteEventHandler {
         if (data.action === 'withdraw') {
           building.withdraw(player)
         }
-      } else if (building.getConstants().isUpgradable) {
-        if (data.action === 'upgrade') {
-          building.upgrade(player)
-        }
       }
     }
     if (data.hasOwnProperty("isCustomAccess")) {
@@ -426,7 +404,6 @@ class RemoteEventHandler {
   onEditTexture(player, data, socket) {
     let item = player.game.getEntity(data.entityId)
     if (item) {
-      if (player.game.isMiniGame()) return
       if (!item.hasInstance()) return
       let isSpaceSuit = item.type == Protocol.definition().BuildingType.SpaceSuit
       if (isSpaceSuit && data.hasOwnProperty("colorIndex")) {
@@ -524,30 +501,13 @@ class RemoteEventHandler {
   onJoinTeam(player, data, socket) {
     player.joinTeam(data)
   }
-  onLeaveTeam(player, data, socket) {
-    if (player.game.isPvP()) {
-      let team = player.getTeam()
-      LOG.info(`${player.name} clicked leave team: about to leave team ${team.name} - ${team.id}. - online: ${team.getMemberCount()} offline: ${team.getOfflineMemberCount()}`)
-      if (player.hasRecentlyLeftTeam()) {
-        player.showError("You just left team recently")
-        return
-      }
-      player.leaveTeam()
-      player.createSelfTeam()
-      player.sector.findNewTeamSpawn([player])
-    }
-  }
   onLeaveGame(player, data, socket) {
     let duration = player.getSessionDuration()
     LOG.info(player.name + " left game. session duration: " + Helper.stringifyTimeShort(duration))
     if (player.isLoggedIn() && player.isSectorOwner()) {
       player.game.saveWorld()
     }
-    if (player.game.isPvP()) {
-      player.removeWithDelay()
-    } else {
-      player.remove()
-    }
+    player.remove()
   }
   onAddScreenshot(player, data, socket) {
     player.addScreenshot(data)
@@ -667,18 +627,6 @@ class RemoteEventHandler {
   }
   onMineResource(player, data, socket) {
     player.mine(data)
-  }
-  onRestartCharacter(player, data, socket) {
-    if (!player.game.isPvP()) return
-    if (player.hasRecentlyLeftTeam()) {
-      player.showError("You just left team recently")
-      return
-    }
-    if (player.hasRecentlyRestarted()) {
-      player.showError("You just did that recently")
-      return
-    }
-    player.restartCharacter()
   }
   onClientDisconnect(socket) {
     const player = this.getPlayerForSocket(socket)

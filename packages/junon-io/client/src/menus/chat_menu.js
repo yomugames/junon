@@ -390,17 +390,8 @@ class ChatMenu extends BaseMenu {
       this.chatHideTween.stop()
     }
 
-    if (this.game.isTutorial() || !this.game.isLoggedIn() || this.game.isPvP()) {
-      document.querySelector(".global_chat_tab").style.display = 'none'
-    } else {
-      document.querySelector(".global_chat_tab").style.display = 'none'
-    }
-
-    if (this.game.isPvP()) {
-      document.querySelector(".team_chat_tab").style.display = 'inline-block'
-    } else {
-      document.querySelector(".team_chat_tab").style.display = 'none'
-    }
+    document.querySelector(".global_chat_tab").style.display = 'none'
+    document.querySelector(".team_chat_tab").style.display = 'none'
 
     if (options.message) {
       this.chatInput.value = options.message

@@ -37,10 +37,6 @@ class EventHandler {
     this.commandDelay += seconds
   }
 
-  getMiniGame() {
-    return this.sector.miniGame
-  }
-
   displayRaidWarning() {
     this.game.forEachPlayer((player) => {
       this.game.eventManager.emitEvent(player, "RaidWarning")
@@ -918,27 +914,8 @@ class EventHandler {
     return 0
   }
 
-  startVote() {
-    this.sector.voteManager.start()
-  }
-
-  endRoundStart() {
-    this.isRoundEnding = true
-    this.game.forEachPlayer((player) => {
-      this.getSocketUtil().emit(player.getSocket(), "EndGame", { isCountdown: true })
-    })
-  }
-
   isPublicGame() {
     return !this.sector.isPrivate
-  }
-
-  endRound() {
-    this.game.forEachPlayer((player) => {
-      this.getSocketUtil().emit(player.getSocket(), "EndGame", {})
-    })
-
-    this.game.onRoundEnded()
   }
 
   getPlayerCount() {
@@ -1031,32 +1008,6 @@ class EventHandler {
     return result
   }
 
-  getObjectivesCountForRole(role) {
-    let count = 0
-
-    for (let name in this.sector.objectives) {
-      let objective = this.sector.objectives[name]
-      if (objective.isForRole(role)) {
-        count++
-      }
-    }
-
-    return count
-  }
-
-  getCompletedObjectivesCount(role) {
-    let count = 0
-
-    for (let name in this.sector.objectives) {
-      let objective = this.sector.objectives[name]
-      if (objective.isCompleted && objective.isForRole(role)) {
-        count++
-      }
-    }
-
-    return count
-  }
-
   trigger(eventName, params) {
     let trigger = this.triggers[eventName]
     if (!trigger) return
@@ -1124,18 +1075,6 @@ class EventHandler {
   resetProcessingEvents() {
     this.processingEvents.clear()
     this.processingOverflow = 0
-  }
-
-  updateTaskCompleted() {
-    let taskCompleted = this.getCompletedObjectivesCount('crew')
-    let totalTasks = this.getObjectivesCountForRole('crew')
-
-    this.game.forEachPlayer((player) => {
-      this.getSocketUtil().emit(player.getSocket(), "UpdateStats", {
-        totalTasks: totalTasks,
-        taskCompleted: taskCompleted
-      })
-    })
   }
 
   runIfThenElse(object, params) {

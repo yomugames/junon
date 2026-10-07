@@ -34,11 +34,7 @@ class AssassinsKnife extends MeleeEquipment {
   }
 
   getDamage() {
-    if (this.game.isMiniGame()) {
-      return 100
-    } else {
-      return 10
-    }
+    return 10
   }
 
   getMeleeTargetOptions() {

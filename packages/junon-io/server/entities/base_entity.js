@@ -1511,7 +1511,7 @@ class BaseEntity extends BaseTransientEntity {
   }
 
   shouldSpreadMiasma() {
-    return !this.game.isMiniGame()
+    return true
   }
 
   spreadMiasma() {

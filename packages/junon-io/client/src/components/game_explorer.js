@@ -30,11 +30,8 @@ class GameExplorer {
     document.querySelector("#region_select").addEventListener("change", this.onRegionChanged.bind(this), true)
     document.querySelector(".game_list_container").addEventListener("mouseover", this.onColonyListMouseover.bind(this), true)
     document.querySelector(".game_list_container").addEventListener("mouseleave", this.onColonyListMouseleave.bind(this), true)
-    document.querySelector("#minigames_tab_content").addEventListener("click", this.onMiniGamesClick.bind(this), true)
     document.querySelector(".list_mode_btn").addEventListener("click", this.onListModeClick.bind(this), true)
     document.querySelector(".gallery_mode_btn").addEventListener("click", this.onGalleryModeClick.bind(this), true)
-    document.querySelector(".main_game_mode_selector").addEventListener("mouseover", this.onGameModeSelectorMouseOver.bind(this), true)
-    document.querySelector(".minigame_details_container").addEventListener("mousemove", this.onMiniGameDetailsMouseMove.bind(this), true)
     document.querySelector("#import_sector_menu .cancel_btn").addEventListener("click", this.onImportSectorCancelClick.bind(this), true)
     document.querySelector("#import_sector_menu .import_sector_btn").addEventListener("click", this.onImportSectorSubmitClick.bind(this), true)
 
@@ -48,11 +45,6 @@ class GameExplorer {
     if (!this.main.isStandalone()) {
       this.listTopColonies()
     }
-  }
-
-  setMiniGames(miniGames) {
-    this.miniGames = miniGames
-    this.renderMiniGames()
   }
 
   onListModeClick() {
@@ -73,59 +65,6 @@ class GameExplorer {
     this.el.querySelector(".main_colony_list").classList.remove("list_mode")
     this.el.querySelector(".search_colony_list").classList.remove("list_mode")
     Cookies.set("list_mode", false)
-  }
-
-  getMiniGame(miniGameId) {
-    if (this.miniGames[miniGameId]) {
-      return this.miniGames[miniGameId]
-    }
-
-    if (miniGameId === 'vbj91eofmFCiu' || miniGameId === 'YcdqgbswlAqRi') {
-      return {
-        "name": "Tower Defense",
-        "playerCount": 0,
-        "screenshot": "9f2495eb19ba4bc4868966567222b1e9",
-        "creator": "Starmancer"
-      }
-    }
-  }
-
-  renderMiniGames() {
-    let el = ""
-    for (let id in this.miniGames) {
-      let miniGame = this.miniGames[id]
-      miniGame.playerCount
-      let gameModeEntry = document.querySelector(".main_game_mode_entry[data-id='" + id + "']")
-      if (gameModeEntry) {
-        gameModeEntry.querySelector(".minigame_player_count").innerText = miniGame.playerCount + " players"
-      }
-    }
-  }
-
-  createMiniGameEntry(id, miniGame) {
-    let screenshotPath = this.main.getScreenshotThumbnailPath(miniGame.screenshot)
-    return "<div class='minigame_entry' data-id='" + id + "'>" + 
-      "<img class='minigame_thumbnail' src='" + screenshotPath + "' />" +
-      "<div class='minigame_name'>" + miniGame.name +  "</div>" +
-      "<div class='minigame_creator'>" + miniGame.creator +  "</div>" +
-      "<div class='minigame_player_count'>" + miniGame.playerCount + " " + i18n.t('players') + "</div>" +
-    "</div>"
-  }
-
-  onMiniGamesClick(e) {
-    let miniGameEntry = e.target.closest(".minigame_entry")
-    if (!miniGameEntry) return
-
-    this.joinMiniGame(miniGameEntry.dataset.id)
-  }
-
-  joinMiniGame(miniGameId, options = {}) {
-    if (this.main.isJoinInProgress) return
-    this.main.lockJoin()
-
-    document.querySelector(".loading_modal").style.display = 'block'
-
-    this.main.joinMiniGame(miniGameId, options)
   }
 
   getOnlineTeamCount() {
@@ -208,7 +147,6 @@ class GameExplorer {
     selectedColonyFilterTab.classList.add("selected")
 
     // document.querySelector(".new_colony_launch_btn").style.display = 'none'
-    document.querySelector("#minigames_tab_content").style.display = 'none'
     document.querySelector("#region_tab_content").style.display = 'inline-block'
 
     if (selectedColonyFilterTab.classList.contains("online_colonies_tab")) {
@@ -222,9 +160,6 @@ class GameExplorer {
       // document.querySelector(".new_colony_launch_btn").style.display = 'inline-block'
     } else if (selectedColonyFilterTab.classList.contains("favorite_colonies_tab")) {
       this.filterColonyList("favorite")
-    } else if (selectedColonyFilterTab.classList.contains("minigames_tab")) {
-      document.querySelector("#minigames_tab_content").style.display = 'block'
-      document.querySelector("#region_tab_content").style.display = 'none'
     }
 
     this.lastActiveTab = selectedColonyFilterTab
@@ -514,14 +449,6 @@ class GameExplorer {
         this.hideScreenshotsPopup()
       }
     }
-  }
-
-  onGameModeSelectorMouseOver() {
-    this.hideScreenshotsPopup()
-  }
-
-  onMiniGameDetailsMouseMove() {
-    this.hideScreenshotsPopup()
   }
 
   onColonyListMouseleave(e) {
@@ -1123,9 +1050,6 @@ class GameExplorer {
       case "1":
         this.onPong(message.data)
         break
-      case "JoinMiniGameStatus":
-        this.onJoinMiniGameStatus(message.data)
-        break
       case "PlayerBootSectorStatus":
         this.onPlayerBootSectorStatus(message.data)
         break
@@ -1215,16 +1139,6 @@ class GameExplorer {
     this.main.game.chatMenu.onChatHistory(data)
   }
 
-  onJoinMiniGameStatus(data) {
-    if (data.error) {
-      document.querySelector(".loading_modal").style.display = 'none'
-      this.main.onPlayerCantJoin({ message: data.error })
-      this.main.enableJoin()
-    } else {
-      this.requestGame(data.host, { sectorId: data.sectorId })
-    }
-  }
-
   onPlayerBootSectorStatus(data) {
     if (!this.selectedEntry) return
     if (data.profile) console.log(data.profile)
@@ -1249,7 +1163,6 @@ class GameExplorer {
 
   renderSectorList(data) {
     this.main.onSectorListPopulated()
-    this.main.pvpExplorer.renderSectorList(data)
 
     let sectors = data.sectors
 
@@ -1321,7 +1234,6 @@ class GameExplorer {
   }
 
   removeSectorFromMatchmaker(sector) {
-    this.main.pvpExplorer.removeSector(sector)
     this.removeSector(sector)
   }
 
@@ -1356,10 +1268,6 @@ class GameExplorer {
   }
 
   renderSector(sector) {
-    this.main.pvpExplorer.renderSector(sector)
-
-    if (sector.gameMode === 'pvp') return
-
     let sectorEntry = this.sectorEntries[sector.id]
 
     if (!sectorEntry) {
@@ -1378,9 +1286,6 @@ class GameExplorer {
   }
 
   renderTeam(team) {
-    let isMiniGame = team.id.match(/mini-(.*)-/)
-    if (isMiniGame) return
-
     if (team.name === "Tutorial Lobby") return
 
     let teamKey = this.getTeamKey(team) 

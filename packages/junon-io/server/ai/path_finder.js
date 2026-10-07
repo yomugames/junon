@@ -438,7 +438,7 @@ class PathFinder {
     // attempt direct chunk region path
     let nextChunkRegion = this.getNextChunkRegionInSameContinent(sourceChunkRegion, destinationChunkRegion)
 
-    if (!nextChunkRegion && !this.game.isPvP()) {
+    if (!nextChunkRegion) {
       let sourceContinent = this.container.findOrCreateContinent(sourceChunkRegion)
       let destinationContinent = this.container.findOrCreateContinent(destinationChunkRegion)
       if (sourceContinent !== destinationContinent) {

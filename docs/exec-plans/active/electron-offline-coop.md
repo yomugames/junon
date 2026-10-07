@@ -72,7 +72,10 @@ Acceptance criteria:
   the owner switches characters with `/character`. The import UI and an
   in-game menu come with the Phase 4 menus. The S3 export script (step 7) was
   dropped, because saves are already being exported.
-- [ ] Phase 3: PvP and minigames removed.
+- [x] 2026-10-07: Phase 3: PvP mode and the official minigames (Find the
+  Imposter, Domination, Bed Wars, Tower Defense) are removed from the game
+  server and client. The matchmaker's minigame code goes with the matchmaker
+  in Phase 8.
 - [ ] Phase 4: Local menus replace the matchmaker UI.
 - [ ] Phase 5: Electron shell runs client and server process.
 - [ ] Phase 6: Co-op hosting and joining.
@@ -205,6 +208,33 @@ so the existing Jest and Playwright suites can still validate each step.
    still load from `commandBlockFullJson` in imported peaceful worlds.
 5. Leave wire/save schema fields in place. Keep enum values and field numbers
    so that old saves still decode.
+
+Done as follows. Server: `Game#isPvP`/`isMiniGame` and every branch on them,
+the minigame classes and imposter objectives, `/endround`, minigame creation
+and matchmaker join checks in `server.js`, PvP-only systems (character
+restart, leave-team-and-respawn, delayed removal, playerData expiry, building
+upgrades and build progress, PvP Firebase registry) and the imposter vote
+system (`vote_manager.js`, vote messages, task counters). Client: the
+minigame/PvP lobby (Games tab, mode entries, details panel, PvP explorer,
+invites, imposter branding), `isPvP`/`isMiniGame`, the end-game, team-full and
+vote menus, imposter HUD and terminal hacking, and their markup in
+`main.ejs`. Hosted worlds saved in `pvp` mode would now load as ordinary
+worlds. Import already rejects them, and standalone registration only accepts
+peaceful/survival/hardcore (`default` counts as unset).
+
+Kept, because they are general features, not PvP/minigame modes: the
+`isPvPAllowed` world setting and region `pvp` flags; rounds started by command
+blocks (a timer named `RoundStartTimer`, `RoundStarted` to clients); the
+objectives system and `/objectives`; meeting music (`/playsound`); the radio,
+emergency button and assassin's knife as items, so saves containing them still
+load (their minigame-only behavior is gone).
+
+Wire contract: the now-unused protobuf messages and fields (`StartRound`,
+`RestartCharacter`, `LeaveTeam`, `SendVote`, `StartVote`/`EndVote`/
+`VoteUpdated`, `EndGame`, `TeamFull`, `JoinGame.isMiniGame`/`fullMap`) stay
+in the schema. Nothing sends them. A client that does gets a logged
+"no handler" error (socket handler errors are caught and logged). Dead CSS
+for the removed markup remains in `client/stylesheets/style.css`.
 
 ### Phase 4: local menus
 
@@ -390,6 +420,18 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   to take Screenshot". Standalone now stores them in
   `<JUNON_SAVES_DIR>/screenshots` and records them on the `sectors` row for
   the Phase 4 world list. This uses `sharp` (native), as noted for Phase 5.
+- 2026-10-07: Phase 1 bug found in Phase 3: the standalone client boot
+  skipped `Main#postInitSetup`, where the projectile object pools are created.
+  Any projectile (turrets, command-block spikes) then threw "object pool ...
+  not found". `Main#initProjectilePools` now runs on both paths.
+- 2026-10-07: "Leave Colony" UI was always hidden by CSS, and its `LeaveTeam`
+  message only did anything in PvP, so both were removed.
+- 2026-10-07: Command-block JSON can't produce `function`/`forEach` actions,
+  which `EventHandler#runActions` passes to `eval`. Command blocks are rebuilt
+  through validated classes (`server/command_blocks/`) that only emit
+  commands, if/then/else and timers. Only built-in minigame scripts (now
+  deleted) used those `eval` paths. Keep it that way, because imported worlds
+  and co-op guests are untrusted.
 - 2026-10-07: `Game#onJoinGame` on the client clears the URL query
   (`history.replaceState`), so reloading the page after joining loses the
   temporary `?server=` parameter. Harmless until Phase 4 replaces direct
@@ -400,7 +442,13 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
 
 ## Result
 
-In progress. Phase 2 validation is under Validation above. Phase 1
+In progress. Phase 3 validation (2026-10-07): Jest 28 suites / 292 tests
+pass; `npm run client:build` passes. The Playwright e2e suite (hosted lobby
+via the real matchmaker, building, mining, combat, storage) passes 15/15 after
+installing Playwright's Chromium (`npx playwright install chromium`). In
+headless Chrome on imported worlds: a peaceful command-block world (buttons,
+`/character` switch, turrets) and a survival world load and play with no page
+or server errors. Phase 2 validation is under Validation above. Phase 1
 validation (2026-10-07):
 
 - Jest: 26 suites / 272 tests pass, including `test/server/standalone_storage`,

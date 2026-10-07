@@ -11,25 +11,7 @@ class Terminal extends BaseBuilding {
   }
 
   openMenu() {
-    // if (this.game.isMiniGame() && this.isUserImposter()) {
-    //   if (!this.game.terminalMenu.isChoiceSubmitted) {
-        this.game.terminalMenu.open({ entity: this })
-    //   }
-    // }
-  }
-
-  isUserImposter() {
-    let result = false
-    
-    for (let index in this.game.player.inventory) {
-      let item = this.game.player.inventory[index]
-      if (item.type === Protocol.definition().BuildingType.AssassinsKnife) {
-        result = true
-        break
-      }
-    }
-
-    return result
+    this.game.terminalMenu.open({ entity: this })
   }
 
   animate() {

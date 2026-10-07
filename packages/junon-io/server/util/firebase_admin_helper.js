@@ -95,18 +95,6 @@ class FirebaseAdminHelper {
     })
   }
 
-  static async setPvPSector(sectorUid) {
-    if (global.isOffline) return 
-    let pvpSectorRef = admin.database().ref(`/pvpSectors/${this.region}/${sectorUid}`)
-    await pvpSectorRef.set(true)
-  }
-
-  static async removePvPSector(sectorUid) {
-    if (global.isOffline) return 
-    let pvpSectorRef = admin.database().ref(`/pvpSectors/${this.region}/${sectorUid}`)
-    await pvpSectorRef.remove()
-  }
-
   static async notifyRevision(revision) {
     let revisionRef = admin.database().ref(`/revision`)
     await revisionRef.set(revision)

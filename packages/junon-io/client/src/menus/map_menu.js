@@ -100,9 +100,6 @@ class MapMenu extends BaseMenu {
   }
 
   addLabel(id, text, x, y) {
-    if (this.game.isMiniGame()) {
-      text = i18n.t(text)  
-    }
     this.labels[id] = { x: x, y: y, text: text }
 
     this.redrawEntityMap()

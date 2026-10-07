@@ -42,12 +42,7 @@ class Dynamite extends HandEquipment {
   }
 
   getEquipmentDamage() {
-    // if (this.game.isPvP()) {
-    if (false) {
-      return this.getConstants().stats.damage * 2
-    } else {
-      return this.getConstants().stats.damage
-    }
+    return this.getConstants().stats.damage
   }
 
 

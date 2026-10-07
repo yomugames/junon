@@ -80,7 +80,6 @@ class Sector {
     this.players = {}
     this.terminalMessages = []
     this.ships = {}
-    this.originalColors = {}
     this.mobs = {}
     this.units = {}
     this.pickups = {}
@@ -94,7 +93,6 @@ class Sector {
     this.chunkRegionPaths = {}
     this.entityToChunkRegionPaths = {}
     this.chunksToCache = {}
-    this.originalPlayers = {}
     this.bars = {}
     this.regionTree = rbush()
     this.regionTree.name = 'regionTree'
@@ -132,16 +130,6 @@ class Sector {
     this.initHomeArea()
     this.game.teamMenu.renderScreenshots(this)
     this.game.mapMenu.resizeCanvas(this)
-
-    if (this.isMiniGame() && this.isPrivate) {
-      this.game.showMiniGameInviteLink()
-    }
-
-    if (this.isMiniGame()) {
-      document.body.classList.add("minigame")
-    } else {
-      document.body.classList.remove("minigame")
-    }
 
     this.initialLoadTime = Date.now()
 
@@ -239,14 +227,6 @@ class Sector {
 
   setIsPrivate(isPrivate) {
     this.isPrivate = isPrivate
-  }
-
-  getOriginalUid() {
-    if (this.isMiniGame()) {
-      return this.uid.split(/mini-(.*)-/)[1]
-    }
-
-    return this.uid
   }
 
   getTimerBombKlass() {
@@ -407,10 +387,6 @@ class Sector {
     return this.name === "Tutorial Lobby"
   }
 
-  isMiniGame() {
-    return this.uid.match(/mini-.*-/)
-  }
-
   onEntityChunkRegionPath(data) {
     this.entityToChunkRegionPaths[data.entityId] = this.entityToChunkRegionPaths[data.entityId] || {}
     this.entityToChunkRegionPaths[data.entityId][data.chunkRegionPath.id] = true
@@ -436,12 +412,7 @@ class Sector {
   }
 
   isZoomAllowed() {
-    if (this.isPvP()) return false
     return this.settings.isZoomAllowed
-  }
-
-  isPvP() {
-    return this.gameMode === 'pvp'
   }
 
   isPeaceful() {
@@ -681,43 +652,10 @@ class Sector {
   }
 
   initPlayers(data) {
-    this.setOriginalPlayerList(data.players)
-
     for(let i in data.players) {
       let playerData = data.players[i]
       let player = new Player(playerData, this)
       this.players[player.id] = player
-    }
-  }
-
-  setOriginalPlayerList(players) {
-    this.originalPlayers = players
-
-    for (let id in players) {
-      let player = players[id]
-      if (player.equipments.storage[0]) {
-        let color = player.equipments.storage[0].instance.content
-        this.originalColors[player.id] = color
-      }
-    }
-  }
-
-  addToOriginalPlayers(player) {
-    this.originalPlayers[player.id] = player
-
-    if (player.equipments.storage[0]) {
-      let color = player.equipments.storage[0].instance.content
-      this.originalColors[player.id] = color
-    }
-  }
-
-  removeFromOriginalPlayers(playerId) {
-    delete this.originalPlayers[playerId]
-  }
-
-  setOriginalPlayerLeft(playerId) {
-    if (this.originalPlayers[playerId]) {
-      this.originalPlayers[playerId].hasLeftGame = true
     }
   }
 
@@ -751,7 +689,6 @@ class Sector {
 
   cleanup() {
     this.bars = {}
-    this.originalColors = {}
     this.buttons = {}
     this.settings = {}
 

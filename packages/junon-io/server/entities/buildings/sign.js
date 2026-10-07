@@ -5,9 +5,7 @@ const BaseBuilding = require("./base_building")
 class Sign extends BaseBuilding {
 
   setHealth(newHealth) {
-    if (this.game.isPvP()) return super.setHealth(newHealth)
-
-    // cannot be damaged in non-pvp
+    // signs cannot be damaged
   }
 
   getConstantsTable() {

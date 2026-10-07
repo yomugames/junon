@@ -7,7 +7,7 @@ const Buildings = require("./buildings/index")
 class SurvivalSector extends Sector {
   onPlayerJoin(player) {
     if (player.isNewPlayer) {
-      if (!this.isPeaceful() && (this.game.isCreatedByPlayer(player) || this.game.isPvP())) {
+      if (!this.isPeaceful() && this.game.isCreatedByPlayer(player)) {
         this.findSpawnPositionForColonyOwner(player)
       } else {
         this.findSpawnPosition(player)
@@ -22,14 +22,6 @@ class SurvivalSector extends Sector {
     let team = player.getTeam()
     if (!team.isJoinable()) return
 
-    if (this.game.isPvP()) {
-      if (player.spawnPosition) {
-        // in pvp, respawn from original location
-        player.repositionTo(player.spawnPosition.x, player.spawnPosition.y)
-        return
-      }
-    } 
-
     let spawnPoint = player.getSpawnPosition()
     if (spawnPoint) {
       player.repositionTo(spawnPoint.x, spawnPoint.y)
@@ -38,7 +30,7 @@ class SurvivalSector extends Sector {
     }
 
     let landedMember = team.getLandedMember({ exclude: player })
-    if (landedMember && !this.game.isPvP()) {
+    if (landedMember) {
       player.repositionTo(landedMember.getX(), landedMember.getY())
       player.setPositionFound(true)
     } else {

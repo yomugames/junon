@@ -7,11 +7,7 @@ class Ghost extends BaseMob {
   constructor(game, data) {
     super(game, data)
 
-    if (this.game.player.isControllingGhost() && this.sector.isMiniGame()) {
-      this.characterSprite.alpha = 0.3
-    } else {
-      this.characterSprite.alpha = 0
-    }
+    this.characterSprite.alpha = 0
   }
 
   onMouseOver() {

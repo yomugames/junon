@@ -16,7 +16,6 @@ class TeamMenu extends BaseMenu {
   initListeners() {
     super.initListeners()
 
-    this.el.querySelector("#leave_team_btn").addEventListener("click", this.onLeaveTeamBtnClick.bind(this), true)
     this.el.querySelector(".invite_link_input").addEventListener("click", this.onTeamInviteInputClick.bind(this), true)
     this.el.querySelector(".team_private_status").addEventListener("click", this.onTeamPrivacyStatusClick.bind(this), true)
     this.el.querySelector(".member_management_container").addEventListener("click", this.onMemberListClick.bind(this))
@@ -1360,9 +1359,7 @@ class TeamMenu extends BaseMenu {
       let uid = memberEntry.dataset.uid
       let username = memberEntry.dataset.username
 
-      if (!this.game.isPvP()) {
-        this.game.userProfileMenu.open({ username: username, uid: uid })
-      }
+      this.game.userProfileMenu.open({ username: username, uid: uid })
     }
   }
 
@@ -1380,19 +1377,12 @@ class TeamMenu extends BaseMenu {
       this.el.querySelector(".colony_teams_tab").style.display = 'none'
     }
 
-    if (this.game.isPvP()) {
-      this.el.querySelector(".colony_pvp_mode").style.display = 'none'
-      this.el.querySelector(".colony_zoom").style.display = 'none'
-      this.el.querySelector(".colony_fov").style.display = 'none'
-      this.el.querySelector(".colony_minimap").style.display = 'none'
-    } else {
-      this.el.querySelector(".colony_pvp_mode").style.display = 'block'
-      this.el.querySelector(".colony_zoom").style.display = 'block'
-      this.el.querySelector(".colony_fov").style.display = 'block'
-      this.el.querySelector(".colony_minimap").style.display = 'block'
-    }
+    this.el.querySelector(".colony_pvp_mode").style.display = 'block'
+    this.el.querySelector(".colony_zoom").style.display = 'block'
+    this.el.querySelector(".colony_fov").style.display = 'block'
+    this.el.querySelector(".colony_minimap").style.display = 'block'
 
-    if (this.game.isPeaceful() || this.game.isMiniGame()) {
+    if (this.game.isPeaceful()) {
       this.el.querySelector(".alliance_entry").style.display = 'none'
       this.el.querySelector(".colony_playerlist").style.display = 'block'
       this.el.querySelector(".colony_hunger_bar").style.display = 'block'
@@ -1582,9 +1572,6 @@ class TeamMenu extends BaseMenu {
 
       let teamId = teamEntry.dataset.teamId
       SocketUtil.emit("JoinTeam", { id: teamId })
-    } else if (el.classList.contains("team_leave_btn")) {
-      let teamId = teamEntry.dataset.teamId
-      SocketUtil.emit("LeaveTeam", { })
     }
 
   }
@@ -1592,15 +1579,6 @@ class TeamMenu extends BaseMenu {
   cleanup() {
     // this.el.querySelector(".team_list").innerHTML = ""
     this.el.querySelector(".member_list").innerHTML = ""
-  }
-
-  onLeaveTeamBtnClick() {
-    let teamId = this.activeTeam.id
-    SocketUtil.emit("LeaveTeam", { id: teamId })
-  }
-
-  onRestartCharacterClick() {
-    SocketUtil.emit("RestartCharacter", {  })
   }
 
   onRoleListClick(e) {
@@ -1783,7 +1761,7 @@ class TeamMenu extends BaseMenu {
 
     document.querySelector(".colony_settings_tab").style.display = 'inline-block'
 
-    if (!team.isAdmin(this.game.player) || this.game.isMiniGame()) {
+    if (!team.isAdmin(this.game.player)) {
       this.el.querySelector(".colony_logs_tab").style.display = 'none'
       this.el.querySelector(".command_logs_tab").style.display = 'none'
       if (this.el.querySelector(".colony_logs_container").classList.contains("active")) {
@@ -1798,17 +1776,6 @@ class TeamMenu extends BaseMenu {
       document.querySelector(".colony_logs_tab").style.display = 'inline-block'
       document.querySelector(".command_logs_tab").style.display = 'inline-block'
     }
-
-    if (this.game.isPvP()) {
-      this.renderPvPMode()
-    }
-  }
-
-  renderPvPMode() {
-    this.el.querySelector(".colony_mode_entry").style.display = 'none'
-    this.el.querySelector(".colony_creator_name_entry").style.display = 'none'
-    this.el.querySelector(".colony_screenshot_tab").style.display = 'none'
-    this.el.querySelector(".colony_settings_tab").style.display = 'none'
   }
 
   createRolesEl(roles) {
@@ -1866,27 +1833,10 @@ class TeamMenu extends BaseMenu {
     let inviteLink = this.game.main.getBrowserHost() + params
 
     this.el.querySelector(".invite_link_input").value = inviteLink
-
-    if (this.game.isMiniGame()) {
-      document.querySelector("#minigame_invite_container .invite_link_input").value = inviteLink
-    }
   }
 
   renderPrivacy(team) {
     let isPrivate = team.isPrivate
-
-    if (this.game.isMiniGame()) {
-      isPrivate = this.game.sector.isPrivate
-      if (!this.game.isRoundStarted) {
-        if (isPrivate) {
-          document.querySelector("#minigame_invite_container").style.display = 'block'
-        } else {
-          document.querySelector("#minigame_invite_container").style.display = 'none'
-        }
-      }
-    } else {
-      document.querySelector("#minigame_invite_container").style.display = 'none'
-    }
 
     if (!this.isLeader(team, this.game.player)) {
       this.el.querySelector(".team_private_status").dataset.disabled = true

@@ -137,7 +137,6 @@
         <div class='browse_games_container'>
             <div class='game_list_container'>
                 <div class='game_list_header'>
-                    <div class='colony_filter_tab minigames_tab '><%= t('Games') %></div>
                     <div class='colony_filter_tab online_colonies_tab selected' data-tab='worlds'><%= t('Worlds') %></div>
                     <div class='colony_filter_tab new_colonies_tab' data-tab='new'><%= t('New') %></div>
                     <div class='colony_filter_tab top_colonies_tab' data-tab='top'><%= t('Top') %></div>
@@ -145,34 +144,6 @@
                     <img class='gallery_mode_btn' src='/assets/images/gallery_view_icon.png' />
                     <img class='list_mode_btn' src='/assets/images/list_view_icon.png' />
                     <div class='colony_filter_tab mine_colonies_tab '><%= t('MineColony') %></div>
-                </div>
-                <div id='minigames_tab_content'>
-                    <div class='main_game_mode_selector'>
-                        <div class='main_game_mode_entry  imposter_game_mode_entry' data-id='Ap9OYBkw3dQvJ'>
-                            <div class='game_mode_thumb'><img src="/assets/images/background/imposter_thumbnail.jpg"></div>
-                            <div class='game_mode_name'>Find the Imposter</div>
-                            <div class='minigame_creator'>kuroro</div>
-                            <div class="minigame_player_count">0 players</div>
-                        </div>
-                        <div class='main_game_mode_entry  domination_game_mode_entry' data-id='PnGkJd5xZsb0v'>
-                            <div class='game_mode_thumb'><img src="/assets/images/background/grey_thumb.png"></div>
-                            <div class='game_mode_name'>Domination</div>
-                            <div class='minigame_creator'>kuroro</div>
-                            <div class="minigame_player_count">0 players</div>
-                        </div>
-                        <div class='main_game_mode_entry  bed_wars_game_mode_entry' data-id='uLHpXWb2koXYe'>
-                            <div class='game_mode_thumb'><img src="/assets/images/background/bedwars_thumbnail.jpg"></div>
-                            <div class='game_mode_name'>Bed Wars</div>
-                            <div class='minigame_creator'>Skylynx</div>
-                            <div class="minigame_player_count">0 players</div>
-                        </div>
-                        <div class='main_game_mode_entry  tower_defense_game_mode_entry' data-id='YcdqgbswlAqRi'>
-                            <div class='game_mode_thumb'><img style='object-fit: contain;' src="/assets/images/background/td_thumb.png"></div>
-                            <div class='game_mode_name'>Tower Defense</div>
-                            <div class='minigame_creator'>Starmancer</div>
-                            <div class="minigame_player_count">0 players</div>
-                        </div>
-                    </div>
                 </div>
                 <div id='region_tab_content'>
                 </div>
@@ -310,33 +281,6 @@
             </table>
         </div>
 
-        <div class='minigame_details_container'>
-            <div class='minigame_title'>Find the Imposter</div>
-            <p class='minigame_description'>
-                Crewmates win by completing tasks and voting out imposter.
-                Imposter wins by killing everyone.
-            </p>
-            <img class='minigame_poster' />
-            <div class='minigame_chat_language'>
-                <label>Chat</label>
-                <select class='minigame_chat_language_select ui_select'>
-                    <option value='en'>English</option>
-                    <option value='ru'>Русский</option>
-                    <option value='ja'>日本語</option>
-                </select>
-            </div>
-            <div class='join_minigame_btn ui_btn'><%= t('Join') %></div>
-            <div class='host_minigame_btn ui_btn'><%= t('Host Private Game') %></div>
-            <div class='minigame_thumbnails'>
-                <a class='minigame_thumbnail_1' href="/assets/images/background/role_crew.jpg" target='_blank'>
-                    <img class='minigame_thumbnail' src='/assets/images/background/role_crew.jpg' />
-                </a>
-                <a class='minigame_thumbnail_2' href="/assets/images/background/meeting.jpg" target='_blank'>
-                    <img class='minigame_thumbnail' src='/assets/images/background/meeting.jpg' />
-                </a>
-            </div>
-        </div>
-
         <div class='load_game_settings_container'>
             <label class='load_game_settings_header'><%= t('Game Settings') %></label>
             <div class='load_game_save_name'></div>
@@ -424,11 +368,6 @@
             </div>
             <button id='restart_btn' class=''><%= t('Respawn') %></button>
         </div>
-        <div id='death_minigame_action_container'>
-            <button class='play_again_btn' class=''><%= t('Play Again') %></button>
-            <button class='exit_minigame_btn' class=''><%= t('Exit Game') %></button>
-            <button class='spectate_btn' class=''><%= t('Spectate') %></button>
-        </div>
     </div>
     <div class='junon_ad_banner'>
         <div id='junon-io_728x90'>
@@ -474,18 +413,6 @@
     <div class='game_mode_action_container'>
         <div class="game_mode_warning"><%= t('GameModeWarning') %></div>
         <div class="accept_game_mode_btn ui_btn"><%= t('AcceptDecide') %></div>
-    </div>
-</div>
-
-<div id='team_full_menu' class='modal_menu'>
-    <div class='cancel_btn'></div>
-    <div class='menu_main_header'><%= t('Team Full') %></div>
-    <div class='team_full_action_container'>
-        <div class='team_full_description'></div>
-        <div class='team_full_member_names'></div>
-        <div class='team_full_action'>
-            <span class='create_new_team_btn ui_btn'>Join a new Team</span>
-        </div>
     </div>
 </div>
 
@@ -567,14 +494,6 @@
             </div>
         </div>
 
-    </div>
-
-    <div class="total_task_stat stat_container">
-        <span class='label'><%= t('Total Tasks Completed') %></span>
-        <div class='bar_container'>
-            <div class='bar_label'>0</div>
-            <div class='bar_fill' style='width: 0%;'></div>
-        </div>
     </div>
 
     <div class="resources stat_container">
@@ -715,24 +634,6 @@
     </div>
 
     <div id='team_request_menu'></div>
-
-    <div id='end_game_menu' class='modal_menu'>
-        <p>Would you like to play another round?</p>
-        <button class='ui_btn play_again_btn'><%= t('Play Again') %></button>
-        <button class='ui_btn spectate_btn'><%= t('Spectate') %></button>
-    </div>
-
-    <div id='vote_menu' class='modal_menu'>
-        <div class='menu_main_header'><%= t('Vote the Imposter') %></div>
-        <div class='vote_player_list'>
-            
-        </div>
-        <div class='vote_action_container'>
-            <button class='ui_btn vote_btn'><%= t('Vote') %></button>
-            <button class='ui_btn skip_vote_btn'><%= t('Skip Vote') %></button>
-        </div>
-        <div class='vote_timer'></div>
-    </div>
 
     <div id='command_block_menu' class='modal_menu'>
         <div class='cancel_btn'></div>
@@ -1048,16 +949,6 @@
 
     <div id='quest_menu'>
         <div class='quest_list'></div>
-    </div>
-
-    <div class='minigame_controls_container'>
-        <a href="" target="_blank" class='launch_minigame_btn ui_btn'>Launch Minigame</a>
-    </div>
-
-    <div id='minigame_invite_container'>
-        <input class='invite_link_input black_input' readonly type="text" value=''>    
-        <span class='start_minigame_btn ui_btn'><%= t('Start Game') %></span>
-         <span class='invite_link_copy_btn ui_btn'><%= t('Invite') %></span>
     </div>
 
     <div id='events_menu'>
@@ -1415,9 +1306,6 @@
                         <div class='menu_main_header'></div>
                         <input class='invite_link_input black_input' readonly type="text" value=''>    
                         <span class='team_private_status'><%= t('Private') %></span>
-                    </div>
-                    <div class='team_leave_container'>
-                        <div id='leave_team_btn' class='team_action_btn'>Leave Colony</div>
                     </div>
                 </div>
 

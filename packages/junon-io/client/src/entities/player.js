@@ -1782,7 +1782,7 @@ class Player extends BaseEntity {
   }
 
   isSpectating() {
-    return this.sector.isMiniGame() && this.health === 0
+    return false
   }
 
   renderDeadBody() {
@@ -1926,17 +1926,10 @@ Object.assign(Player.prototype, Destroyable.prototype, {
     }
 
     this.renderDeadBody()
-    if (this.sector.originalPlayers[this.getId()]) {
-      this.sector.originalPlayers[this.getId()].health = 0
-    }
   },
   onPostSetHealth() {
     if (this.isMe()) {
       this.game.updateHealthBar(this.health, this.getMaxHealth())
-    }
-
-    if (this.sector.originalPlayers[this.getId()]) {
-      this.sector.originalPlayers[this.getId()].health = this.health
     }
 
     if (this.health > 0 && !this.sprite.visible) {
@@ -1990,7 +1983,6 @@ Object.assign(Player.prototype, Needs.prototype, {
     this.notifyLowStatus("oxygen")
   },
   getMaxStamina() {
-    if (this.game.isPvP()) return 300
     return Constants.Player.stamina
   },
   getMaxOxygen() {

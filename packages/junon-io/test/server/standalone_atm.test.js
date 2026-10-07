@@ -30,7 +30,6 @@ function createPlayer(gold) {
     uid: 'profileA',
     gold: gold,
     isAuthenticated: true,
-    game: { isMiniGame: () => false },
     setGold(value) { this.gold = value },
     showError(message) { events.push(['error', message]) },
     onAccountBalanceChanged(balance) { events.push(['balance', balance]) }

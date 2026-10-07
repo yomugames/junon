@@ -175,7 +175,7 @@ class TeamEntry {
     name = name || ""
     let maxLength = 40
     let displayName = ""
-    if (gameMode && gameMode !== 'pvp') {
+    if (gameMode) {
       displayName += this.getGameModeEmoji(gameMode)
     }
     displayName += name.slice(0, maxLength)
@@ -204,7 +204,7 @@ class TeamEntry {
     name = name || ""
     let maxLength = 40
     let displayName = ""
-    if (gameMode && gameMode !== 'pvp') {
+    if (gameMode) {
       displayName += this.getGameModeEmoji(gameMode)
     }
     displayName += name.slice(0, maxLength)

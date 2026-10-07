@@ -142,7 +142,7 @@ class BaseSeed extends BaseDistribution {
   }
 
   harvest(user) {
-    if (this.owner && user.isPlayer() && !this.game.isPvP()) {
+    if (this.owner && user.isPlayer()) {
       if (user.getRole() && !user.getRole().isAllowedTo("HarvestCrops")) {
         user.showError("Permission Denied")
         return

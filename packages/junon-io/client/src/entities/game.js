@@ -83,7 +83,6 @@ class Game {
     this.mutedPlayers = {}
     this.commandBlockTimers = {}
     this.isAFK = false
-    this.totalTaskBar = document.querySelector('.total_task_stat')
     this.healthBar = document.querySelector('.health_stat')
     this.shieldBar = document.querySelector('.shield_stat')
     this.oxygenBar = document.querySelector('.oxygen_stat')
@@ -241,14 +240,11 @@ class Game {
     this.stoveMenu = new Menus.StoveMenu(this, document.querySelector("#stove_menu"))
     this.walkthroughMenu = new Menus.WalkthroughMenu(this, document.querySelector("#walkthrough_menu"))
     this.leaderboardMenu = new Menus.LeaderboardMenu(this, document.querySelector("#leaderboard_menu"))
-    this.teamFullMenu = new Menus.TeamFullMenu(this, document.querySelector("#team_full_menu"))
     this.previewCaptureMenu = new Menus.PreviewCaptureMenu(this, document.querySelector("#preview_capture_menu"))
     this.changeNameMenu = new Menus.ChangeNameMenu(this, document.querySelector("#change_name_menu"))
     this.selectDifficultyMenu = new Menus.SelectDifficultyMenu(this, document.querySelector("#select_difficulty_menu"))
     this.colorPickerMenu = new Menus.ColorPickerMenu(this, document.querySelector("#color_picker_menu"))
-    this.voteMenu = new Menus.VoteMenu(this, document.querySelector("#vote_menu"))
     this.questMenu = new Menus.QuestMenu(this, document.querySelector("#quest_menu"))
-    this.endGameMenu = new Menus.EndGameMenu(this, document.querySelector("#end_game_menu"))
     this.sidebarMenu = new Menus.SidebarMenu(this, document.querySelector("#sidebar_menu"))
     this.securityCameraMenu = new Menus.SecurityCameraMenu(this, document.querySelector("#security_camera_menu"))
     this.suitColorMenu = new Menus.SuitColorMenu(this, document.querySelector("#suit_color_menu"))
@@ -1484,7 +1480,6 @@ class Game {
   initSocketHandlers() {
     SocketUtil.on("GameState", this.onSyncWithServer.bind(this))
     SocketUtil.on("JoinGame", this.onJoinGame.bind(this))
-    SocketUtil.on("EndGame", this.onEndGame.bind(this))
     SocketUtil.on("CantJoin", this.onPlayerCantJoin.bind(this))
     SocketUtil.on("Respawn", this.onPlayerRespawn.bind(this))
     SocketUtil.on("Leaderboard", this.onLeaderboard.bind(this))
@@ -1552,15 +1547,11 @@ class Game {
     SocketUtil.on("SellableUpdated", this.onSellableUpdated.bind(this))
     SocketUtil.on("TeamResidentsUpdated", this.onTeamResidentsUpdated.bind(this))
     SocketUtil.on("WalkthroughUpdated", this.onWalkthroughUpdated.bind(this))
-    SocketUtil.on("TeamFull", this.onTeamFull.bind(this))
     SocketUtil.on("TeamLogs", this.onTeamLogs.bind(this))
     SocketUtil.on("RegionUpdated", this.onRegionUpdated.bind(this))
     SocketUtil.on("ButtonUpdated", this.onButtonUpdated.bind(this))
-    SocketUtil.on("VoteUpdated", this.onVoteUpdated.bind(this))
     SocketUtil.on("StartScene", this.onStartScene.bind(this))
     SocketUtil.on("EndScene", this.onEndScene.bind(this))
-    SocketUtil.on("StartVote", this.onStartVote.bind(this))
-    SocketUtil.on("EndVote", this.onEndVote.bind(this))
     SocketUtil.on("SidebarUpdated", this.onSidebarUpdated.bind(this))
     SocketUtil.on("Objective", this.onObjective.bind(this))
     SocketUtil.on("DialogueUpdated", this.onDialogueUpdated.bind(this))
@@ -1747,24 +1738,6 @@ class Game {
     }
   }
 
-  onStartVote(data) {
-    this.voteMenu.open()
-    this.voteMenu.setVotingEndTimestamp(data.votingEndTimestamp)
-    this.questMenu.close()
-  }
-
-  onEndVote(data) {
-    this.voteMenu.close()
-    this.questMenu.open()
-    this.chatMenu.close()
-
-    this.stopMeetingMusic()
-  }
-
-  onVoteUpdated(data) {
-    this.voteMenu.updateVote(data)
-  }
-
   onRenderCamera(data) {
     this.enterSecurityCameraMode()
   }
@@ -1869,10 +1842,6 @@ class Game {
     this.letterBoxTween.start()
   }
 
-  onTeamFull(data) {
-    this.teamFullMenu.open(data)
-  }
-
   onTeamLogs(data) {
     this.teamMenu.updateActivityLogs(data.activityLogs)
     this.teamMenu.updateCommandLogs(data.commandLogs)
@@ -1952,20 +1921,6 @@ class Game {
   onRemovedFromGame(data) {
     // this.gameConnection.displayRemoved()
     this.showPlayerLeaveGameMessage(data.playerName)
-    if (this.sector) {
-      if (this.isRoundStarted) {
-        if (this.sector.originalPlayers[data.playerId] &&
-          this.sector.originalPlayers[data.playerId].health === 0) {
-          this.sector.setOriginalPlayerLeft(data.playerId)
-        } else {
-          this.sector.removeFromOriginalPlayers(data.playerId)
-        }
-      } else {
-        this.sector.removeFromOriginalPlayers(data.playerId)
-      }
-    }
-
-    this.voteMenu.rerenderPlayers()
   }
 
   displayHomePage() {
@@ -2139,14 +2094,9 @@ class Game {
     this.securityCameraMenu.updateCameraFeeds(this.cameraFeeds)
   }
 
+  // rounds are started by command blocks (a timer named RoundStartTimer)
   onRoundStarted(data) {
     this.isRoundStarted = true
-
-    document.querySelector("#minigame_invite_container").style.display = 'none'
-  }
-
-  showMiniGameInviteLink() {
-    document.querySelector("#minigame_invite_container").style.display = 'block'
   }
 
   onFavoriteUpdated(data) {
@@ -2397,11 +2347,6 @@ class Game {
     document.getElementById("tutorial_toggle_btn").addEventListener("click", this.onTutorialOpenBtnClick.bind(this), true)
     document.querySelector(".sector_favorite_btn").addEventListener("click", this.onSectorFavoriteBtnClick.bind(this), true)
     document.querySelector(".upvote_btn").addEventListener("click", this.onSectorUpvoteBtnClick.bind(this), true)
-    document.querySelector(".play_again_btn").addEventListener("click", this.onPlayAgainBtnClick.bind(this), true)
-    document.querySelector(".exit_minigame_btn").addEventListener("click", this.onExitMinigameBtnClick.bind(this), true)
-    document.querySelector(".spectate_btn").addEventListener("click", this.onSpectateBtnClick.bind(this), true)
-    document.querySelector("#minigame_invite_container .invite_link_input").addEventListener("click", this.onMiniGameInviteInputClick.bind(this), true)
-    document.querySelector("#minigame_invite_container .start_minigame_btn").addEventListener("click", this.onStartMiniGameBtnClick.bind(this), true)
 
     document.querySelector("#player_quick_inventory").addEventListener("click", this.onQuickInventoryClick.bind(this), true)
 
@@ -2505,24 +2450,10 @@ class Game {
     }
   }
 
-  isImposterGame() {
-    return this.sector.getOriginalUid() === "eWC1CfZymRExY" ||
-      this.sector.getOriginalUid() === "Ap9OYBkw3dQvJ"
-  }
-
   showGameHuds() {
     this.hideMainMenus = false
 
-    if (!this.isMiniGame()) {
-      document.querySelector("#player_stats").style.display = "block"
-    } else {
-      if (this.isImposterGame()) {
-        document.querySelector(".total_task_stat").style.display = "block"
-      } else {
-        document.querySelector(".total_task_stat").style.display = "none"
-        document.querySelector("#player_stats").style.display = "block"
-      }
-    }
+    document.querySelector("#player_stats").style.display = "block"
 
     if (this.shouldShowMiniMap()) {
       document.querySelector("#mini_map_menu").style.display = "block"
@@ -2563,7 +2494,7 @@ class Game {
   }
 
   shouldShowLeaderboard() {
-    return this.isPvP()
+    return false
   }
 
   shouldShowMiniMap() {
@@ -2571,12 +2502,8 @@ class Game {
   }
 
   shouldShowTutorial() {
-    if (this.isPvP()) return true
     if (!this.sector) return false
-    if (this.sector.isPeaceful()) {
-      if (this.sector.uid.match('PnGkJd5xZsb0v')) return true
-      return false
-    }
+    if (this.sector.isPeaceful()) return false
 
     if (this.isTutorial() || this.main.isMobile || !this.isGameCreatedByPlayer()) return false
 
@@ -2590,7 +2517,6 @@ class Game {
   hideGameHuds() {
     this.hideMainMenus = true
     document.querySelector("#player_stats").style.display = "none"
-    document.querySelector(".total_task_stat").style.display = "none"
     document.querySelector("#mini_map_menu").style.display = "none"
     document.querySelector("#mini_map_player_pos_label").style.display = "none"
     document.querySelector("#entity_menu").style.display = "none"
@@ -2615,7 +2541,7 @@ class Game {
   }
 
   shouldShowFavoriteButton() {
-    if (this.isTutorial() || this.isAnonymousGame() || this.isMiniGame()) {
+    if (this.isTutorial() || this.isAnonymousGame()) {
       return false
     }
 
@@ -2678,8 +2604,6 @@ class Game {
   }
 
   toggleVisitColonyMenu() {
-    if (this.isPvP()) return
-    if (main.impy) return
 
     document.querySelector(".search_colony_list").style.display = 'none'
     document.querySelector(".main_colony_list").style.display = 'block'
@@ -2709,37 +2633,6 @@ class Game {
 
   onSectorUpvoteBtnClick() {
     SocketUtil.emit("SectorAction", { action: "upvote", sectorId: this.sector.uid })
-  }
-
-  onPlayAgainBtnClick() {
-    if (!this.isMiniGame()) return
-    if (this.sector.isPrivate) return
-
-    let uid = this.sector.getOriginalUid()
-
-    // in some cases, we might player to just respawn in same game instance
-    // instead of joining a diff one
-
-    this.main.gameExplorer.joinMiniGame(uid, { prevMiniGameId: this.sector.uid })
-    this.hideDeathMessage()
-  }
-
-  onExitMinigameBtnClick() {
-    this.hideDeathMessage()
-    this.main.onExitGameMenuBtnClick()
-  }
-
-  onSpectateBtnClick() {
-    this.hideDeathMessage()
-  }
-
-  onStartMiniGameBtnClick(e) {
-    SocketUtil.emit("StartRound", {})
-  }
-
-  onMiniGameInviteInputClick(e) {
-    e.target.select()
-    document.execCommand('copy')
   }
 
   onTutorialOpenBtnClick() {
@@ -3002,11 +2895,6 @@ console.log(options)
     
   }
 
-  isPvP() {
-    if (!this.sector) return false
-    return this.sector.isPvP()
-  }
-
   isSandbox() {
     return this.isPeaceful()
   }
@@ -3032,7 +2920,6 @@ console.log(options)
     }
 
     if (options.sectorId) data["sectorId"] = options.sectorId
-    if (options.isNewTeam) data["isNewTeam"] = true
 
     const url = this.main.getBrowserHref()
     const isTroubleshooter = url.match(new RegExp(".*?stress=(.*)"))
@@ -3422,10 +3309,6 @@ arrow.style.setProperty('--arrow-color',realColor)
       }
     })
 
-    if (data.hasOwnProperty("taskCompleted")) {
-      this.updateTotalTasksBar(data.taskCompleted, data.totalTasks)
-    }
-
     if (data.hasOwnProperty("colorIndex")) {
       this.colorPickerMenu.setColorIndex(data.colorIndex)
     }
@@ -3721,7 +3604,7 @@ arrow.style.setProperty('--arrow-color',realColor)
 
   createCooldownRenderInterval(inventorySlot, data, cooldownSeconds) {
     return setInterval(() => {
-      if (this.player.mountedId || this.voteMenu.isOpen()) {
+      if (this.player.mountedId) {
         return
       }
       let seconds = Math.floor((this.timestamp - data.lastUsedTimestamp) / Constants.physicsTimeStep)
@@ -3952,23 +3835,8 @@ arrow.style.setProperty('--arrow-color',realColor)
   }
 
   renderCommon() {
-    if (this.isMiniGame()) {
-      document.querySelector("#hud_action_container").classList.add("minigame")
-      document.querySelector("#time_label").style.display = 'none'
-
-      if (this.isImposterGame()) {
-        document.querySelector("#player_stats").style.display = 'none'
-        document.querySelector(".total_task_stat").style.display = 'block'
-      } else {
-        document.querySelector("#player_stats").style.display = 'block'
-        document.querySelector(".total_task_stat").style.display = 'none'
-      }
-    } else {
-      document.querySelector("#hud_action_container").classList.remove("minigame")
-      document.querySelector("#time_label").style.display = 'block'
-      document.querySelector("#player_stats").style.display = 'block'
-      document.querySelector(".total_task_stat").style.display = 'none'
-    }
+    document.querySelector("#time_label").style.display = 'block'
+    document.querySelector("#player_stats").style.display = 'block'
 
     if (this.shouldShowTutorial()) {
       this.tutorialMenu.open()
@@ -3993,28 +3861,9 @@ arrow.style.setProperty('--arrow-color',realColor)
     } else {
       this.leaderboardMenu.close()
     }
-
-    if (this.isMiniGameEditor()) {
-      document.querySelector(".minigame_controls_container").style.display = 'block'
-      let link = main.getBrowserHref() + "minigame=" + "minigame-" + this.sector.uid
-      document.querySelector(".launch_minigame_btn").href = link
-    } else {
-      document.querySelector(".minigame_controls_container").style.display = 'none'
-    }
-  }
-
-  isMiniGameEditor() {
-    let sectors = ["uLHpXWb2koXYe", "l8v7ezWMvnGeC", "eWC1CfZymRExY", "Ap9OYBkw3dQvJ", "YcdqgbswlAqRi"]
-    return sectors.indexOf(this.sector.uid) !== -1
   }
 
   initGameModeUI() {
-    if (this.isPvP()) {
-      this.renderPvPMode()
-    } else {
-      this.renderDefault()
-    }
-
     if (this.isSandbox()) {
       document.querySelector("#command_block_hud_btn").style.display = 'block'
     } else {
@@ -4033,16 +3882,6 @@ arrow.style.setProperty('--arrow-color',realColor)
   }
 
   renderMobileUI() {
-  }
-
-  renderDefault() {
-    document.querySelector("#base_hud").classList.remove("pvp")
-  }
-
-  renderPvPMode() {
-    document.querySelector("#alliance_btn").style.display = 'none'
-    document.querySelector("#visit_colony_hud_btn").style.display = 'none'
-    document.querySelector("#base_hud").classList.add("pvp")
   }
 
   onEnterSector(data) {
@@ -4072,28 +3911,19 @@ arrow.style.setProperty('--arrow-color',realColor)
   }
 
   playBackgroundMusic() {
-    if (this.isPvP()) return
     let musicName = this.getPeacefulMusicName()
     this.backgroundMusicSoundId = this.playSoundLazyDownload(musicName, { loop: true })
   }
 
   stopBackgroundMusic() {
-    if (this.isPvP()) return
     this.stopSound(this.getPeacefulMusicName())
   }
 
   getPeacefulMusicName() {
-    if (this.sector.getOriginalUid() === "Ap9OYBkw3dQvJ") {
-      return "anotherplanet"
-    } else if (this.sector.getOriginalUid() === "vbj91eofmFCiu") {
-      return "td"
-    } else {
-      return "peaceful"
-    }
+    return "peaceful"
   }
 
   stopAllBackgroundMusic() {
-    if (this.isPvP()) return
     this.stopSound("peaceful")
     this.stopSound("enemy_invasion")
     this.stopSound("meeting")
@@ -4131,7 +3961,6 @@ arrow.style.setProperty('--arrow-color',realColor)
   }
 
   playRaidMusic() {
-    if (this.isPvP()) return
     try {
       let backgroundSound = this.sounds[this.getPeacefulMusicName()]
       if (backgroundSound.playing()) {
@@ -4177,7 +4006,6 @@ arrow.style.setProperty('--arrow-color',realColor)
   }
 
   stopRaidMusic() {
-    if (this.isPvP()) return
     try {
       let raidSound = this.sounds["enemy_invasion"]
       if (raidSound.playing()) {
@@ -4203,18 +4031,6 @@ arrow.style.setProperty('--arrow-color',realColor)
     return uuidv4Regex.test(this.creatorUid)
   }
 
-  onEndGame(data) {
-    if (data.isCountdown) {
-      this.hideDeathMessage()
-    } else if (this.sector.isPrivate) {
-      let uid = this.sector.getOriginalUid()
-      this.main.gameExplorer.joinMiniGame(uid, { targetMiniGameId: this.sector.uid, isPrivate: true })
-      this.hideDeathMessage()
-    } else {
-      this.onPlayAgainBtnClick()
-    }
-
-  }
 
   onJoinGame(data) {
     document.body.style.overflow = 'hidden'
@@ -4227,7 +4043,6 @@ arrow.style.setProperty('--arrow-color',realColor)
     this.pid = data.pid
     this.version = data.version
     this.revision = data.revision
-    this._isMiniGame = data.isMiniGame
 
     console.log("joined sector " + data.sector.uid)
 
@@ -4259,10 +4074,6 @@ arrow.style.setProperty('--arrow-color',realColor)
 
     if (data.objectives) {
       this.questMenu.setObjectives(data.objectives)
-    }
-
-    if (this.isPvP()) {
-      Cookies.set('pvpSectorUid', this.sector.uid)
     }
 
     this.initGameModeUI()
@@ -4306,11 +4117,6 @@ arrow.style.setProperty('--arrow-color',realColor)
     this.teamMenu.renderRoles()
     this.entityMenu.createPermissions()
     this.entityMenu.populateSpawnPointSelectors()
-
-    if (this.isMiniGame()) {
-      // render invite link
-      this.renderInviteLink(this.sector.uid)
-    }
 
     this.setTeamVisibility()
     this.mapMenu.reinit()
@@ -4393,12 +4199,6 @@ arrow.style.setProperty('--arrow-color',realColor)
       document.querySelector("#rules_menu").style.display = 'block'
     }
 
-    if (data.fullMap) {
-      data.fullMap.chunks.forEach((chunk) => {
-        this.sector.onChunk(chunk, { sync: true })
-      })
-    }
-
     // let joinDuration = Date.now() - this.joinGameTime
     // console.log("map load after join took: " + joinDuration + "ms")
   }
@@ -4408,19 +4208,7 @@ arrow.style.setProperty('--arrow-color',realColor)
   }
 
   displayStickyAnnouncement() {
-    if (this.isPvP()) {
-      document.querySelector("#game_sticky_announcement").innerText = "Map resets in Day 600"
-    } else {
-      document.querySelector("#game_sticky_announcement").innerText = ""
-    }
-  }
-
-  renderInviteLink(sectorUid) {
-    let params = window.location.search
-    params = ClientHelper.replaceQueryParam('e', sectorUid, params)
-    let inviteLink = this.main.getBrowserHost() + params
-
-    document.querySelector("#minigame_invite_container .invite_link_input").value = inviteLink
+    document.querySelector("#game_sticky_announcement").innerText = ""
   }
 
   shouldBeAddedToMineColonies(sectorUid) {
@@ -4459,10 +4247,6 @@ arrow.style.setProperty('--arrow-color',realColor)
 
   isTutorial() {
     return this.sector.isTutorial()
-  }
-
-  isMiniGame() {
-    return this._isMiniGame
   }
 
   visitSector(sectorUid) {
@@ -4546,27 +4330,6 @@ arrow.style.setProperty('--arrow-color',realColor)
   showDeathScreenImmediate() {
     document.querySelector("#death_screen_container").classList.add("now")
     this.deathScreen.style.display = 'block'
-
-    if (this.sector.isMiniGame()) {
-      this.showDeathMiniGameAction()
-    } else {
-      this.hideDeathMiniGameAction()
-    }
-  }
-
-  showDeathMiniGameAction() {
-    document.querySelector("#death_minigame_action_container").style.display = 'block'
-    if (this.sector.isPrivate) {
-      document.querySelector("#death_screen_container .play_again_btn").style.display = 'none'
-      document.querySelector("#death_screen_container .exit_minigame_btn").style.display = 'inline-block'
-    } else {
-      document.querySelector("#death_screen_container .play_again_btn").style.display = 'inline-block'
-      document.querySelector("#death_screen_container .exit_minigame_btn").style.display = 'none'
-    }
-  }
-
-  hideDeathMiniGameAction() {
-    document.querySelector("#death_minigame_action_container").style.display = 'none'
   }
 
   showDeathMessage(canRespawn) {
@@ -4574,17 +4337,7 @@ arrow.style.setProperty('--arrow-color',realColor)
 
     let opacity = { opacity: 0 }
     this.deathScreen.style.display = 'block'
-    this.hideDeathMiniGameAction()
-
-    if (this.sector.isMiniGame() && !canRespawn) {
-      document.querySelector("#death_screen_action_container").style.display = 'none'
-      setTimeout(() => {
-        this.showDeathMiniGameAction()
-      }, 3000)
-    } else {
-      document.querySelector("#death_screen_action_container").style.display = 'block'
-      this.hideDeathMiniGameAction()
-    }
+    document.querySelector("#death_screen_action_container").style.display = 'block'
 
     this.deathMessageTween = new TWEEN.Tween(opacity)
       .to({ opacity: 0.85 }, 2000)
@@ -4729,7 +4482,6 @@ arrow.style.setProperty('--arrow-color',realColor)
     if (!this.sector) return
 
     this.sector.syncWithServerForGroups(["players"], { players: [data.player] })
-    this.sector.addToOriginalPlayers(data.player)
   }
 
   showPlayerLeaveGameMessage(name) {
@@ -4763,11 +4515,6 @@ arrow.style.setProperty('--arrow-color',realColor)
         this.showDeathMessage(data.canRespawn)
         this.showRestartCountdown(Date.now(), data.restartCooldown)
       }
-    }
-
-    let originalPlayer = this.sector.originalPlayers[data.id]
-    if (originalPlayer) {
-      originalPlayer.health = 0
     }
   }
 
@@ -5010,11 +4757,6 @@ arrow.style.setProperty('--arrow-color',realColor)
   updateHealthBar(curr, max) {
     this.healthBar.querySelector(".bar_label").innerText = curr
     this.healthBar.querySelector(".bar_fill").style.width = max ? (curr / max * 100) + "%" : "0%"
-  }
-
-  updateTotalTasksBar(curr, max) {
-    this.totalTaskBar.querySelector(".bar_label").innerText = curr
-    this.totalTaskBar.querySelector(".bar_fill").style.width = max ? (curr / max * 100) + "%" : "0%"
   }
 
   onLeaderboard(data) {

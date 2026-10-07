@@ -268,9 +268,10 @@ class Player extends BaseEntity {
 
   async queryBalance() {
     if (!this.isLoggedIn()) return
-    // hosted servers only answered in minigames, so survival players saw their
-    // balance only after a transaction; standalone answers when the ATM opens
-    if (!this.game.isMiniGame() && env !== 'standalone') return
+    // hosted servers only answered this in (now removed) minigames, so
+    // survival players saw their balance only after a transaction; standalone
+    // answers when the ATM opens
+    if (env !== 'standalone') return
 
     let user = await User.findOne({ where: { uid: this.uid } })
     if (!user) return
@@ -299,8 +300,6 @@ class Player extends BaseEntity {
   }
 
   async performToggleUpvote(sectorId) {
-    if (this.game.isMiniGame()) return
-
     if (this.sector.getUid() === sectorId) {
       if (this.sector.isLobby()) return
       if (this.sector.game.isCreatedByAnonynmous()) return
@@ -364,8 +363,6 @@ class Player extends BaseEntity {
   }
 
   async performToggleDownvote(sectorId) {
-    if (this.game.isMiniGame()) return
-
     if (this.sector.getUid() === sectorId) {
       if (this.sector.isLobby()) return
       if (this.sector.game.isCreatedByAnonynmous()) return
@@ -411,8 +408,6 @@ class Player extends BaseEntity {
   }
 
   async performToggleFavorite(sectorId) {
-    if (this.game.isMiniGame()) return
-
     if (this.sector.getUid() === sectorId) {
       if (this.sector.isLobby()) return
       if (this.sector.game.isCreatedByAnonynmous()) return
@@ -648,11 +643,7 @@ class Player extends BaseEntity {
     }
 
     if (this.health === 0) {
-      if (this.game.isPvP()) {
-        this.setRespawnTime()
-      } else {
-        this.respawn()
-      }
+      this.respawn()
     }
   }
 
@@ -677,11 +668,9 @@ class Player extends BaseEntity {
 
     let data = { ip: this.getRemoteAddress() }
 
-    if (!this.game.isMiniGame()) {
-      let sectorModel = await SectorModel.findOne({ where: { uid: this.sector.getUid() }})
-      if (sectorModel) {
-        data["currentSectorUid"] = sectorModel.uid
-      }
+    let sectorModel = await SectorModel.findOne({ where: { uid: this.sector.getUid() }})
+    if (sectorModel) {
+      data["currentSectorUid"] = sectorModel.uid
     }
 
     await user.update(data)
@@ -705,10 +694,6 @@ class Player extends BaseEntity {
   }
 
   setRoleType(roleType) {
-    if (this.game.isPvP() && roleType === Team.GuestRoleType) {
-      return
-    }
-
     if (this.roleType !== roleType) {
       let prevRoleType = this.roleType
       this.roleType = roleType
@@ -723,7 +708,6 @@ class Player extends BaseEntity {
 
   onRoleTypeChanged(prevRoleType, currRoleType) {
     if (this.game.isTutorial) return
-    if (this.game.isMiniGame()) return
 
     let roleName = this.getRole().name
     let message = i18n.t(this.locale, 'AssignedRole', { roleName: roleName })
@@ -821,8 +805,6 @@ class Player extends BaseEntity {
   }
 
   async withdrawAccount(gold) {
-    if (this.game.isMiniGame()) return
-
     let user = await User.findOne({ where: { uid: this.uid } })
     if (!user) return
 
@@ -850,8 +832,6 @@ class Player extends BaseEntity {
   }
 
   async depositAccount(gold) {
-    if (this.game.isMiniGame()) return
-
     let user = await User.findOne({ where: { uid: this.uid } })
     if (!user) return
 
@@ -1367,8 +1347,7 @@ class Player extends BaseEntity {
   }
 
   createSelfTeam() {
-    let isPrivate = this.game.isPvP() ? false : true
-    let team = new Team(this.sector, { name: this.name, joinable: true, leader: this, isPrivate: isPrivate })
+    let team = new Team(this.sector, { name: this.name, joinable: true, leader: this, isPrivate: true })
     team.setCreator(this)
     team.addMember(this)
     this.setRoleType(Team.AdminRoleType)
@@ -1377,8 +1356,6 @@ class Player extends BaseEntity {
   }
 
   shouldUseSectorName() {
-    if (this.game.isPvP()) return false
-
     return this.game.isCustomNameProvided
   }
 
@@ -1414,13 +1391,6 @@ class Player extends BaseEntity {
 
   setLeaveTimestamp() {
     this.leaveTimestamp = this.game.timestamp
-  }
-
-  hasRecentlyLeftTeam() {
-    if (!this.leaveTimestamp) return false
-
-    let duration = this.game.timestamp - this.leaveTimestamp
-    return duration < (Constants.physicsTimeStep * 60 * 3)
   }
 
   leaveTeam() {
@@ -1481,9 +1451,7 @@ class Player extends BaseEntity {
     }
 
     if (this.isAdmin()) {
-      if (!this.game.isPvP()) {
-        this.inventory.store(new Item(this, "Core"))
-      }
+      this.inventory.store(new Item(this, "Core"))
       this.setGold(150)
     }
   }
@@ -1678,12 +1646,6 @@ class Player extends BaseEntity {
       return
     }
 
-    if (this.game.isMiniGame()) {
-      if (this.game.sector.miniGame.name === 'find_the_imposter') {
-        return
-      }
-    }
-
     let sourceItem      = sourceStorage.retrieve(sourceIndex)
     if (sourceItem) {
       this.throwInventory(sourceItem)
@@ -1698,12 +1660,6 @@ class Player extends BaseEntity {
   }
 
   throwInventory(item) {
-    if (this.game.isMiniGame()) {
-      if (this.game.sector.miniGame.name === 'find_the_imposter') {
-        return
-      }
-    }
-
     super.throwInventory(item)
 
     this.game.triggerEvent("ItemDropped", {
@@ -1721,8 +1677,7 @@ class Player extends BaseEntity {
 
     let destinationItem = destinationStorage.get(destinationIndex)
 
-    let disallowSuitChange = (this.game.isMiniGame() && this.game.sector.miniGame.name === 'find_the_imposter') ||
-                             !this.sector.shouldAllowSuitChanged()
+    let disallowSuitChange = !this.sector.shouldAllowSuitChanged()
     if (disallowSuitChange) {
       if (sourceStorage.isEquipmentStorage() || destinationStorage.isEquipmentStorage()) {
         return
@@ -2021,12 +1976,6 @@ class Player extends BaseEntity {
     if (storage.isFull(data.type)) {
       this.showError("Inventory Full")
       return
-    }
-
-    if (this.game.isMiniGame() && !data.sourceStorageId) {
-      if (!this.game.sector.miniGame.canCraft()) {
-        return
-      }
     }
 
     if (!this.sector.settings.isCraftingEnabled) return
@@ -2900,11 +2849,6 @@ class Player extends BaseEntity {
   requestNewChunks() {
     if (!this.isPlayerReady) return
 
-    if (this.isFirstFullChunkRequest && this.game.isMiniGame()) {
-      this.isFirstFullChunkRequest = false
-      return
-    }
-
     let chunks = this.getVisibleChunks()
 
     // remove ones no longer visible
@@ -3184,7 +3128,6 @@ class Player extends BaseEntity {
     this.isMuted = false
     this.isFlying = false
     this.releasedAction = true
-    this.isFirstFullChunkRequest = true
     this.objectives = {}
     this.fovTileHits = {}
     this.visiblePlayers = {}
@@ -3529,10 +3472,6 @@ class Player extends BaseEntity {
 
   respawnIfReady() {
     if (!this.respawnTime || (this.game.clock > this.respawnTime)) {
-      if (this.game.isPvP()) {
-        this.sector.findNewTeamSpawn([this])
-      }
-
       this.respawn()
     }
   }
@@ -3562,9 +3501,6 @@ class Player extends BaseEntity {
   isAFKTimeLimitExceeded() {
     if (debugMode) return false
     let numMinutes = 10
-    if (this.game.isMiniGame()) {
-      numMinutes = this.sector.miniGame.getAFKLimit()
-    }
     return Date.now() - this.lastActivityTime > (1000 * 60 * numMinutes)
   }
 
@@ -4197,13 +4133,6 @@ class Player extends BaseEntity {
   }
 
   isBuildingAllowedInGame(buildingKlass) {
-    if (this.game.isPvP()) {
-      let notAllowedList = ["Atm", "RailStop", "RailTrack"]
-      if (notAllowedList.indexOf(buildingKlass.name) !== -1) {
-        return false
-      }
-    }
-
     if (this.game.isHardcore()) {
       let notAllowedList = ["Atm"]
       if (notAllowedList.indexOf(buildingKlass.name) !== -1) {
@@ -4555,10 +4484,6 @@ class Player extends BaseEntity {
           player: this.name
         }
 
-        if (this.sector.miniGame && this.sector.miniGame.name === 'find_the_imposter') {
-          data.action = action || ""
-        }
-
         this.game.triggerEvent("InteractBuilding", data)
       } else {
         if (entity.canBeInteracted()) {
@@ -4631,11 +4556,6 @@ class Player extends BaseEntity {
 
   attemptDrag(mob) {
     if (!this.getContainer().isSector()) return
-    if (this.game.isMiniGame()) {
-      if (mob.isCorpse() && mob.getMobKlass().name === 'Human') {
-        return
-      }
-    }
 
     if (this.dragTarget === mob) {
       this.releaseDragTarget()
@@ -4770,29 +4690,6 @@ class Player extends BaseEntity {
     return true
   }
 
-  hasRecentlyRestarted() {
-    return this.game.characterRestarts[this.getUid()]
-  }
-
-  restartCharacter() {
-    this.game.addCharacterRestart(this)
-
-    if (this.initialEscapePod) {
-      this.initialEscapePod.clearStorage()
-      this.initialEscapePod.remove()
-    }
-
-    this.removeInventoryAndEquipments()
-    this.removeAllBuildingsPlacedInfo()
-
-    this.leaveTeam()
-
-    this.createSelfTeam()
-    this.createSurvivalTool()
-    this.initStartingEquipment()
-    this.sector.findSpawnPositionForColonyOwner(this)
-  }
-
   removeTeamMemberships() {
     let team = this.getTeam()
     if (team) {
@@ -4869,21 +4766,6 @@ class Player extends BaseEntity {
     EventBus.removeEventListener(this.game.getId() + ":entity:removed", this.onEntityRemovedListener)
   }
 
-  removeCore() {
-    for (let index in this.inventory.storage) {
-      let item = this.inventory.storage[index]
-      if (item.getTypeName() === "Core") {
-        item.remove()
-        break
-      }
-    }
-
-    if (this.core) {
-      this.core.remove()
-      this.core = null
-    }
-  }
-
   removeSurvivalTool() {
     for (let index in this.inventory.storage) {
       let item = this.inventory.storage[index]
@@ -4924,11 +4806,6 @@ class Player extends BaseEntity {
     return this.sector.getSetting("isPlayerSavingEnabled")
   }
 
-  removeWithDelay() {
-    delete this.game.playerIdMap[this.getSocketId()]
-    this.game.addLeavingPlayer(this)
-  }
-
   remove() {
     // dont remove twice, otherwise, savedata would be overwritten
     if (this.isRemoved) return
@@ -4963,14 +4840,6 @@ class Player extends BaseEntity {
       // LOG.info("Removing player: " + this.name + " saving inventory count: " + inventoryCount)
       this.saveOwnerships(playerData)
     } else {
-      if (this.game.isPvP()) {
-        if (this.initialEscapePod) {
-          this.initialEscapePod.clearStorage()
-          this.initialEscapePod.remove()
-        }
-
-        this.removeCore()
-      }
       this.removeSurvivalTool()
       this.removeSpaceSuit()
 
@@ -5636,13 +5505,6 @@ class Player extends BaseEntity {
     const isCommand = message[0] === "/"
     let isTeamChat = data.isTeam
 
-    if (this.sector.voteManager.isStarted) {
-      if (this.isDestroyed()) {
-        this.showChatError("dead people cant vote")
-        return
-      }
-    }
-
     if (isCommand) {
       this.executeCommand(message)
       this.game.triggerEvent("PlayerMessage", {
@@ -5664,9 +5526,7 @@ class Player extends BaseEntity {
       if (message.length <= 0) return
 
       if (!this.sector.settings["isChatEnabled"]) {
-        if (!this.sector.voteManager.isStarted) {
-          return
-        }
+        return
       }
 
       // if (!this.isLoggedIn()) {
@@ -5823,10 +5683,6 @@ class Player extends BaseEntity {
   }
 
   canRespawn() {
-    if (this.game.isMiniGame()) {
-      return this.game.sector.miniGame.canRespawn(this)
-    }
-
     return true
   }
 
@@ -6078,9 +5934,7 @@ Object.assign(Player.prototype, Movable.prototype, {
         speed += 5
       }
     } else if (!this.getArmorEquipment()) {
-      if (!this.game.isMiniGame()) {
-        speed += 2
-      }
+      speed += 2
     }
     
 
@@ -6192,11 +6046,6 @@ Object.assign(Player.prototype, Destroyable.prototype, {
       killingMob: ""
     }
 
-    if (this.sector.isMiniGame()) {
-      data['playerId'] = this.id
-      data['canRespawn'] = this.canRespawn()
-    }
-
     let lastHitBy = this.game.getEntity(this.attackerId)
     if (lastHitBy) {
       let killer = this.getKillerFromAttacker(lastHitBy)
@@ -6212,13 +6061,6 @@ Object.assign(Player.prototype, Destroyable.prototype, {
     }
 
     this.game.triggerEvent("PlayerDestroyed", data)
-
-    if (this.game.isMiniGame() && !this.canRespawn()) {
-      this.setHidden(true)
-      this.transformIntoGhost()
-      this.followGhost()
-      this.game.onAlivePlayerCountChanged()
-    }
   },
   onPostSetHealth(delta) {
     if (delta < 0) {
@@ -6302,7 +6144,6 @@ Object.assign(Player.prototype, Needs.prototype, {
     this.game.triggerEvent("HungerChanged", data)
   },
   getMaxStamina() {
-    if (this.game.isPvP()) return 300
     return Constants.Player.stamina
   },
   getMaxOxygen() {

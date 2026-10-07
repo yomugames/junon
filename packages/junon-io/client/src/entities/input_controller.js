@@ -207,7 +207,7 @@ class InputController {
       this.game.chatMenu.chatInput.blur()
       if (this.game.sector.shouldShowChat()) {
         this.game.chatMenu.close()
-      } else if (!this.game.voteMenu.isOpen()) {
+      } else {
         this.game.chatMenu.hide()
       }
       return

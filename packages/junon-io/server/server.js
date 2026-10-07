@@ -281,7 +281,7 @@ class Server {
     let result = await this.createGame({
       creatorIp: "127.0.0.1",
       creatorUid: sectorModel.creatorUid,
-      sectorData: { id: worldId, name: sectorModel.name, sectorModel: sectorModel, origSectorUid: sectorModel.dataValues.uid },
+      sectorData: { id: worldId, name: sectorModel.name, sectorModel: sectorModel },
       gameMode: sectorModel.gameMode
     })
 
@@ -623,37 +623,6 @@ class Server {
     return { createdGame: game }
   }
 
-  async createMiniGame(sectorId, options) {
-    let key = Math.random().toString(36).substring(6)
-
-    if (options.targetMiniGameId) {
-      options.sectorData.id = options.targetMiniGameId
-    } else {
-      options.sectorData.id = `mini-${sectorId}-${key}`
-    }
-
-    let game = new Game(this, options.sectorData)
-    if (options.creatorUid) {
-      game.setCreatorUid(options.creatorUid)
-    }
-
-    LOG.info("Creating Mini game for " + sectorId)
-    await game.init(options)
-
-
-    if (!game.sector) {
-      return { error: "Error in game create" }
-    }
-
-    if (options.isPrivate) {
-      game.sector.setIsPrivate(true)
-    }
-
-    this.addGame(game)
-
-    return { createdGame: game }
-  }
-
   async getUidFromRequest(idToken, uid) {
     if (debugMode || !idToken) return uid
     return await FirebaseAdminHelper.verifyIdToken(idToken)
@@ -711,8 +680,6 @@ class Server {
     try {
       if (options.isTutorial) {
         return this.createTutorialGame(sectorId, options)
-      } else if (options.isMiniGame) {
-        return this.createMiniGame(sectorId, options)
       } else {
         return this.createNormalGame(sectorId, options)
       }
@@ -969,13 +936,6 @@ class Server {
     }
   }
 
-  onCanPlayerJoinResponse(data) {
-    let game = this.games[data.gameId]
-    if (!game) return
-
-    game.onCanPlayerJoinResponse(data.requestId, data.canJoin)
-  }
-
   restartOnZeroGames() {
     if (!this.shouldRestart) return
     if (this.getGameCount() > 0) return
@@ -1107,16 +1067,14 @@ class Server {
       if (sectorModel) {
         result = await this.createGame({
           isBootSector: data.isBootSector,
-          isMiniGame: data.isMiniGame,
           sessionId: data.sessionId,
           creatorIp: data.creatorIp,
           creatorUid: sectorModel.creatorUid,
-          sectorData: { id: sectorId, name: sectorModel.name, sectorModel: sectorModel, origSectorUid: sectorModel.dataValues.uid },
+          sectorData: { id: sectorId, name: sectorModel.name, sectorModel: sectorModel },
           gameMode: data.gameMode || sectorModel.gameMode,
           rowCount: parseInt(data.rowCount),
           colCount: parseInt(data.colCount),
           isPrivate: data.isPrivate,
-          targetMiniGameId: data.targetMiniGameId,
           language: data.language
         })
       } else {
@@ -1132,7 +1090,6 @@ class Server {
       socketId: data.socketId,
       host: this.getHost(),
       isBootSector: data.isBootSector,
-      isMiniGame: data.isMiniGame,
       gameMode: data.gameMode,
       success: success,
       error: error,
@@ -1172,9 +1129,6 @@ class Server {
           break
         case "Restart":
           this.restartServer(data)
-          break
-        case "CanPlayerJoinResponse":
-          this.onCanPlayerJoinResponse(data)
           break
         case "BanWorldAndOwner":
           this.onBanWorldAndOwner(data)

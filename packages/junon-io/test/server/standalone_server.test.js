@@ -11,6 +11,7 @@ const path = require('path')
 const zlib = require('zlib')
 const protobuf = require('protobufjs')
 const sqlite3 = require('sqlite3')
+const WorldSerializer = require('junon-common/world_serializer')
 
 const SERVER_PATH = path.resolve(__dirname, '../../server/server.js')
 const SAVE_HEADER_PROTO = path.join(path.dirname(require.resolve('junon-common/world_serializer')), 'protocol/save_formats/save_header.proto')
@@ -47,6 +48,7 @@ function startServer(extraEnv) {
   child.stderr.on('data', (chunk) => { child.output += chunk })
   child.exited = new Promise((resolve) => child.on('exit', (code) => resolve(code)))
   child.port = parseInt(env.PORT)
+  child.clientPort = parseInt(env.JUNON_CLIENT_PORT)
 
   return child
 }
@@ -124,4 +126,58 @@ test('refuses to start without a world owner', async () => {
   const server = startServer({ JUNON_OWNER_UID: '' })
   expect(await server.exited).toBe(1)
   expect(server.output).toContain('JUNON_OWNER_UID is not defined')
+})
+
+test('local menu creates and reloads a world through loopback routes', async () => {
+  const server = startServer({ JUNON_WORLD_ID: '', JUNON_OWNER_UID: '' })
+  try {
+    await waitForOutput(server, 'Webpage available')
+    const base = `http://127.0.0.1:${server.clientPort}/local/`
+    const ownerUid = '0123456789abcdef0123456789abcdef'
+    const post = (route, body) => fetch(base + route, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    })
+
+    let response = await fetch(base + 'worlds')
+    expect((await response.json()).worlds).toEqual([])
+
+    response = await post('worlds', { ownerUid, name: 'Menu World', gameMode: 'survival' })
+    expect(response.status).toBe(200)
+    const { worldId, serverUrl } = await response.json()
+    expect(worldId).toMatch(/^[a-f0-9]{24}$/)
+    expect(serverUrl).toBe(`ws://127.0.0.1:${server.port}`)
+
+    response = await fetch(base + 'worlds')
+    let listed = await response.json()
+    expect(listed.activeWorldId).toBe(worldId)
+    expect(listed.worlds[0].name).toBe('Menu World')
+
+    response = await post('worlds/open', { worldId, ownerUid: 'ffffffffffffffffffffffffffffffff' })
+    expect(response.status).toBe(400)
+
+    response = await post('worlds/open', { worldId, ownerUid })
+    expect(response.status).toBe(200)
+
+    global.env = 'standalone'
+    global.debugMode = false
+    await WorldSerializer.initSerializer()
+    const SaveState = WorldSerializer.getProtocolForVersion(39).SaveState
+    const save = { metadata: { version: 39, uid: 'hosted', name: 'Imported World', gameMode: 'survival', rowCount: 128, colCount: 128 }, entities: { teams: {}, playerDataMap: { hostedUid: { uid: 'hostedUid', name: 'Alice', data: { uid: 'hostedUid', name: 'Alice' } } }, players: {} } }
+    const bytes = zlib.gzipSync(SaveState.encode(SaveState.fromObject(save)).finish())
+    response = await fetch(base + 'import/characters', { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: bytes })
+    expect(response.status).toBe(200)
+    const characters = (await response.json()).characters
+    expect(characters.map((entry) => entry.name)).toEqual(['Alice'])
+    response = await fetch(base + 'import', { method: 'POST', headers: { 'Content-Type': 'application/octet-stream', 'X-Junon-Owner': ownerUid, 'X-Junon-Name': 'Player', 'X-Junon-Character': characters[0].uid }, body: bytes })
+    expect(response.status).toBe(200)
+    const imported = await response.json()
+    expect(imported.name).toBe('Imported World')
+    expect(fs.existsSync(path.join(savesDir, imported.worldId, 'sector.sav'))).toBe(true)
+
+    response = await fetch(base + 'worlds', { headers: { Origin: 'https://example.com' } })
+    expect(response.status).toBe(403)
+  } finally {
+    server.kill('SIGTERM')
+    await server.exited
+  }
 })

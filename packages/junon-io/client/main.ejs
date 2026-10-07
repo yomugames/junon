@@ -95,6 +95,21 @@
 
     <p id='game_caption'>JUNON . IO </p>    
     <div class='middle_container'>
+        <% if (nodeEnv === 'standalone') { %>
+        <section id='local_world_menu' aria-label='Local worlds'>
+            <h1>Junon</h1>
+            <label>Your name <input class='local_player_name black_input' maxlength='16' autocomplete='nickname'></label>
+            <nav class='local_menu_actions'>
+                <button class='local_new_btn ui_btn'>New world</button>
+                <button class='local_load_btn ui_btn'>Load world</button>
+                <button class='local_import_btn ui_btn'>Import save</button>
+                <button class='local_host_btn ui_btn'>Host co-op</button>
+                <button class='local_join_btn ui_btn'>Join co-op</button>
+            </nav>
+            <div class='local_menu_panel'></div>
+            <p class='local_menu_message' role='status'></p>
+        </section>
+        <% } %>
         <div class='home_user_action_container'>
             <div class='home_action_row'>
                 <div class='default_play_btn btn'>

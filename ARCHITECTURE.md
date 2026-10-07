@@ -31,6 +31,11 @@ process, stores saves as files with a SQLite database in place of MySQL, and
 needs no matchmaker, Firebase or S3
 ([how to run it](docs/development.md#standalone-offline-mode)). Gameplay code is
 shared with hosted servers. Only infrastructure branches check for standalone.
+The standalone page server also exposes loopback-only `/local/*` routes to
+list, create, open and import worlds. The browser's local menu calls these
+routes and then joins the selected world over the ordinary game WebSocket.
+The menu can join a remote co-op host; opening a local world to the LAN remains
+in Phase 6 of the [execution plan](docs/exec-plans/active/electron-offline-coop.md).
 
 ## Packages and responsibilities
 

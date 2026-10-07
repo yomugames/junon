@@ -17,6 +17,7 @@ const Cookies = require("js-cookie")
 const { v4: uuidv4 } = require('uuid')
 const FirebaseClientHelper = require('./util/firebase_client_helper')
 const LocalProfile = require('./util/local_profile')
+const LocalWorldMenu = require('./components/local_world_menu')
 const Polyglot = require('node-polyglot')
 const japaneseTranslationMap = require("../../common/translations/ja")
 const englishTranslationMap = require("../../common/translations/en")
@@ -290,10 +291,6 @@ class Main {
     })
   }
 
-  // A standalone server has no matchmaker, so the client skips the lobby and
-  // joins the world server directly (?server=ws://host:port selects it, and
-  // ?name= sets the player name). Temporary until the local Host/Join menus
-  // replace it - see docs/exec-plans/active/electron-offline-coop.md.
   runStandalone() {
     this.localProfile = LocalProfile.load()
 
@@ -311,7 +308,8 @@ class Main {
     this.initListeners()
     this.initGame()
     this.initSettingsMenu()
-    this.initBanManagerMenu()
+    this.localWorldMenu = new LocalWorldMenu(this)
+    this.localWorldMenu.show()
   }
 
   initProjectilePools() {
@@ -327,7 +325,7 @@ class Main {
   }
 
   joinStandaloneWorld() {
-    let url = this.getUrlParam().get("server") || "ws://127.0.0.1:8000"
+    let url = this.standaloneServerUrl || this.getUrlParam().get("server") || "ws://127.0.0.1:8000"
 
     document.querySelector("#connecting_message").style.display = 'none'
     this.requestGame(url)
@@ -554,7 +552,8 @@ class Main {
 
     if (this.isStandalone()) {
       this.initProjectilePools()
-      this.joinStandaloneWorld()
+      document.querySelector("#connecting_message").style.display = 'none'
+      if (this.getUrlParam().get("server")) this.joinStandaloneWorld()
       return
     }
 
@@ -683,6 +682,7 @@ class Main {
       error: (wasNeverConnected) => {
         if (wasNeverConnected) {
           this.onPlayerCantJoin({ message: "Cant connect to server " + url })
+          if (this.isStandalone() && this.localWorldMenu) this.localWorldMenu.show()
         } else {
           this.enableJoin()
         }
@@ -1478,6 +1478,12 @@ class Main {
   }
 
   showHomeMenu() {
+    if (this.isStandalone()) {
+      this.hideMainMenu()
+      document.querySelector(".middle_container").style.display = 'block'
+      this.localWorldMenu.show()
+      return
+    }
     this.clearHomeErrorMessage()
 
     document.body.style.overflowY = 'scroll'

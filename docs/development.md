@@ -307,27 +307,31 @@ build speed and admin mode differ.
 | Variable | Meaning |
 | --- | --- |
 | `JUNON_SAVES_DIR` | Required. Worlds are stored as `<dir>/<worldId>/sector.sav`, the same bytes as the hosted S3 objects. |
-| `JUNON_WORLD_ID` | Required. The world to load, or to generate if it has no save yet. `[A-Za-z0-9_-]` only. |
-| `JUNON_OWNER_UID` | Required. Local profile id of the world's owner. |
+| `JUNON_WORLD_ID` | Optional. The world to load at startup, or to generate if it has no save yet. `[A-Za-z0-9_-]` only. Without it, the local menu selects the first world. |
+| `JUNON_OWNER_UID` | Required when `JUNON_WORLD_ID` is set. Local profile id of the world's owner. |
 | `JUNON_WORLD_NAME`, `JUNON_GAME_MODE` | New worlds only; an existing save supplies its own name and mode. Mode defaults to `survival`. |
 | `PORT` | Game socket port (default 8000). |
 | `JUNON_HOST` | Address the game socket binds to. Defaults to `127.0.0.1`, so nothing on the network can connect. |
 | `JUNON_CLIENT_PORT` | Port of the page server for the browser client (default 8001, always on `127.0.0.1`). |
 
 ```sh
-# terminal 1: build and watch the browser client
-npm run client
+# terminal 1: build and watch the standalone browser client
+NODE_ENV=standalone npm run client
 
-# terminal 2: serve one world
-NODE_ENV=standalone JUNON_SAVES_DIR=/tmp/junon-saves JUNON_WORLD_ID=myWorld \
-  JUNON_OWNER_UID=<your profile id> node packages/junon-io/server/server.js
+# terminal 2: open the local world menu
+NODE_ENV=standalone JUNON_SAVES_DIR=/tmp/junon-saves \
+  node packages/junon-io/server/server.js
 ```
 
-Then open `http://localhost:8001/?server=ws://127.0.0.1:8000&name=YourName`.
-In standalone mode the client skips the lobby and joins that server directly.
+Then open `http://localhost:8001/`. The menu creates, lists, loads, and imports
+worlds, and joins a co-op host by address and port. It talks to loopback-only
+`/local/*` routes on the page server; that server owns the SQLite registry and
+save directory. The optional `?server=ws://127.0.0.1:8000&name=YourName`
+direct-connect entry remains for tests and development.
 Its identity is the local profile in `localStorage` (`junon_local_profile`),
-whose `uid` is what `JUNON_OWNER_UID` must match for you to own the world. This
-direct-connect entry is temporary until the local Host/Join menus exist.
+whose `uid` is what `JUNON_OWNER_UID` must match when preloading a world.
+Hosting a world to the LAN is part of Phase 6; the Phase 4 Host screen explains
+that boundary.
 
 To play a world exported from the hosted game, import it. Import replaces
 the hosted account ids, makes your profile the owner of the world and of its

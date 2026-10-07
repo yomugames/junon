@@ -39,6 +39,7 @@ const Favorite = require("junon-common/db/favorite")
 const sequelize = require("junon-common/db/sequelize")
 const syncStandaloneSchema = require("junon-common/db/standalone_schema")
 const StandaloneWorlds = require("junon-common/standalone_worlds")
+const SaveImporter = require("junon-common/save_importer")
 const Item = require("./entities/item")
 const base64id = require('base64id')
 
@@ -154,6 +155,10 @@ class Server {
 
   async run() {
     if (isStandalone) {
+      if (process.env.JUNON_WORLD_ID && !process.env.JUNON_OWNER_UID) {
+        LOG.error("JUNON_OWNER_UID is not defined")
+        process.exit(1)
+      }
       // the sqlite file lives in the saves directory (junon-common/db/config.js)
       fs.mkdirSync(WorldSerializer.getSavesDirectory(), { recursive: true })
       await syncStandaloneSchema(sequelize)
@@ -240,7 +245,7 @@ class Server {
 
     if (isStandalone) {
       this.initStandaloneProcessHandlers()
-      await this.loadStandaloneWorld()
+      if (process.env.JUNON_WORLD_ID) await this.loadStandaloneWorld()
     }
 
   }
@@ -251,19 +256,17 @@ class Server {
   // mode and owner. A world without a row - new, or a save copied in from the
   // hosted game - is registered from its save header, owned by the launching
   // profile.
-  async loadStandaloneWorld() {
-    let worldId = process.env.JUNON_WORLD_ID
+  async loadStandaloneWorld(options = {}) {
+    let worldId = options.worldId || process.env.JUNON_WORLD_ID
     if (!worldId) {
-      LOG.error("JUNON_WORLD_ID is not defined. Unable to run standalone server.")
-      process.exit(1)
+      throw new Error("JUNON_WORLD_ID is not defined")
     }
 
     // Required: Team#isSectorOwner compares teams against the world owner, and
     // an unset owner would match every team saved without a creator
-    let ownerUid = process.env.JUNON_OWNER_UID
+    let ownerUid = options.ownerUid || process.env.JUNON_OWNER_UID
     if (!ownerUid) {
-      LOG.error("JUNON_OWNER_UID is not defined. Unable to run standalone server.")
-      process.exit(1)
+      throw new Error("JUNON_OWNER_UID is not defined")
     }
 
     // worlds imported with server/util/tasks/import_save.js are registered
@@ -271,8 +274,8 @@ class Server {
     let metadata = await WorldSerializer.getSaveMetadata(worldId)
     await StandaloneWorlds.register({
       uid: worldId,
-      name: metadata ? metadata.name : process.env.JUNON_WORLD_NAME,
-      gameMode: (metadata && metadata.gameMode) || process.env.JUNON_GAME_MODE,
+      name: metadata ? metadata.name : (options.name || process.env.JUNON_WORLD_NAME),
+      gameMode: (metadata && metadata.gameMode) || options.gameMode || process.env.JUNON_GAME_MODE,
       ownerUid: ownerUid
     })
 
@@ -286,11 +289,17 @@ class Server {
     })
 
     if (!result.createdGame) {
-      LOG.error("Unable to load world " + worldId + ": " + result.error)
-      process.exit(1)
+      throw new Error("Unable to load world " + worldId + ": " + result.error)
     }
 
     console.log("Standalone world ready: " + worldId)
+  }
+
+  async activateStandaloneWorld(options) {
+    let current = this.getMainGame()
+    if (current && current.getId() === options.worldId) return
+    if (current) await current.prepareRemove()
+    await this.loadStandaloneWorld(options)
   }
 
   initStandaloneProcessHandlers() {
@@ -762,12 +771,60 @@ class Server {
   // only for debug mode. production uses s3->cloudlare for client side content
   initDevelopmentAppServer() {
     const app = express()
-    app.use(cors())
+    if (!isStandalone) app.use(cors())
     app.use(bodyParser.json())
     app.use(express.static(appRoot + "/client/dist"))
     app.use(express.static(appRoot + "/client/"))
     app.set('views', appRoot + '/client')
     app.set('view engine', 'ejs')
+
+    if (isStandalone) {
+      // Browser management is bound to loopback. Reject cross-origin form
+      // submissions as well as CORS requests before they can mutate saves.
+      app.use('/local', (req, res, next) => {
+        let origin = req.get('origin')
+        if (!/^((localhost|127\.0\.0\.1):[0-9]+)$/.test(req.get('host') || '')) return res.sendStatus(403)
+        if (origin && origin !== `${req.protocol}://${req.get('host')}`) return res.sendStatus(403)
+        next()
+      })
+      const validOwner = (uid) => typeof uid === 'string' && /^[a-f0-9]{32}$/i.test(uid)
+      const validWorld = (uid) => typeof uid === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(uid)
+      const route = (handler) => async (req, res) => {
+        try { res.json(await handler(req)) } catch (e) { res.status(400).json({ error: e.message }) }
+      }
+      app.get('/local/worlds', route(async () => {
+        let rows = await SectorModel.findAll({ order: [['updatedAt', 'DESC']] })
+        return { worlds: rows.map((row) => ({ id: row.uid, name: row.name, mode: row.gameMode, days: row.daysAlive })), activeWorldId: this.getMainGame() && this.getMainGame().getId(), serverUrl: `ws://127.0.0.1:${this.APP_SERVER_PORT}` }
+      }))
+      app.post('/local/worlds', route(async (req) => {
+        let { ownerUid, name, gameMode } = req.body
+        if (!validOwner(ownerUid) || typeof name !== 'string' || !/^[\p{L}\p{N} _-]{1,40}$/u.test(name.trim()) || !['peaceful', 'survival', 'hardcore'].includes(gameMode)) throw new Error('Invalid world details')
+        let worldId = require('crypto').randomBytes(12).toString('hex')
+        await this.activateStandaloneWorld({ worldId, ownerUid, name: name.trim(), gameMode })
+        return { worldId, serverUrl: `ws://127.0.0.1:${this.APP_SERVER_PORT}` }
+      }))
+      app.post('/local/worlds/open', route(async (req) => {
+        let { worldId, ownerUid } = req.body
+        if (!validWorld(worldId) || !validOwner(ownerUid)) throw new Error('Invalid world or profile')
+        let row = await SectorModel.findOne({ where: { uid: worldId } })
+        if (!row) throw new Error('World not found')
+        if (row.creatorUid !== ownerUid) throw new Error('World belongs to another profile')
+        await this.activateStandaloneWorld({ worldId, ownerUid })
+        return { worldId, serverUrl: `ws://127.0.0.1:${this.APP_SERVER_PORT}` }
+      }))
+      app.post('/local/import/characters', express.raw({ type: 'application/octet-stream', limit: '100mb' }), route(async (req) => ({ characters: SaveImporter.listCharacters(req.body) })))
+      app.post('/local/import', express.raw({ type: 'application/octet-stream', limit: '100mb' }), route(async (req) => {
+        let ownerUid = req.get('x-junon-owner')
+        let ownerName = req.get('x-junon-name')
+        let characterUid = req.get('x-junon-character') || null
+        if (!validOwner(ownerUid) || !/^[a-zA-Z0-9_]{1,16}$/.test(ownerName || '')) throw new Error('Invalid profile')
+        let result = SaveImporter.importSave(req.body, { ownerUid, ownerName, characterUid })
+        let savePath = WorldSerializer.getSectorSavePath(result.worldId)
+        await WorldSerializer.writeToSavesDirectory(savePath, result.compressed)
+        await StandaloneWorlds.register({ uid: result.worldId, name: result.name, gameMode: result.gameMode, ownerUid })
+        return { worldId: result.worldId, name: result.name }
+      }))
+    }
 
     let gameVersion        = fs.readFileSync(appRoot + "/VERSION.txt", 'utf8').replace("\n","")
     let changeLogs         = this.fetchChangeLogs().reverse()

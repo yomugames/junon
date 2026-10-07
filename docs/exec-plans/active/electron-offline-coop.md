@@ -76,7 +76,10 @@ Acceptance criteria:
   Imposter, Domination, Bed Wars, Tower Defense) are removed from the game
   server and client. The matchmaker's minigame code goes with the matchmaker
   in Phase 8.
-- [ ] Phase 4: Local menus replace the matchmaker UI.
+- [x] 2026-10-07: Phase 4: standalone local menus create, list, load and
+  import worlds (with character choice), and join by address. Hosted account,
+  friends, favorites and event badge screens are hidden in standalone. The
+  Host panel describes the LAN hosting work scheduled for Phase 6.
 - [ ] Phase 5: Electron shell runs client and server process.
 - [ ] Phase 6: Co-op hosting and joining.
 - [ ] Phase 7: Singleplayer behavior (pause, autosave, save on quit).
@@ -242,6 +245,15 @@ Replace `game_explorer.js` with New world / Load world / Import / Host / Join
 (address:port) menus. Remove the account, friends, favorites, voting, event
 badge, and ban-appeal UI.
 
+Implemented as `client/src/components/local_world_menu.js` for standalone.
+`game_explorer.js` and its markup stay for hosted development and the existing
+Playwright suite until Phase 8 removes the matchmaker. Standalone CSS hides
+their screens. Loopback `/local/*` routes on the standalone page server own
+world mutation; they reject non-loopback Host and cross-origin requests. A
+server may boot without a selected world, and the menu then creates or loads
+one. Joining by address uses the normal game socket. The Host panel is an
+entry point only until Phase 6 adds socket rebinding and guest handling.
+
 ### Phase 5: Electron shell
 
 1. New workspace package `packages/junon-desktop`. The main process serves the
@@ -300,6 +312,12 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   character and switched back, with no page or server errors, no duplicated
   or lost characters (61/61 after a save), and the main team still the
   owner's.
+- Phase 4: `test/server/standalone_server.test.js` boots without a selected
+  world, creates and lists one through `/local/*`, checks owner/origin rejection,
+  and previews/imports a synthetic save. `test/server/save_importer.test.js`
+  covers the identity rewrite. A headless Chromium smoke check created and
+  joined a world from the standalone menu with a nondefault socket port.
+  `NODE_ENV=standalone npm run client:build` passed.
 - Phase 6: two clients (two Electron instances or Electron + browser) on one
   machine and across a LAN can join, play, disconnect, and resume.
 - Playwright e2e suite green against the standalone server.

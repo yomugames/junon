@@ -1034,7 +1034,10 @@ initSettings(entities) {
     this.sectorBans = []
     if (this.isMiniGame() || this.isTutorial()) {
     } else {
+      // standalone worlds have no sector row (and no database bans)
       let sectorModel = this.game.sectorModel
+      if (!sectorModel) return
+
       const sectorBans = await SectorBan.findAll({ where: { sectorUid: this.getUid() } })
       sectorModel.sectorBans = sectorBans
 
@@ -3336,6 +3339,8 @@ initSettings(entities) {
     let sectorModel = await SectorModel.findOne({
       where: { uid: this.getUid() }
     })
+    if (!sectorModel) return
+
     sectorModel.screenshot = null
     await sectorModel.save()
 

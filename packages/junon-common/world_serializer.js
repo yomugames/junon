@@ -13,7 +13,7 @@ const bucketName = process.env.S3_BUCKET_NAME || "junon"
 class WorldSerializer {
 
   static async initSerializer() {
-    if (!debugMode) {
+    if (!debugMode && !this.isStandalone()) {
       const spacesEndpoint = new AWS.Endpoint('nyc3.digitaloceanspaces.com')
       this.s3 = new AWS.S3({
         endpoint: spacesEndpoint
@@ -51,6 +51,75 @@ class WorldSerializer {
     })
   }
 
+  // Standalone (offline desktop / listen-server) mode keeps each world as a
+  // plain file at <JUNON_SAVES_DIR>/<sectorUid>/sector.sav - the same bytes
+  // and relative layout as the hosted game's S3 objects, so an exported
+  // hosted save can be dropped in as-is.
+  static isStandalone() {
+    return env === 'standalone'
+  }
+
+  static getSavesDirectory() {
+    let directory = process.env.JUNON_SAVES_DIR
+    if (!directory) {
+      throw new Error("JUNON_SAVES_DIR must be set in standalone mode")
+    }
+
+    return path.resolve(directory)
+  }
+
+  static getStandaloneSavePath(sectorUid) {
+    // the uid becomes a directory name, so only allow the base64id alphabet
+    // (no separators or dots) to keep every path inside the saves directory
+    if (typeof sectorUid !== 'string' || !sectorUid.match(/^[A-Za-z0-9_-]+$/)) {
+      throw new Error("Invalid sector uid: " + sectorUid)
+    }
+
+    return path.join(this.getSavesDirectory(), sectorUid, "sector.sav")
+  }
+
+  static async existsInSavesDirectory(filePath) {
+    try {
+      await fs.promises.access(filePath)
+      return true
+    } catch(e) {
+      return false
+    }
+  }
+
+  static async readFromSavesDirectory(filePath) {
+    try {
+      return await fs.promises.readFile(filePath)
+    } catch(e) {
+      ExceptionReporter.captureException(e)
+      return false
+    }
+  }
+
+  static async writeToSavesDirectory(filePath, data) {
+    // write to a temp file and rename over the old save, so a crash or power
+    // loss mid-write leaves the previous save intact instead of a truncated one
+    let tempPath = filePath + ".tmp"
+
+    try {
+      await fs.promises.mkdir(path.dirname(filePath), { recursive: true })
+      await fs.promises.writeFile(tempPath, data)
+      await fs.promises.rename(tempPath, filePath)
+    } catch(e) {
+      ExceptionReporter.captureException(e)
+    }
+  }
+
+  static async deleteFromSavesDirectory(filePath) {
+    try {
+      await fs.promises.unlink(filePath)
+    } catch(e) {
+      if (e.code !== 'ENOENT') {
+        ExceptionReporter.captureException(e)
+      }
+    }
+  }
+
   static async existsLocally(sectorUid) {
     const sector = await SectorModel.findOne({ where: { uid: sectorUid } })
     if (!sector) return false
@@ -78,7 +147,9 @@ class WorldSerializer {
   static async hasCloudSavedData(sectorUid, cb) {
     let key = this.getSectorSavePath(sectorUid)
 
-    if (debugMode) {
+    if (this.isStandalone()) {
+      return this.existsInSavesDirectory(key)
+    } else if (debugMode) {
       return this.existsLocally(sectorUid)
     } else {
       return this.existsRemotely(key)
@@ -136,6 +207,10 @@ class WorldSerializer {
   }
 
   static getSectorSavePath(sectorUid) {
+    if (this.isStandalone()) {
+      return this.getStandaloneSavePath(sectorUid)
+    }
+
     let namespace = env
 
     return ["sectors", namespace, sectorUid, "sector.sav"].join("/")
@@ -200,6 +275,21 @@ class WorldSerializer {
     }
   }
 
+  // header-only parse: version, name, size and gameMode without decoding
+  // every entity in the save
+  static async getSaveMetadata(sectorUid) {
+    try {
+      let compressed = await this.readFile(sectorUid)
+      if (!compressed) return null
+      let buffer = await this.decompressGzip(compressed)
+      if (!buffer) return null
+      return this.parseSaveHeader(buffer).metadata
+    } catch(e) {
+      ExceptionReporter.captureException(e)
+      return null
+    }
+  }
+
   static async readLocally(sectorUid) {
     const sector = await SectorModel.findOne({ where: { uid: sectorUid } })
     return sector.data
@@ -226,7 +316,9 @@ class WorldSerializer {
   static async readFile(sectorUid) {
     let key = this.getSectorSavePath(sectorUid)
 
-    if (debugMode) {
+    if (this.isStandalone()) {
+      return this.readFromSavesDirectory(key)
+    } else if (debugMode) {
       return this.readLocally(sectorUid)
     } else {
       return this.readRemotely(key)
@@ -260,7 +352,9 @@ class WorldSerializer {
   static async deleteSector(sectorUid) {
     let key = this.getSectorSavePath(sectorUid)
 
-    if (debugMode) {
+    if (this.isStandalone()) {
+      await this.deleteFromSavesDirectory(key)
+    } else if (debugMode) {
       await this.deleteLocally(sectorUid)
     } else {
       this.deleteRemotely(key)
@@ -295,7 +389,10 @@ class WorldSerializer {
   static async upload(sectorUid, data, cb) {
     let key = this.getSectorSavePath(sectorUid)
 
-    if (debugMode) {
+    if (this.isStandalone()) {
+      await this.writeToSavesDirectory(key, data)
+      cb()
+    } else if (debugMode) {
       await this.writeLocally(sectorUid, data)
       cb()
     } else {

@@ -24,6 +24,13 @@ Authoritative game server <------> MySQL / Firebase / AWS
 In development, `start_server.js` constructs both the game server and matchmaker.
 The workspace scripts can also start them independently.
 
+The repository is migrating to an offline-first desktop game with co-op listen
+servers ([execution plan](docs/exec-plans/active/electron-offline-coop.md)).
+`NODE_ENV=standalone` is that runtime's game server. It hosts one world per
+process, stores saves as files, and needs no matchmaker, MySQL, Firebase or S3
+([how to run it](docs/development.md#standalone-offline-mode)). Gameplay code is
+shared with hosted servers. Only infrastructure branches check for standalone.
+
 ## Packages and responsibilities
 
 ### `packages/junon-io`

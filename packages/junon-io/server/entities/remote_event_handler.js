@@ -110,6 +110,14 @@ class RemoteEventHandler {
         if (game) {
           game.join(socket, data)
         }
+      } else if (env === 'standalone') {
+        // a standalone server hosts a single world, so joining needs no id
+        let game = this.server.getMainGame()
+        if (game) {
+          game.join(socket, data)
+        } else {
+          this.getSocketUtil().emit(socket, "CantJoin", { message: "World is still loading. Try again in a few seconds." })
+        }
       }
     } catch(e) {
       this.getSocketUtil().emit(socket, "CantJoin", { message: "Unable to join server" })
@@ -203,6 +211,9 @@ class RemoteEventHandler {
     socket.sessionId = data.sessionId
     socket.locale = data.locale || 'en'
     let game = this.server.getGame(data.sectorId)
+    if (!game && env === 'standalone') {
+      game = this.server.getMainGame()
+    }
     if (!game) {
       this.getSocketUtil().emit(socket, "CantJoin", { message: "Game not found" })
       return

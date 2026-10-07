@@ -3038,7 +3038,11 @@ console.log(options)
     const isTroubleshooter = url.match(new RegExp(".*?stress=(.*)"))
     if (isTroubleshooter) data["isTroubleshooter"] = true
 
-    if (this.main.user) {
+    if (this.main.isStandalone()) {
+      data["uid"] = this.main.localProfile.uid
+      data["username"] = this.main.localProfile.name
+      SocketUtil.emit("RequestGame", data)
+    } else if (this.main.user) {
       let idToken = await this.main.getFirebaseIdToken()
       if (idToken) {
         data["idToken"] = idToken
@@ -3073,7 +3077,9 @@ console.log(options)
       locale: window.language
     }
 
-    if (this.main.idToken) {
+    if (this.main.isStandalone()) {
+      data.uid = this.main.localProfile.uid
+    } else if (this.main.idToken) {
       data.idToken = this.main.idToken
       data.uid = this.main.uid
     }

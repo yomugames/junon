@@ -30,6 +30,13 @@
       "appId": "1:497331755585:web:241453fe17be5b31"
     }
   },
+  "standalone": {
+    "googleAnalyticsId": "",
+    "matchmakerUrl": "",
+    "matchmakerWebsocketUrl": "",
+    "matchmakerGameServerWebsocketUrl": "",
+    "firebase": {}
+  },
   "staging": {
     "googleAnalyticsId": "UA-53143804-3",
     "matchmakerUrl": "https://matchmaker-staging.junon.io:3000/",

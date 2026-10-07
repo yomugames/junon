@@ -18,6 +18,7 @@ const isMobile = require('ismobilejs')
 const Cookies = require("js-cookie")
 const { v4: uuidv4 } = require('uuid')
 const FirebaseClientHelper = require('./util/firebase_client_helper')
+const LocalProfile = require('./util/local_profile')
 const Polyglot = require('node-polyglot')
 const japaneseTranslationMap = require("../../common/translations/ja")
 const englishTranslationMap = require("../../common/translations/en")
@@ -280,6 +281,11 @@ class Main {
     console.log("initializing..")
     window.initializeTime = (new Date()).getTime()
 
+    if (env === "standalone") {
+      this.runStandalone()
+      return
+    }
+
     if (env === "production" || env === "staging") {
       this.initAnalytics()
       this.initErrorReporting()
@@ -322,6 +328,42 @@ class Main {
         })
       })
     })
+  }
+
+  // A standalone server has no matchmaker, so the client skips the lobby and
+  // joins the world server directly (?server=ws://host:port selects it, and
+  // ?name= sets the player name). Temporary until the local Host/Join menus
+  // replace it - see docs/exec-plans/active/electron-offline-coop.md.
+  runStandalone() {
+    this.localProfile = LocalProfile.load()
+
+    let name = this.getUrlParam().get("name")
+    if (name) {
+      this.localProfile.setName(name)
+    }
+
+    this.initPools()
+    this.initTranslation()
+    this.initGameUI()
+    this.initSessionId()
+    this.initGameExplorer()
+    this.mobileDetect()
+    this.initListeners()
+    this.initGame()
+    this.initMiniGameMenu()
+    this.initSettingsMenu()
+    this.initBanManagerMenu()
+  }
+
+  isStandalone() {
+    return env === "standalone"
+  }
+
+  joinStandaloneWorld() {
+    let url = this.getUrlParam().get("server") || "ws://127.0.0.1:8000"
+
+    document.querySelector("#connecting_message").style.display = 'none'
+    this.requestGame(url)
   }
 
   renderImposterMode() {
@@ -456,6 +498,10 @@ class Main {
   }
 
   isLoggedIn() {
+    // standalone players have no account, but their local profile is a
+    // persistent identity, which is what callers of this check care about
+    if (this.isStandalone()) return true
+
     let hasLocalStorage = this.checkLocalStorageSupport()
     if (!hasLocalStorage) {
       return false
@@ -566,6 +612,12 @@ class Main {
 
   onGameInitialized() {
     this.isGameInitialized = true
+
+    if (this.isStandalone()) {
+      this.joinStandaloneWorld()
+      return
+    }
+
     this.postInitSetup()
   }
 
@@ -1790,8 +1842,9 @@ class Main {
   }
 
   sendToMatchmaker(json) {
+    if (!this.isMatchmakerReady()) return
+
     let matchmakerSocket = this.getMatchmakerSocket()
-    if (matchmakerSocket.readyState !== WebSocket.OPEN) return
 
     matchmakerSocket.send(JSON.stringify(json))
   }

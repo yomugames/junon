@@ -63,9 +63,15 @@ global.appRoot = path.resolve(__dirname + '/../')
 
 debugMode = (env === 'development' || env === 'test') ? true : false
 
+// NODE_ENV=standalone is the offline desktop / listen-server runtime: one world
+// per process, saved under JUNON_SAVES_DIR, with no matchmaker, MySQL,
+// Firebase, S3 or Sentry. Gameplay runs with production settings (debugMode is
+// off), so only infrastructure branches check isStandalone.
+const isStandalone = env === 'standalone'
+
 // Firebase is an optional production integration. Local runs must not require
 // Application Default Credentials just because the machine has network access.
-if (debugMode && process.env.JUNON_USE_FIREBASE !== 'true') {
+if (isStandalone || (debugMode && process.env.JUNON_USE_FIREBASE !== 'true')) {
   global.isOffline = true
 }
 
@@ -74,10 +80,11 @@ if (debugMode && process.env.JUNON_USE_FIREBASE !== 'true') {
 // sockets. E2E tests want the opposite: test env's sqlite db / isOffline
 // Firebase / fast sector init, but a real matchmaker-routed game creation
 // flow. JUNON_E2E_MATCHMAKER opts back into matchmaker communication while
-// keeping every other test-env behavior unchanged.
-global.isMatchmakerDisabledForTest = env === 'test' && process.env.JUNON_E2E_MATCHMAKER !== 'true'
+// keeping every other test-env behavior unchanged. Standalone servers never
+// have a matchmaker.
+global.isMatchmakerDisabled = isStandalone || (env === 'test' && process.env.JUNON_E2E_MATCHMAKER !== 'true')
 
-if (debugMode) {
+if (debugMode || isStandalone) {
   let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
   let protocolDirectory = nodeModulesPath + "/junon-common/protocol"
   let protocolContents        = require('child_process').execSync(`cat '${protocolDirectory}/enum.proto' '${protocolDirectory}/base.proto' '${protocolDirectory}/app.proto'`).toString()
@@ -121,7 +128,7 @@ class Server {
   }
 
   determineDebugPort() {
-    if (debugMode) return
+    if (debugMode || isStandalone) return
 
     try {
       let result = require('child_process').execSync(`lsof -p ${process.pid} | grep LISTEN`).toString()
@@ -132,7 +139,7 @@ class Server {
   }
 
   async allocatePort() {
-    if (debugMode) {
+    if (debugMode || isStandalone) {
       // uws.App#listen() silently fails (falsy token, no error) when given a
       // string port instead of a number - process.env.PORT is always a
       // string, so this must be parsed rather than used as-is
@@ -144,7 +151,7 @@ class Server {
   }
 
   async run() {
-    if (env === 'test') {
+    if (env === 'test' || isStandalone) {
       // sqlite :memory: (see junon-common/db/config.js) starts with no schema
       // at all - real MySQL gets its schema from db/migrations, which never
       // runs against the in-memory db, so any real query would 404 on a
@@ -163,7 +170,7 @@ class Server {
       return
     }
 
-    if (env !== 'development') {
+    if (env !== 'development' && !isStandalone) {
       try {
         let dnsEntry = await dns.promises.lookup('google.com')
         if (!dnsEntry) {
@@ -189,7 +196,7 @@ class Server {
     this.assignServerIp()
     await this.allocatePort()
 
-    if (!debugMode) {
+    if (!debugMode && !isStandalone) {
       this.systemdIndex = this.getSystemdServiceIndex()
     }
 
@@ -215,14 +222,91 @@ class Server {
       FirebaseAdminHelper.registerServerToNode(this.getNodeName(), this.getFirebaseServerKey())
     }
     
-    if (!debugMode) {
+    if (!debugMode && !isStandalone) {
       await this.initLivenessProbeServer()
     }
 
-    if (debugMode) {
+    if (debugMode || isStandalone) {
       await this.initDevelopmentAppServer()
     }
 
+    if (isStandalone) {
+      this.initStandaloneProcessHandlers()
+      await this.loadStandaloneWorld()
+    }
+
+  }
+
+  // The launcher (desktop shell, or a developer running serveronly) picks the
+  // world. A world without a save file yet is generated fresh; otherwise its
+  // name and game mode come from the save, since there is no sector database
+  // row to supply them as on hosted servers.
+  async loadStandaloneWorld() {
+    let worldId = process.env.JUNON_WORLD_ID
+    if (!worldId) {
+      LOG.error("JUNON_WORLD_ID is not defined. Unable to run standalone server.")
+      process.exit(1)
+    }
+
+    // the local profile that owns the world. Required: Team#isSectorOwner
+    // compares against it, and an unset owner would match every team saved
+    // without a creator.
+    let ownerUid = process.env.JUNON_OWNER_UID
+    if (!ownerUid) {
+      LOG.error("JUNON_OWNER_UID is not defined. Unable to run standalone server.")
+      process.exit(1)
+    }
+
+    let metadata = await WorldSerializer.getSaveMetadata(worldId)
+    let name = metadata ? metadata.name : process.env.JUNON_WORLD_NAME
+    let gameMode = metadata ? metadata.gameMode : process.env.JUNON_GAME_MODE
+
+    let result = await this.createGame({
+      creatorIp: "127.0.0.1",
+      creatorUid: ownerUid,
+      sectorData: { id: worldId, name: name },
+      gameMode: gameMode || 'survival'
+    })
+
+    if (!result.createdGame) {
+      LOG.error("Unable to load world " + worldId + ": " + result.error)
+      process.exit(1)
+    }
+
+    console.log("Standalone world ready: " + worldId)
+  }
+
+  initStandaloneProcessHandlers() {
+    // hosted servers crash and get restarted by systemd; a player's own world
+    // would instead lose everything since the last autosave, so log a failed
+    // async handler and keep the world running
+    process.on('unhandledRejection', (reason) => {
+      ExceptionReporter.captureException(reason instanceof Error ? reason : new Error(String(reason)))
+    })
+
+    // save before exiting so closing the game (or Ctrl-C on serveronly)
+    // doesn't lose progress since the last autosave
+    let shutdown = async () => {
+      if (this.isStandaloneShutdownInProgress) return
+      this.isStandaloneShutdownInProgress = true
+
+      let exitCode = 0
+      let games = Object.values(this.games)
+      for (let i = 0; i < games.length; i++) {
+        try {
+          await games[i].prepareRemove()
+        } catch(e) {
+          // still exit - e.g. a world stopped mid-load has nothing to save
+          ExceptionReporter.captureException(e)
+          exitCode = 1
+        }
+      }
+
+      process.exit(exitCode)
+    }
+
+    process.on('SIGINT', shutdown)
+    process.on('SIGTERM', shutdown)
   }
 
   initObjectPools() {
@@ -356,6 +440,8 @@ class Server {
   assignServerIp() {
     if (env === 'development') {
       this.SERVER_IP = '127.0.0.1'
+    } else if (isStandalone) {
+      this.SERVER_IP = this.getStandaloneBindHost()
     } else {
       this.SERVER_IP = process.env.IP_ADDRESS
     }
@@ -375,6 +461,12 @@ class Server {
     let namespace = this.getNamespace()
 
     return [namespace,region,hexIp].join("-")
+  }
+
+  // standalone servers only accept connections from this machine unless the
+  // host explicitly opens the world to other players
+  getStandaloneBindHost() {
+    return process.env.JUNON_HOST || '127.0.0.1'
   }
 
   getNamespace() {
@@ -429,7 +521,7 @@ class Server {
   }
 
   sendServerInfoToMatchmaker() {
-    if (global.isMatchmakerDisabledForTest) return
+    if (global.isMatchmakerDisabled) return
 
     this.sendToMatchmaker({ event: "ServerUpdated", data: this.getServerData() })
   }
@@ -696,10 +788,13 @@ class Server {
     let gameVersion        = fs.readFileSync(appRoot + "/VERSION.txt", 'utf8').replace("\n","")
     let changeLogs         = this.fetchChangeLogs().reverse()
 
-    app.get('/debug/:message', (req, res) => {
-      let result = this.getMainGame().runCommand(req.params.message, req.query)
-      res.send({ result: result })
-    })
+    // runs arbitrary game commands unauthenticated - development only
+    if (debugMode) {
+      app.get('/debug/:message', (req, res) => {
+        let result = this.getMainGame().runCommand(req.params.message, req.query)
+        res.send({ result: result })
+      })
+    }
 
     app.get('/__status', (req, res) => {
       res.render('status', {
@@ -732,10 +827,13 @@ class Server {
 
 
     this.developmentServer = http.Server(app)
-    let devAppServerPort = 8001
+    let devAppServerPort = (isStandalone && parseInt(process.env.JUNON_CLIENT_PORT)) || 8001
+
+    // standalone serves the client to this machine only
+    let devAppServerHost = isStandalone ? '127.0.0.1' : undefined
 
     return new Promise((resolve, reject) => {
-      this.developmentServer.listen(devAppServerPort, () => {
+      this.developmentServer.listen(devAppServerPort, devAppServerHost, () => {
         console.log("\n\n")
         console.log("Junon.io Webpage available at http://localhost:" + devAppServerPort)
         resolve()
@@ -806,7 +904,7 @@ class Server {
   }
 
   initMatchmakerClient() {
-    if (global.isMatchmakerDisabledForTest) return
+    if (global.isMatchmakerDisabled) return
 
     let url = Config[env].matchmakerGameServerWebsocketUrl
 
@@ -1127,7 +1225,7 @@ class Server {
   }
 
   sendToMatchmaker(data) {
-    if (global.isMatchmakerDisabledForTest) return
+    if (global.isMatchmakerDisabled) return
 
     let socket = this.getMatchmakerSocket()
     if (socket.readyState !== WebSocket.OPEN) return
@@ -1144,7 +1242,7 @@ class Server {
     }
 
     let app
-    if (debugMode) {
+    if (debugMode || isStandalone) {
       app = uws.App()
     } else {
       app = uws.SSLApp({
@@ -1201,6 +1299,32 @@ class Server {
       res.end(JSON.stringify({ success: isSuccess }))
     })
 
+    if (!isStandalone) {
+      this.initOperatorEndpoints(app)
+    }
+
+    let onListen = (token) => {
+      if (token) {
+        console.log('Junon Gameserver listening to port ' + this.APP_SERVER_PORT)
+      } else {
+        console.log('Gameserver failed to listen to port ' + this.APP_SERVER_PORT)
+      }
+    }
+
+    if (isStandalone) {
+      app.listen(this.getStandaloneBindHost(), this.APP_SERVER_PORT, onListen)
+    } else {
+      app.listen(this.APP_SERVER_PORT, onListen)
+    }
+
+    this.gameLoopHelper = new GameLoop()
+    setInterval(this.mainLoop.bind(this), this.PHYSICS_TIMESTEP)
+    setInterval(this.scoreLoop.bind(this), this.LEADERBOARD_TIMESTEP)
+  }
+
+  // hosted-infrastructure endpoints (metrics scraping, matchmaker visibility
+  // toggle); never exposed by standalone servers
+  initOperatorEndpoints(app) {
     app.get('/metrics', (res, req) => {
       res.writeHeader('Access-Control-Allow-Origin','*')
       res.writeHeader('Content-Type', promClient.register.contentType)
@@ -1219,18 +1343,6 @@ class Server {
         res.end(result)
       })
     })
-
-    app.listen(this.APP_SERVER_PORT, (token) => {
-      if (token) {
-        console.log('Junon Gameserver listening to port ' + this.APP_SERVER_PORT)
-      } else {
-        console.log('Gameserver failed to listen to port ' + this.APP_SERVER_PORT)
-      }
-    })
-
-    this.gameLoopHelper = new GameLoop()
-    setInterval(this.mainLoop.bind(this), this.PHYSICS_TIMESTEP)
-    setInterval(this.scoreLoop.bind(this), this.LEADERBOARD_TIMESTEP)
   }
 
   readJson(res, cb, err) {
@@ -1308,8 +1420,9 @@ class Server {
         game.sendUpdates()
         let endProcessTime = (new Date()).getTime()
         
-        // remove worlds that are likely too resource-intensive
-        if(endProcessTime - startProcessTime >= limit){
+        // remove worlds that are likely too resource-intensive. A standalone
+        // server hosts only the player's own world, so it is never evicted.
+        if(!isStandalone && endProcessTime - startProcessTime >= limit){
           game.isGameReady = false
           game.forEachPlayer((player) => {
             if (player.socket) player.socket.close()

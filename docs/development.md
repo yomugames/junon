@@ -295,6 +295,51 @@ development HTTP port defaults to 8000 in code; the historical README mentions
 8001, so confirm the URL printed by the running processes rather than relying on
 the old value.
 
+## Standalone (offline) mode
+
+`NODE_ENV=standalone` runs one world per game-server process with no matchmaker,
+MySQL, Firebase, S3 or Sentry. It is the runtime for the offline desktop build
+and co-op listen servers (see
+[the execution plan](exec-plans/active/electron-offline-coop.md)). Gameplay uses
+production settings: `debugMode` is off, unlike `development`, where waves,
+build speed and admin mode differ.
+
+| Variable | Meaning |
+| --- | --- |
+| `JUNON_SAVES_DIR` | Required. Worlds are stored as `<dir>/<worldId>/sector.sav`, the same bytes as the hosted S3 objects. |
+| `JUNON_WORLD_ID` | Required. The world to load, or to generate if it has no save yet. `[A-Za-z0-9_-]` only. |
+| `JUNON_OWNER_UID` | Required. Local profile id of the world's owner. |
+| `JUNON_WORLD_NAME`, `JUNON_GAME_MODE` | New worlds only; an existing save supplies its own name and mode. Mode defaults to `survival`. |
+| `PORT` | Game socket port (default 8000). |
+| `JUNON_HOST` | Address the game socket binds to. Defaults to `127.0.0.1`, so nothing on the network can connect. |
+| `JUNON_CLIENT_PORT` | Port of the page server for the browser client (default 8001, always on `127.0.0.1`). |
+
+```sh
+# terminal 1: build and watch the browser client
+npm run client
+
+# terminal 2: serve one world
+NODE_ENV=standalone JUNON_SAVES_DIR=/tmp/junon-saves JUNON_WORLD_ID=myWorld \
+  JUNON_OWNER_UID=<your profile id> node packages/junon-io/server/server.js
+```
+
+Then open `http://localhost:8001/?server=ws://127.0.0.1:8000&name=YourName`.
+In standalone mode the client skips the lobby and joins that server directly.
+Its identity is the local profile in `localStorage` (`junon_local_profile`),
+whose `uid` is what `JUNON_OWNER_UID` must match for you to own the world. This
+direct-connect entry is temporary until the local Host/Join menus exist.
+
+To play a world exported from the hosted game, copy its `sector.sav` to
+`<JUNON_SAVES_DIR>/<worldId>/sector.sav`. Until import exists (Phase 2 of the
+plan), you join it as a new character.
+
+The server autosaves every three minutes and saves on `SIGINT`/`SIGTERM`. In
+this mode an unhandled promise rejection is logged instead of crashing the
+world. Standalone still uses an empty in-memory SQLite database as a stand-in
+for the remaining hosted-only model calls (`junon-common/db/config.js`), so
+features backed by MySQL rows do nothing in this mode. That includes the ATM
+account balance, badges, votes, favorites, sector bans and screenshots.
+
 ## Configuration and integrations
 
 Runtime behavior depends on `NODE_ENV` and, depending on the service, variables

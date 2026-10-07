@@ -145,6 +145,7 @@ server really applied the change instead of the client having predicted it.
 | Database model/migration | Migration on a disposable database and model path |
 | Matchmaker/API | Focused request/socket reproduction with isolated dependencies |
 | Startup/configuration | Start the affected service in the intended `NODE_ENV` |
+| Standalone (offline) mode | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real standalone server, generates a world, and checks it saves on shutdown and reloads |
 | Player-facing flow across client and server | The closest `test/e2e` spec, or a new one |
 
 ## Writing tests

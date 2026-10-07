@@ -44,7 +44,10 @@ class GameExplorer {
       colony_filter_tab.addEventListener("click", this.onColonyFilterTabClick.bind(this), true)
     }
 
-    this.listTopColonies() 
+    // the colony list comes from the matchmaker, which standalone mode lacks
+    if (!this.main.isStandalone()) {
+      this.listTopColonies()
+    }
   }
 
   setMiniGames(miniGames) {
@@ -1097,7 +1100,8 @@ class GameExplorer {
   sendToMatchmaker(json) {
     let data = JSON.stringify(json)
 
-    if (this.socket.readyState !== WebSocket.OPEN) return
+    // no socket until init() connects - and never in standalone mode
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return
       
     this.socket.send(data)
   }

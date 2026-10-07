@@ -5,6 +5,7 @@ const ExceptionReporter = require('junon-common/exception_reporter')
 const Helper = require('../../common/helper')
 const p2 = require('p2')
 const fs = require("fs")
+const path = require("path")
 const vec2 = p2.vec2
 const AABB = p2.AABB
 const rbush = require("rbush")
@@ -320,16 +321,27 @@ class Game {
   }
 
   async uploadImage(key, data, options = {}) {
-    if (debugMode) {
+    if (debugMode || env === 'standalone') {
       return this.uploadImageLocally(key, data)
     } else {
       return this.uploadImageRemotely(key, data)
     }
   }
 
+  getLocalImagePath(key) {
+    // standalone keeps screenshots with the saves; the app directory may be
+    // read-only once packaged
+    if (env === 'standalone') {
+      return path.join(WorldSerializer.getSavesDirectory(), "screenshots", path.basename(key))
+    }
+
+    return global.appRoot + "/client/assets/screenshots/" + key
+  }
+
   async uploadImageLocally(key, data) {
     try {
-      let filePath = global.appRoot + "/client/assets/screenshots/" + key
+      let filePath = this.getLocalImagePath(key)
+      fs.mkdirSync(path.dirname(filePath), { recursive: true })
       fs.writeFileSync(filePath, data)
       return true
     } catch(e) {
@@ -340,7 +352,7 @@ class Game {
 
   async deleteImageLocally(key) {
     try {
-      let filePath = global.appRoot + "/client/assets/screenshots/" + key
+      let filePath = this.getLocalImagePath(key)
       if (!fs.existsSync(filePath)) {
         return false
       }
@@ -375,7 +387,7 @@ class Game {
   }
 
   async deleteImage(key) {
-    if (debugMode) {
+    if (debugMode || env === 'standalone') {
       return this.deleteImageLocally(key)
     } else {
       return this.deleteImageRemotely(key)
@@ -981,7 +993,7 @@ class Game {
       return
     }
 
-    console.log("Save data found on s3 bucket: " + WorldSerializer.getSectorSavePath(uid))
+    console.log("Save data found: " + WorldSerializer.getSectorSavePath(uid))
     let sectorSaveData = await WorldSerializer.loadSector(uid)
     if (!sectorSaveData) {
       this.captureException(new Error("Error downloading save data."))
@@ -1402,6 +1414,9 @@ async setGameMode(gameMode) {
 
   canBeShutdown() {
     if (this.isPvP()) return false
+    // a standalone server exists to host this one world; it stays loaded with
+    // nobody connected and is saved and stopped when the process exits
+    if (env === 'standalone') return false
 
     return this.getPlayerCount() === 0
   }
@@ -1496,6 +1511,9 @@ async setGameMode(gameMode) {
   }
 
   isCreatedByAnonynmous() {
+    // anonymous hosted worlds are deleted on shutdown; every standalone world
+    // belongs to the local player (and local profile ids may look like uuids)
+    if (env === 'standalone') return false
     if (!this.creatorUid) return true
 
     let uuidv4Regex = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
@@ -1852,7 +1870,7 @@ async setGameMode(gameMode) {
   }
 
   sendSectorInfoToMatchmaker() {
-    if (global.isMatchmakerDisabledForTest) return
+    if (global.isMatchmakerDisabled) return
     if (this.isRemoved) return
 
     this.sendToMatchmaker({ event: "SectorUpdated", data: this.getSectorData() })
@@ -1986,6 +2004,23 @@ async setGameMode(gameMode) {
 
   isValidUsername(username) {
     return !username.match(/[^a-zA-Z0-9_]/)
+  }
+
+  // standalone identity: an opaque id the client generated once and kept in
+  // its local profile. It keys the player's saved character, so restrict it
+  // to a plain token.
+  getLocalProfileUid(data) {
+    let uid = data.uid
+    if (typeof uid !== 'string') return null
+    if (!uid.match(/^[A-Za-z0-9_-]{8,64}$/)) return null
+
+    return uid
+  }
+
+  // same rules as hosted account usernames
+  isValidLocalUsername(username) {
+    if (typeof username !== 'string') return false
+    return !!username.match(/^[a-zA-Z0-9_]{1,16}$/)
   }
 
   hasPlayerAlreadyJoined(options = {}) {
@@ -2207,7 +2242,30 @@ async setGameMode(gameMode) {
 
     let uid
 
-    if (data.idToken) {
+    if (env === 'standalone') {
+      // there are no accounts offline: the client's local profile id is its
+      // identity, and the name it chose is kept (validated like any username)
+      uid = this.getLocalProfileUid(data)
+      if (!uid) {
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "Invalid player profile." })
+        return
+      }
+
+      if (!this.isValidLocalUsername(data.username)) {
+        // no usable name sent: a returning character keeps its saved name
+        let existingPlayer = this.getPlayerByUID(uid)
+        let playerData = this.getPlayerData(uid)
+        data.username = (existingPlayer && existingPlayer.getName()) ||
+                        (playerData && playerData.name) ||
+                        await this.generateUniqueUsername()
+      }
+
+      let isNameUsedByOtherPlayer = this.isUsernameTakenInServer(data.username) && !this.getPlayerByUID(uid)
+      if (isNameUsedByOtherPlayer) {
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
+        return
+      }
+    } else if (data.idToken) {
       uid = await this.server.getUidFromRequest(data.idToken, data.uid)
       if (!uid) {
         this.getSocketUtil().emit(socket, "CantJoin", { message: "Player credentials are invalid. Unable to load save file." })
@@ -2238,7 +2296,18 @@ async setGameMode(gameMode) {
           return
         }
       }
+    } else if (data.username) {
+      let isTaken = false
+      isTaken = await User.isUsernameTaken(data.username)
+      let isTakenInServer = this.isUsernameTakenInServer(data.username)
+      if (isTaken || isTakenInServer) {
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
+        return
+      }
 
+    }
+
+    if (uid) {
       let existingPlayer = this.getPlayerByUID(uid)
       if (existingPlayer) {
         this.handleExistingLoggedInPlayer(socket, existingPlayer)
@@ -2273,19 +2342,8 @@ async setGameMode(gameMode) {
         }
       }
 
-      if (uid) {
-        data.uid = uid
-        data.isAuthenticated = true
-      }
-    } else if (data.username) {
-      let isTaken = false
-      isTaken = await User.isUsernameTaken(data.username)
-      let isTakenInServer = this.isUsernameTakenInServer(data.username)
-      if (isTaken || isTakenInServer) {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
-        return
-      }
-
+      data.uid = uid
+      data.isAuthenticated = true
     }
 
     let sectorToJoin

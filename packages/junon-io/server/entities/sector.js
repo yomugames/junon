@@ -3292,7 +3292,8 @@ initSettings(entities) {
   }
 
   async replaceScreenshot(data, player) {
-    if (global.isOffline) return
+    // standalone is offline too, but keeps thumbnails with its saves
+    if (global.isOffline && env !== 'standalone') return
 
     for (let id in this.screenshots) {
       await this.removeScreenshot(id, player)
@@ -3302,7 +3303,7 @@ initSettings(entities) {
   }
 
   async addScreenshot(data, player) {
-    if (global.isOffline) return
+    if (global.isOffline && env !== 'standalone') return
     if (this.isMiniGame()) return
 
     let imageData = data.imageData

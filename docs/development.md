@@ -329,9 +329,26 @@ Its identity is the local profile in `localStorage` (`junon_local_profile`),
 whose `uid` is what `JUNON_OWNER_UID` must match for you to own the world. This
 direct-connect entry is temporary until the local Host/Join menus exist.
 
-To play a world exported from the hosted game, copy its `sector.sav` to
-`<JUNON_SAVES_DIR>/<worldId>/sector.sav`. Until import exists (Phase 2 of the
-plan), you join it as a new character.
+To play a world exported from the hosted game, import it. Import replaces
+the hosted account ids, makes your profile the owner of the world and of its
+main colony team, and lets you take over one of its characters:
+
+```sh
+# list the save's characters (filter with --search)
+node packages/junon-io/server/util/tasks/import_save.js sector.sav \
+  --saves-dir /tmp/junon-saves --owner <your profile id> --search kur
+
+# import, playing as one of them (or --new for a new character)
+node packages/junon-io/server/util/tasks/import_save.js sector.sav \
+  --saves-dir /tmp/junon-saves --owner <your profile id> --owner-name YourName \
+  --character kuroro
+```
+
+It prints the new world id to start the server with. In the world, the owner
+can switch to any other unclaimed character with `/character list [search]`,
+`/character <name>`, or `/character new`. The character you leave becomes
+unclaimed. Saved characters keep their own names. Hosted PvP and minigame
+saves are rejected.
 
 The server autosaves every three minutes and saves on `SIGINT`/`SIGTERM`. In
 this mode an unhandled promise rejection is logged instead of crashing the

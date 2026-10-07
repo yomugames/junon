@@ -67,7 +67,11 @@ Acceptance criteria:
   entry. Two Phase 1 steps moved: the world list (step 2) to Phase 4, and
   removing the remaining database call sites (step 5) to a prerequisite of
   Phase 5. See Phase 1 below.
-- [ ] Phase 2: Save import with character pick and owner character switching.
+- [x] 2026-10-07: Phase 2: hosted saves import with a character pick
+  (`junon-common/save_importer.js`, `server/util/tasks/import_save.js`), and
+  the owner switches characters with `/character`. The import UI and an
+  in-game menu come with the Phase 4 menus. The S3 export script (step 7) was
+  dropped, because saves are already being exported.
 - [ ] Phase 3: PvP and minigames removed.
 - [ ] Phase 4: Local menus replace the matchmaker UI.
 - [ ] Phase 5: Electron shell runs client and server process.
@@ -150,33 +154,41 @@ so the existing Jest and Playwright suites can still validate each step.
      activity/command logs by team id and store usernames. No Firebase uid
      remains, and characters keep their inventory, position, and stats.
      `OwnerRef` holds entity ids and is left unchanged.
-3. World ownership is separate from teams. The local world metadata records
-   the importer's profile as the world owner (admin/host rights). This does
-   not depend on any team field. The hosted game kept the sector creator in
-   MySQL, not in the save, so nothing in the save needs to be inferred.
+3. World ownership. The importer's profile owns the world: the `sectors`
+   registry row's `creatorUid`, which the import tool writes. Hosted servers
+   also tied the main colony team to the world owner (`Team#isSectorOwner`:
+   `team.creatorUid === game.creatorUid`). New players join that team, and the
+   world name follows its name. The save doesn't record which team that was,
+   so import picks the team named after the world (true for all 10 provided
+   saves), else the team with the most characters, and sets its `creatorUid`
+   to the importer. Without this, picking a character outside the main team
+   would leave the world with no main colony, and joining friends would have
+   no team to land in.
 4. The importer picks a character, and that character's team becomes their
-   team. The import dialog lists the saved characters (name, team name). There
-   is no separate team choice. Picking a character is a uid swap: every
-   occurrence of the chosen character's `imported-<n>` id (`Player.uid`,
-   `PlayerData.uid`, `playerDataMap` key, and `Team.creatorUid`/`leaderUid`
-   if that character created or leads its team) becomes the profile UUID. The
-   importer inherits exactly the character's team membership and role. They
-   lead the team only if that character led it.
-5. The owner can switch characters later from an in-game menu:
-   - The list shows saved characters that no connected player is controlling.
-   - Switching reverses the swap for the current character (it goes back to an
-     `imported-<n>` id, or a new one if it was a fresh character), saves it into
-     `playerDataMap`, applies the swap to the target, and resumes it through the
-     existing `resumeFromSaveFile` path in `server/entities/game.js`. The
-     owner's team changes with the character.
-   - This is an owner-only server command. It validates that the target is
-     unbound and belongs to this world; guests cannot use it.
-   - Guests join as fresh characters by default. Letting the owner hand a
-     saved character to a guest is a later option, not in scope for Phase 2.
-6. Reject PvP/minigame saves (`Metadata.gameMode`) with a clear message.
-7. Provide an operator-side export script that downloads a sector's save from the
-   existing S3 bucket, so players can request their old worlds before hosted
-   infrastructure is shut down. Keep it outside the desktop app.
+   team. Picking renames the character's `imported-<n>` id to the profile id
+   (`PlayerData.uid`, `Player.uid`, `playerDataMap` key) along with any
+   `Team.leaderUid` it held. Team creators don't move: the main team stays the
+   owner's, and other teams keep their founder's id. Picking none is allowed
+   (`--new`). A new character joins the main colony.
+   Done: `SaveImporter.listCharacters`/`importSave`, run by the CLI
+   `server/util/tasks/import_save.js` (list with `--search`, then
+   `--character <name|id>` or `--new`). The CLI writes the save and registers
+   the world in the standalone registry as owned by `--owner`.
+5. The owner can switch characters later. Done as the owner-only,
+   standalone-only `/character` chat command (`list [search]`, `<name>`,
+   `new`), backed by `Game#switchCharacter`. The owner's player is removed
+   (saved as player data, released as a new `imported-<n>`), the target's id
+   becomes the profile id, and the owner joins again on the same connection
+   (the client already handles a second `JoinGame`). Only `imported-<n>`
+   characters can be taken. A client can't claim one by sending such an id as
+   its profile id (`Game#getLocalProfileUid` rejects them). A saved character
+   keeps its own name; new characters use the profile name, which the
+   `users` row keeps. Guests join as fresh characters. Handing a saved
+   character to a guest is a later option.
+6. Done: import rejects game modes other than default/peaceful/survival/
+   hardcore (hosted PvP/minigames).
+7. Dropped: an operator-side S3 export script. Saves are already being
+   exported, and it can't be tested without production credentials.
 
 ### Phase 3: remove PvP and minigames
 
@@ -245,17 +257,19 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   `npm run client` can create a world through the direct-connect entry, save
   it, restart, and reload it with the same character. A Jest test covers
   filesystem storage: save, list, load, delete.
-- Phase 2 fixtures: real hosted saves from several format versions, checked in
-  under `packages/junon-io/test/fixtures/saves/`. The repository has none
-  today. Strip or replace player names before committing (they are player
-  data).
-- Phase 2: a Jest test round-trips a fixture save from an older format version
-  through import. It asserts that no hosted-game uid remains, that the chosen
-  character and only that character carries the profile UUID (including any
-  team creator/leader field it held), that characters keep inventory and
-  position, and that buildings and terrain are preserved. A second test
-  switches the owner between two saved characters and asserts that both
-  characters' state survives a save/reload.
+- Phase 2: `test/server/save_importer.test.js` builds synthetic hosted saves
+  in formats v4, v20, v38 and v39. Real exported saves are player data, which
+  AGENTS.md forbids committing. It asserts that no hosted uid remains, the
+  chosen character carries the profile id and keeps its state, leadership
+  follows the character, the main team is owned by the importer, and
+  PvP/unknown modes are rejected. `test/server/character_switch.test.js`
+  covers switching rules.
+- Phase 2, manual: the import tool ran on all 10 provided saves (v36-v38, up
+  to 327 characters). In headless Chrome on an imported 256x256 world:
+  joined as the picked character, switched to another, listed, started a new
+  character and switched back, with no page or server errors, no duplicated
+  or lost characters (61/61 after a save), and the main team still the
+  owner's.
 - Phase 6: two clients (two Electron instances or Electron + browser) on one
   machine and across a LAN can join, play, disconnect, and resume.
 - Playwright e2e suite green against the standalone server.
@@ -298,6 +312,13 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   module, so its prebuilt binary should load under Electron without an ABI
   rebuild. Confirm in Phase 5. This replaces an earlier plan to use an empty
   in-memory SQLite stand-in and later delete the call sites.
+- 2026-10-07: Imported worlds: the importer owns the world and its main
+  colony team, and plays a chosen character from any team. Character ids and
+  team leadership move with the character; team creators don't. Saved
+  characters keep their own names. Alternatives considered: tying the main
+  team to whichever character is picked (leaves worlds without a main colony
+  when a non-founder is picked), and renaming taken-over characters to the
+  profile name (released characters would all carry the owner's name).
 - 2026-10-07: `JUNON_OWNER_UID` is required in standalone.
   `Team#isSectorOwner` compares a team's creator with the world owner, so with
   no owner every team saved without a creator counted as the owner, and team
@@ -317,8 +338,10 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
 - `uWebSockets.js` is expected not to load under Electron's ABI. The plan
   replaces it with `ws`. Throughput is not a concern at co-op player counts.
 - Character switching creates a new despawn/resume path for a live player.
-  Check that it doesn't duplicate items (a save racing the switch) or leave a
-  stale entity for the previous character. Cover it with the Phase 2 test.
+  It reuses `Player#remove` (which saves the character) and the normal join
+  path, both synchronous up to the rejoin, so an autosave can't capture a
+  half-switched state. A save after switching held exactly the original
+  characters.
 - PvP/minigame removal touches about 164 call sites. Doing it after standalone
   mode works (Phase 3) keeps regressions attributable.
 - Join-time identity is self-asserted (local UUID). A guest could impersonate
@@ -351,19 +374,34 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   encode of the `uint32` field failed, and players couldn't join. It is now
   rounded down. Watch for the same thing in other database dates that reach
   the wire.
-- 2026-10-07: Existing race: the server can send `ButtonUpdated` (command-block
-  buttons) before the client has processed `JoinGame`, which throws in
-  `Game#onButtonUpdated` and drops the button. It appears joining hosted saves
-  with command-block buttons and isn't specific to standalone. Fix when
-  touching command blocks in Phase 3.
+- 2026-10-07: Existing race, fixed in Phase 2 because every imported
+  command-block world hit it on each join and switch. `Button#onStateChanged`
+  broadcast `ButtonUpdated` to players whose client hadn't processed
+  `JoinGame`, which threw in the client. Buttons also weren't part of the join
+  snapshot at all, so late joiners never saw them. Now updates go only to
+  ready players, and `Player#onPlayerReady` sends every button, like
+  `sendAllRegions`.
+- 2026-10-07: Imported worlds run their own command-block scripts. For
+  example, "Generated survival world" runs `/team join $player $player` for
+  every joining player, which moves them to a personal team. That is world
+  content behaving as it did when hosted, not an import or switching bug.
+- 2026-10-07: World thumbnails were disabled whenever `isOffline` was set
+  (`Sector#replaceScreenshot`/`addScreenshot`), which showed the owner "Failed
+  to take Screenshot". Standalone now stores them in
+  `<JUNON_SAVES_DIR>/screenshots` and records them on the `sectors` row for
+  the Phase 4 world list. This uses `sharp` (native), as noted for Phase 5.
+- 2026-10-07: `Game#onJoinGame` on the client clears the URL query
+  (`history.replaceState`), so reloading the page after joining loses the
+  temporary `?server=` parameter. Harmless until Phase 4 replaces direct
+  connect.
 - 2026-10-07: The provided hosted saves are format versions 36-38, with 15 to
-  327 characters each. The Phase 2 character picker needs search/filtering.
-  Joining one now creates a new character with no team spawn ("Please
-  wait..." at the map corner) until Phase 2's character pick exists.
+  327 characters each, so character pickers need search (the CLI's
+  `--search` and `/character list [search]` have it).
 
 ## Result
 
-In progress. Phase 1 validation (2026-10-07):
+In progress. Phase 2 validation is under Validation above. Phase 1
+validation (2026-10-07):
 
 - Jest: 26 suites / 272 tests pass, including `test/server/standalone_storage`,
   `standalone_identity`, `standalone_schema`, `standalone_atm`, and

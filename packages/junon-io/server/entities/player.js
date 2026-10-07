@@ -2872,10 +2872,17 @@ class Player extends BaseEntity {
 
     this.requestNewChunks()
     this.sendAllRegions()
+    this.sendAllButtons()
     this.sendCommandBlocks()
 
     this.game.globalSidebar.emitContentsToPlayer(this)
     this.game.sidebars[this.id].emitContentsToPlayer(this)
+  }
+
+  sendAllButtons() {
+    for (let name in this.sector.buttons) {
+      this.getSocketUtil().emit(this.getSocket(), "ButtonUpdated", { button: this.sector.buttons[name] })
+    }
   }
 
   sendAllRegions() {

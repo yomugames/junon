@@ -38,6 +38,7 @@ const IpBan = require("junon-common/db/ip_ban")
 const Favorite = require("junon-common/db/favorite")
 const sequelize = require("junon-common/db/sequelize")
 const syncStandaloneSchema = require("junon-common/db/standalone_schema")
+const StandaloneWorlds = require("junon-common/standalone_worlds")
 const Item = require("./entities/item")
 const base64id = require('base64id')
 
@@ -265,20 +266,17 @@ class Server {
       process.exit(1)
     }
 
-    await User.findOrCreate({ where: { uid: ownerUid }, defaults: { gold: 0 } })
+    // worlds imported with server/util/tasks/import_save.js are registered
+    // already, owned by the importing profile
+    let metadata = await WorldSerializer.getSaveMetadata(worldId)
+    await StandaloneWorlds.register({
+      uid: worldId,
+      name: metadata ? metadata.name : process.env.JUNON_WORLD_NAME,
+      gameMode: (metadata && metadata.gameMode) || process.env.JUNON_GAME_MODE,
+      ownerUid: ownerUid
+    })
 
-    let sectorModel = await SectorModel.findOne({ where: { uid: worldId } })
-    if (!sectorModel) {
-      let metadata = await WorldSerializer.getSaveMetadata(worldId)
-      await SectorModel.createOne({
-        uid: worldId,
-        name: metadata ? metadata.name : process.env.JUNON_WORLD_NAME,
-        gameMode: (metadata && metadata.gameMode) || process.env.JUNON_GAME_MODE || 'survival',
-        creatorUid: ownerUid
-      })
-    }
-
-    sectorModel = await this.findSectorWithAttributers(worldId)
+    let sectorModel = await this.findSectorWithAttributers(worldId)
 
     let result = await this.createGame({
       creatorIp: "127.0.0.1",

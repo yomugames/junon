@@ -50,6 +50,9 @@ class Button extends BaseTransientEntity {
 
   onStateChanged() {
     this.game.forEachPlayer((player) => {
+      // a joining player's client has no sector to apply this to until it
+      // reports ready; Player#onPlayerReady sends it every button then
+      if (!player.isPlayerReady) return
       this.getSocketUtil().emit(player.getSocket(), "ButtonUpdated", { button: this })
     })
   }

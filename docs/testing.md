@@ -141,7 +141,7 @@ server really applied the change instead of the client having predicted it.
 | Client UI or assets | Client build plus the closest e2e spec, or a manual browser flow |
 | Shared game entity/interface | Focused tests and client build; inspect both sides |
 | Protobuf contract | Client build and affected server/client message flow |
-| Save serialization | Round-trip fixtures across relevant format versions |
+| Save serialization | Round-trip fixtures across relevant format versions. Build synthetic saves (as `test/server/save_importer.test.js` does); real exported saves are player data and must not be committed |
 | Database model/migration | Migration on a disposable database and model path |
 | Matchmaker/API | Focused request/socket reproduction with isolated dependencies |
 | Startup/configuration | Start the affected service in the intended `NODE_ENV` |

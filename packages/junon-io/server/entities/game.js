@@ -25,6 +25,7 @@ const Faker = require('faker')
 const BadWordsFilter = require("../util/bad_words_filter")
 const IDGenerator = require('../util/id_generator')
 const WorldSerializer = require("junon-common/world_serializer")
+const SaveImporter = require("junon-common/save_importer")
 const ObjectPool = require("../../common/entities/object_pool")
 const TileHit = require("./tile_hit")
 const FirebaseAdminHelper = require("../util/firebase_admin_helper")
@@ -2013,8 +2014,74 @@ async setGameMode(gameMode) {
     let uid = data.uid
     if (typeof uid !== 'string') return null
     if (!uid.match(/^[A-Za-z0-9_-]{8,64}$/)) return null
+    // unclaimed characters of imported worlds; a client presenting one of
+    // these ids would take that character over
+    if (SaveImporter.isImportedUid(uid)) return null
 
     return uid
+  }
+
+  // Standalone: the world owner switches which saved character they play.
+  // Only unclaimed characters of an imported world (`imported-<n>` ids) can be
+  // taken, or none to start a new character; the one being left becomes
+  // unclaimed in turn. The owner's player is removed (saving it as player
+  // data) and joins again on the same connection as the other character.
+  async switchCharacter(player, targetUid) {
+    if (targetUid && (!SaveImporter.isImportedUid(targetUid) || !this.getPlayerData(targetUid))) {
+      return false
+    }
+
+    let ownerUid = player.getUid()
+    let socket = player.socket
+
+    player.remove()
+
+    if (this.getPlayerData(ownerUid)) {
+      this.renameCharacterUid(ownerUid, this.generateImportedCharacterUid())
+    }
+
+    if (targetUid) {
+      this.renameCharacterUid(targetUid, ownerUid)
+    }
+
+    // no name sent: the taken-over character keeps its own, and a new one
+    // gets the profile's
+    await this.performJoinGame(socket, { uid: ownerUid })
+    return true
+  }
+
+  // identity and team leadership move with the character; team creators stay
+  // (as in junon-common/save_importer.js)
+  renameCharacterUid(fromUid, toUid) {
+    let playerData = this.playerDataMap[fromUid]
+    if (playerData) {
+      delete this.playerDataMap[fromUid]
+      playerData.uid = toUid
+      playerData.data.uid = toUid
+      this.playerDataMap[toUid] = playerData
+    }
+
+    this.forEachTeam((team) => {
+      if (team.leaderUid === fromUid) team.leaderUid = toUid
+    })
+  }
+
+  generateImportedCharacterUid() {
+    let highest = 0
+    for (let uid in this.playerDataMap) {
+      if (SaveImporter.isImportedUid(uid)) {
+        let index = parseInt(uid.slice(SaveImporter.IMPORTED_UID_PREFIX.length))
+        if (index > highest) highest = index
+      }
+    }
+
+    return SaveImporter.IMPORTED_UID_PREFIX + (highest + 1)
+  }
+
+  getUnclaimedCharacters() {
+    return Object.values(this.playerDataMap).filter((playerData) => {
+      return SaveImporter.isImportedUid(playerData.getUID())
+    })
   }
 
   // same rules as hosted account usernames
@@ -2252,16 +2319,14 @@ async setGameMode(gameMode) {
       }
 
       let user = await User.findOne({ where: { uid: uid } })
+      let profileName = this.isValidLocalUsername(data.username) ? data.username : null
 
-      if (!this.isValidLocalUsername(data.username)) {
-        // no usable name sent: a returning player keeps their name
-        let existingPlayer = this.getPlayerByUID(uid)
-        let playerData = this.getPlayerData(uid)
-        data.username = (existingPlayer && existingPlayer.getName()) ||
-                        (playerData && playerData.name) ||
-                        (user && user.username) ||
-                        await this.generateUniqueUsername()
-      }
+      // a saved character keeps its own name - including one taken over from
+      // an imported world - and the profile's name is used for new ones
+      let existingPlayer = this.getPlayerByUID(uid)
+      let playerData = this.getPlayerData(uid)
+      let characterName = (existingPlayer && existingPlayer.getName()) || (playerData && playerData.name)
+      data.username = characterName || profileName || (user && user.username) || await this.generateUniqueUsername()
 
       let isNameUsedByOtherPlayer = this.isUsernameTakenInServer(data.username) && !this.getPlayerByUID(uid)
       if (isNameUsedByOtherPlayer) {
@@ -2270,11 +2335,12 @@ async setGameMode(gameMode) {
       }
 
       // the profile's users row backs account features (ATM balance, badges)
-      // the same way an account's row does on hosted servers
+      // the same way an account's row does on hosted servers; it keeps the
+      // profile's name, not the character's
       if (!user) {
-        await User.create({ uid: uid, username: data.username, gold: 0 })
-      } else if (user.username !== data.username) {
-        await user.update({ username: data.username })
+        await User.create({ uid: uid, username: profileName || data.username, gold: 0 })
+      } else if (profileName && user.username !== profileName) {
+        await user.update({ username: profileName })
       }
     } else if (data.idToken) {
       uid = await this.server.getUidFromRequest(data.idToken, data.uid)

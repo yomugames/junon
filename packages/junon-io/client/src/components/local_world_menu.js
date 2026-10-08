@@ -1,5 +1,8 @@
-// Standalone home menu. The local HTTP routes are served from the loopback
-// page server; game traffic still uses the ordinary authoritative socket.
+const LocalWorldApi = require('../util/local_world_api')
+
+// Standalone home menu. World management goes through LocalWorldApi (loopback
+// page server, or the desktop app's game server process); game traffic still
+// uses the ordinary authoritative socket.
 class LocalWorldMenu {
   constructor(main) {
     this.main = main
@@ -29,20 +32,9 @@ class LocalWorldMenu {
     this.main.localProfile.setName(name)
   }
 
-  async request(path, options) {
-    const response = await fetch('/local/' + path, options)
-    const body = await response.json()
-    if (!response.ok) throw new Error(body.error || 'Request failed')
-    return body
-  }
-
   async run(action) {
     this.message.textContent = ''
     try { await action() } catch (e) { this.message.textContent = e.message }
-  }
-
-  json(data) {
-    return { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }
   }
 
   open(worldId, serverUrl) {
@@ -55,7 +47,7 @@ class LocalWorldMenu {
     this.panel.innerHTML = '<h2>New world</h2><label>World name <input class="world_name black_input" maxlength="40"></label><label>Mode <select class="world_mode ui_select"><option value="survival">Survival</option><option value="peaceful">Sandbox</option><option value="hardcore">Hardcore</option></select></label><button class="create_world ui_btn">Create and play</button>'
     this.panel.querySelector('.create_world').addEventListener('click', () => this.run(async () => {
       this.saveName()
-      const result = await this.request('worlds', this.json({ ownerUid: this.main.localProfile.uid, name: this.panel.querySelector('.world_name').value, gameMode: this.panel.querySelector('.world_mode').value }))
+      const result = await LocalWorldApi.createWorld({ ownerUid: this.main.localProfile.uid, name: this.panel.querySelector('.world_name').value, gameMode: this.panel.querySelector('.world_mode').value })
       this.open(result.worldId, result.serverUrl)
     }))
   }
@@ -63,7 +55,7 @@ class LocalWorldMenu {
   loadWorlds() {
     this.panel.innerHTML = '<h2>Local worlds</h2><div class="local_world_list">Loading…</div>'
     this.run(async () => {
-      const result = await this.request('worlds')
+      const result = await LocalWorldApi.listWorlds()
       const list = this.panel.querySelector('.local_world_list')
       list.textContent = ''
       if (!result.worlds.length) list.textContent = 'No local worlds yet.'
@@ -73,7 +65,7 @@ class LocalWorldMenu {
         button.textContent = world.name + ' · ' + world.mode + ' · day ' + world.days
         button.addEventListener('click', () => this.run(async () => {
           this.saveName()
-          const opened = await this.request('worlds/open', this.json({ worldId: world.id, ownerUid: this.main.localProfile.uid }))
+          const opened = await LocalWorldApi.openWorld({ worldId: world.id, ownerUid: this.main.localProfile.uid })
           this.open(world.id, opened.serverUrl)
         }))
         list.appendChild(button)
@@ -88,7 +80,7 @@ class LocalWorldMenu {
       if (!file) throw new Error('Choose a .sav file')
       this.saveName()
       const bytes = await file.arrayBuffer()
-      const result = await this.request('import/characters', { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: bytes })
+      const result = await LocalWorldApi.listImportCharacters(bytes)
       const choices = this.panel.querySelector('.import_characters')
       choices.textContent = ''
       const select = document.createElement('select')
@@ -108,8 +100,8 @@ class LocalWorldMenu {
       button.className = 'ui_btn'
       button.textContent = 'Import and play'
       button.addEventListener('click', () => this.run(async () => {
-        const imported = await this.request('import', { method: 'POST', headers: { 'Content-Type': 'application/octet-stream', 'X-Junon-Owner': this.main.localProfile.uid, 'X-Junon-Name': this.main.localProfile.name, 'X-Junon-Character': select.value }, body: bytes })
-        const opened = await this.request('worlds/open', this.json({ worldId: imported.worldId, ownerUid: this.main.localProfile.uid }))
+        const imported = await LocalWorldApi.importWorld(bytes, { ownerUid: this.main.localProfile.uid, ownerName: this.main.localProfile.name, characterUid: select.value })
+        const opened = await LocalWorldApi.openWorld({ worldId: imported.worldId, ownerUid: this.main.localProfile.uid })
         this.open(imported.worldId, opened.serverUrl)
       }))
       choices.appendChild(button)

@@ -1,0 +1,47 @@
+// World management for the standalone local menu (server: Server#getLocalWorldApi).
+// The desktop app's preload script exposes window.junonDesktop, which forwards
+// calls to the game server process. A browser uses the loopback /local/* routes
+// of the standalone page server instead.
+const LocalWorldApi = {
+  listWorlds() {
+    return this.call('listWorlds', [], () => this.request('worlds'))
+  },
+
+  createWorld(details) {
+    return this.call('createWorld', [details], () => this.request('worlds', this.json(details)))
+  },
+
+  openWorld(details) {
+    return this.call('openWorld', [details], () => this.request('worlds/open', this.json(details)))
+  },
+
+  listImportCharacters(bytes) {
+    return this.call('listImportCharacters', [new Uint8Array(bytes)], () => {
+      return this.request('import/characters', { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: bytes })
+    })
+  },
+
+  importWorld(bytes, profile) {
+    return this.call('importWorld', [new Uint8Array(bytes), profile], () => {
+      return this.request('import', { method: 'POST', headers: { 'Content-Type': 'application/octet-stream', 'X-Junon-Owner': profile.ownerUid, 'X-Junon-Name': profile.ownerName, 'X-Junon-Character': profile.characterUid }, body: bytes })
+    })
+  },
+
+  call(method, args, httpRequest) {
+    if (window.junonDesktop) return window.junonDesktop.localWorldApi(method, args)
+    return httpRequest()
+  },
+
+  async request(path, options) {
+    const response = await fetch('/local/' + path, options)
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.error || 'Request failed')
+    return body
+  },
+
+  json(data) {
+    return { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }
+  }
+}
+
+module.exports = LocalWorldApi

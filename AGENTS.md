@@ -22,6 +22,8 @@ This file is the entry point, not the complete manual. Keep durable knowledge in
 - `packages/junon-common/`: database models and migrations, protobuf schemas,
   serialization, logging, and socket utilities shared by services.
 - `packages/junon-io-watchdog/`: standalone game-server liveness watchdog.
+- `packages/junon-desktop/`: Electron shell that runs the standalone game server
+  and client offline.
 - `docs/`: versioned engineering knowledge and execution plans.
 
 ## Working rules
@@ -60,6 +62,7 @@ npm run db:setup
 npm run client
 npm run serveronly
 npm run matchmaker
+npm run desktop
 npm run server
 npm run client:build
 ```

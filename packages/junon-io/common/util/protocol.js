@@ -4,8 +4,9 @@ const Protocol = {
     this.init(protoFile, cb)
   },
   initServer(cb) {
-    let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
-    const directory = nodeModulesPath + "/junon-common/protocol"
+    // resolved through node's module lookup rather than `npm root`, which a
+    // packaged desktop app can't run
+    const directory = require.resolve("junon-common/package.json").replace(/package\.json$/, "") + "protocol"
     let protoFile = debugMode ? `${directory}/app_debug.proto` : `${directory}/app.proto`
     this.init(protoFile, cb)
   },

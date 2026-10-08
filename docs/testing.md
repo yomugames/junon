@@ -137,6 +137,19 @@ server really applied the change instead of the client having predicted it.
   moves off it - so a second dig started without moving the cursor switches
   mining off instead of on.
 
+### Desktop e2e
+
+`packages/junon-desktop/test/desktop.spec.js` launches the Electron app with
+Playwright against a temporary user-data directory. It creates a world through
+the local menu, joins it, quits (which saves), relaunches, and loads the world
+again. It needs the standalone client build. A Linux machine without a display
+needs `xvfb-run`; the test enables software WebGL itself.
+
+```sh
+NODE_ENV=standalone npm run client:build
+xvfb-run -a npm run test:e2e --workspace packages/junon-desktop
+```
+
 ## Validation by change type
 
 | Change | Minimum useful validation |
@@ -149,7 +162,8 @@ server really applied the change instead of the client having predicted it.
 | Database model/migration | Migration on a disposable database and model path |
 | Matchmaker/API | Focused request/socket reproduction with isolated dependencies |
 | Startup/configuration | Start the affected service in the intended `NODE_ENV` |
-| Standalone (offline) mode | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real standalone server, checks save/reload, and exercises the local world and import HTTP routes |
+| Standalone (offline) mode | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real standalone server, checks save/reload, exercises the local world and import HTTP routes, and checks the `ws` game socket |
+| Desktop shell (`packages/junon-desktop`) | `NODE_ENV=standalone npm run client:build`, then the desktop e2e test (see below) |
 | Player-facing flow across client and server | The closest `test/e2e` spec, or a new one |
 
 ## Writing tests

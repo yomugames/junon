@@ -18,7 +18,6 @@ const http = require("http")
 const https = require("https")
 const express = require("express")
 const bodyParser = require('body-parser')
-const uws = require('uWebSockets.js')
 const WebSocket = require('ws')
 const cors = require('cors')
 const fs = require("fs")
@@ -72,6 +71,11 @@ debugMode = (env === 'development' || env === 'test') ? true : false
 // off), so only infrastructure branches check isStandalone.
 const isStandalone = env === 'standalone'
 
+// The desktop shell (packages/junon-desktop) runs a standalone server in an
+// Electron utility process, which provides process.parentPort. It serves the
+// client itself and talks to this process over that port, so no page server.
+const isDesktop = isStandalone && !!process.parentPort
+
 // Firebase is an optional production integration. Local runs must not require
 // Application Default Credentials just because the machine has network access.
 if (isStandalone || (debugMode && process.env.JUNON_USE_FIREBASE !== 'true')) {
@@ -88,10 +92,13 @@ if (isStandalone || (debugMode && process.env.JUNON_USE_FIREBASE !== 'true')) {
 global.isMatchmakerDisabled = isStandalone || (env === 'test' && process.env.JUNON_E2E_MATCHMAKER !== 'true')
 
 if (debugMode || isStandalone) {
-  let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
-  let protocolDirectory = nodeModulesPath + "/junon-common/protocol"
-  let protocolContents        = require('child_process').execSync(`cat '${protocolDirectory}/enum.proto' '${protocolDirectory}/base.proto' '${protocolDirectory}/app.proto'`).toString()
-  global.protocolHash = require('crypto').createHash('md5').update(protocolContents).digest("hex").substring(0,8)
+  // same hash as the client build's (gulpfile.js), read without shelling out
+  // to npm/cat, which a packaged desktop app doesn't have
+  let protocolDirectory = path.join(path.dirname(require.resolve("junon-common/package.json")), "protocol")
+  let protocolContents = ["enum.proto", "base.proto", "app.proto"].map((file) => {
+    return fs.readFileSync(path.join(protocolDirectory, file))
+  })
+  global.protocolHash = require('crypto').createHash('md5').update(Buffer.concat(protocolContents)).digest("hex").substring(0,8)
 }
 
 const Protocol = require("../common/util/protocol")
@@ -103,6 +110,7 @@ const Game = require("./entities/game")
 const ExceptionReporter = require("junon-common/exception_reporter")
 const LOG = require('junon-common/logger')
 const Helper = require('../common/helper')
+const StandaloneSocketServer = require('./util/standalone_socket_server')
 const Profiler = require('../common/profiler')
 const RemoteEventHandler = require('./entities/remote_event_handler')
 const FirebaseAdminHelper = require("./util/firebase_admin_helper")
@@ -143,9 +151,9 @@ class Server {
 
   async allocatePort() {
     if (debugMode || isStandalone) {
-      // uws.App#listen() silently fails (falsy token, no error) when given a
-      // string port instead of a number - process.env.PORT is always a
-      // string, so this must be parsed rather than used as-is
+      // uws.App#listen() (hosted debug servers) silently fails (falsy token,
+      // no error) when given a string port instead of a number -
+      // process.env.PORT is always a string, so this must be parsed
       this.APP_SERVER_PORT = parseInt(process.env.PORT) || 8000
     } else {
       let availablePort = await FirebaseAdminHelper.claimFreePort(this.getNodeName())
@@ -223,7 +231,7 @@ class Server {
     this.initRemoteEventHandler()
 
 
-    this.initWebsocketServer()
+    await this.initWebsocketServer()
     this.sendServerInfoToMatchmaker()
 
     this.initObjectPools()
@@ -239,13 +247,17 @@ class Server {
       await this.initLivenessProbeServer()
     }
 
-    if (debugMode || isStandalone) {
+    if (debugMode || (isStandalone && !isDesktop)) {
       await this.initDevelopmentAppServer()
     }
 
     if (isStandalone) {
       this.initStandaloneProcessHandlers()
       if (process.env.JUNON_WORLD_ID) await this.loadStandaloneWorld()
+    }
+
+    if (isDesktop) {
+      this.initDesktopChannel()
     }
 
   }
@@ -292,6 +304,10 @@ class Server {
       throw new Error("Unable to load world " + worldId + ": " + result.error)
     }
 
+    // a save's entities are applied over several ticks (processSectorLoadQueue)
+    // and joins before that are refused, so the menu may only connect after this
+    await new Promise((resolve) => result.createdGame.onGameReady(resolve))
+
     console.log("Standalone world ready: " + worldId)
   }
 
@@ -312,7 +328,7 @@ class Server {
 
     // save before exiting so closing the game (or Ctrl-C on serveronly)
     // doesn't lose progress since the last autosave
-    let shutdown = async () => {
+    let shutdown = this.shutdownStandalone = async () => {
       if (this.isStandaloneShutdownInProgress) return
       this.isStandaloneShutdownInProgress = true
 
@@ -333,6 +349,30 @@ class Server {
 
     process.on('SIGINT', shutdown)
     process.on('SIGTERM', shutdown)
+  }
+
+  // Messages from the desktop main process: local menu requests (see
+  // getLocalWorldApi) and a save-and-exit request when the app quits, since
+  // killing a utility process on Windows skips the SIGTERM handler.
+  initDesktopChannel() {
+    let api = this.getLocalWorldApi()
+
+    process.parentPort.on('message', async ({ data }) => {
+      if (!data) return
+      if (data.type === 'shutdown') return this.shutdownStandalone()
+      if (data.type !== 'localApi') return
+
+      try {
+        if (!Object.prototype.hasOwnProperty.call(api, data.method)) throw new Error('Unknown request')
+        let args = Array.isArray(data.args) ? data.args : []
+        let result = await api[data.method](...args)
+        process.parentPort.postMessage({ type: 'localApiResult', id: data.id, result: result })
+      } catch(e) {
+        process.parentPort.postMessage({ type: 'localApiResult', id: data.id, error: e.message })
+      }
+    })
+
+    process.parentPort.postMessage({ type: 'ready', port: this.APP_SERVER_PORT })
   }
 
   initObjectPools() {
@@ -407,9 +447,21 @@ class Server {
 
   fetchServerInfo() {
     this.REGION = process.env.REGION || "localhost"
-    this.gameRevision = require('child_process').execSync('git rev-parse --short=7 HEAD').toString().trim()
+    this.gameRevision = this.readGameRevision()
     this.gameVersion = require('fs').readFileSync(appRoot + '/VERSION.txt', 'utf8')
                          .replace(".alpha","").trim()
+  }
+
+  readGameRevision() {
+    try {
+      return require('child_process').execSync('git rev-parse --short=7 HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()
+    } catch(e) {
+      // packaged desktop builds have no git checkout; the client build
+      // records the revision it was built from
+      if (!isStandalone) throw e
+      let revisionFile = appRoot + '/dist/revision'
+      return fs.existsSync(revisionFile) ? fs.readFileSync(revisionFile, 'utf8').trim() : 'unknown'
+    }
   }
 
   addSectorLoadQueue(sector, metadata, entities) {
@@ -787,43 +839,20 @@ class Server {
         if (origin && origin !== `${req.protocol}://${req.get('host')}`) return res.sendStatus(403)
         next()
       })
-      const validOwner = (uid) => typeof uid === 'string' && /^[a-f0-9]{32}$/i.test(uid)
-      const validWorld = (uid) => typeof uid === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(uid)
       const route = (handler) => async (req, res) => {
         try { res.json(await handler(req)) } catch (e) { res.status(400).json({ error: e.message }) }
       }
-      app.get('/local/worlds', route(async () => {
-        let rows = await SectorModel.findAll({ order: [['updatedAt', 'DESC']] })
-        return { worlds: rows.map((row) => ({ id: row.uid, name: row.name, mode: row.gameMode, days: row.daysAlive })), activeWorldId: this.getMainGame() && this.getMainGame().getId(), serverUrl: `ws://127.0.0.1:${this.APP_SERVER_PORT}` }
-      }))
-      app.post('/local/worlds', route(async (req) => {
-        let { ownerUid, name, gameMode } = req.body
-        if (!validOwner(ownerUid) || typeof name !== 'string' || !/^[\p{L}\p{N} _-]{1,40}$/u.test(name.trim()) || !['peaceful', 'survival', 'hardcore'].includes(gameMode)) throw new Error('Invalid world details')
-        let worldId = require('crypto').randomBytes(12).toString('hex')
-        await this.activateStandaloneWorld({ worldId, ownerUid, name: name.trim(), gameMode })
-        return { worldId, serverUrl: `ws://127.0.0.1:${this.APP_SERVER_PORT}` }
-      }))
-      app.post('/local/worlds/open', route(async (req) => {
-        let { worldId, ownerUid } = req.body
-        if (!validWorld(worldId) || !validOwner(ownerUid)) throw new Error('Invalid world or profile')
-        let row = await SectorModel.findOne({ where: { uid: worldId } })
-        if (!row) throw new Error('World not found')
-        if (row.creatorUid !== ownerUid) throw new Error('World belongs to another profile')
-        await this.activateStandaloneWorld({ worldId, ownerUid })
-        return { worldId, serverUrl: `ws://127.0.0.1:${this.APP_SERVER_PORT}` }
-      }))
-      app.post('/local/import/characters', express.raw({ type: 'application/octet-stream', limit: '100mb' }), route(async (req) => ({ characters: SaveImporter.listCharacters(req.body) })))
-      app.post('/local/import', express.raw({ type: 'application/octet-stream', limit: '100mb' }), route(async (req) => {
-        let ownerUid = req.get('x-junon-owner')
-        let ownerName = req.get('x-junon-name')
-        let characterUid = req.get('x-junon-character') || null
-        if (!validOwner(ownerUid) || !/^[a-zA-Z0-9_]{1,16}$/.test(ownerName || '')) throw new Error('Invalid profile')
-        let result = SaveImporter.importSave(req.body, { ownerUid, ownerName, characterUid })
-        let savePath = WorldSerializer.getSectorSavePath(result.worldId)
-        await WorldSerializer.writeToSavesDirectory(savePath, result.compressed)
-        await StandaloneWorlds.register({ uid: result.worldId, name: result.name, gameMode: result.gameMode, ownerUid })
-        return { worldId: result.worldId, name: result.name }
-      }))
+      const api = this.getLocalWorldApi()
+      const raw = express.raw({ type: 'application/octet-stream', limit: '100mb' })
+      app.get('/local/worlds', route(() => api.listWorlds()))
+      app.post('/local/worlds', route((req) => api.createWorld(req.body)))
+      app.post('/local/worlds/open', route((req) => api.openWorld(req.body)))
+      app.post('/local/import/characters', raw, route((req) => api.listImportCharacters(req.body)))
+      app.post('/local/import', raw, route((req) => api.importWorld(req.body, {
+        ownerUid: req.get('x-junon-owner'),
+        ownerName: req.get('x-junon-name'),
+        characterUid: req.get('x-junon-character')
+      })))
     }
 
     let gameVersion        = fs.readFileSync(appRoot + "/VERSION.txt", 'utf8').replace("\n","")
@@ -880,6 +909,51 @@ class Server {
         resolve()
       })
     })
+  }
+
+  // World management for the standalone local menu. A browser reaches it
+  // through the loopback /local/* routes, the desktop shell through its parent
+  // port (initDesktopChannel). Arguments come from the client: validate them.
+  getLocalWorldApi() {
+    const validOwner = (uid) => typeof uid === 'string' && /^[a-f0-9]{32}$/i.test(uid)
+    const validWorld = (uid) => typeof uid === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(uid)
+    const validSave = (bytes) => {
+      if (!(bytes instanceof Uint8Array)) throw new Error('Invalid save file')
+      return Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+    }
+    const serverUrl = () => `ws://127.0.0.1:${this.APP_SERVER_PORT}`
+
+    return {
+      listWorlds: async () => {
+        let rows = await SectorModel.findAll({ order: [['updatedAt', 'DESC']] })
+        return { worlds: rows.map((row) => ({ id: row.uid, name: row.name, mode: row.gameMode, days: row.daysAlive })), activeWorldId: this.getMainGame() && this.getMainGame().getId(), serverUrl: serverUrl() }
+      },
+      createWorld: async ({ ownerUid, name, gameMode } = {}) => {
+        if (!validOwner(ownerUid) || typeof name !== 'string' || !/^[\p{L}\p{N} _-]{1,40}$/u.test(name.trim()) || !['peaceful', 'survival', 'hardcore'].includes(gameMode)) throw new Error('Invalid world details')
+        let worldId = require('crypto').randomBytes(12).toString('hex')
+        await this.activateStandaloneWorld({ worldId, ownerUid, name: name.trim(), gameMode })
+        return { worldId, serverUrl: serverUrl() }
+      },
+      openWorld: async ({ worldId, ownerUid } = {}) => {
+        if (!validWorld(worldId) || !validOwner(ownerUid)) throw new Error('Invalid world or profile')
+        let row = await SectorModel.findOne({ where: { uid: worldId } })
+        if (!row) throw new Error('World not found')
+        if (row.creatorUid !== ownerUid) throw new Error('World belongs to another profile')
+        await this.activateStandaloneWorld({ worldId, ownerUid })
+        return { worldId, serverUrl: serverUrl() }
+      },
+      listImportCharacters: async (bytes) => {
+        return { characters: SaveImporter.listCharacters(validSave(bytes)) }
+      },
+      importWorld: async (bytes, { ownerUid, ownerName, characterUid } = {}) => {
+        if (!validOwner(ownerUid) || !/^[a-zA-Z0-9_]{1,16}$/.test(ownerName || '')) throw new Error('Invalid profile')
+        let result = SaveImporter.importSave(validSave(bytes), { ownerUid, ownerName, characterUid: characterUid || null })
+        let savePath = WorldSerializer.getSectorSavePath(result.worldId)
+        await WorldSerializer.writeToSavesDirectory(savePath, result.compressed)
+        await StandaloneWorlds.register({ uid: result.worldId, name: result.name, gameMode: result.gameMode, ownerUid })
+        return { worldId: result.worldId, name: result.name }
+      }
+    }
   }
 
   getMainGame() {
@@ -1269,8 +1343,45 @@ class Server {
       this.socketUtil.on(eventName, this.onSocketMessage.bind(this, eventName))
     }
 
+    let listening
+    if (isStandalone) {
+      listening = this.initStandaloneSocketServer()
+    } else {
+      this.initUwsServer()
+    }
+
+    this.gameLoopHelper = new GameLoop()
+    setInterval(this.mainLoop.bind(this), this.PHYSICS_TIMESTEP)
+    setInterval(this.scoreLoop.bind(this), this.LEADERBOARD_TIMESTEP)
+
+    return listening
+  }
+
+  onSocketOpen(ws) {
+    this.socketUtil.registerSocket(ws)
+  }
+
+  onSocketData(ws, message, isBinary) {
+    if (isBinary) {
+      this.socketUtil.onMessage(ws, message)
+    } else {
+      this.socketUtil.onTextMessage(ws, message)
+    }
+  }
+
+  onSocketClose(ws) {
+    ws.isClosed = true
+    this.socketUtil.unregisterSocket(ws)
+    this.onClientDisconnect(ws)
+  }
+
+  // uWebSockets.js only loads under Node's own ABI, so it is required here
+  // rather than at the top: the standalone (Electron) runtime never loads it
+  initUwsServer() {
+    const uws = require('uWebSockets.js')
+
     let app
-    if (debugMode || isStandalone) {
+    if (debugMode) {
       app = uws.App()
     } else {
       app = uws.SSLApp({
@@ -1297,21 +1408,9 @@ class Server {
           context
         )
       },
-      open: (ws) => {
-        this.socketUtil.registerSocket(ws)
-      },
-      message: (ws, message, isBinary) => {
-        if (isBinary) {
-          this.socketUtil.onMessage(ws, message)
-        } else {
-          this.socketUtil.onTextMessage(ws, message)
-        }
-      },
-      close: (ws, code, message) => {
-        ws.isClosed = true
-        this.socketUtil.unregisterSocket(ws)
-        this.onClientDisconnect(ws)
-      }
+      open: this.onSocketOpen.bind(this),
+      message: this.onSocketData.bind(this),
+      close: this.onSocketClose.bind(this)
     })
 
     app.get('/ping', (res, req) => {
@@ -1327,9 +1426,7 @@ class Server {
       res.end(JSON.stringify({ success: isSuccess }))
     })
 
-    if (!isStandalone) {
-      this.initOperatorEndpoints(app)
-    }
+    this.initOperatorEndpoints(app)
 
     let onListen = (token) => {
       if (token) {
@@ -1339,19 +1436,47 @@ class Server {
       }
     }
 
-    if (isStandalone) {
-      app.listen(this.getStandaloneBindHost(), this.APP_SERVER_PORT, onListen)
-    } else {
-      app.listen(this.APP_SERVER_PORT, onListen)
-    }
+    app.listen(this.APP_SERVER_PORT, onListen)
+  }
 
-    this.gameLoopHelper = new GameLoop()
-    setInterval(this.mainLoop.bind(this), this.PHYSICS_TIMESTEP)
-    setInterval(this.scoreLoop.bind(this), this.LEADERBOARD_TIMESTEP)
+  initStandaloneSocketServer() {
+    this.standaloneSocketServer = new StandaloneSocketServer({
+      open: this.onSocketOpen.bind(this),
+      message: this.onSocketData.bind(this),
+      close: this.onSocketClose.bind(this),
+      http: (req, res) => {
+        if (req.method !== 'GET') return false
+
+        let pathname = req.url.split('?')[0]
+        if (pathname === '/ping') {
+          res.writeHead(200, { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/plain' })
+          res.end('pong')
+          return true
+        }
+
+        if (pathname === '/join') {
+          let ip = StandaloneSocketServer.normalizeAddress(req.socket.remoteAddress)
+          res.writeHead(200, { 'Access-Control-Allow-Origin': '*' })
+          res.end(JSON.stringify({ success: this.reserveSpot(ip) }))
+          return true
+        }
+
+        return false
+      }
+    })
+
+    // a game socket that can't listen leaves nothing to play on; exit so the
+    // launcher sees it instead of a server that silently isn't reachable
+    return this.standaloneSocketServer.listen(this.getStandaloneBindHost(), this.APP_SERVER_PORT).then(() => {
+      console.log('Junon Gameserver listening to port ' + this.APP_SERVER_PORT)
+    }).catch((e) => {
+      LOG.error('Gameserver failed to listen to port ' + this.APP_SERVER_PORT + ': ' + e.message)
+      process.exit(1)
+    })
   }
 
   // hosted-infrastructure endpoints (metrics scraping, matchmaker visibility
-  // toggle); never exposed by standalone servers
+  // toggle); standalone servers use their own socket server without them
   initOperatorEndpoints(app) {
     app.get('/metrics', (res, req) => {
       res.writeHeader('Access-Control-Allow-Origin','*')

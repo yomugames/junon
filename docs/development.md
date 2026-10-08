@@ -375,6 +375,30 @@ from `db/migrations`, which are MySQL-only. Missing tables and newly added
 columns are created at startup. Renaming or removing a column needs an explicit
 standalone step.
 
+### Desktop app
+
+`packages/junon-desktop` is the Electron shell for the same runtime. It loads
+the production client build, so build that for standalone first and rebuild it
+after client changes:
+
+```sh
+NODE_ENV=standalone npm run client:build
+npm run desktop
+```
+
+The window loads `app://junon/` from `packages/junon-io/dist/`, and the app
+refuses to start if that build is missing or wasn't built for standalone. The
+game server runs in an Electron utility process on a free loopback port. The
+saves directory is `<userData>/saves`, for example
+`~/.config/junon-desktop/saves` on Linux. The local menu reaches the server over
+IPC (`window.junonDesktop`), not over HTTP, so no page server runs. Quitting the
+app saves the open world. The local profile stays in the window's
+`localStorage`, which is tied to the fixed `app://junon` origin.
+
+Set `JUNON_USER_DATA_DIR` to run with a different user-data directory, for
+example to run two instances side by side. Server output appears in the
+terminal that ran `npm run desktop`.
+
 ## Configuration and integrations
 
 Runtime behavior depends on `NODE_ENV` and, depending on the service, variables

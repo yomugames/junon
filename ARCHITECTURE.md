@@ -31,9 +31,25 @@ process, stores saves as files with a SQLite database in place of MySQL, and
 needs no matchmaker, Firebase or S3
 ([how to run it](docs/development.md#standalone-offline-mode)). Gameplay code is
 shared with hosted servers. Only infrastructure branches check for standalone.
-The standalone page server also exposes loopback-only `/local/*` routes to
-list, create, open and import worlds. The browser's local menu calls these
-routes and then joins the selected world over the ordinary game WebSocket.
+Standalone servers use the pure-JS `ws` package for the game socket, because
+`uWebSockets.js` (still used by hosted servers) doesn't load under Electron.
+The local menu lists, creates, opens and imports worlds through
+`Server#getLocalWorldApi`, then joins the selected world over the ordinary game
+WebSocket. In a browser it reaches that API through loopback-only `/local/*`
+routes on the standalone page server. The desktop app reaches it over Electron
+IPC instead:
+
+```text
+Electron main process (packages/junon-desktop)
+  | serves the standalone client build as app://junon/
+  | relays preload IPC (window.junonDesktop) to the server's parent port
+  v
+utility process: standalone game server <------> saves dir (files + SQLite)
+  ^
+  | game WebSocket (ws://127.0.0.1:<free port>)
+renderer: browser client
+```
+
 The menu can join a remote co-op host; opening a local world to the LAN remains
 in Phase 6 of the [execution plan](docs/exec-plans/active/electron-offline-coop.md).
 
@@ -73,6 +89,16 @@ This package is shared infrastructure:
 
 Changes here have the widest blast radius and must be checked against both
 runtime services and the browser/game shared code.
+
+### `packages/junon-desktop`
+
+The Electron shell for offline play. `src/main.js` serves the client built with
+`NODE_ENV=standalone npm run client:build` (`packages/junon-io/dist/`) over the
+`app://` protocol, and opens a sandboxed, context-isolated window.
+`src/server_process.js` runs `junon-io/server/server.js` in an Electron utility
+process, with saves in `<userData>/saves`, and asks it to save and exit when the
+app quits. `src/preload.js` exposes the only privileged renderer API, the local
+world API.
 
 ### `packages/junon-io-watchdog`
 

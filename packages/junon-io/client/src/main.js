@@ -1897,6 +1897,9 @@ class Main {
   }
 
   getUserRecord(uid) {
+    // hosted account records live in the matchmaker, which standalone lacks
+    if (this.isStandalone()) return Promise.resolve({ error: "User not found" })
+
     let matchmakerUrl = Config[env].matchmakerUrl
     return new Promise((resolve, reject) => {
       ClientHelper.httpRequest(matchmakerUrl + "get_user?uid=" + uid, {

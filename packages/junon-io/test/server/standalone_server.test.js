@@ -14,6 +14,7 @@ const sqlite3 = require('sqlite3')
 const WorldSerializer = require('junon-common/world_serializer')
 
 const SERVER_PATH = path.resolve(__dirname, '../../server/server.js')
+const APP_PROTO = path.join(path.dirname(require.resolve('junon-common/world_serializer')), 'protocol/app.proto')
 const SAVE_HEADER_PROTO = path.join(path.dirname(require.resolve('junon-common/world_serializer')), 'protocol/save_formats/save_header.proto')
 
 jest.setTimeout(180_000)
@@ -120,6 +121,32 @@ test('generates a new world, saves it on shutdown and loads the save on the next
   header = readSaveHeader()
   expect(header.name).toEqual('TestColony')
   expect(header.gameMode).toEqual('peaceful')
+})
+
+// standalone uses the `ws` socket server (uWebSockets.js doesn't load in
+// Electron); it must speak the same binary protocol as the hosted uWS server
+test('game socket answers protobuf messages over ws', async () => {
+  const WebSocket = require('ws')
+  const MessageWrapper = protobuf.loadSync(APP_PROTO).lookupType('app.MessageWrapper')
+
+  const server = startServer({ JUNON_WORLD_ID: '', JUNON_OWNER_UID: '' })
+  try {
+    await waitForOutput(server, 'Junon Gameserver listening to port ' + server.port)
+
+    const pong = await new Promise((resolve, reject) => {
+      const ws = new WebSocket(`ws://127.0.0.1:${server.port}`)
+      ws.on('open', () => ws.send(MessageWrapper.encode({ Ping: {} }).finish()))
+      ws.on('message', (data) => { ws.close(); resolve(MessageWrapper.decode(data)) })
+      ws.on('error', reject)
+    })
+    expect(pong.kind).toBe('Pong')
+
+    const response = await fetch(`http://127.0.0.1:${server.port}/ping`)
+    expect(await response.text()).toBe('pong')
+  } finally {
+    server.kill('SIGTERM')
+    await server.exited
+  }
 })
 
 test('refuses to start without a world owner', async () => {

@@ -80,7 +80,11 @@ Acceptance criteria:
   import worlds (with character choice), and join by address. Hosted account,
   friends, favorites and event badge screens are hidden in standalone. The
   Host panel describes the LAN hosting work scheduled for Phase 6.
-- [ ] Phase 5: Electron shell runs client and server process.
+- [x] 2026-10-07: Phase 5: `packages/junon-desktop` (Electron 44) serves the
+  standalone client build over `app://junon/` and runs the game server in a
+  utility process. The local menu uses preload IPC. Standalone servers use
+  `ws` instead of `uWebSockets.js`. Quitting saves the open world (part of
+  Phase 7).
 - [ ] Phase 6: Co-op hosting and joining.
 - [ ] Phase 7: Singleplayer behavior (pause, autosave, save on quit).
 - [ ] Phase 8: Remove hosted-service packages and dependencies; update docs.
@@ -266,6 +270,26 @@ entry point only until Phase 6 adds socket rebinding and guest handling.
    (already a dependency) because uWS only ships Node-ABI binaries. Rebuild or
    remove `sharp` (`server/entities/sector.js`).
 
+Done as follows. `src/main.js` serves `packages/junon-io/dist` (the
+`NODE_ENV=standalone` production build) on `app://junon/`. The window is
+sandboxed and context-isolated with no Node integration, and external links
+open in the system browser. `src/server_process.js` forks the unchanged
+`server/server.js` with `utilityProcess.fork` on a free loopback port, with
+saves in `<userData>/saves`. `src/preload.js` exposes
+`junonDesktop.localWorldApi(method, args)`. Main relays it to the server's
+parent port only for the five menu methods and only from `app://junon` frames.
+On the server, the `/local/*` route bodies became `Server#getLocalWorldApi`,
+which both the HTTP routes and `Server#initDesktopChannel` use. A server with a
+parent port doesn't start the page server. On quit, main sends `shutdown`
+(the `SIGTERM` save path) and waits up to 30 s before killing the process.
+Standalone uses `server/util/standalone_socket_server.js` (`ws` 7 behind a
+uWS-shaped socket wrapper with the same 16 MB payload limit and 120 s idle
+timeout). Hosted servers still load uWS, now lazily, until Phase 8.
+`sharp` and `sqlite3` load in Electron's Node (N-API) without a rebuild. The
+"start/stop server" and "profile" parts of the preload API were not needed:
+the server lives as long as the app, and the profile stays in `localStorage`
+(see Decisions).
+
 ### Phase 6: co-op
 
 1. "Open to LAN" rebinds the running server to `0.0.0.0:<port>` and shows the
@@ -278,7 +302,8 @@ entry point only until Phase 6 adds socket rebinding and guest handling.
 ### Phase 7: singleplayer behavior
 
 Pause the simulation when the menu is open with a single local player, autosave
-on an interval, and flush a save on `before-quit` before exiting.
+on an interval, and flush a save on `before-quit` before exiting. Saving on
+quit landed with Phase 5, and standalone already autosaves every three minutes.
 
 ### Phase 8: cleanup
 
@@ -318,6 +343,14 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   covers the identity rewrite. A headless Chromium smoke check created and
   joined a world from the standalone menu with a nondefault socket port.
   `NODE_ENV=standalone npm run client:build` passed.
+- Phase 5: `packages/junon-desktop/test/desktop.spec.js` (Playwright Electron,
+  under `xvfb-run` on Linux) launches the app, checks that the page has only the
+  preload API (no `require`/`process`) and that unknown API methods are
+  rejected. It then creates and joins a world, quits, checks the save, relaunches
+  on a new port, and loads and joins the same world, with no page errors.
+  `standalone_server.test.js` sends a protobuf `Ping` over the `ws` socket.
+  Manual: an import (character list, rejecting non-bytes, import, world list)
+  over the preload API in Electron.
 - Phase 6: two clients (two Electron instances or Electron + browser) on one
   machine and across a LAN can join, play, disconnect, and resume.
 - Playwright e2e suite green against the standalone server.
@@ -367,6 +400,17 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   team to whichever character is picked (leaves worlds without a main colony
   when a non-founder is picked), and renaming taken-over characters to the
   profile name (released characters would all carry the owner's name).
+- 2026-10-07: Desktop client origin is `app://junon` (standard, not
+  `secure`), as planned, rather than loading the standalone page server over
+  `http://127.0.0.1:<port>`. The local profile, which owns the player's worlds,
+  lives in `localStorage`, which is scoped to the origin. A free port changes
+  on every launch, so an http origin would lose the profile. `secure` is left
+  off because a secure page can't open `ws://` sockets to a co-op host on the
+  LAN (mixed content). The profile stays in `localStorage` instead of the
+  preload API in the original step, since a stable origin already persists it.
+- 2026-10-07: Standalone uses `ws`, while hosted servers keep `uWebSockets.js`
+  until Phase 8 removes them. Moving hosted servers would change a production
+  path (TLS via `SSLApp`, throughput) that is about to be deleted.
 - 2026-10-07: `JUNON_OWNER_UID` is required in standalone.
   `Team#isSectorOwner` compares a team's creator with the world owner, so with
   no owner every team saved without a creator counted as the owner, and team
@@ -458,9 +502,37 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   327 characters each, so character pickers need search (the CLI's
   `--search` and `/character list [search]` have it).
 
+- 2026-10-07: Phase 5: standalone startup shelled out to `npm root`/`cat` (the
+  protocol hash in `server.js` and `Protocol.initServer`) and `git rev-parse`
+  (`fetchServerInfo`). A packaged app has none of those. The protocol files are
+  now found with `require.resolve` and read with `fs`, giving the same hash as
+  `gulpfile.js`. The revision falls back to the client build's `dist/revision`.
+  `gulpfile.js` still shells out; it only runs at build time.
+- 2026-10-07: Phase 4 race found in Phase 5: opening a saved world returned
+  before its entities finished loading (`processSectorLoadQueue` runs over
+  several ticks). The client's join then got "Server initializing", and the menu
+  stayed on a blank screen. `loadStandaloneWorld` now waits for
+  `Game#onGameReady`.
+- 2026-10-07: Joining a world requested the hosted user record from the
+  matchmaker (`Main#getUserRecord`, via `addToMineColonies`). Standalone has no
+  matchmaker, so it got a 404 on every join; it now returns "User not found"
+  immediately.
+- 2026-10-07: `sharp` warns on Linux that Electron's binaries "may be
+  incompatible". It loads, but world thumbnails haven't been taken in Electron
+  yet; check them on each platform. Packaging (Phase 9) must
+  unpack `sharp`, `sqlite3`, and `@img/*` from the asar archive.
+- 2026-10-07: Without a GPU (xvfb), Chromium blocklists WebGL and the client
+  never shows the menu. Tests pass `--ignore-gpu-blocklist
+  --enable-unsafe-swiftshader`. Real machines don't need these flags.
+- Not validated: macOS and Windows. On Windows, `Protocol.initServer` mixes `\`
+  and `/` in the proto path; Node accepts that, but check it during Phase 9.
+
 ## Result
 
-In progress. Phase 3 validation (2026-10-07): Jest 28 suites / 292 tests
+In progress. Phase 5 validation (2026-10-07): Jest 28 suites / 294 tests pass.
+The hosted Playwright e2e suite passes 15/15 (uWS path unchanged). The desktop
+e2e test passes under `xvfb-run` with Electron 44.6.0 on Linux.
+`NODE_ENV=standalone npm run client:build` passes. Phase 3 validation (2026-10-07): Jest 28 suites / 292 tests
 pass; `npm run client:build` passes. The Playwright e2e suite (hosted lobby
 via the real matchmaker, building, mining, combat, storage) passes 15/15 after
 installing Playwright's Chromium (`npx playwright install chromium`). In

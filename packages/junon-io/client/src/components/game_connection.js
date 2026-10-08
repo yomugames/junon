@@ -87,7 +87,8 @@ class GameConnection {
   }
 
   getServerIp() {
-    return this.url.replace(/ws.*\//,"")
+    // co-op URLs carry the join password in the query
+    return this.url.split("?")[0].replace(/ws.*\//,"")
   }
 
   waitForSectorRestart() {

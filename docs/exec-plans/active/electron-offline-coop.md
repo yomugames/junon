@@ -85,7 +85,10 @@ Acceptance criteria:
   utility process. The local menu uses preload IPC. Standalone servers use
   `ws` instead of `uWebSockets.js`. Quitting saves the open world (part of
   Phase 7).
-- [ ] Phase 6: Co-op hosting and joining.
+- [x] 2026-10-08: Phase 6: the owner hosts a world from the menu on a port of
+  their choice with an optional password. Guests join by address after a
+  version and password preflight, and are told why when hosting ends. Validated
+  with two Electron instances over a non-loopback interface on one machine.
 - [ ] Phase 7: Singleplayer behavior (pause, autosave, save on quit).
 - [ ] Phase 8: Remove hosted-service packages and dependencies; update docs.
 - [ ] Phase 9: Packaging.
@@ -299,6 +302,38 @@ the server lives as long as the app, and the profile stays in `localStorage`
 3. On connect, check the protocol hash and show a clear version-mismatch error.
 4. When the host quits: save, notify guests, then close.
 
+Done as follows. Rather than rebinding, hosting adds a second listener:
+`StandaloneSocketServer#openGuestListener` binds `0.0.0.0:<port>` (default
+7777, 1024-65535) next to the loopback listener, and both feed one `ws` server.
+Guest sockets are marked `isGuest`. `Server#startHosting`/`stopHosting`/
+`getHostingStatus` hold the state, and `getLocalWorldApi` gained `hostWorld`
+(owner only; opens the world first if needed) and `stopHosting`, through the
+same `/local/*` routes and desktop IPC allowlist. Hosting status
+(addresses, port, password flag) is also in `listWorlds`.
+
+- Version and password: both listeners serve `GET /info` (protocol hash, game
+  version, world name, `requiresPassword`, `passwordAccepted` for
+  `?password=`). The Join panel calls it first and shows "Version mismatch",
+  "Wrong password" or "Can't reach" messages. The guest socket URL carries
+  `?protocol=<hash>&password=<password>`, and `Server#authorizeGuest` answers
+  403 to an upgrade with a wrong protocol or password, so a mismatched client
+  never sends a message. Passwords are compared as SHA-256 digests with
+  `timingSafeEqual`.
+- Guests are untrusted. `Game#performJoinGame` refuses a guest socket that
+  presents the owner's profile id (it would get owner powers). The loopback
+  listener is the only way in for the owner. Guests otherwise join like any
+  new player: the main colony team, their own character keyed by their profile
+  id, and a `users` row on the host.
+- Host notices: the Host panel lists the machine's non-internal IPv4 addresses,
+  and the owner gets a chat line with them on joining (`Player#onPlayerReady`
+  -> `Server#sendHostingStatus`).
+- Ending: stopping, opening another world, or quitting sends every guest socket
+  `PlayerKick` with the new `reason` field, then closes them gracefully. The
+  client shows the reason and returns to the menu. On quit this runs before the
+  save, so guests' characters are stored as player data in it.
+- The client no longer writes the socket URL's query (the password) into its
+  `server_ip` reconnect cookie.
+
 ### Phase 7: singleplayer behavior
 
 Pause the simulation when the menu is open with a single local player, autosave
@@ -353,6 +388,15 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   over the preload API in Electron.
 - Phase 6: two clients (two Electron instances or Electron + browser) on one
   machine and across a LAN can join, play, disconnect, and resume.
+  `standalone_server.test.js` "hosts a world for co-op guests": owner-only
+  hosting and port checks, `/info`, 403 upgrades (no protocol, wrong protocol,
+  wrong password), owner-profile refusal, guest join, stop with a reason and
+  closed port, rejoin (session resume), and the quit notice followed by a clean
+  save. `desktop.spec.js` "a second instance joins a hosted world": a host
+  instance hosts with a password, a guest instance joins at the machine's
+  private (Tailscale `100.x`) address, is rejected with a wrong password first,
+  quits and rejoins with the same name, and gets "The host closed the world"
+  when the host quits.
 - Playwright e2e suite green against the standalone server.
 
 ## Decisions
@@ -424,6 +468,20 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   client would be trusted to report it. Alternatives considered: a per-world
   bank (loses the cross-world purpose), removing the ATM, and a separate
   `bank.json` (built, then dropped once SQLite made it redundant).
+
+- 2026-10-08: Co-op hosting adds a guest listener on a host-chosen port next
+  to the loopback one, instead of rebinding the game socket to `0.0.0.0`. The
+  desktop server's loopback port is random per launch, which guests can't be
+  told in advance or forward on a router. The owner's own socket also stays
+  unreachable from the network.
+- 2026-10-08: The join password and protocol hash are checked at the guest
+  WebSocket upgrade, not in `performJoinGame` as first planned. A guest without
+  them can't send any game message (and a mismatched protocol can't produce
+  garbage decodes). The `/info` preflight provides the clear error messages an
+  upgrade rejection can't.
+- 2026-10-08: Guests are told why they were disconnected through a new
+  `PlayerKick.reason` field (field 2, so old messages still decode). A new
+  message type would have needed new client handling for the same effect.
 
 ## Discoveries and risks
 
@@ -524,12 +582,26 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
 - 2026-10-07: Without a GPU (xvfb), Chromium blocklists WebGL and the client
   never shows the menu. Tests pass `--ignore-gpu-blocklist
   --enable-unsafe-swiftshader`. Real machines don't need these flags.
+- 2026-10-08: Phase 6 risks. Wrong passwords are not rate-limited; this is
+  acceptable for friends-only hosting on a LAN or VPN, but forwarding the port
+  to the internet exposes it to guessing. The password travels in clear text
+  (no TLS on `ws://`), and the per-IP limit of 2 players (from hosted servers)
+  applies to guests behind one NAT. Two players can't both use the default
+  name "Player" at once; the second gets "username is already taken".
+  Disconnected guests linger for the usual resume window, so a quick rejoin
+  resumes the same session instead of a fresh join.
+- Not validated (Phase 6): two separate machines on a physical LAN; the test
+  used a second network interface of one machine. Windows/macOS firewall
+  prompts for the utility process.
 - Not validated: macOS and Windows. On Windows, `Protocol.initServer` mixes `\`
   and `/` in the proto path; Node accepts that, but check it during Phase 9.
 
 ## Result
 
-In progress. Phase 5 validation (2026-10-07): Jest 28 suites / 294 tests pass.
+In progress. Phase 6 validation (2026-10-08): Jest 28 suites / 295 tests
+pass. Both desktop e2e tests pass under `xvfb-run`. The hosted Playwright e2e
+suite passes 15/15 after the shared `PlayerKick` schema change.
+`NODE_ENV=standalone npm run client:build` passes. Phase 5 validation (2026-10-07): Jest 28 suites / 294 tests pass.
 The hosted Playwright e2e suite passes 15/15 (uWS path unchanged). The desktop
 e2e test passes under `xvfb-run` with Electron 44.6.0 on Linux.
 `NODE_ENV=standalone npm run client:build` passes. Phase 3 validation (2026-10-07): Jest 28 suites / 292 tests

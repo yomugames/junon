@@ -15,6 +15,14 @@ const LocalWorldApi = {
     return this.call('openWorld', [details], () => this.request('worlds/open', this.json(details)))
   },
 
+  hostWorld(details) {
+    return this.call('hostWorld', [details], () => this.request('host', this.json(details)))
+  },
+
+  stopHosting() {
+    return this.call('stopHosting', [], () => this.request('host/stop', this.json({})))
+  },
+
   listImportCharacters(bytes) {
     return this.call('listImportCharacters', [new Uint8Array(bytes)], () => {
       return this.request('import/characters', { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: bytes })

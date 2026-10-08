@@ -45,13 +45,20 @@ Electron main process (packages/junon-desktop)
   | relays preload IPC (window.junonDesktop) to the server's parent port
   v
 utility process: standalone game server <------> saves dir (files + SQLite)
-  ^
-  | game WebSocket (ws://127.0.0.1:<free port>)
-renderer: browser client
+  ^                                  ^
+  | game WebSocket                   | guest WebSocket, while hosting co-op
+  | (ws://127.0.0.1:<free port>)     | (ws://0.0.0.0:<host port>, password)
+renderer: browser client             other players' clients
 ```
 
-The menu can join a remote co-op host; opening a local world to the LAN remains
-in Phase 6 of the [execution plan](docs/exec-plans/active/electron-offline-coop.md).
+Co-op is a listen server. Hosting (`hostWorld`) opens a second listener on all
+interfaces at a port the host picks. Sockets from it are marked `isGuest`;
+their upgrade must carry the server's protocol hash and the optional password,
+and they can't join with the owner's profile id. The host keeps playing over
+loopback, which guests can't reach. Clients check a host's `/info` endpoint
+before connecting, to report version and password problems. Hosting ends when
+the host stops it, switches worlds or quits; guests then get a `PlayerKick` with
+a reason.
 
 ## Packages and responsibilities
 

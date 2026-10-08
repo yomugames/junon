@@ -2167,6 +2167,13 @@ async setGameMode(gameMode) {
         return
       }
 
+      // the owner plays on the host machine's loopback socket; a co-op guest
+      // presenting the owner's profile id would get owner powers
+      if (socket.isGuest && uid === this.creatorUid) {
+        this.getSocketUtil().emit(socket, "CantJoin", { message: "This profile owns the world. Join with your own profile." })
+        return
+      }
+
       let user = await User.findOne({ where: { uid: uid } })
       let profileName = this.isValidLocalUsername(data.username) ? data.username : null
 

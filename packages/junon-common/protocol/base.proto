@@ -659,6 +659,7 @@ message TeamMemberAction {
 
 message PlayerKick {
   bool isBan = 1;
+  string reason = 2;
 }
 
 message UpdateTeamHealth {

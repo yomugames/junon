@@ -208,3 +208,112 @@ test('local menu creates and reloads a world through loopback routes', async () 
     await server.exited
   }
 })
+
+// Co-op: the host opens the world on a second, all-interfaces port. Guests
+// pass a protocol and password check, can't use the owner's profile, and are
+// told why they are disconnected when hosting stops or the host quits.
+test('hosts a world for co-op guests', async () => {
+  const WebSocket = require('ws')
+  const MessageWrapper = protobuf.loadSync(APP_PROTO).lookupType('app.MessageWrapper')
+
+  const server = startServer({ JUNON_WORLD_ID: '', JUNON_OWNER_UID: '' })
+  try {
+    await waitForOutput(server, 'Webpage available')
+    const base = `http://127.0.0.1:${server.clientPort}/local/`
+    const ownerUid = '0123456789abcdef0123456789abcdef'
+    const guestPort = randomPort()
+    const post = (route, body) => fetch(base + route, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    })
+
+    let response = await post('worlds', { ownerUid, name: 'Coop World', gameMode: 'survival' })
+    const { worldId } = await response.json()
+
+    // only the owner may host, on an unprivileged port
+    response = await post('host', { worldId, ownerUid: 'ffffffffffffffffffffffffffffffff', port: guestPort, password: '' })
+    expect(response.status).toBe(400)
+    response = await post('host', { worldId, ownerUid, port: 80, password: '' })
+    expect(response.status).toBe(400)
+
+    response = await post('host', { worldId, ownerUid, port: guestPort, password: 'secret' })
+    expect(response.status).toBe(200)
+    expect((await response.json()).hosting).toMatchObject({ worldId, port: guestPort, hasPassword: true })
+    response = await post('host', { worldId, ownerUid, port: guestPort + 1, password: '' })
+    expect(response.status).toBe(400)
+
+    response = await fetch(base + 'worlds')
+    expect((await response.json()).hosting).toMatchObject({ worldId, port: guestPort })
+
+    const guestBase = `http://127.0.0.1:${guestPort}`
+    let info = await (await fetch(guestBase + '/info')).json()
+    expect(info).toMatchObject({ worldName: 'Coop World', requiresPassword: true, passwordAccepted: false })
+    expect(info.protocolHash).toMatch(/^[a-f0-9]{8}$/)
+    info = await (await fetch(guestBase + '/info?password=secret')).json()
+    expect(info.passwordAccepted).toBe(true)
+
+    // the host's loopback socket needs no password
+    info = await (await fetch(`http://127.0.0.1:${server.port}/info`)).json()
+    expect(info.requiresPassword).toBe(false)
+
+    const connect = (query) => new Promise((resolve) => {
+      const ws = new WebSocket(`ws://127.0.0.1:${guestPort}/?${query}`)
+      ws.messages = []
+      ws.on('message', (data) => ws.messages.push(MessageWrapper.decode(data)))
+      ws.closed = new Promise((closed) => ws.on('close', closed))
+      ws.on('open', () => resolve(ws))
+      ws.on('unexpected-response', (req, res) => resolve(res.statusCode))
+      ws.on('error', () => {})
+    })
+    const waitForMessage = async (ws, kind) => {
+      const deadline = Date.now() + 30_000
+      while (Date.now() < deadline) {
+        const message = ws.messages.find((entry) => entry.kind === kind)
+        if (message) return message[kind]
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
+      throw new Error('no ' + kind + ' message, got ' + ws.messages.map((entry) => entry.kind).join(','))
+    }
+    const requestGame = (ws, uid, username) => {
+      ws.send(MessageWrapper.encode({ RequestGame: { uid, username, screenWidth: 800, screenHeight: 600, sessionId: uid } }).finish())
+    }
+
+    const protocol = 'protocol=' + info.protocolHash
+    expect(await connect('')).toBe(403)
+    expect(await connect(protocol + '&password=wrong')).toBe(403)
+    expect(await connect('protocol=00000000&password=secret')).toBe(403)
+
+    // the owner's profile can't come in through the guest port
+    const impostor = await connect(protocol + '&password=secret')
+    requestGame(impostor, ownerUid, 'Impostor')
+    expect((await waitForMessage(impostor, 'CantJoin')).message).toContain('owns the world')
+    impostor.close()
+
+    const guest = await connect(protocol + '&password=secret')
+    requestGame(guest, 'guestProfile1234', 'Guest')
+    expect((await waitForMessage(guest, 'JoinGame')).uid).toBe('guestProfile1234')
+
+    // stopping disconnects guests with a reason, and closes the port
+    response = await post('host/stop', {})
+    expect(response.status).toBe(200)
+    expect((await waitForMessage(guest, 'PlayerKick')).reason).toContain('stopped hosting')
+    await guest.closed
+    expect(await canConnect('127.0.0.1', guestPort)).toBe(false)
+
+    // the guest's player is kept for a while and resumes when they rejoin
+    response = await post('host', { worldId, ownerUid, port: guestPort, password: '' })
+    expect(response.status).toBe(200)
+    const returning = await connect(protocol)
+    requestGame(returning, 'guestProfile1234', 'Guest')
+    await waitForMessage(returning, 'SessionResume')
+
+    // quitting the host notifies guests, then saves
+    server.kill('SIGTERM')
+    expect((await waitForMessage(returning, 'PlayerKick')).reason).toContain('closed the world')
+    expect(await server.exited).toBe(0)
+    const saved = await queryDatabase("select uid from users where uid = 'guestProfile1234'")
+    expect(saved).toEqual([{ uid: 'guestProfile1234' }])
+  } finally {
+    server.kill('SIGTERM')
+    await server.exited
+  }
+})

@@ -14,6 +14,8 @@ require("./util/polyfill")
 
 const path = require('path')
 const net = require('net')
+const os = require('os')
+const crypto = require('crypto')
 const http = require("http")
 const https = require("https")
 const express = require("express")
@@ -314,6 +316,7 @@ class Server {
   async activateStandaloneWorld(options) {
     let current = this.getMainGame()
     if (current && current.getId() === options.worldId) return
+    this.stopHosting("The host closed the world.")
     if (current) await current.prepareRemove()
     await this.loadStandaloneWorld(options)
   }
@@ -331,6 +334,9 @@ class Server {
     let shutdown = this.shutdownStandalone = async () => {
       if (this.isStandaloneShutdownInProgress) return
       this.isStandaloneShutdownInProgress = true
+
+      // guests leave first, so their characters are stored before the save
+      this.stopHosting("The host closed the world.")
 
       let exitCode = 0
       let games = Object.values(this.games)
@@ -847,6 +853,8 @@ class Server {
       app.get('/local/worlds', route(() => api.listWorlds()))
       app.post('/local/worlds', route((req) => api.createWorld(req.body)))
       app.post('/local/worlds/open', route((req) => api.openWorld(req.body)))
+      app.post('/local/host', route((req) => api.hostWorld(req.body)))
+      app.post('/local/host/stop', route(() => api.stopHosting()))
       app.post('/local/import/characters', raw, route((req) => api.listImportCharacters(req.body)))
       app.post('/local/import', raw, route((req) => api.importWorld(req.body, {
         ownerUid: req.get('x-junon-owner'),
@@ -922,11 +930,17 @@ class Server {
       return Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength)
     }
     const serverUrl = () => `ws://127.0.0.1:${this.APP_SERVER_PORT}`
+    const validOwnedWorld = async (worldId, ownerUid) => {
+      if (!validWorld(worldId) || !validOwner(ownerUid)) throw new Error('Invalid world or profile')
+      let row = await SectorModel.findOne({ where: { uid: worldId } })
+      if (!row) throw new Error('World not found')
+      if (row.creatorUid !== ownerUid) throw new Error('World belongs to another profile')
+    }
 
     return {
       listWorlds: async () => {
         let rows = await SectorModel.findAll({ order: [['updatedAt', 'DESC']] })
-        return { worlds: rows.map((row) => ({ id: row.uid, name: row.name, mode: row.gameMode, days: row.daysAlive })), activeWorldId: this.getMainGame() && this.getMainGame().getId(), serverUrl: serverUrl() }
+        return { worlds: rows.map((row) => ({ id: row.uid, name: row.name, mode: row.gameMode, days: row.daysAlive })), activeWorldId: this.getMainGame() && this.getMainGame().getId(), serverUrl: serverUrl(), hosting: this.getHostingStatus() }
       },
       createWorld: async ({ ownerUid, name, gameMode } = {}) => {
         if (!validOwner(ownerUid) || typeof name !== 'string' || !/^[\p{L}\p{N} _-]{1,40}$/u.test(name.trim()) || !['peaceful', 'survival', 'hardcore'].includes(gameMode)) throw new Error('Invalid world details')
@@ -935,12 +949,23 @@ class Server {
         return { worldId, serverUrl: serverUrl() }
       },
       openWorld: async ({ worldId, ownerUid } = {}) => {
-        if (!validWorld(worldId) || !validOwner(ownerUid)) throw new Error('Invalid world or profile')
-        let row = await SectorModel.findOne({ where: { uid: worldId } })
-        if (!row) throw new Error('World not found')
-        if (row.creatorUid !== ownerUid) throw new Error('World belongs to another profile')
+        await validOwnedWorld(worldId, ownerUid)
         await this.activateStandaloneWorld({ worldId, ownerUid })
         return { worldId, serverUrl: serverUrl() }
+      },
+      // opens the world (if it isn't already) and lets guests join it
+      hostWorld: async ({ worldId, ownerUid, port, password } = {}) => {
+        await validOwnedWorld(worldId, ownerUid)
+        if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Choose a port between 1024 and 65535')
+        if (typeof password !== 'string' || !/^[\x20-\x7e]{0,64}$/.test(password)) throw new Error('Use up to 64 plain characters for the password')
+        if (this.getHostingStatus()) throw new Error('Already hosting. Stop hosting first.')
+        await this.activateStandaloneWorld({ worldId, ownerUid })
+        await this.startHosting({ port, password })
+        return { worldId, serverUrl: serverUrl(), hosting: this.getHostingStatus() }
+      },
+      stopHosting: async () => {
+        this.stopHosting("The host stopped hosting the world.")
+        return { hosting: null }
       },
       listImportCharacters: async (bytes) => {
         return { characters: SaveImporter.listCharacters(validSave(bytes)) }
@@ -953,6 +978,114 @@ class Server {
         await StandaloneWorlds.register({ uid: result.worldId, name: result.name, gameMode: result.gameMode, ownerUid })
         return { worldId: result.worldId, name: result.name }
       }
+    }
+  }
+
+  // Co-op ("open to LAN"). Guests connect to a second listener on every
+  // interface; the host keeps playing over the loopback one, which guests
+  // can't reach. Hosting ends when the world is closed or switched.
+  async startHosting({ port, password }) {
+    try {
+      await this.standaloneSocketServer.openGuestListener('0.0.0.0', port)
+    } catch(e) {
+      if (e.code === 'EADDRINUSE') throw new Error('Port ' + port + ' is already in use. Choose another port.')
+      if (e.code === 'EACCES') throw new Error('Not allowed to use port ' + port + '. Choose another port.')
+      throw e
+    }
+
+    this.coopHost = {
+      port: port,
+      passwordDigest: password ? this.digestPassword(password) : null
+    }
+
+    LOG.info('Hosting co-op on port ' + port + (password ? ' with a password' : ''))
+    this.forEachGame((game) => {
+      game.forEachPlayer((player) => this.sendHostingStatus(player))
+    })
+  }
+
+  stopHosting(reason) {
+    if (!this.coopHost) return
+
+    this.standaloneSocketServer.sockets.forEach((socket) => {
+      if (socket.isGuest) this.socketUtil.emit(socket, "PlayerKick", { reason: reason })
+    })
+    this.standaloneSocketServer.closeGuestListener()
+    this.coopHost = null
+
+    LOG.info('Stopped hosting co-op')
+  }
+
+  getHostingStatus() {
+    if (!this.coopHost) return null
+    let game = this.getMainGame()
+
+    return {
+      worldId: game ? game.getId() : null,
+      port: this.coopHost.port,
+      addresses: this.getLanAddresses(),
+      hasPassword: !!this.coopHost.passwordDigest
+    }
+  }
+
+  // tells the world owner where guests can join, once they are in the game
+  sendHostingStatus(player) {
+    let status = this.getHostingStatus()
+    if (!status || !player.isSectorOwner() || !player.isPlayerReady) return
+
+    let addresses = status.addresses.map((address) => address + ':' + status.port)
+    let where = addresses.length ? addresses.join(', ') : 'port ' + status.port
+    player.showChatSuccess('Co-op is open. Friends join at ' + where + (status.hasPassword ? ' with your password' : ''))
+  }
+
+  // IPv4 addresses of this machine that other machines can use, LAN or VPN
+  // (Tailscale, ZeroTier); IPv6 addresses aren't offered in the join menu
+  getLanAddresses() {
+    let addresses = []
+    let interfaces = os.networkInterfaces()
+    for (let name in interfaces) {
+      interfaces[name].forEach((entry) => {
+        if (entry.family === 'IPv4' || entry.family === 4) {
+          if (!entry.internal) addresses.push(entry.address)
+        }
+      })
+    }
+
+    return addresses
+  }
+
+  digestPassword(password) {
+    return crypto.createHash('sha256').update(String(password)).digest()
+  }
+
+  isHostPasswordAccepted(password) {
+    if (!this.coopHost) return false
+    if (!this.coopHost.passwordDigest) return true
+    if (typeof password !== 'string') return false
+    return crypto.timingSafeEqual(this.digestPassword(password), this.coopHost.passwordDigest)
+  }
+
+  // guest upgrades carry ?protocol=<hash>&password=<password>; a client with
+  // another protocol would send messages this server decodes as garbage
+  authorizeGuest(req) {
+    let query = new URL(req.url, 'http://localhost').searchParams
+    if (query.get('protocol') !== protocolHash) return false
+    return this.isHostPasswordAccepted(query.get('password') || '')
+  }
+
+  // join preflight: lets a client show a clear version or password error
+  // before connecting, instead of a failed socket
+  getJoinInfo(req, isGuest) {
+    let query = new URL(req.url, 'http://localhost').searchParams
+    let game = this.getMainGame()
+    let requiresPassword = isGuest && !!(this.coopHost && this.coopHost.passwordDigest)
+
+    return {
+      protocolHash: protocolHash,
+      version: this.gameVersion,
+      worldName: game && game.sector ? game.sector.name : null,
+      requiresPassword: requiresPassword,
+      passwordAccepted: !requiresPassword || this.isHostPasswordAccepted(query.get('password') || '')
     }
   }
 
@@ -1440,14 +1573,23 @@ class Server {
   }
 
   initStandaloneSocketServer() {
+    this.gameVersion = fs.readFileSync(appRoot + "/VERSION.txt", 'utf8').trim()
+
     this.standaloneSocketServer = new StandaloneSocketServer({
       open: this.onSocketOpen.bind(this),
       message: this.onSocketData.bind(this),
       close: this.onSocketClose.bind(this),
-      http: (req, res) => {
+      authorizeGuest: this.authorizeGuest.bind(this),
+      http: (req, res, isGuest) => {
         if (req.method !== 'GET') return false
 
         let pathname = req.url.split('?')[0]
+        if (pathname === '/info') {
+          res.writeHead(200, { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' })
+          res.end(JSON.stringify(this.getJoinInfo(req, isGuest)))
+          return true
+        }
+
         if (pathname === '/ping') {
           res.writeHead(200, { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/plain' })
           res.end('pong')

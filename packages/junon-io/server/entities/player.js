@@ -2826,6 +2826,8 @@ class Player extends BaseEntity {
 
     this.game.globalSidebar.emitContentsToPlayer(this)
     this.game.sidebars[this.id].emitContentsToPlayer(this)
+
+    if (env === 'standalone') this.game.server.sendHostingStatus(this)
   }
 
   sendAllButtons() {

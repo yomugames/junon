@@ -23,10 +23,10 @@ test.afterEach(() => {
   fs.rmSync(userDataDir, { recursive: true, force: true })
 })
 
-async function launch() {
+async function launch(dataDir = userDataDir) {
   const app = await electron.launch({
     args: CHROMIUM_ARGS.concat([APP_DIR]),
-    env: Object.assign({}, process.env, { JUNON_USER_DATA_DIR: userDataDir })
+    env: Object.assign({}, process.env, { JUNON_USER_DATA_DIR: dataDir })
   })
   const page = await app.firstWindow()
   const errors = []
@@ -77,4 +77,78 @@ test('creates a world, saves it on quit and loads it after a restart', async () 
 
   await quit(app)
   expect(errors).toEqual([])
+})
+
+// prefer a private (LAN or VPN) address, as a friend on the same network
+// would use; the loopback address would skip the network path entirely
+function pickAddress(addresses) {
+  const isPrivate = (address) => /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.)/.test(address)
+  return addresses.find(isPrivate) || addresses[0] || '127.0.0.1'
+}
+
+async function setName(page, name) {
+  await page.fill('.local_player_name', name)
+  await page.dispatchEvent('.local_player_name', 'change')
+}
+
+test('a second instance joins a hosted world, leaves and rejoins', async () => {
+  const guestDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'junon-desktop-guest-'))
+  const port = 20_000 + Math.floor(Math.random() * 20_000)
+  let host
+  let guest
+
+  try {
+    host = await launch()
+    await setName(host.page, 'Host')
+    await host.page.evaluate(() => window.junonDesktop.localWorldApi('createWorld', [{ ownerUid: window.main.localProfile.uid, name: 'Coop World', gameMode: 'survival' }]))
+    await host.page.click('.local_host_btn')
+    await host.page.fill('.host_port', String(port))
+    await host.page.fill('.host_password', 'secret')
+    await host.page.click('.start_hosting')
+    await host.page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
+    await host.page.waitForFunction(() => document.body.innerText.includes('Co-op is open'), null, { timeout: 30_000 })
+
+    const status = await host.page.evaluate(() => window.junonDesktop.localWorldApi('listWorlds', []))
+    expect(status.hosting).toMatchObject({ port, hasPassword: true })
+    const address = pickAddress(status.hosting.addresses) + ':' + port
+
+    const joinAs = async (page, password) => {
+      await page.click('.local_join_btn')
+      await page.fill('.join_address', address)
+      await page.fill('.join_password', password)
+      await page.click('.connect_world')
+    }
+
+    guest = await launch(guestDataDir)
+    await setName(guest.page, 'Guest')
+    await joinAs(guest.page, 'wrong')
+    await expect(guest.page.locator('.local_menu_message')).toHaveText('Wrong password')
+    await joinAs(guest.page, 'secret')
+    await guest.page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
+    expect(await guest.page.evaluate(() => [window.game.sector.name, window.player.name])).toEqual(['Coop World', 'Guest'])
+
+    // leaving and coming back (same profile, new app session) keeps the
+    // character's identity
+    await quit(guest.app)
+    expect(guest.errors).toEqual([])
+    guest = await launch(guestDataDir)
+    await joinAs(guest.page, 'secret')
+    await guest.page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
+    expect(await guest.page.evaluate(() => window.player.name)).toBe('Guest')
+
+    // the host quitting saves the world and tells the guest why they left
+    await quit(host.app)
+    expect(host.errors).toEqual([])
+    host = null
+    await guest.page.waitForFunction(() => document.body.innerText.includes('The host closed the world'), null, { timeout: 30_000 })
+    await expect(guest.page.locator('#local_world_menu')).toBeVisible()
+
+    await quit(guest.app)
+    guest = null
+    expect(savePaths().length).toBe(1)
+  } finally {
+    if (host) await quit(host.app)
+    if (guest) await quit(guest.app)
+    fs.rmSync(guestDataDir, { recursive: true, force: true })
+  }
 })

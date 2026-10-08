@@ -311,7 +311,7 @@ build speed and admin mode differ.
 | `JUNON_OWNER_UID` | Required when `JUNON_WORLD_ID` is set. Local profile id of the world's owner. |
 | `JUNON_WORLD_NAME`, `JUNON_GAME_MODE` | New worlds only; an existing save supplies its own name and mode. Mode defaults to `survival`. |
 | `PORT` | Game socket port (default 8000). |
-| `JUNON_HOST` | Address the game socket binds to. Defaults to `127.0.0.1`, so nothing on the network can connect. |
+| `JUNON_HOST` | Address the game socket binds to. Defaults to `127.0.0.1`, so nothing on the network can connect. Co-op hosting from the menu doesn't need it (see below). |
 | `JUNON_CLIENT_PORT` | Port of the page server for the browser client (default 8001, always on `127.0.0.1`). |
 
 ```sh
@@ -330,8 +330,31 @@ save directory. The optional `?server=ws://127.0.0.1:8000&name=YourName`
 direct-connect entry remains for tests and development.
 Its identity is the local profile in `localStorage` (`junon_local_profile`),
 whose `uid` is what `JUNON_OWNER_UID` must match when preloading a world.
-Hosting a world to the LAN is part of Phase 6; the Phase 4 Host screen explains
-that boundary.
+
+### Co-op
+
+**Host co-op** in the menu opens one of your worlds to other players on a port
+you choose (default 7777), with an optional password, and joins it. The server
+keeps your own socket on loopback and adds a guest listener on all interfaces.
+The Host panel and an in-game chat line list the machine's IPv4 addresses.
+Friends use **Join co-op** with `address:port`. Their client first asks the
+host's `GET /info` for its protocol hash and whether the password is right, so
+a different game version or a wrong password gets a clear message. The socket
+URL then carries `?protocol=<hash>&password=<password>`, and the server refuses
+upgrades without them.
+
+- Guests are identified by their own local profile. Their characters, and their
+  ATM balance, are stored in the host's world and SQLite file. A guest can't
+  join with the owner's profile id.
+- Hosting stops when the host clicks Stop hosting, opens another world, or
+  quits. Guests are disconnected with a message saying why. Their characters are
+  saved with the world.
+- On the internet, the host forwards the TCP port on their router or uses an
+  overlay VPN such as Tailscale or ZeroTier. On Windows and macOS the first
+  hosting session triggers the OS firewall prompt for the game server process.
+- To try it on one machine, run two desktop instances with different
+  `JUNON_USER_DATA_DIR` values, or join from a browser on the standalone page
+  server.
 
 To play a world exported from the hosted game, import it. Import replaces
 the hosted account ids, makes your profile the owner of the world and of its

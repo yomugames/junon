@@ -1,5 +1,7 @@
 const LocalWorldApi = require('../util/local_world_api')
 
+const DEFAULT_HOST_PORT = 7777
+
 // Standalone home menu. World management goes through LocalWorldApi (loopback
 // page server, or the desktop app's game server process); game traffic still
 // uses the ordinary authoritative socket.
@@ -108,22 +110,93 @@ class LocalWorldMenu {
     }))
   }
 
+  // Opens one of the player's worlds to other machines: guests connect to
+  // this port on any of the listed addresses, the host plays locally
   hostWorld() {
-    this.panel.innerHTML = '<h2>Host co-op</h2><p>Opening a world to the LAN will be available with the desktop co-op runtime. You can play your worlds locally from Load world.</p>'
+    this.panel.innerHTML = '<h2>Host co-op</h2><div class="host_status">Loading…</div>'
+    this.run(async () => {
+      const result = await LocalWorldApi.listWorlds()
+      if (result.hosting) return this.showHosting(result)
+
+      this.panel.innerHTML = '<h2>Host co-op</h2><p>Friends on your network, or on a VPN such as Tailscale, join with your address and this port. To play over the internet, forward the port on your router.</p><label>World <select class="host_world ui_select"></select></label><label>Port <input class="host_port black_input" type="number" min="1024" max="65535" value="' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="host_password black_input" type="password" maxlength="64" placeholder="optional" autocomplete="new-password"></label><button class="start_hosting ui_btn">Host and play</button>'
+      const select = this.panel.querySelector('.host_world')
+      result.worlds.forEach((world) => {
+        const option = document.createElement('option')
+        option.value = world.id
+        option.textContent = world.name + ' · ' + world.mode
+        option.selected = world.id === result.activeWorldId
+        select.appendChild(option)
+      })
+      if (!result.worlds.length) throw new Error('Create or import a world first')
+
+      this.panel.querySelector('.start_hosting').addEventListener('click', () => this.run(async () => {
+        this.saveName()
+        const hosted = await LocalWorldApi.hostWorld({
+          worldId: select.value,
+          ownerUid: this.main.localProfile.uid,
+          port: Number(this.panel.querySelector('.host_port').value),
+          password: this.panel.querySelector('.host_password').value
+        })
+        this.open(hosted.worldId, hosted.serverUrl)
+      }))
+    })
+  }
+
+  showHosting(result) {
+    const hosting = result.hosting
+    const world = result.worlds.find((entry) => entry.id === hosting.worldId)
+    this.panel.innerHTML = '<h2>Host co-op</h2><p class="host_summary"></p><ul class="host_addresses"></ul><button class="play_hosted ui_btn">Play</button> <button class="stop_hosting ui_btn">Stop hosting</button>'
+    this.panel.querySelector('.host_summary').textContent = 'Hosting ' + (world ? world.name : 'your world') + (hosting.hasPassword ? ' with a password' : '') + '. Friends join at:'
+    const list = this.panel.querySelector('.host_addresses')
+    const addresses = hosting.addresses.length ? hosting.addresses : ['<your address>']
+    addresses.forEach((address) => {
+      const item = document.createElement('li')
+      item.textContent = address + ':' + hosting.port
+      list.appendChild(item)
+    })
+    this.panel.querySelector('.play_hosted').addEventListener('click', () => this.open(hosting.worldId, result.serverUrl))
+    this.panel.querySelector('.stop_hosting').addEventListener('click', () => this.run(async () => {
+      await LocalWorldApi.stopHosting()
+      this.hostWorld()
+    }))
   }
 
   joinWorld() {
-    this.panel.innerHTML = '<h2>Join co-op</h2><label>Address <input class="join_address black_input" placeholder="192.168.1.10:8000"></label><button class="connect_world ui_btn">Join</button>'
+    this.panel.innerHTML = '<h2>Join co-op</h2><label>Address <input class="join_address black_input" placeholder="192.168.1.10:' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="join_password black_input" type="password" maxlength="64" placeholder="if the host set one"></label><button class="connect_world ui_btn">Join</button>'
     this.panel.querySelector('.connect_world').addEventListener('click', () => this.run(async () => {
       this.saveName()
       const address = this.panel.querySelector('.join_address').value.trim()
       if (!/^[a-zA-Z0-9.:-]+:\d{1,5}$/.test(address)) throw new Error('Enter an address and port')
       const port = Number(address.split(':').pop())
       if (port < 1 || port > 65535) throw new Error('Invalid port')
-      this.main.standaloneServerUrl = 'ws://' + address
+      const password = this.panel.querySelector('.join_password').value
+      await this.checkHost(address, password)
+      this.main.standaloneServerUrl = 'ws://' + address + '?protocol=' + encodeURIComponent(window.protocolHash) + '&password=' + encodeURIComponent(password)
       this.el.style.display = 'none'
       this.main.joinStandaloneWorld()
     }))
+  }
+
+  // the host's /info preflight turns version and password problems into
+  // clear messages; the game socket itself would only fail to connect
+  async checkHost(address, password) {
+    let info
+    try {
+      const response = await fetch('http://' + address + '/info?password=' + encodeURIComponent(password))
+      if (!response.ok) throw new Error('outdated')
+      info = await response.json()
+    } catch (e) {
+      if (e.message === 'outdated') throw new Error('The host runs a different version of Junon. Both players need the same version.')
+      throw new Error('Can\'t reach ' + address + '. Check the address and that the world is being hosted.')
+    }
+
+    if (info.protocolHash !== window.protocolHash) {
+      const ownVersion = (document.querySelector('.game_version') || {}).textContent || 'another version'
+      throw new Error('Version mismatch: the host runs Junon ' + info.version + ', you run ' + ownVersion + '. Both players need the same version.')
+    }
+    if (!info.passwordAccepted) {
+      throw new Error(password ? 'Wrong password' : 'This world needs a password')
+    }
   }
 }
 

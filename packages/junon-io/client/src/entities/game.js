@@ -1908,7 +1908,10 @@ class Game {
 
   onPlayerKick(data) {
     this.gameConnection.close()
-    if (data.isBan) {
+    if (data.reason) {
+      // e.g. a co-op host closing the world
+      this.main.onPlayerCantJoin({ message: data.reason })
+    } else if (data.isBan) {
       this.main.onPlayerCantJoin({ message: i18n.t("Player.Banned") })
     } else {
       this.main.onPlayerCantJoin({ message: i18n.t("Player.Kicked") })

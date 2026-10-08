@@ -685,6 +685,11 @@ class Game {
     const isOneSecondInterval = this.timestamp % Constants.physicsTimeStep === 0
     if (!isOneSecondInterval) return
 
+    this.removeDisconnectedPlayers()
+  }
+
+  // called once a second
+  removeDisconnectedPlayers() {
     const numSecondsAllowDisconnected = 15
 
     for (let playerId in this.disconnectedPlayers) {
@@ -1044,6 +1049,30 @@ class Game {
 
   pause() {
     this.shouldPause = true
+  }
+
+  // Standalone singleplayer: the world stands still while nobody plays it.
+  // That is when no player is connected (the host is in the local menu), or
+  // the only one is the host with the in-game menu open or the window hidden.
+  // Any co-op guest keeps it running. Unlike pause() (command blocks), the
+  // clock stops too, so day/night and every timer wait.
+  isSimulationPaused() {
+    if (env !== 'standalone') return false
+
+    let connected = Object.values(this.players).filter((player) => player.isConnected())
+    if (connected.length === 0) return true
+    if (connected.length > 1) return false
+
+    let player = connected[0]
+    return !player.getSocket().isGuest && player.isPauseRequested
+  }
+
+  // nothing advances, but players who left are still removed on time
+  stepPaused() {
+    this.pausedTickCount = (this.pausedTickCount || 0) + 1
+    if (this.pausedTickCount % Constants.physicsTimeStep === 0) {
+      this.removeDisconnectedPlayers()
+    }
   }
 
   unpause() {
@@ -1716,6 +1745,11 @@ async setGameMode(gameMode) {
 
   stepWorld() {
     if (!this.isGameReady) return
+
+    if (this.isSimulationPaused()) {
+      this.stepPaused()
+      return
+    }
 
     // fixedTimeStep = seconds per frame
     this.platformerWorldStep(this.fixedTimeStep)

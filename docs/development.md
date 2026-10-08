@@ -381,6 +381,10 @@ The server autosaves every three minutes and saves on `SIGINT`/`SIGTERM`. In
 this mode an unhandled promise rejection is logged instead of crashing the
 world.
 
+A world stands still, clock included, while nobody is playing it: no player is
+connected, or the only one is the host with the in-game menu open or the window
+hidden (the client sends `SetPaused`). Co-op guests keep it running.
+
 Standalone uses a SQLite file, `<JUNON_SAVES_DIR>/junon.sqlite`, in place of
 MySQL. It has the same models and tables, and is shared by every world in that
 saves directory:

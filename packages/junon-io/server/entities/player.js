@@ -4433,6 +4433,13 @@ class Player extends BaseEntity {
     this.lastActivityTime = Date.now()
   }
 
+  // standalone: see Game#isSimulationPaused
+  setPauseRequested(isPaused) {
+    this.isPauseRequested = !!isPaused
+    // time in the menu doesn't count towards the AFK limit
+    this.touchActivity()
+  }
+
   debugRoom(data) {
     let platform = this.game.getEntity(data.id)
     if (platform && platform.room) {

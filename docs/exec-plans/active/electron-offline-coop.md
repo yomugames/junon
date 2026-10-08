@@ -89,7 +89,9 @@ Acceptance criteria:
   their choice with an optional password. Guests join by address after a
   version and password preflight, and are told why when hosting ends. Validated
   with two Electron instances over a non-loopback interface on one machine.
-- [ ] Phase 7: Singleplayer behavior (pause, autosave, save on quit).
+- [x] 2026-10-08: Phase 7: a singleplayer world stands still while the host's
+  in-game menu is open, the window is hidden, or nobody is in it. Autosave and
+  save on quit were already in place.
 - [ ] Phase 8: Remove hosted-service packages and dependencies; update docs.
 - [ ] Phase 9: Packaging.
 
@@ -340,6 +342,21 @@ Pause the simulation when the menu is open with a single local player, autosave
 on an interval, and flush a save on `before-quit` before exiting. Saving on
 quit landed with Phase 5, and standalone already autosaves every three minutes.
 
+Done as follows. The standalone client sends a new `SetPaused { isPaused }`
+message (field 186) when its in-game menu opens or closes, or when the page
+becomes hidden (`visibilitychange`, e.g. a minimized window); see
+`Game#updateLocalPause`. It resends after `JoinGame` and `SessionResume`,
+because the server's player may be new. `Game#isSimulationPaused` (standalone
+only) is true when no player is connected, or when the only connected player is
+on the loopback socket (not a co-op guest) and asked to pause. `stepWorld` then
+skips the whole step, the clock (`timestamp`, so hour and day) included. Only
+the once-a-second removal of disconnected players keeps running, on its own
+tick count. Updates are still sent. A guest's `SetPaused` has no effect while
+it is in the world with others, and a lone guest never pauses it. Resuming
+resets the player's AFK timer, so time in the menu doesn't count towards the
+10-minute AFK kick. Autosave is on wall-clock time and keeps running while
+paused.
+
 ### Phase 8: cleanup
 
 Remove `junon-matchmaker`, `junon-io-watchdog`, `junon-common/db` and its
@@ -483,6 +500,15 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   `PlayerKick.reason` field (field 2, so old messages still decode). A new
   message type would have needed new client handling for the same effect.
 
+- 2026-10-08: The singleplayer pause stops the world clock as well as the
+  simulation, rather than reusing the command-block `Game#pause`, which keeps
+  advancing `timestamp` (and with it the hour and day) while entities stand
+  still. A world with no connected player is paused too: hosted servers shut
+  such worlds down, and standalone keeps them loaded for the menu, so without
+  this a base would keep being raided while the player is in the local menu.
+  Minecraft-style pause on focus loss was narrowed to a hidden page, so that
+  playing with the window unfocused (e.g. a second monitor) still works.
+
 ## Discoveries and risks
 
 - `uWebSockets.js` is expected not to load under Electron's ABI. The plan
@@ -598,7 +624,13 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
 
 ## Result
 
-In progress. Phase 6 validation (2026-10-08): Jest 28 suites / 295 tests
+In progress. Phase 7 validation (2026-10-08): Jest 28 suites / 296 tests pass,
+including `standalone_server.test.js` "pauses a singleplayer world while the
+host is away" (the clock stops on `SetPaused`, resumes, keeps running with a
+co-op guest, and a guest can't pause it). The first desktop e2e test opens the
+in-game menu with Escape and sees the world clock stop and resume. The hosted
+Playwright suite passes 15/15 after the `SetPaused` schema change.
+`NODE_ENV=standalone npm run client:build` passes. Phase 6 validation (2026-10-08): Jest 28 suites / 295 tests
 pass. Both desktop e2e tests pass under `xvfb-run`. The hosted Playwright e2e
 suite passes 15/15 after the shared `PlayerKick` schema change.
 `NODE_ENV=standalone npm run client:build` passes. Phase 5 validation (2026-10-07): Jest 28 suites / 294 tests pass.

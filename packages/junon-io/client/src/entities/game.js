@@ -1462,6 +1462,22 @@ class Game {
     this.hideActionTooltip()
     this.hideGameHuds()
     this.closeEntityMenu()
+    this.updateLocalPause()
+  }
+
+  // Standalone: tells the server when the local player is away (in-game menu
+  // open, or the window hidden), so a singleplayer world stands still. The
+  // server ignores it when co-op guests are playing.
+  updateLocalPause(options = {}) {
+    if (!this.main.isStandalone()) return
+
+    let menu = document.querySelector("#welcome_container")
+    let isMenuOpen = menu.classList.contains("in_game") && menu.style.display === 'block'
+    let isPaused = this.isActive && (document.hidden || isMenuOpen)
+    if (isPaused === this.isLocalPauseSent && !options.force) return
+
+    this.isLocalPauseSent = isPaused
+    SocketUtil.emit("SetPaused", { isPaused: isPaused })
   }
 
   closeInGameMenu() {
@@ -1471,6 +1487,7 @@ class Game {
     document.querySelector("#welcome_container").classList.remove("in_game")
     document.querySelector("#welcome_container").style.display = 'none'
     this.showGameHuds()
+    this.updateLocalPause()
   }
 
   emitPlayerPositionChanged() {
@@ -2006,6 +2023,8 @@ class Game {
   onSessionResume(data) {
     this.gameConnection.onSessionResume()
     this.playBackgroundMusic()
+    // a resumed session may be a new server-side player
+    this.updateLocalPause({ force: true })
   }
 
   onUpdateHomeArea(data) {
@@ -2328,6 +2347,7 @@ class Game {
     let isOnIOS = navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPhone/i)
     let unloadEvent = isOnIOS ? "pagehide" : "beforeunload"
     window.addEventListener(unloadEvent, this.onBeforeUnload.bind(this), false)
+    document.addEventListener("visibilitychange", () => this.updateLocalPause())
 
     document.getElementById("manage_team_btn").addEventListener("click", this.onManageTeamBtnClick.bind(this), true)
     document.getElementById("friends_btn").addEventListener("click", this.onFriendsBtnClick.bind(this), true)
@@ -4040,6 +4060,9 @@ arrow.style.setProperty('--arrow-color',realColor)
     this.joinGameTime = Date.now()
 
     this.isActive = true
+    // the server's new player starts unpaused
+    this.isLocalPauseSent = false
+    this.updateLocalPause()
     this.playerUid = data.playerUid
     this.creatorUid = data.creatorUid
     this.host = data.host

@@ -25,6 +25,11 @@ class RemoteEventHandler {
 
   }
 
+  onSetPaused(player, data, socket) {
+    if (env !== 'standalone') return
+    player.setPauseRequested(data.isPaused)
+  }
+
   onTriggerPlayerMenu(player, data, socket) {
     player.triggerPlayerMenu(data)
   }

@@ -176,6 +176,7 @@ message MessageWrapper {
     TriggerPlayerMenu TriggerPlayerMenu = 183;
     RevitalizerActivate RevitalizerActivate = 184;
     VendingPriceChange VendingPriceChange = 185;
+    SetPaused SetPaused = 186;
   }
 }
 
@@ -1273,6 +1274,12 @@ message Inventory {
 }
 
 message AFK {
+}
+
+// standalone client -> server: the local player is away (menu open or window
+// hidden), so a singleplayer world may stand still
+message SetPaused {
+  bool isPaused = 1;
 }
 
 message SectorUpdated {

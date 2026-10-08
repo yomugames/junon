@@ -142,7 +142,8 @@ server really applied the change instead of the client having predicted it.
 `packages/junon-desktop/test/desktop.spec.js` launches the Electron app with
 Playwright against a temporary user-data directory. It creates a world through
 the local menu, joins it, quits (which saves), relaunches, and loads the world
-again. A second test runs two instances: one hosts co-op with a password, the
+again, and checks that the world clock stops while the in-game menu is open.
+A second test runs two instances: one hosts co-op with a password, the
 other joins through a non-loopback address of the machine (rejected with a wrong
 password first), quits, rejoins, and is told when the host quits. It needs the
 standalone client build. A Linux machine without a display
@@ -165,7 +166,7 @@ xvfb-run -a npm run test:e2e --workspace packages/junon-desktop
 | Database model/migration | Migration on a disposable database and model path |
 | Matchmaker/API | Focused request/socket reproduction with isolated dependencies |
 | Startup/configuration | Start the affected service in the intended `NODE_ENV` |
-| Standalone (offline) mode | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real standalone server, checks save/reload, exercises the local world and import HTTP routes, checks the `ws` game socket, and covers co-op hosting (preflight, guest upgrade checks, owner-profile refusal, stop and shutdown notices) |
+| Standalone (offline) mode | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real standalone server, checks save/reload, exercises the local world and import HTTP routes, checks the `ws` game socket, and covers co-op hosting (preflight, guest upgrade checks, owner-profile refusal, stop and shutdown notices) and the singleplayer pause |
 | Desktop shell (`packages/junon-desktop`) | `NODE_ENV=standalone npm run client:build`, then the desktop e2e test (see below) |
 | Player-facing flow across client and server | The closest `test/e2e` spec, or a new one |
 

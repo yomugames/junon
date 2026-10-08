@@ -63,6 +63,24 @@ test('creates a world, saves it on quit and loads it after a restart', async () 
   await page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
   const worldId = await page.evaluate(() => window.game.sector.uid)
 
+  // singleplayer: the world clock stops while the in-game menu is open
+  const clockAdvance = async () => {
+    await page.waitForTimeout(300)
+    const start = await page.evaluate(() => window.game.timestamp)
+    await page.waitForTimeout(1000)
+    return (await page.evaluate(() => window.game.timestamp)) - start
+  }
+  expect(await clockAdvance()).toBeGreaterThan(0)
+  // the first Escape may close a menu the game opened on joining
+  for (let attempt = 0; attempt < 3 && !(await page.locator('#welcome_container').isVisible()); attempt++) {
+    await page.keyboard.press('Escape')
+  }
+  await expect(page.locator('#welcome_container')).toBeVisible()
+  expect(await clockAdvance()).toBe(0)
+  await page.keyboard.press('Escape')
+  await expect(page.locator('#welcome_container')).toBeHidden()
+  expect(await clockAdvance()).toBeGreaterThan(0)
+
   await quit(app)
   expect(errors).toEqual([])
   expect(savePaths()).toEqual([path.join(userDataDir, 'saves', worldId, 'sector.sav')])

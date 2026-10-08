@@ -317,3 +317,70 @@ test('hosts a world for co-op guests', async () => {
     await server.exited
   }
 })
+
+// Singleplayer pause: the world clock stops while the host's menu is open
+// (SetPaused) and runs again when it closes; a co-op guest keeps it running.
+test('pauses a singleplayer world while the host is away', async () => {
+  const WebSocket = require('ws')
+  const MessageWrapper = protobuf.loadSync(APP_PROTO).lookupType('app.MessageWrapper')
+
+  const server = startServer({ JUNON_WORLD_ID: '', JUNON_OWNER_UID: '' })
+  try {
+    await waitForOutput(server, 'Webpage available')
+    const base = `http://127.0.0.1:${server.clientPort}/local/`
+    const ownerUid = '0123456789abcdef0123456789abcdef'
+    const post = (route, body) => fetch(base + route, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    })
+    const guestPort = randomPort()
+    const { worldId } = await (await post('worlds', { ownerUid, name: 'Paused World', gameMode: 'survival' })).json()
+
+    const join = (url, uid) => new Promise((resolve, reject) => {
+      const ws = new WebSocket(url)
+      ws.timestamps = []
+      ws.on('message', (data) => {
+        const message = MessageWrapper.decode(data)
+        if (message.kind === 'GameState') ws.timestamps.push(message.GameState.timestamp)
+        if (message.kind === 'JoinGame') resolve(ws)
+        if (message.kind === 'CantJoin') reject(new Error(message.CantJoin.message))
+      })
+      ws.on('open', () => ws.send(MessageWrapper.encode({ RequestGame: { uid, username: uid.slice(0, 8), screenWidth: 800, screenHeight: 600, sessionId: uid } }).finish()))
+      ws.on('error', reject)
+    })
+    const setPaused = (ws, isPaused) => ws.send(MessageWrapper.encode({ SetPaused: { isPaused } }).finish())
+    // world clock over one second of wall time
+    const clockAdvance = async (ws) => {
+      await new Promise((resolve) => setTimeout(resolve, 300))
+      const start = ws.timestamps[ws.timestamps.length - 1]
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      return ws.timestamps[ws.timestamps.length - 1] - start
+    }
+
+    const host = await join(`ws://127.0.0.1:${server.port}`, ownerUid)
+    expect(await clockAdvance(host)).toBeGreaterThan(0)
+
+    setPaused(host, true)
+    expect(await clockAdvance(host)).toBe(0)
+
+    setPaused(host, false)
+    expect(await clockAdvance(host)).toBeGreaterThan(0)
+
+    // with a guest in the world, the host's menu doesn't stop it
+    await post('host', { worldId, ownerUid, port: guestPort, password: '' })
+    const info = await (await fetch(`http://127.0.0.1:${guestPort}/info`)).json()
+    const guest = await join(`ws://127.0.0.1:${guestPort}/?protocol=${info.protocolHash}`, 'guestProfile1234')
+    setPaused(host, true)
+    expect(await clockAdvance(host)).toBeGreaterThan(0)
+
+    // and a guest can't pause it for everyone
+    setPaused(host, false)
+    setPaused(guest, true)
+    host.close()
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    expect(await clockAdvance(guest)).toBeGreaterThan(0)
+    guest.close()
+  } finally {
+    server.kill('SIGTERM')
+    await server.exited
+  }
+})

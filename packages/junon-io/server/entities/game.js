@@ -29,8 +29,6 @@ const SaveImporter = require("junon-common/save_importer")
 const ObjectPool = require("../../common/entities/object_pool")
 const TileHit = require("./tile_hit")
 const Sentry = require('@sentry/node')
-const AWS = require('aws-sdk')
-const bucketName = process.env.S3_BUCKET_NAME || "junon"
 const User = require("junon-common/db/user")
 const SectorModel = require("junon-common/db/sector")
 const Protocol = require("../../common/util/protocol")
@@ -296,37 +294,14 @@ class Game {
     return this.idGenerator.generate(type)
   }
 
-  static getS3() {
-    if (!this.s3) {
-      const spacesEndpoint = new AWS.Endpoint('nyc3.digitaloceanspaces.com')
-      this.s3 = new AWS.S3({
-        endpoint: spacesEndpoint
-      })
-    }
-
-    return this.s3
-  }
-
-  getS3() {
-    return this.constructor.getS3()
-  }
-
   async uploadImage(key, data, options = {}) {
-    if (debugMode || env === 'standalone') {
-      return this.uploadImageLocally(key, data)
-    } else {
-      return this.uploadImageRemotely(key, data)
-    }
+    return this.uploadImageLocally(key, data)
   }
 
+  // screenshots are kept with the saves; the app directory may be read-only
+  // once packaged
   getLocalImagePath(key) {
-    // standalone keeps screenshots with the saves; the app directory may be
-    // read-only once packaged
-    if (env === 'standalone') {
-      return path.join(WorldSerializer.getSavesDirectory(), "screenshots", path.basename(key))
-    }
-
-    return global.appRoot + "/client/assets/screenshots/" + key
+    return path.join(WorldSerializer.getSavesDirectory(), "screenshots", path.basename(key))
   }
 
   async uploadImageLocally(key, data) {
@@ -356,51 +331,8 @@ class Game {
     }
   }
 
-  async uploadImageRemotely(key, data) {
-    const params = {
-      Body: data,
-      Bucket: bucketName,
-      Key: key,
-      ACL: 'public-read',
-      ContentType: 'image/jpeg'
-    }
-
-    return new Promise((resolve, reject) => {
-      this.getS3().putObject(params, (err, data) => {
-        if (err) {
-          this.captureException(err)
-          resolve(false)
-        } else {
-          resolve(true)
-        }
-      })
-    })
-  }
-
   async deleteImage(key) {
-    if (debugMode || env === 'standalone') {
-      return this.deleteImageLocally(key)
-    } else {
-      return this.deleteImageRemotely(key)
-    }
-  }
-
-  deleteImageRemotely(key) {
-    const params = {
-      Bucket: bucketName,
-      Key: key
-    }
-
-    return new Promise((resolve, reject) => {
-      this.getS3().deleteObject(params, (err, data) => {
-        if (err) {
-          this.captureException(err)
-          resolve(false)
-        } else {
-          resolve(true)
-        }
-      })
-    })
+    return this.deleteImageLocally(key)
   }
 
   setCreatorIp(creatorIp) {
@@ -519,7 +451,6 @@ class Game {
 
     this.readyTime = Date.now()
     this.isGameReady = true
-    this.sendSectorInfoToMatchmaker()
 
     this.triggerEvent("GameStart")
     this.triggerEvent("WorldLoaded")
@@ -528,16 +459,6 @@ class Game {
       this.gameReadyCallback()
       this.gameReadyCallback = null
     }
-  }
-
-  sendServerRestartCountdown(reason, seconds) {
-    this.forceRestart = true
-    this.serverRestartTimestamp = this.timestamp + (Constants.physicsTimeStep * seconds)
-    this.restartReason = reason
-    this.getSocketUtil().broadcast(this.getSocketIds(), "ServerRestartCountdown", {
-      timestamp: this.serverRestartTimestamp,
-      reason: reason
-    })
   }
 
   getSocketUtil() {
@@ -634,12 +555,6 @@ class Game {
     for (let id in this.teams) {
       cb(this.teams[id])
     }
-  }
-
-  getJoinableTeamsJson() {
-    return this.getJoinableTeams().map((team) => {
-      return team.getTeamData()
-    })
   }
 
   createRaidEvent(options) {
@@ -882,8 +797,9 @@ class Game {
     let rowCount = options.rowCount
     let colCount = options.colCount
 
+    // tests always start from a new map
     if (env === 'test') {
-      this.initSurvivalSector({ rowCount: rowCount, colCount: colCount, uid: this.sectorUid, name: this.sectorName })
+      this.initSurvivalSector({ rowCount: rowCount, colCount: colCount, uid: this.sectorUid, name: this.sectorName, gameMode: gameMode })
       return
     }
 
@@ -1051,13 +967,14 @@ class Game {
     this.shouldPause = true
   }
 
-  // Standalone singleplayer: the world stands still while nobody plays it.
+  // Singleplayer: the world stands still while nobody plays it.
   // That is when no player is connected (the host is in the local menu), or
   // the only one is the host with the in-game menu open or the window hidden.
   // Any co-op guest keeps it running. Unlike pause() (command blocks), the
-  // clock stops too, so day/night and every timer wait.
+  // clock stops too, so day/night and every timer wait. Tests step worlds
+  // without connected players, so it is off there.
   isSimulationPaused() {
-    if (env !== 'standalone') return false
+    if (env === 'test') return false
 
     let connected = Object.values(this.players).filter((player) => player.isConnected())
     if (connected.length === 0) return true
@@ -1101,11 +1018,6 @@ async setGameMode(gameMode) {
     })
   }
 }
-
-  isStale() {
-    let twoMinutes = Date.now() - this.gameStartTime > (1000 * 60 * 2)
-    return twoMinutes && !this.isReady()
-  }
 
   isReady() {
     return this.isGameReady
@@ -1340,42 +1252,6 @@ async setGameMode(gameMode) {
     }
   }
 
-  canBeShutdown() {
-    // a standalone server exists to host this one world; it stays loaded with
-    // nobody connected and is saved and stopped when the process exits
-    if (env === 'standalone') return false
-
-    return this.getPlayerCount() === 0
-  }
-
-  shutdownOnZeroPlayers() {
-    const isTwentySecondInterval = this.timestamp % (Constants.physicsTimeStep * 20) === 0
-    if (!isTwentySecondInterval) return
-
-    // sometimes player takes a long time to join game.
-    // take into account game is initially but still waiting
-    // for sector to finish asynchronously loading
-    // prevent premature shutdown
-    if (this.getReadyDuration() < (10 * 1000)) {
-      return
-    }
-
-    if (this.canBeShutdown()) {
-      LOG.info(`Sector ${this.sectorUid} inactive with 0 players. Removing game.`)
-      this.prepareRemove()
-    }
-  }
-
-  removeOnForced() {
-    if (this.forceRestart && this.timestamp >= this.serverRestartTimestamp) {
-      this.forEachPlayer((player) => {
-        if (player.socket) player.socket.close()
-        player.remove()
-      })
-      this.prepareRemove()
-    }
-  }
-
   getReadyDuration() {
     if (!this.readyTime) return 0
     return Date.now() - this.readyTime
@@ -1403,14 +1279,6 @@ async setGameMode(gameMode) {
       return
     }
 
-    if (this.isCreatedByAnonynmous()) {
-      let creator = [this.creatorUid, this.getCreatorIp()].join("-")
-      LOG.info(`Sector ${this.sectorUid} ${this.sector.name} is anonymously created by ${creator}. Removing save file`)
-      await this.deleteForever()
-      return
-    }
-
-
     this.preSaveWorldBeforeGameShutdown()
 
     if (this.isSaving) {
@@ -1437,16 +1305,6 @@ async setGameMode(gameMode) {
     })
   }
 
-  isCreatedByAnonynmous() {
-    // anonymous hosted worlds are deleted on shutdown; every standalone world
-    // belongs to the local player (and local profile ids may look like uuids)
-    if (env === 'standalone') return false
-    if (!this.creatorUid) return true
-
-    let uuidv4Regex = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
-    return uuidv4Regex.test(this.creatorUid)
-  }
-
   setPersistent(isPersistent) {
     this.isPersistent = isPersistent
   }
@@ -1464,11 +1322,6 @@ async setGameMode(gameMode) {
     this.forEachPlayer((player) => {
       player.remove()
     })
-
-    let sectorData = this.getSectorData()
-
-    this.sendToMatchmaker({ event: "SectorRemoved", data: sectorData })
-
 
     this.cleanup()
     this.server.removeGame(this)
@@ -1794,13 +1647,6 @@ async setGameMode(gameMode) {
     this.sector.onScoreChanged()
   }
 
-  sendSectorInfoToMatchmaker() {
-    if (global.isMatchmakerDisabled) return
-    if (this.isRemoved) return
-
-    this.sendToMatchmaker({ event: "SectorUpdated", data: this.getSectorData() })
-  }
-
   addPlayerData(playerData) {
     this.playerDataMap[playerData.getUID()] = playerData
   }
@@ -1836,7 +1682,6 @@ async setGameMode(gameMode) {
     this.onPlayerCountChanged()
     this.onAlivePlayerCountChanged()
 
-    this.sendCreatorLeaveSectorToMatchmaker(player)
     this.sector.onScoreChanged()
 
     return playerId
@@ -1853,19 +1698,6 @@ async setGameMode(gameMode) {
       player: player.getName(),
       playerRole: player.getRoleName()
     })
-  }
-
-  sendCreatorLeaveSectorToMatchmaker(player) {
-    if (this.creator === player) {
-      let data = {
-        env: this.getEnvironment(),
-        region: this.getRegion(),
-        creatorIp: this.getCreatorIp(),
-        creatorUid: this.getCreatorUid()
-      }
-
-      this.sendToMatchmaker({ event: "CreatorLeaveSector", data: data })
-    }
   }
 
   isCreatedByPlayer(player) {
@@ -2164,7 +1996,7 @@ async setGameMode(gameMode) {
     // check if ip blacklisted
     let ipAddress = Helper.getSocketRemoteAddress(socket)
     let ipBan = await IpBan.findOne({ where: { ip: ipAddress } })
-    if (ipBan && !data.idToken) {
+    if (ipBan) {
       if (this.server.isBanExpired(ipBan)) {
         this.server.removeBan({ ip: [ipBan.ip] })
       } else {
@@ -2192,86 +2024,44 @@ async setGameMode(gameMode) {
 
     let uid
 
-    if (env === 'standalone') {
-      // there are no accounts offline: the client's local profile id is its
-      // identity, and the name it chose is kept (validated like any username)
-      uid = this.getLocalProfileUid(data)
-      if (!uid) {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "Invalid player profile." })
-        return
-      }
+    // there are no accounts: the client's local profile id is its identity,
+    //, and the name it chose is kept (validated like any username)
+    uid = this.getLocalProfileUid(data)
+    if (!uid) {
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "Invalid player profile." })
+      return
+    }
 
-      // the owner plays on the host machine's loopback socket; a co-op guest
-      // presenting the owner's profile id would get owner powers
-      if (socket.isGuest && uid === this.creatorUid) {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "This profile owns the world. Join with your own profile." })
-        return
-      }
+    // the owner plays on the host machine's loopback socket; a co-op guest
+    // presenting the owner's profile id would get owner powers
+    if (socket.isGuest && uid === this.creatorUid) {
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "This profile owns the world. Join with your own profile." })
+      return
+    }
 
-      let user = await User.findOne({ where: { uid: uid } })
-      let profileName = this.isValidLocalUsername(data.username) ? data.username : null
+    let user = await User.findOne({ where: { uid: uid } })
+    let profileName = this.isValidLocalUsername(data.username) ? data.username : null
 
-      // a saved character keeps its own name - including one taken over from
-      // an imported world - and the profile's name is used for new ones
-      let existingPlayer = this.getPlayerByUID(uid)
-      let playerData = this.getPlayerData(uid)
-      let characterName = (existingPlayer && existingPlayer.getName()) || (playerData && playerData.name)
-      data.username = characterName || profileName || (user && user.username) || await this.generateUniqueUsername()
+    // a saved character keeps its own name - including one taken over from
+    // an imported world - and the profile's name is used for new ones
+    let existingPlayer = this.getPlayerByUID(uid)
+    let playerData = this.getPlayerData(uid)
+    let characterName = (existingPlayer && existingPlayer.getName()) || (playerData && playerData.name)
+    data.username = characterName || profileName || (user && user.username) || await this.generateUniqueUsername()
 
-      let isNameUsedByOtherPlayer = this.isUsernameTakenInServer(data.username) && !this.getPlayerByUID(uid)
-      if (isNameUsedByOtherPlayer) {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
-        return
-      }
+    let isNameUsedByOtherPlayer = this.isUsernameTakenInServer(data.username) && !this.getPlayerByUID(uid)
+    if (isNameUsedByOtherPlayer) {
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
+      return
+    }
 
-      // the profile's users row backs account features (ATM balance, badges)
-      // the same way an account's row does on hosted servers; it keeps the
-      // profile's name, not the character's
-      if (!user) {
-        await User.create({ uid: uid, username: profileName || data.username, gold: 0 })
-      } else if (profileName && user.username !== profileName) {
-        await user.update({ username: profileName })
-      }
-    } else if (data.idToken) {
-      uid = await this.server.getUidFromRequest(data.idToken, data.uid)
-      if (!uid) {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "Player credentials are invalid. Unable to load save file." })
-
-        let signInAlert = `[performJoinGame] ${ipAddress} used invalid idToken ${data.idToken}`
-        ExceptionReporter.captureException(new Error(signInAlert))
-        LOG.info(signInAlert)
-        return
-      }
-
-      let userModel = await User.findOne({ where: { uid: uid } })
-      if (!userModel) {
-        ExceptionReporter.captureException(new Error("used missing uid " + uid + " idToken: " + data.idToken))
-        return
-      }
-
-      data.username = userModel.username
-
-      let userBan = await IpBan.findOne({ where: { username: data.username.toLowerCase() } })
-      if (userBan) {
-        if (this.server.isBanExpired(userBan)) {
-          this.server.removeBan({ ip: [userBan.ip] })
-        } else {
-          this.getSocketUtil().emit(socket, "CantJoin", {
-            message: this.formatBanMsg(userBan)
-          })
-
-          return
-        }
-      }
-    } else if (data.username) {
-      let isTaken = false
-      isTaken = await User.isUsernameTaken(data.username)
-      let isTakenInServer = this.isUsernameTakenInServer(data.username)
-      if (isTaken || isTakenInServer) {
-        this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
-        return
-      }
-
+    // the profile's users row backs account features (ATM balance, badges)
+    // the same way an account's row does on hosted servers; it keeps the
+    // profile's name, not the character's
+    if (!user) {
+      await User.create({ uid: uid, username: profileName || data.username, gold: 0 })
+    } else if (profileName && user.username !== profileName) {
+      await user.update({ username: profileName })
     }
 
     if (uid) {
@@ -2295,7 +2085,7 @@ async setGameMode(gameMode) {
           return
         }
 
-        let loadedPlayer = this.resumeFromSaveFile(socket, playerData, data.idToken)
+        let loadedPlayer = this.resumeFromSaveFile(socket, playerData)
         if (loadedPlayer) {
           return
         }
@@ -2342,9 +2132,7 @@ async setGameMode(gameMode) {
        this.creator = player
      }
 
-    //  hack to send player team to matchmaker
-    //  as isSectorOwner will have correct value by now
-    //  FIX: TBD
+    //  isSectorOwner has its correct value by now
      player.getTeam() && player.getTeam().onTeamChanged()
 
     // if (debugMode) {
@@ -2436,18 +2224,6 @@ async setGameMode(gameMode) {
       sidebar: this.sidebars[player.getId()],
       objectives: player.objectives,
       dialogueMap: this.dialogueMap
-    }
-
-    if (this.serverRestartTimestamp) {
-      payload.serverRestartTimestamp = this.serverRestartTimestamp
-      payload.restartReason = this.restartReason
-    }
-
-    if (this.sector.isUpvotable()) {
-      let hasUpvoted = await player.hasUpvoted()
-      if (hasUpvoted) {
-        payload['hasUpvoted'] = true
-      }
     }
 
     this.getSocketUtil().emit(player.getSocket(), "JoinGame", payload)
@@ -2636,42 +2412,8 @@ async setGameMode(gameMode) {
     this.resumeSessionForExistingPlayer(existingPlayer, socket)
   }
 
-  async resumeIdToken(socket, idToken, userUid) {
-    const uid = await this.server.getUidFromRequest(idToken, userUid)
-    if (!uid) {
-      this.getSocketUtil().emit(socket, "CantJoin", {
-        message: "Player credentials are invalid. Unable to load save file."
-      })
-      return null
-    }
-
-    let existingPlayer = this.getPlayerByUID(uid)
-    if (existingPlayer) {
-      this.handleExistingLoggedInPlayer(socket, existingPlayer)
-      return existingPlayer
-    }
-
-    let playerData = this.getPlayerData(uid)
-    if (!playerData) {
-      this.getSocketUtil().emit(socket, "CantJoin", { message: "Player Data not found in save file." })
-      return
-    }
-
-    let team = playerData.getTeam()
-    if (!team) {
-      this.getSocketUtil().emit(socket, "CantJoin", { message: "Team not found in save file." })
-      return null
-    }
-
-    let loadedPlayer = this.resumeFromSaveFile(socket, playerData, idToken)
-    if (loadedPlayer) {
-      return
-    }
-  }
-
-  async resumeFromSaveFile(socket, playerData, idToken) {
+  async resumeFromSaveFile(socket, playerData) {
     playerData.data.isAuthenticated = true
-    playerData.data.idToken = idToken
 
     let player = this.createPlayerFromPlayerData(socket, playerData)
     if (player) {
@@ -2688,41 +2430,6 @@ async setGameMode(gameMode) {
 
   getSectorUid() {
     return this.sectorUid
-  }
-
-  getSectorData() {
-    let data = {
-      sectorId: this.sectorUid,
-      env: this.getEnvironment(),
-      region: this.getRegion(),
-      ip: this.server.getHost(),
-      host: this.server.getHost(),
-      name: this.sector.getName(),
-      version: this.getVersion(),
-      revision: this.getRevision(),
-      playerCount: this.getNumPlayers(),
-      daysAlive: this.sector.getDayCount(),
-      occupancy: this.sector.getOccupancyPercentage(),
-      screenshots: this.sector.screenshots,
-      gameMode: this.getGameMode(),
-      isPrivate: this.sector.isPrivate,
-      maxPlayers: this.getMaxPlayers(),
-      language: this.language
-    }
-
-    if (this.isTutorial) {
-      data["isTutorial"] = true
-    }
-
-    if (this.getCreatorIp()) {
-      data["creatorIp"] = this.getCreatorIp()
-    }
-
-    if (this.getCreatorUid()) {
-      data["creatorUid"] = this.getCreatorUid()
-    }
-
-    return data
   }
 
   getVersion() {
@@ -2795,27 +2502,8 @@ async setGameMode(gameMode) {
     delete this.colonies[team.id]
   }
 
-  getRegion() {
-    return this.server.getRegion()
-  }
-
-  getEnvironment() {
-    return process.env["NODE_ENV"] || 'development'
-  }
-
   onPlayerCountChanged() {
-    this.server.onPlayerCountChanged()
-    this.sendSectorInfoToMatchmaker()
     this.triggerEvent("PlayerCountChanged")
-
-    if (this.canBeShutdown()) {
-      LOG.info(`Sector ${this.sectorUid} inactive with 0 players. Removing game.`)
-      this.prepareRemove()
-    }
-  }
-
-  sendToMatchmaker(data) {
-    this.server.sendToMatchmaker(data)
   }
 
   isTeamNameTaken(name) {

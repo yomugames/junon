@@ -15,10 +15,6 @@ class Team {
     return [this.id, this.game.sector.uid].join(":")
   }
 
-  getInviteToken() {
-    return this.game.sector.uid
-  }
-
   isSectorOwner() {
     return this.creatorUid === this.game.creatorUid
   }

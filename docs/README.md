@@ -10,8 +10,6 @@ with the code.
   and dependency guidance.
 - [Development](development.md): prerequisites, setup, and run/build commands.
 - [Testing](testing.md): test layout, focused commands, and validation strategy.
-- [Production deployment](deployment.md): automatic production deployment and
-  its required GitHub configuration.
 - [Execution plans](exec-plans/README.md): format and lifecycle for substantial
   work.
 

@@ -83,8 +83,8 @@ function setupMeleeArenaInServer({ sectorId, span, mobType }) {
 // browser is currently in.
 //
 // sector.id is a local per-entity id (server/entities/sector.js: metadata.id ||
-// game.generateEntityId()) - sector.uid is the actual matchmaker-assigned
-// sectorId that keys Server#games, so that is what has to be looked up.
+// game.generateEntityId()) - sector.uid is the world id that keys
+// Server#games, so that is what has to be looked up.
 //
 // `fn` is serialised across the DevTools Protocol (see server_console.js), so
 // each one closes over nothing and repeats its own `getGame(sectorId).sector`
@@ -430,8 +430,29 @@ async function readStructure(page, row, col) {
   return inSector(page, readStructureInServer, { row, col })
 }
 
+// Under NODE_ENV=test (debugMode) every player starts in admin mode, in which
+// the colony owner crafts without ingredients (Inventory#isSandboxMode). This
+// switches it off on the server, which tells the client (SetAdmin).
+function disableAdminModeInServer({ sectorId }) {
+  const game = global.server.getGame(sectorId)
+  if (!game) return { error: `no game for sector ${sectorId}` }
+
+  const player = game.sector.getFirstPlayer()
+  if (!player) return { error: 'no player in sector' }
+
+  if (player.isAdminMode) player.setAdmin()
+  return { isAdminMode: player.isAdminMode }
+}
+
+async function disableAdminMode(page) {
+  const result = await inSector(page, disableAdminModeInServer)
+  await page.waitForFunction(() => !window.game.isAdminMode, null, { timeout: 10_000 })
+  return result
+}
+
 module.exports = {
   setupMeleeArena,
+  disableAdminMode,
   readMob,
   findClearArea,
   createTerrain,

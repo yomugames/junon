@@ -2,9 +2,7 @@ const sequelize = require("./sequelize")
 const Sequelize = require("sequelize")
 
 const Sector = require('./sector')
-const Favorite = require('./favorite')
 const SectorBan = require('./sector_ban')
-const Friend = require('./friend')
 
 class User extends Sequelize.Model {
   static async validateCreate(attributes) {
@@ -110,52 +108,14 @@ Sector.hasMany(User, {
   as: 'currentUsers'
 })
 
-User.belongsToMany(User, {
-  through: Friend,
-  foreignKey: 'userUid',
-  as: 'friends'
-})
-
-Friend.belongsTo(User, {
-  foreignKey: 'userUid',
-  as: 'sender'
-})
-
-Friend.belongsTo(User, {
-  foreignKey: 'friendUid',
-  as: 'receiver'
-})
-
-Sector.hasMany(Favorite, {
-  foreignKey: 'sectorUid',
-  as: 'favorites'
-})
-
 Sector.hasMany(SectorBan, {
   foreignKey: 'sectorUid',
   as: 'sectorBans'
 })
 
-Favorite.belongsTo(Sector, {
-  foreignKey: 'sectorUid',
-  as: 'sector'
-})
-
 User.belongsTo(Sector, {
   foreignKey: 'currentSectorUid',
   as: 'sector'
-})
-
-User.belongsToMany(Sector, { 
-  through: Favorite ,
-  as: 'favorites',
-  foreignKey: 'userUid'
-})
-
-Sector.belongsToMany(User, { 
-  through: Favorite ,
-  as: 'followers',
-  foreignKey: 'sectorUid'
 })
 
 module.exports = User

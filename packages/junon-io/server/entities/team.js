@@ -2,7 +2,6 @@ const BaseTransientEntity = require('./base_transient_entity')
 const Protocol = require('../../common/util/protocol')
 const Owner = require('../../common/interfaces/owner')
 const Constants = require('../../common/constants')
-const FirebaseAdminHelper = require("../util/firebase_admin_helper")
 const EventBus = require('eventbusjs')
 const SectorModel = require("junon-common/db/sector")
 const SectorBanModel = require("junon-common/db/sector_ban")
@@ -594,11 +593,6 @@ class Team extends BaseTransientEntity {
       }
     }
 
-    if (this.isSectorOwner()) {
-      // only for sector owner
-      let teamData = this.getTeamData()
-      this.game.sendToMatchmaker({ event: "TeamUpdated", data: teamData })
-    }
   }
 
   getJsonWithoutMembers() {
@@ -897,25 +891,6 @@ class Team extends BaseTransientEntity {
 
   getTeam() {
     return this
-  }
-
-  getTeamData() {
-    return {
-      id: this.getId(),
-      env: this.game.getEnvironment(),
-      region: this.game.getRegion(),
-      ip: this.game.server.getHost(),
-      host: this.game.server.getHost(),
-      name: this.getName(),
-      creatorName: this.getCreatorName(),
-      creatorUid: this.creatorUid,
-      members: this.getMemberNamesJson(),
-      isPrivate: this.isPrivate,
-      sectorId: this.game.sectorUid,
-      daysAlive: this.dayCount,
-      gameMode: this.game.getGameMode(),
-      playerCount: this.getMemberCount()
-    }
   }
 
   getCreatorName() {

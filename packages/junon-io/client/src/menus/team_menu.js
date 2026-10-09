@@ -16,7 +16,6 @@ class TeamMenu extends BaseMenu {
   initListeners() {
     super.initListeners()
 
-    this.el.querySelector(".invite_link_input").addEventListener("click", this.onTeamInviteInputClick.bind(this), true)
     this.el.querySelector(".team_private_status").addEventListener("click", this.onTeamPrivacyStatusClick.bind(this), true)
     this.el.querySelector(".member_management_container").addEventListener("click", this.onMemberListClick.bind(this))
 
@@ -1352,15 +1351,6 @@ class TeamMenu extends BaseMenu {
       let banId = e.target.closest(".banned_member").dataset.banId
       this.unbanMember(banId)
     }
-
-    let memberName = e.target.closest(".member_list_entry_name")
-    if (memberName) {
-      let memberEntry = e.target.closest(".member_list_entry")
-      let uid = memberEntry.dataset.uid
-      let username = memberEntry.dataset.username
-
-      this.game.userProfileMenu.open({ username: username, uid: uid })
-    }
   }
 
   open(options = {}) {
@@ -1550,11 +1540,6 @@ class TeamMenu extends BaseMenu {
     SocketUtil.emit("EditTeam", { id: this.activeTeam.id, name: name })
   }
 
-  onTeamInviteInputClick(event) {
-    event.target.select()
-    document.execCommand('copy')
-  }
-
   onTeamPrivacyStatusClick() {
     if (!this.activeTeam) return
 
@@ -1739,7 +1724,6 @@ class TeamMenu extends BaseMenu {
     this.el.querySelector(".member_list_container").style.display = 'block'
 
     this.renderRenameBtn(team)
-    this.renderInviteLink(team)
     this.renderPrivacy(team)
     this.renderMembers(team)
 
@@ -1825,14 +1809,6 @@ class TeamMenu extends BaseMenu {
     } else {
       this.el.querySelector(".rename_btn").style.display = 'inline-block'
     }
-  }
-
-  renderInviteLink(team) {
-    let params = window.location.search
-    params = ClientHelper.replaceQueryParam('e', team.getInviteToken(), params)
-    let inviteLink = this.game.main.getBrowserHost() + params
-
-    this.el.querySelector(".invite_link_input").value = inviteLink
   }
 
   renderPrivacy(team) {

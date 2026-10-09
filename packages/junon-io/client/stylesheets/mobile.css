@@ -3,9 +3,6 @@
         min-height: 210px;
     }
 
-    .middle_container {
-        width: calc(100% - 470px);
-    }
     
     .other_game_ad_square {
         transform: scale(0.7);
@@ -44,9 +41,6 @@
         display: none;
     }
 
-    .middle_container {
-        width: 500px;
-    }
 
 }
 
@@ -204,9 +198,6 @@
         max-width: 80px;
     }
 
-    .middle_container {
-        width: calc(100% - 200px);
-    }
 
     #total_online_count {
         display: none;
@@ -590,10 +581,6 @@
         padding-left: 10px;
     }
 
-    .middle_container {
-        clear: both;
-        width: 100%;
-    }
 
     .left_sidebar .settings_menu_btn,
     .left_sidebar .tutorial_menu_btn {

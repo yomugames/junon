@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test')
 const { createNewColonyAndJoin } = require('./support/join')
-const { giveItems, readInventory } = require('./support/scenario')
+const { giveItems, readInventory, disableAdminMode } = require('./support/scenario')
 
 // The crafting menu is opened with C (input_controller.js keyBindings.craft ->
 // game.toggleBlueprintMenu) and is built once, at construction, from the
@@ -131,6 +131,7 @@ test.describe('crafting', () => {
 
   test('will not craft without the ingredients', async ({ page }) => {
     await createNewColonyAndJoin(page)
+    expect(await disableAdminMode(page)).toEqual({ isAdminMode: false })
 
     await openCraftMenu(page)
     await selectProduct(page, 'Floors', PRODUCT)

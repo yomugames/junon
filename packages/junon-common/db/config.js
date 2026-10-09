@@ -5,12 +5,7 @@ module.exports = {
   // via Team -> junon-common/db/sector) crashes immediately trying to read
   // `.database` off `undefined`, before ever reaching a real connection.
   //
-  // This uses sqlite (in-memory) instead of mysql so tests never depend on a
-  // live MySQL server being reachable - a test that hits a real db query used
-  // to open a real TCP connection to 127.0.0.1:3306, and when nothing was
-  // listening there, mysql2 would blow up asynchronously *after* the test
-  // file finished and Jest tore down its environment, crashing the whole
-  // process instead of just failing a test.
+  // Tests use an in-memory database.
   "test": {
     "username": null,
     "password": null,
@@ -19,9 +14,9 @@ module.exports = {
     "dialect": "sqlite",
     "logging": false
   },
-  // Standalone (offline desktop / listen-server) mode uses a sqlite file in
-  // place of MySQL, next to the world saves and shared by every world in that
-  // directory - the same tables and models as hosted servers.
+  // The game's database is a sqlite file next to the world saves, shared by
+  // every world in that directory (the hosted game used MySQL with the same
+  // tables and models).
   "standalone": {
     "username": null,
     "password": null,
@@ -30,27 +25,13 @@ module.exports = {
     "dialect": "sqlite",
     "logging": false
   },
+  // development uses the same sqlite file layout as standalone
   "development": {
-    "username": process.env['JUNON_DB_USER'] || "root",
-    "password": process.env['JUNON_DB_PASS'] || null,
-    "database": "junon_development",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  },
-  "staging": {
-    "username": process.env['JUNON_DB_USER'],
-    "password": process.env['JUNON_DB_PASS'],
-    "database": "junon_staging",
-    "host": process.env['JUNON_DB_HOST'],
-    "dialect": "mysql",
-    "logging": false
-  },
-  "production": {
-    "username": process.env['JUNON_DB_USER'],
-    "password": process.env['JUNON_DB_PASS'],
-    "database": "junon_production",
-    "host": process.env['JUNON_DB_HOST'],
-    "dialect": "mysql",
+    "username": null,
+    "password": null,
+    "database": null,
+    "storage": process.env['JUNON_SAVES_DIR'] ? require('path').join(process.env['JUNON_SAVES_DIR'], 'junon.sqlite') : null,
+    "dialect": "sqlite",
     "logging": false
   }
 }

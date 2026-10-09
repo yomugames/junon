@@ -294,20 +294,10 @@ class Player extends BaseEntity {
 
     const playerKickBtn = "<div class='player_kick_btn ui_btn' data-action='kick'>" + i18n.t('Kick') + "</div>"
     const playerBanBtn = "<div class='player_ban_btn ui_btn' data-action='ban'>" + i18n.t('Ban') + "</div>"
-    const playerAddFriendBtn = "<div class='player_add_friend_btn ui_btn' data-action='add_friend'><img src='/assets/images/add_friend_icon.png' /></div>"
-    const playerFriendRequestPending = "<div class='pending_friend_request_label'>" + i18n.t('Friend request sent') + "</div>"
 
     if (this.game.teamMenu.canKickMembers(this.getTeam(), this)) {
       actions += playerKickBtn
       actions += playerBanBtn
-    }
-
-    if (this.game.isLoggedIn() && this.isLoggedIn()) {
-      if (this.isMyFriend() || this.isFriendRequestPending()) {
-          // actions += playerFriendRequestPending
-      } else {
-        actions += playerAddFriendBtn
-      }
     }
 
     let customActions = this.getActions()
@@ -327,19 +317,6 @@ class Player extends BaseEntity {
     })
 
     return html
-  }
-
-  isLoggedIn() {
-    return !this.uid.match("-")
-  }
-
-  isMyFriend() {
-    return this.game.main.friends[this.uid]
-  }
-
-  isFriendRequestPending() {
-    return this.game.main.sentFriendRequests[this.uid] ||
-           this.game.main.receivedFriendRequests[this.uid]
   }
 
   initUsernameHeight() {
@@ -529,11 +506,7 @@ class Player extends BaseEntity {
   }
 
   setDaysAlive(daysAlive) {
-    let prevDaysAlive = this.daysAlive
-    if (this.daysAlive !== daysAlive) {
-      this.daysAlive = daysAlive
-      this.onDaysAliveChanged(daysAlive)
-    }
+    this.daysAlive = daysAlive
   }
 
   setIsAngleLocked(isAngleLocked) {
@@ -595,17 +568,6 @@ class Player extends BaseEntity {
 
     if (this.game.entityMenu.isOpen(this)) {
       this.game.entityMenu.update(this)
-    }
-  }
-
-  onDaysAliveChanged(currDaysAlive) {
-    // every 2 days
-    if (currDaysAlive < 30 && currDaysAlive % 2 === 0) {
-      if (debugMode) {
-        console.log("production analytics will send day_passed event")
-      } else {
-        gtag('event', 'day_passed', { event_category: 'gameplay' })
-      }
     }
   }
 

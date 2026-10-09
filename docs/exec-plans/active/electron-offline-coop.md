@@ -92,7 +92,10 @@ Acceptance criteria:
 - [x] 2026-10-08: Phase 7: a singleplayer world stands still while the host's
   in-game menu is open, the window is hidden, or nobody is in it. Autosave and
   save on quit were already in place.
-- [ ] Phase 8: Remove hosted-service packages and dependencies; update docs.
+- [x] 2026-10-08: Phase 8: the hosted services are gone. One server runtime
+  (file saves, SQLite, `ws`, local world menu) serves every `NODE_ENV`; the
+  matchmaker, watchdog, MySQL, Firebase, S3 and deploy pipeline are removed;
+  the e2e harness runs against a local server; docs are rewritten.
 - [ ] Phase 9: Packaging.
 
 ## Implementation
@@ -146,8 +149,8 @@ so the existing Jest and Playwright suites can still validate each step.
    replaces it with the real Host/Join menus.
    Done as `?server=ws://host:port&name=<name>`. The world id isn't needed
    because a standalone server resolves an id-less `RequestGame`/`ResumeGame`
-   to its only world. See `Main#runStandalone` and
-   [development.md](../../development.md#standalone-offline-mode).
+   to its only world. See `Main#run` (`Main#runStandalone` until Phase 8) and
+   [development.md](../../development.md#running-the-game).
 
 ### Phase 2: import old saves
 
@@ -364,6 +367,73 @@ migrations, `aws-sdk`, `firebase*`, `mysql`/`mysql2`/`sequelize`, and the
 S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
 `docs/deployment.md`, and `docs/testing.md`. Point the e2e harness at a local server.
 
+The 2026-10-07 SQLite decision changes this list: the Sequelize models stay,
+on SQLite. Phase 8 removes the MySQL drivers, the MySQL migrations,
+`sequelize-cli`, and the hosted-only models (favorites, votes, friends,
+sessions, tokens), not the database layer. Stages (planned as separate
+commits, but landed as one, because the server and client halves depend on
+each other and no intermediate state ran end to end):
+
+1. Server: the standalone infrastructure becomes the only one. Remove
+   `uWebSockets.js`, the matchmaker client, Firebase, S3, Prometheus, the
+   liveness socket, systemd/DNS/kube checks, operator endpoints, and the
+   hosted `idToken` join. `NODE_ENV` then only selects gameplay (see
+   Decisions). All environments use SQLite.
+2. Client: the local world menu is the only home screen in every environment.
+   Remove the matchmaker lobby (`game_explorer.js` and its components),
+   Firebase sign-in, account, friends, favorites, votes, event badges, regions
+   and ban appeals, with their markup.
+3. Packages and dependencies: delete `junon-matchmaker`, `junon-io-watchdog`,
+   `deployment/`, the production deploy workflow, `start_server.js` and the
+   systemd unit; drop `aws-sdk`, `firebase*`, `mysql`, `mysql2`,
+   `sequelize-cli`, `prom-client`, `cors`; delete the MySQL migrations and
+   hosted-only models.
+4. The Playwright e2e harness boots a local server (no matchmaker) and joins
+   through the local menu. Rewrite `ARCHITECTURE.md`, `AGENTS.md`, and
+   `docs/`.
+
+Done as follows.
+
+- Server (`server.js`): startup is now the former standalone sequence for
+  every environment: SQLite schema sync, protocol, `ws` game socket, page server
+  (unless desktop), signal handlers, optional `JUNON_WORLD_ID`. Removed:
+  matchmaker client and messages, uWS and operator endpoints, Firebase, region/
+  host naming, port claiming, systemd/DNS/kube checks, Prometheus, liveness
+  socket, reserved spots and `/join`, `/__status`, the stale-world, zero-player
+  and lag eviction, and the restart countdown. `development` defaults
+  `JUNON_SAVES_DIR` to the gitignored `.dev-saves/`.
+- Game code: `performJoinGame` always uses local profiles (no `idToken` or
+  username-only joins); votes, favorites and their `SectorAction`s are gone, so
+  command-block `ColonyLike`/`ColonyUnlike` events no longer fire; global chat
+  is delivered as normal chat; screenshots are always local files;
+  `isCreatedByAnonynmous` is gone (worlds are never deleted on shutdown, and
+  raids need the owner's team online, as standalone already did).
+  `Helper.getSocketRemoteAddress` just reads `socket.remoteAddress`.
+- Storage: `world_serializer.js` only reads and writes the saves directory (no
+  S3, no MySQL `sectors.data`). `db/config.js` has `test` (in memory),
+  `development` and `standalone` (both a file). Removed models: favorite,
+  friend, vote, session; removed: the MySQL migrations and `db:setup`.
+- Client: the local world menu is the home screen in every environment (see
+  `Main#run`); the lobby, Firebase sign-in, account, friends, badges, favorites,
+  votes, regions, bans, ads, analytics, fingerprinting and client Sentry are
+  removed with their markup. A message without a client handler is now skipped
+  instead of throwing (`socket_util.js`).
+- Packages and files removed: `junon-matchmaker`, `junon-io-watchdog`,
+  `deployment/`, `.github/workflows/deploy-production.yml`, `start_server.js`,
+  `junon-io@.service`, `docs/deployment.md`, `client/status.ejs`,
+  `client/ads.txt`, `firebaseui.css`. Dependencies dropped: `aws-sdk`,
+  `firebase-admin`, `@firebase/*`, `@fingerprintjs`, `mysql`, `mysql2`,
+  `sequelize-cli`, `prom-client`, `cors`, `uWebSockets.js`, `minipass`,
+  `@sentry/browser`, `@sentry/cli`, and the `@grpc/proto-loader` override.
+  `junon-common/config.json` keeps only `saveFormatVersion`.
+- Root scripts: `server` (the game server under nodemon with `--inspect`, in
+  `development`), `client`, `client:build`, `desktop`, `test`. `serveronly`,
+  `matchmaker` and `db:setup` are gone.
+- E2E: `global-setup.js` starts gulp and the game server (`NODE_ENV=test`, a
+  temporary saves directory, no world); `support/join.js` creates each test's
+  world through New world, choosing the game mode there (`selectGameMode` is
+  gone).
+
 ### Phase 9: packaging
 
 `electron-builder` for Windows, macOS, and Linux; code signing and notarization.
@@ -509,6 +579,21 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
   Minecraft-style pause on focus loss was narrowed to a hidden page, so that
   playing with the window unfocused (e.g. a second monitor) still works.
 
+- 2026-10-08: After Phase 8 there is one server runtime, the standalone one.
+  `NODE_ENV` only chooses gameplay settings: `standalone` (production
+  gameplay, used by the desktop app), and `development`/`test` (`debugMode`:
+  fast waves and building, admin mode, `app_debug.proto`) for developers and
+  Jest. `staging` and `production` go away with the hosted services. Keeping a
+  debug variant avoids rewriting the Jest suites and keeps developer cheats.
+  Alternative considered: removing `debugMode` entirely, which changes
+  gameplay that many tests assert on.
+- 2026-10-08: Server Sentry (`ExceptionReporter`) stays, opt-in: it reports
+  only when `JUNON_SERVER_SENTRY_DSN` is set outside `development`/`test`. It
+  isn't on the Phase 8 list and may be useful for desktop crash reports. Client
+  Sentry was removed instead: it started lazily with the hosted project's
+  hardcoded DSN whenever `debugMode` was off, so desktop players' errors would
+  have gone to the old hosted project. Client errors are logged to the console.
+
 ## Discoveries and risks
 
 - `uWebSockets.js` is expected not to load under Electron's ABI. The plan
@@ -619,12 +704,45 @@ S3/Firebase utility tasks. Rewrite `ARCHITECTURE.md`, `docs/development.md`,
 - Not validated (Phase 6): two separate machines on a physical LAN; the test
   used a second network interface of one machine. Windows/macOS firewall
   prompts for the utility process.
+- 2026-10-08: Phase 8 discoveries.
+  - Under `NODE_ENV=test` the client used `app.proto` (its `debugMode` was only
+    `development`) while the server used `app_debug.proto`. The two differ in a
+    few `Building` field numbers, so the hosted e2e suite ran with a protocol
+    mismatch. The client's `debugMode` now matches the server's. One crafting
+    spec had passed only because of it: in debug mode the owner is in admin
+    mode and crafts without ingredients, and the client now agrees; the spec
+    switches admin mode off (`disableAdminMode`).
+  - `Game#initSector` dropped the chosen game mode under `NODE_ENV=test`, so a
+    new e2e world had no mode and opened "Choose a Game Mode" over the game.
+    The hosted harness never saw it because without MySQL `sector.createdAt`
+    stayed 0, which suppressed the menu.
+  - Removed hosted features that leave player-visible gaps: world thumbnails
+    are saved under `<saves>/screenshots` but nothing serves them, so the team
+    menu's Preview images are broken (they pointed at the hosted CDN); the
+    language selector is gone (`/ja/`, `/ru/` paths still work in a browser).
+  - `test/bots/player_bot.js` and the `load_testing` suites join with a username
+    only, which the server no longer accepts; they need a local profile id
+    before they can run again.
+  - Existing SQLite files may keep the unused favorites, votes, friends and
+    sessions tables; the schema sync only adds.
+  - Merging to `master` no longer deploys the hosted game (the workflow is
+    deleted); the live hosted service gets no further updates from this
+    repository.
 - Not validated: macOS and Windows. On Windows, `Protocol.initServer` mixes `\`
   and `/` in the proto path; Node accepts that, but check it during Phase 9.
 
 ## Result
 
-In progress. Phase 7 validation (2026-10-08): Jest 28 suites / 296 tests pass,
+In progress. Phase 8 validation (2026-10-08): Jest 25 suites / 288 tests pass
+(the removed suites tested Firebase, the deploy script and the uWS address
+workaround). `npm run client:build`, `NODE_ENV=development` and
+`NODE_ENV=standalone` client builds pass. The Playwright e2e suite passes 15/15
+against a local server with no matchmaker. Both desktop e2e tests pass under
+`xvfb-run`. Manual: `NODE_ENV=development` server boots with no configuration,
+creates a world, and saves it on `SIGTERM`. A headless browser created, played
+and exited a world from the local menu with no page errors. Not run:
+`load_testing`/`memleak` (they need the bot update noted above). Phase 7
+validation (2026-10-08): Jest 28 suites / 296 tests pass,
 including `standalone_server.test.js` "pauses a singleplayer world while the
 host is away" (the clock stops on `SetPaused`, resumes, keeps running with a
 co-op guest, and a guest can't pause it). The first desktop e2e test opens the

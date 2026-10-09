@@ -41,8 +41,6 @@ const PlayerData = require('./player_data')
 const TradeOrder = require("./trade_order")
 const User = require("junon-common/db/user")
 const SectorModel = require("junon-common/db/sector")
-const Favorite = require("junon-common/db/favorite")
-const Vote = require("junon-common/db/vote")
 const NeedsServer = require('./../interfaces/needs')
 const Dragger = require('./../interfaces/dragger')
 const WalkthroughManager = require("./walkthrough_manager")
@@ -269,9 +267,7 @@ class Player extends BaseEntity {
   async queryBalance() {
     if (!this.isLoggedIn()) return
     // hosted servers only answered this in (now removed) minigames, so
-    // survival players saw their balance only after a transaction; standalone
-    // answers when the ATM opens
-    if (env !== 'standalone') return
+    // survival players saw their balance only after a transaction
 
     let user = await User.findOne({ where: { uid: this.uid } })
     if (!user) return
@@ -284,157 +280,6 @@ class Player extends BaseEntity {
 
   }
 
-  async toggleUpvote(sectorId) {
-    if (!this.isLoggedIn()) return
-
-    clearTimeout(this.voteTimeout)
-
-    this.voteTimeout = setTimeout(() => {
-      this.performToggleUpvote(sectorId)
-    }, 1000)
-  }
-
-  async hasUpvoted() {
-    let voteRecord = await Vote.findOne({ where: { sectorUid: this.game.getSectorUid(), userUid: this.getUid() }})
-    return voteRecord && voteRecord.upvote === 1
-  }
-
-  async performToggleUpvote(sectorId) {
-    if (this.sector.getUid() === sectorId) {
-      if (this.sector.isLobby()) return
-      if (this.sector.game.isCreatedByAnonynmous()) return
-    }
-
-    let isRemoved = false
-
-    let voteRecord = await Vote.findOne({ where: { sectorUid: sectorId, userUid: this.getUid() }})
-    if (voteRecord) {
-      if (voteRecord.upvote === 1) {
-        await voteRecord.update({ upvote: 0 })
-        this.sector.decreaseUpvote()
-        isRemoved = true
-
-        this.game.triggerEvent("ColonyUnlike", {
-          player: this.name
-        })
-      } else if (voteRecord.downvote === 1) {
-        await voteRecord.update({ downvote: 0, upvote: 1 })
-        this.sector.decreaseDownvote()
-        this.sector.increaseUpvote()
-
-        this.game.triggerEvent("ColonyLike", {
-          player: this.name
-        })
-      } else {
-        await voteRecord.update({ upvote: 1 })
-        this.sector.increaseUpvote()
-        this.game.triggerEvent("ColonyLike", {
-          player: this.name
-        })
-      }
-    } else {
-      let sectorModel = await SectorModel.findOne({ where: { uid: sectorId }})
-      if (sectorModel) {
-        await Vote.createOne({ userUid: this.getUid(), sectorUid: sectorId, upvote: 1 })
-        this.sector.increaseUpvote()
-        this.game.triggerEvent("ColonyLike", {
-          player: this.name
-        })
-      }
-    }
-
-    if (this.sector.getUid() === sectorId) {
-      this.getSocketUtil().broadcast(this.game.getSocketIds(), "FavoriteUpdated", {
-        upvoteCount: this.sector.upvoteCount,
-        userUid: this.getUid(),
-        isRemoved: isRemoved
-      })
-    }
-  }
-
-  async toggleDownvote(sectorId) {
-    if (!this.isLoggedIn()) return
-
-    clearTimeout(this.voteTimeout)
-
-    this.voteTimeout = setTimeout(() => {
-      this.performToggleDownvote(sectorId)
-    }, 1000)
-  }
-
-  async performToggleDownvote(sectorId) {
-    if (this.sector.getUid() === sectorId) {
-      if (this.sector.isLobby()) return
-      if (this.sector.game.isCreatedByAnonynmous()) return
-    }
-
-    let voteRecord = await Vote.findOne({ where: { sectorUid: sectorId, userUid: this.getUid() }})
-    if (voteRecord) {
-      if (voteRecord.downvote === 1) {
-        await voteRecord.update({ downvote: 0 })
-        this.sector.decreaseDownvote()
-      } else if (voteRecord.upvote === 1) {
-        await voteRecord.update({ upvote: 0, downvote: 1 })
-        this.sector.decreaseUpvote()
-        this.sector.increaseDownvote()
-      } else {
-        await voteRecord.update({ downvote: 1 })
-        this.sector.increaseDownvote()
-      }
-    } else {
-      let sectorModel = await SectorModel.findOne({ where: { uid: sectorId }})
-      if (sectorModel) {
-        await Vote.createOne({ userUid: this.getUid(), sectorUid: sectorId, downvote: 1 })
-        this.sector.increaseDownvote()
-      }
-    }
-
-    if (this.sector.getUid() === sectorId) {
-      // this.getSocketUtil().broadcast(this.game.getSocketIds(), "SectorUpdated", {
-      //   upvoteCount: this.sector.upvoteCount,
-      //   downvoteCount: this.sector.downvoteCount
-      // })
-    }
-  }
-
-
-  async toggleFavorite(sectorId) {
-    if (!this.isLoggedIn()) return
-
-    clearTimeout(this.favoriteTimeout)
-    this.favoriteTimeout = setTimeout(() => {
-      this.performToggleFavorite(sectorId)
-    }, 1000)
-  }
-
-  async performToggleFavorite(sectorId) {
-    if (this.sector.getUid() === sectorId) {
-      if (this.sector.isLobby()) return
-      if (this.sector.game.isCreatedByAnonynmous()) return
-    }
-
-    let isRemoved = false
-
-    let favorite = await Favorite.findOne({ where: { sectorUid: sectorId, userUid: this.getUid() }})
-    if (favorite) {
-      await favorite.destroy()
-      isRemoved = true
-    } else {
-      let sectorModel = await SectorModel.findOne({ where: { uid: sectorId }})
-      if (sectorModel) {
-        await Favorite.createOne({ userUid: this.getUid(), sectorUid: sectorId })
-      }
-    }
-
-    if (this.sector.getUid() === sectorId) {
-      await this.sector.fetchFavoriteCount()
-      this.getSocketUtil().broadcast(this.game.getSocketIds(), "FavoriteUpdated", {
-        favoriteCount: this.sector.favoriteCount,
-        userUid: this.getUid(),
-        isRemoved: isRemoved
-      })
-    }
-  }
 
   getRemoteAddress() {
     return this.remoteAddress
@@ -509,7 +354,6 @@ class Player extends BaseEntity {
 
     if (data.uid) {
       this.uid = data.uid
-      this.idToken = data.idToken
     } else {
       this.uid = uuidv4()
     }
@@ -778,16 +622,6 @@ class Player extends BaseEntity {
     }
 
     this.equipBadge("Default")
-
-    this.game.sendToMatchmaker({ event: "PlayerJoin",
-      data: {
-        playerRemoteAddress: this.getRemoteAddress(),
-        fingerprint: this.fingerprint,
-        host: this.game.server.getHost(),
-        region: this.game.getRegion(),
-        sectorUid: this.game.sectorUid
-      }
-    })
   }
 
   setLocale(locale) {
@@ -868,7 +702,6 @@ class Player extends BaseEntity {
     this.commands["chunkPath"] = this.chunkPath.bind(this)
     this.commands["gold"] = this.setGoldAmount.bind(this)
     this.commands["die"] = this.performSuicide.bind(this)
-    this.commands["disc"] = this.performMatchmakerDisconnect.bind(this)
     this.commands["speed"] = this.speedCommand.bind(this)
     this.commands["admin"] = this.setAdmin.bind(this)
     this.commands["slave"] = this.workSlave.bind(this)
@@ -1039,12 +872,6 @@ class Player extends BaseEntity {
     if (!this.isAdminMode) return
 
     this.setHealth(0)
-  }
-
-  performMatchmakerDisconnect() {
-    if (!this.isAdminMode) return
-
-    this.game.server.matchmakerClient.close()
   }
 
   workSlave(args) {
@@ -1291,10 +1118,6 @@ class Player extends BaseEntity {
     this.getTeam().forEachMember((player) => {
       this.getSocketUtil().emit(player.getSocket(), "ScreenshotUpdated", { id: data.id, clientMustDelete: true })
     })
-  }
-
-  getS3() {
-    return this.game.getS3()
   }
 
   getNumHoursAlive() {
@@ -2827,7 +2650,7 @@ class Player extends BaseEntity {
     this.game.globalSidebar.emitContentsToPlayer(this)
     this.game.sidebars[this.id].emitContentsToPlayer(this)
 
-    if (env === 'standalone') this.game.server.sendHostingStatus(this)
+    this.game.server.sendHostingStatus(this)
   }
 
   sendAllButtons() {
@@ -4795,18 +4618,6 @@ class Player extends BaseEntity {
     }
   }
 
-  getPlayerMatchmakerData() {
-    let playerTag = this.isLoggedIn() ? this.getUid() : this.getRemoteAddress()
-
-    return {
-      region: this.game.server.getRegion(),
-      host: this.game.server.getHost(),
-      sectorId: this.game.getSectorUid(),
-      playerTag: playerTag,
-      stress: this.isTroubleshooter
-    }
-  }
-
   shouldCreatePlayerData() {
     if (!this.isLoggedIn()) return false
     if (this.isSectorOwner()) return true
@@ -4882,16 +4693,6 @@ class Player extends BaseEntity {
     this.game.onAlivePlayerCountChanged()
 
     this.game.removePlayer(this) // game also keeps track of players
-
-    this.game.sendToMatchmaker({ event: "PlayerLeave",
-      data: {
-        playerRemoteAddress: this.getRemoteAddress(),
-        fingerprint: this.fingerprint,
-        host: this.game.server.getHost(),
-        region: this.game.getRegion(),
-        sectorUid: this.game.sectorUid
-      }
-    })
 
     this.clientMustDelete = true
     this.onStateChanged()
@@ -5567,14 +5368,9 @@ class Player extends BaseEntity {
         player: this.getName()
       })
 
-      if (data.isGlobal) {
-        LOG.info("globalchat> " + this.name + ": " + message)
-        let data = { username: this.name, message: message, prefixesList:JSON.stringify(this.game.playerChatPrefixes||{})}
-        if (this.isLoggedIn()) {
-          data.uid = this.getUid()
-        }
-        this.game.sendToMatchmaker({ event: "GlobalClientChat", data: data })
-      } else {
+      // global chat went to every hosted server through the matchmaker; a
+      // message sent as global now reaches this world, like normal chat
+      {
         LOG.info("[" + this.game.getSectorUid() + "] chat> " + this.name + ": " + message)
         let data = { playerId: this.id, message: message, username: this.name, isTeam: isTeamChat,prefixesList:JSON.stringify(this.game.playerChatPrefixes||{})}
         if (this.isLoggedIn()) {

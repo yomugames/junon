@@ -1,101 +1,15 @@
 <canvas id='game_canvas'></canvas>
 
-<div id='more_io_games'><a href="/partners.html" target="_blank" id='partners_link'><%= t('More IO games') %></a></div>
-
 <div id='home_background'>
     <img id="home_background_image" src="\assets\images\background\space.jpg">
 </div>
 
-<div class='loading_modal modal_menu'>
-    <div class='loading_modal_message'>Loading</div>
-    <div class='loading_modal_spinner lds-ring'><div></div><div></div><div></div><div></div></div>
-</div>
-
 <div id='welcome_container'>
-    <div id='home_footer' style="background-color: #00000080; padding: 10px">
-        <a href="/changelogs.html" target="_blank" class='game_version'><%= gameVersion %></a> 
-        <a href="/partners.html" target="_blank" id='partners_link'><%= t('Partners') %></a> 
-        <a href="/privacy.html" target="_blank" id='privacy_link'><%= t('Privacy') %></a>
-        <a href="/rules.html" target="_blank" id='rules_link'><%= t('Rules') %></a>
-        <a href="/credits.html" target="_blank" id='credits_link'><%= t('Credits') %></a>
-    </div>
-    <div id='username_form_container' class='modal_menu'>
-        <div id='username_form_description'>Choose a username</div>
-        <input type="text" id='username_input' class='menu_input'>
-        <button id='set_username_btn'>Submit</button>
-        <div id='username_errors'></div>
-    </div>
-
-    <div class='left_sidebar' style="background-color: #00000080;">
-        <div id='home_user_account_container' class='home_menu_container'>
-            <div id='login_cookies'>Cookies must be enabled to Login</div>
-            <div id='auth_in_progress'>
-                <span>Authenticating...</span>
-            </div>
-            <div id='username_container'>
-                <div id='username'></div>
-                <div id='logout_btn' class='logout_container home_menu_container'><%= t('Logout') %></div>
-            </div>
-            <div id='authentication_container'>
-                <div id='login_btn' class='btn'><%= t('Login') %></div>
-                <div class='login_error'>
-                    <div class='login_error_header'>Login Error</div>
-                    <div class='login_error_message'></div>
-                </div>
-            </div>
-        </div>
-
-        <div class='left_sidebar_contents'>
-            <div id='changelogs'>
-                <% let changeLog = changeLogs[0] %>
-                <div>
-                    <p class='date'><%= changeLog.date %></p>
-                    <% if (changeLog.content.bugs.length > 0) { %>
-                        <ul>
-                            <% changeLog.content.bugs = changeLog.content.bugs.slice(0,1) %>
-                            <% for (let i = 0; i < changeLog.content.bugs.length; i++) { %>
-                                <% let bug = changeLog.content.bugs[i] %>
-                                <li><%= bug %></li>                    
-                            <% } %>
-                        </ul>
-                    <% } %>
-                    <% if (changeLog.content.features.length > 0) { %>
-                        <ul>
-                            <% changeLog.content.features = changeLog.content.features.slice(0,2) %>
-                            <% for (let i = 0; i < changeLog.content.features.length; i++) { %>
-                                <% let feature = changeLog.content.features[i] %>
-                                <li><%= feature %></li>                    
-                            <% } %>
-                        </ul>
-                    <% } %>
-                    <a href="/changelogs.html" target="_blank" id='changelog_link'>(See More)</a>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-        <div id='home_error_message'></div>
-        <div id='connecting_message'><%= t('Connecting') %> <div class="lds-ring"><div></div><div></div><div></div><div></div></div></div>
-
-
-    <div id='social_login_container'>
-        <div class='google_login_btn'>
-            <img src="/assets/images/google_white_icon.png">
-            <span class='login_btn_label'>Signin with Google</span>
-        </div>
-
-        <div class='facebook_login_btn'>
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/facebook.svg">
-            <span class='login_btn_label'>Signin with Facebook</span>
-        </div>
-    </div>
-
-    <div id='firebaseui-auth-container'></div>
+    <div id='home_error_message'></div>
+    <div id='connecting_message'><%= t('Connecting') %> <div class="lds-ring"><div></div><div></div><div></div><div></div></div></div>
 
     <p id='game_caption'>JUNON . IO </p>    
     <div class='middle_container'>
-        <% if (nodeEnv === 'standalone') { %>
         <section id='local_world_menu' aria-label='Local worlds'>
             <h1>Junon</h1>
             <label>Your name <input class='local_player_name black_input' maxlength='16' autocomplete='nickname'></label>
@@ -108,244 +22,22 @@
             </nav>
             <div class='local_menu_panel'></div>
             <p class='local_menu_message' role='status'></p>
+            <p class='local_menu_version'>Version <span class='game_version'><%= gameVersion %></span></p>
         </section>
-        <% } %>
-        <div class='home_user_action_container'>
-            <div class='home_action_row'>
-                <div class='default_play_btn btn'>
-                    <span><%= t('New Game') %></span>
-                    <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
-                </div>
-
-                <div class='tutorial_menu_btn btn'>
-                    <span><%= t('Tutorial') %></span>
-                    <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
-                </div>
-
-                <div class='settings_menu_btn btn'>
-                    <img src="/assets/images/settings_icon.png" />
-                </div>
-            </div>
-
-            <div id='language_selector'>
-                <img src="/assets/images/language_icon.png" class='language_icon' />
-                <select id='language_select'>
-                    <option value='en'>English</option>
-                    <option value='ru'>Русский</option>
-                    <option value='ja'>日本語</option>
-                </select>
-            </div>
-
-            <a class='discord_link' href="https://discord.gg/T6rPXtw" target="_blank"><img src="/assets/images/background/discord_small_icon.png"></a>
-
-            <button class='open_ban_list_btn ui_btn'>Manage Bans</button>
-            <button class="open_event_badges_btn ui_btn" style="display:none;margin-top: 20px;background-color: #bf5036; font-family: 'cc'">Give player event badge</button>
-
-        </div>
-
-        <div class='survival_list_container'>
-            <div class='minigame_list_header'>
-                <input class='search_world_input' type="text" name="" placeholder="Enter world name">
-                <button class='search_world_btn'>Search</button>
-            </div>
-        </div>
-        <div class='browse_games_container'>
-            <div class='game_list_container'>
-                <div class='game_list_header'>
-                    <div class='colony_filter_tab online_colonies_tab selected' data-tab='worlds'><%= t('Worlds') %></div>
-                    <div class='colony_filter_tab new_colonies_tab' data-tab='new'><%= t('New') %></div>
-                    <div class='colony_filter_tab top_colonies_tab' data-tab='top'><%= t('Top') %></div>
-                    <div class='colony_filter_tab favorite_colonies_tab'><%= t('Favorites') %></div>
-                    <img class='gallery_mode_btn' src='/assets/images/gallery_view_icon.png' />
-                    <img class='list_mode_btn' src='/assets/images/list_view_icon.png' />
-                    <div class='colony_filter_tab mine_colonies_tab '><%= t('MineColony') %></div>
-                </div>
-                <div id='region_tab_content'>
-                </div>
-            </div>
-        </div>
     </div>
     
     <div id='background'></div>
 
-    <div id='name_input_container'>
-        <div id='name_input_message'></div>
-        <input id='name_input' type='text' placeholder='name'>
-        <div id='play_btn' class='btn'>
-            <span>Play</span>
-            <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
-        </div>
-        <div id='survival_btn' class='btn'>
-            <span>Survival</span>
-            <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
-        </div>
-    </div>
-
-    <div id="event_manager_container" class="modal_menu">
-        <div class="cancel_btn"></div>
-        <div class="menu_main_header">Event badge manager</div>
-        <div class="add_badge_form">
-            <p>Username</p>
-            <input type="text" id="badge_username_field">
-            <button id="badge_submit">Add event badge</button>
-        </div>
-
-        <p id="event_badge_menu_info"></p>
-    </div>
-    
-    <div id='ban_manager_container' class='modal_menu'>
-        <div class='cancel_btn'></div>
-        <div class='menu_main_header'>Ban List</div>
-        <div class='ban_status_message'>Authorizing..</div>
-        <div class='global_ban_list_container'>
-            <div class='global_ban_list_header'>
-                <div class='global_ban_list_header_col'>Username</div>
-                <div class='global_ban_list_header_col duration_col'>Days</div>
-                <div class='global_ban_list_header_col reason_col'>Reason</div>
-                <div class='global_ban_list_header_col'>Date</div>
-            </div>
-            <div class='global_ban_list_body'></div>
-        </div>
-        <div class='ban_user_form'>
-            <div class='ban_username'>
-                <label>Username</label>
-                <input type="text" class='black_input'>
-            </div>
-            <div class='ban_duration'>
-                <label>Duration (Days)</label>
-                <input type="number" class='black_input'>
-            </div>
-            <div class='ban_reason'>
-                <label>Reason</label>
-                <input type="text" class='black_input'>
-            </div>
-            <button class='global_ban_btn ui_btn'>Ban</button>
-        </div>
-    </div>
-
-    <div class='home_menu'>
-        <div class='home_menu_controls'>
-            <div id='region_selector'>
-                <select id='region_select'>
-                </select>
-            </div>
-
-        </div>
-    </div>
-
     <div class='main_menu'>
-        <div class='mobile_authentication_container'>
-            <div class='btn mobile_login_btn'><%= t('Login') %></div>    
-            <div class='btn mobile_logout_btn'><%= t('Logout') %></div>    
-        </div>
-
-        <div class='mobile_username_container'>
-            <div class='username'></div>
-        </div>
-
         <div class='resume_menu_btn main_menu_btn'><%= t('Resume') %></div>
         <div class='settings_menu_btn main_menu_btn'><%= t('Settings') %></div>
         <div class='exit_game_menu_btn main_menu_btn'><%= t('Exit Game') %></div>
     </div>
 
-    <a class='other_game_ad_square' href='https://uchu.io' target="_blank">
-        <img src="">
-    </a>
-    <div class='junon_ad_square junon_ad_square_1'>
-        <div id='junon-io_300x250'>
-        </div>
-    </div>
-    <div class='junon_ad_square junon_ad_square_2 middle'>
-        <div id='junon-io_300x250_2'>
-        </div>
-    </div>
-    
     <div class='main_menu_navigator'>
         <div class='back_main_menu_btn'>
             <img src="/assets/images/arrow_back_icon.png" />
             <%= t('Back') %>
-        </div>
-
-        <div class='game_invite_container'>
-            <div class='game_invite_name'></div>
-            <div id="join_game_btn" data-disabled='true'>Join Game</div>
-            <img class='game_invite_screenshot' src="" />
-            <div class='game_invite_details'>
-                <div class='game_invite_day_count'>
-                    <span><%= t('ColonyDay') %>: </span>
-                    <span class="team_days_alive">22</span>
-                </div>
-                <div class='game_invite_player_count'>
-                    <span><%= t('ColonyOnline') %>: </span>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <span class="team_member_count">0 / 20</span>
-                </div>
-            </div>
-        </div>
-
-        <div class='pvp_games_container'>
-            <table class='pvp_colony_list colony_list' cellspacing='0' cellpadding='0'>
-              <thead>
-                <tr>
-                  <th class='info_name'><%= t('ColonyName') %></th>
-                  <th class='days_alive_header'><%= t('ColonyDay') %></th>
-                  <th class='colony_list_member_count'><%= t('ColonyOnline') %></th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-        </div>
-
-        <div class='load_game_settings_container'>
-            <label class='load_game_settings_header'><%= t('Game Settings') %></label>
-            <div class='load_game_save_name'></div>
-            <div class='load_game_settings_row'>
-                <label><%= t('Visibility') %></label>
-                <select class='visibility_select'>
-                    <option value='public'><%= t('Public') %></option>
-                    <option value='private'><%= t('Private') %></option>
-                </select>
-            </div>
-
-            <div>
-                <button class='main_menu_btn continue_game_btn'>
-                    <span><%= t('Start Game') %></span>
-                    <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
-                </button>
-            </div>
-        </div>
-        <div class='save_list_container'>
-            <div class='save_list_content'></div>
-            <div class='save_list_empty_container'>
-                <%= t('No Saves Found') %>
-            </div>
-        </div>
-
-        <div class='new_game_container'>
-            <div class='menu_main_header'><%= t('New Game') %></div>
-            <input type="text" name="" class='new_colony_name_input black_input' placeholder='<%= t('Enter Colony Name') %>'>
-            <div class='new_game_row_count'>
-                <label>Row Count</label>
-                <select class='row_count_select ui_select'>
-                    <option value='32'>32</option>
-                    <option value='64'>64</option>
-                    <option value='96'>96</option>
-                    <option value='128' selected>128</option>
-                </select>
-            </div>
-            <div class='new_game_col_count'>
-                <label>Col Count</label>
-                <select class='col_count_select ui_select'>
-                    <option value='32'>32</option>
-                    <option value='64'>64</option>
-                    <option value='96'>96</option>
-                    <option value='128' selected>128</option>
-                </select>
-            </div>
-            <div class='new_colony_menu_btn main_menu_btn'>
-                <span><%= t('Start') %></span>
-                <div class="play_spinner lds-ring"><div></div><div></div><div></div><div></div></div>
-            </div>
         </div>
 
         <div class='settings_container'>
@@ -384,10 +76,6 @@
             <button id='restart_btn' class=''><%= t('Respawn') %></button>
         </div>
     </div>
-    <div class='junon_ad_banner'>
-        <div id='junon-io_728x90'>
-        </div>
-    </div>
 </div>
 
 
@@ -396,16 +84,6 @@
     <div class='confirm_message'></div>
     <button class='confirm_cancel_btn ui_btn'><%= t('No') %></button>
     <button class='confirm_ok_btn ui_btn'><%= t('Yes') %></button>
-</div>
-
-<div id='import_sector_menu' class='modal_menu'>
-    <div class='cancel_btn'></div>
-    <h3>Replace Save File</h3>
-    <div class='sector_name'></div>
-    <div class='import_warning'>Make sure to backup your save before overwriting with a new one</div>
-    <img src="" class='sector_thumbnail'>
-    <input type="file" name="file">
-    <button class='import_sector_btn ui_btn'><%= t('Upload') %></button>
 </div>
 
 <div id='select_difficulty_menu' class='modal_menu'>
@@ -429,32 +107,6 @@
         <div class="game_mode_warning"><%= t('GameModeWarning') %></div>
         <div class="accept_game_mode_btn ui_btn"><%= t('AcceptDecide') %></div>
     </div>
-</div>
-
-<div id='rules_menu' class='modal_menu'>
-    <div class='menu_main_header'><%= t('Rules') %></div>
-    <div class='rules_description'>
-      <div>Breaking rules below might result in a ban. Please read carefully. If you see anyone breaking rule, visit our <a target="_blank" href='https://discord.com/invite/T6rPXtw'>discord channel</a> and report the offending user to one of our moderators. Include screenshots if appropriate.</div>
-
-      <h3>Respect players</h3>
-      <ul>
-        <li>No malicious griefing (destroying/spamming buildings without owners permission)</li>
-        <li>No racist, homophopic, hateful speech or excessive swearing. Any harassments, threats, and bullying will not be tolerated.</li>
-        <li>No NSFW (or sexually suggestive or implied) or explicit content</li>
-        <li>No teaming in minigames that disallow teaming</li>
-        <li>No talking about self-harm, or other deeply negative experiences</li>
-        <li>No encouraging violence or hatred towards other players</li>
-        <li>No threating to hack other players</li>
-        <li>No copying other player made games block by block and claiming it as your own.</li>
-      </ul>
-      <h3>Cheating and Exploits</h3>
-      <ul>
-        <li>No hacking allowed. Such as using unexposed api from the server.</li>
-        <li>No exploiting the game to gain unfair advantage. This could include item duplications, infinite gold, or spawning items or mob freely unless the gamemode allows it.</li>
-        <li>Report exploitable bugs to our <a target="_blank" href='https://discord.com/invite/T6rPXtw'>discord channel</a> to one of our moderators. And if its significant such gold glitch or item duplication, you'll be credited with finding the bug in changelog.</li>
-      </ul>
-    </div>
-    <div class='ui_btn rules_accept_btn'>Accept</div>
 </div>
 
 <div id="base_hud" class="base_menu">
@@ -563,20 +215,6 @@
     </div>
 
     <div class='top_right_menu'>
-        <div id='sector_action_menu'>
-            <div class='sector_upvote_container'>
-                <div class='upvote_btn'>
-                    <div class='upvote_action_icon'></div>    
-                    <div class='upvote_count'>0</div>
-                </div>
-            </div>
-            <div class='sector_favorite_action_container'>
-                <div class='sector_favorite_btn'>
-                    <div class='bookmark_action_icon'></div>    
-                </div>
-            </div>
-        </div>
-
         <div id="sidebar_menu">
             <div class='sidebar_text'></div>
         </div>
@@ -617,15 +255,10 @@
                 <span class='chat_tab_label'>Team</span>
                 <span class='chat_unread_count'></span>
             </div>
-            <div class='global_chat_tab chat_tab' data-chat='global'>
-                <span class='chat_tab_label'>Global</span>
-                <span class='chat_unread_count'></span>
-            </div>
         </div>
         <div id='chat_group_tab_content'>
             <div class='local_chat_history chat_history selected'></div>
             <div class='team_chat_history chat_history'></div>
-            <div class='global_chat_history chat_history'></div>
         </div>
         <div id='chat_input_container'>
             <input type="text" id='chat_input' autocomplete="nope" placeholder="send message">
@@ -837,13 +470,6 @@
         </div>
     </div>
 
-    <div id="badge_menu" class="modal_menu">
-        <div id="badge_container_header" class="menu_main_header"><%= t('Badges') %></div>   
-        <div id="badge_container">
-            
-        </div>
-    </div>
-
     <div id="keypad_menu" class="modal_menu">
         <div id="keypad_container_header" class="menu_main_header"><%= t('Keypad') %></div>
         <div id='keypad_container_cancel_btn' class='cancel_btn'></div>
@@ -903,24 +529,9 @@
             <div class='hud_btn_shortcut'>P</div>
         </div>
 
-        <div id='friends_btn' class='hud_btn'>
-            <img src='/assets/images/party_icon.png'>
-            <div class='hud_btn_shortcut'>F</div>
-        </div>
-
-        <div id='visit_colony_hud_btn' class='hud_btn'>
-            <img src='/assets/images/language_icon.png'>
-            <div class='hud_btn_shortcut'>V</div>
-        </div>
-
         <div id='command_block_hud_btn' class='hud_btn'>
             <img src='/assets/images/chunk_icon.png'>
             <div class='hud_btn_shortcut'>K</div>
-        </div>
-
-        <div id="badge_hud_btn" class="hud_btn">
-            <img src="/assets/images/badge.png" alt="view badges">
-            <div class="hud_btn_shortcut">B</div>
         </div>
 
         <div id='debug_control_panel' >
@@ -1228,28 +839,6 @@
         </div>
     </div>
 
-    <div id='user_profile_menu' class='modal_menu'>
-        <div class='cancel_btn'></div>
-        <div class='username_header menu_main_header'></div>
-        <div class='user_profile_details'>
-            <div class='tags'></div>
-            <div class='user_location'>
-                <label><%= t('Location') %>:</label>
-                <div class='colony_name'></div>
-                <button class='visit_colony_btn ui_btn'><%= t('Visit') %></button>
-            </div>
-            <div class='location_day_count'>
-                <label><%= t('ColonyDay') %>:</label>
-                <div class='colony_day_count'></div>
-            </div>
-            <div class='owned_colonies'>
-                <label>Colonies:</label>
-                <div class='user_colonies'></div>
-            </div>
-        </div>
-        <div class='guest_account_label'>Guest Account</div>
-    </div>
-
     <div id='rail_stop_menu' class='modal_menu'>
         <div class='cancel_btn'></div>
         <div class='colony_info_container'>
@@ -1319,7 +908,6 @@
                     </div>
                     <div class='invite_link_container'>
                         <div class='menu_main_header'></div>
-                        <input class='invite_link_input black_input' readonly type="text" value=''>    
                         <span class='team_private_status'><%= t('Private') %></span>
                     </div>
                 </div>
@@ -1647,31 +1235,6 @@
                 </span>
             </div>    
             <div class='alliance_relationship_details'>
-            </div>
-        </div>
-    </div>
-
-    <div id='friend_request_menu'>
-    </div>
-
-    <div id='friends_menu' class='modal_menu'>
-        <div class='cancel_btn'></div>
-        <div class='menu_main_header'><%= t('Friends') %></div>
-        <div class="friends_tab_container">
-            <div class='friend_tab' data-tab='search_players'><%= t('Search Users') %></div>
-            <div class='friend_tab selected' data-tab='my_friends'><%= t('Friends') %></div>
-            <div class='friend_tab pending_request_tab' data-tab='pending_requests'>Requests</div>
-        </div>
-        <div class='tab_content'>
-            <div class="search_players_content tab-pane" data-tab='search_players'>
-                <input type="text" name="" class='player_search_input' placeholder="Enter username" />
-                <button class='player_search_btn'>Search</button>
-                <div class='player_search_results'></div>
-            </div>
-            <div class="my_friends_content tab-pane active" data-tab='my_friends'>
-            </div>
-            <div class="pending_requests_content tab-pane" data-tab='pending_requests'>
-
             </div>
         </div>
     </div>

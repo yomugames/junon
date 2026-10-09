@@ -5,10 +5,8 @@
   recipe can be paid for and which items/counts should be deducted.
 */
 
-// Item.js's module graph pulls in Buildings/index -> BaseBuilding -> Team ->
-// firebase_admin_helper -> firebase-admin/auth, which transitively depends on
-// the ESM-only `jose` package and can't load under Jest's CJS runtime. Nothing
-// under test here touches Team, so stub it out to keep this hermetic.
+// Item.js's module graph pulls in Buildings/index -> BaseBuilding -> Team.
+// Nothing under test here touches Team, so stub it out to keep this hermetic.
 jest.mock('../../server/entities/team', () => ({
   MemberRoleType: 0,
   AdminRoleType: 1,

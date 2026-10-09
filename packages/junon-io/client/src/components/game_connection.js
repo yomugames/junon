@@ -91,20 +91,6 @@ class GameConnection {
     return this.url.split("?")[0].replace(/ws.*\//,"")
   }
 
-  waitForSectorRestart() {
-    let sectorsOnline = this.main.gameExplorer.sectorEntries
-    if (sectorsOnline[this.game.sector.uid]) {
-      clearInterval(this.sectorWaitInterval)
-      this.displayServerUp()
-    }  
-  }
-
-  displayServerUp() {
-    const message    = document.querySelector(".disconnected_msg")
-    message.style.display = 'block'
-    message.innerText = "Server ready.. Please reload game"
-  }
-
   getDots(reloadIncrement) {
     let progress = (reloadIncrement % 3) + 1
 

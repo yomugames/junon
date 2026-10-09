@@ -30,7 +30,7 @@ class ServerProcess {
       PORT: String(port)
     })
     // the menu picks the world and the socket stays on loopback until co-op
-    // hosting opens it; don't inherit launcher settings meant for serveronly
+    // hosting opens it; don't inherit launcher settings meant for `npm run server`
     delete env.JUNON_WORLD_ID
     delete env.JUNON_OWNER_UID
     delete env.JUNON_HOST

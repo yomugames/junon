@@ -4,7 +4,7 @@ const { setupMeleeArena, readMob } = require('./support/scenario')
 const { moveTowardAndAttack } = require('./support/combat')
 
 test.describe('gameplay', () => {
-  test('creates a new colony through the real matchmaker flow and joins', async ({ page }) => {
+  test('creates a new colony through the local world menu and joins', async ({ page }) => {
     await createNewColonyAndJoin(page)
 
     const joined = await page.evaluate(() => ({

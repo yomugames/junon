@@ -364,9 +364,6 @@ class EntityMenu extends BaseMenu {
         case "ban": 
           this.onPlayerBan(this.selectedEntity)
           break
-        case "add_friend": 
-          this.onPlayerAddFriend(this.selectedEntity)
-          break
         default: 
 
       }
@@ -504,16 +501,6 @@ class EntityMenu extends BaseMenu {
     if (!entity) return
 
     this.game.teamMenu.banMember(entity.id)
-  }
-
-  onPlayerAddFriend(entity) {
-    if (!entity) return
-    if (!entity.isPlayer()) return   
-
-    if (this.game.main.isMyFriend(entity.uid)) return
-
-    this.game.main.addFriend(entity.uid)
-    this.game.entityMenu.redraw()
   }
 
   onVendingWithdraw(entity) {

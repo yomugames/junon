@@ -1,3 +1,5 @@
+const isDebug = () => typeof debugMode !== "undefined" && debugMode
+
 class SocketUtil {
 
   static getInstance() {
@@ -65,7 +67,7 @@ class SocketUtil {
     const messageWrapper = this.protocol.MessageWrapper.create(wrappedMessage)
     const uint8Array  = this.protocol.MessageWrapper.encode(messageWrapper).finish()
 
-    if (env === "development") {
+    if (isDebug()) {
       const isEncodingFailed = uint8Array.length === 0
       if (isEncodingFailed) {
         throw "Failed to binary encode " + eventName + " : " + JSON.stringify(payload) + " . Make sure event is included in MessageWrapper#oneof list"
@@ -89,13 +91,13 @@ class SocketUtil {
     const messageWrapper = this.protocol.MessageWrapper.decode(uint8Array)
     const data = messageWrapper[messageWrapper.kind]
 
+    // a message this client has no use for is skipped rather than fatal
     const isMessageHandlerDefined = typeof this.handlers[messageWrapper.kind] === "function"
     if (!isMessageHandlerDefined) {
-      if (this.options.allowMissingHandlers) {
-        return
-      } else {
-        throw new Error("Must implement Socket handler for " + messageWrapper.kind)
+      if (isDebug() && !this.options.allowMissingHandlers) {
+        console.warn("No socket handler for " + messageWrapper.kind)
       }
+      return
     }
 
     this.handlers[messageWrapper.kind](data)

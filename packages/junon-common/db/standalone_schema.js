@@ -1,11 +1,9 @@
-// Schema for the standalone (offline) sqlite database (see config.js).
-//
-// The migrations in db/migrations are MySQL history and many use raw MySQL
-// SQL, so they can't run on sqlite and must not be rewritten. Standalone
-// databases are instead built from the models: each table is created when
-// missing, and columns a model gained since the file was created are added.
-// Only additive changes are applied automatically; renaming or removing a
-// column needs an explicit standalone step.
+// Schema for the game's sqlite database (see config.js). There are no
+// migrations (the hosted game's MySQL migrations were removed with it): the
+// database is built from the models. Each table is created when missing, and
+// columns a model gained since the file was created are added. Only additive
+// changes are applied automatically; renaming or removing a column needs an
+// explicit step here.
 async function syncStandaloneSchema(sequelize) {
   let queryInterface = sequelize.getQueryInterface()
 

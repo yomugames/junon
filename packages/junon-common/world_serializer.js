@@ -1,25 +1,13 @@
 const fs = require("fs")
 const path = require("path")
 const ExceptionReporter = require('./exception_reporter')
-const AWS = require('aws-sdk')
 const protobuf = require("protobufjs")
 const zlib = require('zlib')
 const Config = require("./config")
-const os = require('os')
-const SectorModel = require("./db/sector")
-
-const bucketName = process.env.S3_BUCKET_NAME || "junon"
 
 class WorldSerializer {
 
   static async initSerializer() {
-    if (!debugMode && !this.isStandalone()) {
-      const spacesEndpoint = new AWS.Endpoint('nyc3.digitaloceanspaces.com')
-      this.s3 = new AWS.S3({
-        endpoint: spacesEndpoint
-      })
-    }
-
     this.protocols = {}
 
     await this.initSaveFileProtocols()
@@ -51,18 +39,13 @@ class WorldSerializer {
     })
   }
 
-  // Standalone (offline desktop / listen-server) mode keeps each world as a
-  // plain file at <JUNON_SAVES_DIR>/<sectorUid>/sector.sav - the same bytes
-  // and relative layout as the hosted game's S3 objects, so an exported
-  // hosted save can be dropped in as-is.
-  static isStandalone() {
-    return env === 'standalone'
-  }
-
+  // Each world is a plain file at <JUNON_SAVES_DIR>/<sectorUid>/sector.sav -
+  // the same bytes as the hosted game's S3 objects, so an exported hosted
+  // save can be dropped in as-is.
   static getSavesDirectory() {
     let directory = process.env.JUNON_SAVES_DIR
     if (!directory) {
-      throw new Error("JUNON_SAVES_DIR must be set in standalone mode")
+      throw new Error("JUNON_SAVES_DIR is not defined")
     }
 
     return path.resolve(directory)
@@ -120,106 +103,12 @@ class WorldSerializer {
     }
   }
 
-  static async existsLocally(sectorUid) {
-    const sector = await SectorModel.findOne({ where: { uid: sectorUid } })
-    if (!sector) return false
-
-    return sector.data // check if save file already exist in data column
-  }
-
-  static existsRemotely(key) {
-    const params = {
-      Bucket: bucketName,
-      Key: key
-    }
-
-    return new Promise((resolve, reject) => {
-      this.s3.headObject(params, (err, data) => {
-        if (err) {
-          resolve(false)
-        } else {
-          resolve(true)
-        }
-      })
-    })
-  }
-
-  static async hasCloudSavedData(sectorUid, cb) {
-    let key = this.getSectorSavePath(sectorUid)
-
-    if (this.isStandalone()) {
-      return this.existsInSavesDirectory(key)
-    } else if (debugMode) {
-      return this.existsLocally(sectorUid)
-    } else {
-      return this.existsRemotely(key)
-    }
-  }
-
-  static async listSectors() {
-    let prefix = this.getSectorsListPath()
-
-    let params = {
-      Bucket: bucketName,
-      Prefix: prefix,
-      MaxKeys: 500
-    }
-
-    let hasMoreData = true
-    let result = []
-
-    while (hasMoreData) {
-      try {
-        let data = await this.listSectorsPromise(params)
-        let sectorIds = data.Contents.map((content) => {
-          return content.Key
-        }).filter((key) => {
-          return key.match("sector.sav")
-        })
-
-        result = result.concat(sectorIds)
-
-        if (data.NextMarker) {
-          params['Marker'] = data.NextMarker
-        } else {
-          hasMoreData = false
-        }
-      } catch(e) {
-        hasMoreData = false
-      }
-    }
-
-    return result
-  }
-
-  static listSectorsPromise(params) {
-    return new Promise((resolve, reject) => {
-      this.s3.listObjects(params, (err, data) => {
-        if (err) {
-          console.log(err, err.stack)
-          reject({})
-          return
-        } else {
-          resolve(data)
-        }
-      })
-    })
+  static async hasCloudSavedData(sectorUid) {
+    return this.existsInSavesDirectory(this.getSectorSavePath(sectorUid))
   }
 
   static getSectorSavePath(sectorUid) {
-    if (this.isStandalone()) {
-      return this.getStandaloneSavePath(sectorUid)
-    }
-
-    let namespace = env
-
-    return ["sectors", namespace, sectorUid, "sector.sav"].join("/")
-  }
-
-  static getSectorsListPath() {
-    let namespace = env
-
-    return ["sectors", namespace].join("/")
+    return this.getStandaloneSavePath(sectorUid)
   }
 
   static parseSaveGame(buffer, version) {
@@ -293,122 +182,21 @@ class WorldSerializer {
     }
   }
 
-  static async readLocally(sectorUid) {
-    const sector = await SectorModel.findOne({ where: { uid: sectorUid } })
-    return sector.data
-  }
-
-  static readRemotely(key) {
-    const params = {
-      Bucket: bucketName,
-      Key: key
-    }
-
-    return new Promise((resolve, reject) => {
-      this.s3.getObject(params, (err, data) => {
-        if (err) {
-          ExceptionReporter.captureException(err)
-          resolve(false)
-        } else {
-          resolve(data.Body)
-        }
-      })
-    })
-  }
-
   static async readFile(sectorUid) {
-    let key = this.getSectorSavePath(sectorUid)
-
-    if (this.isStandalone()) {
-      return this.readFromSavesDirectory(key)
-    } else if (debugMode) {
-      return this.readLocally(sectorUid)
-    } else {
-      return this.readRemotely(key)
-    }
-  }
-
-  static async deleteLocally(sectorUid) {
-    const sector = await SectorModel.findOne({ where: { uid: sectorUid } })
-    if (!sector) return
-    await sector.update({ data: null })
-  }
-
-  static deleteRemotely(key) {
-    const params = {
-      Bucket: bucketName,
-      Key: key
-    }
-
-    return new Promise((resolve, reject) => {
-      this.s3.deleteObject(params, (err, data) => {
-        if (err) {
-          ExceptionReporter.captureException(err)
-          resolve(false)
-        } else {
-          resolve(true)
-        }
-      })
-    })
+    return this.readFromSavesDirectory(this.getSectorSavePath(sectorUid))
   }
 
   static async deleteSector(sectorUid) {
-    let key = this.getSectorSavePath(sectorUid)
-
-    if (this.isStandalone()) {
-      await this.deleteFromSavesDirectory(key)
-    } else if (debugMode) {
-      await this.deleteLocally(sectorUid)
-    } else {
-      this.deleteRemotely(key)
-    }
-
+    await this.deleteFromSavesDirectory(this.getSectorSavePath(sectorUid))
   }
 
   static createPlayerData(player) {
     return this.getCurrentProtocol().Player.fromObject(player)
   }
 
-  static async writeLocally(sectorUid, data) {
-    const sector = await SectorModel.findOne({ where: { uid: sectorUid } })
-    await sector.update({ data: data })
-  }
-
-  static writeRemotely(key, data, cb) {
-    const params = {
-      Body: data,
-      Bucket: bucketName,
-      Key: key
-    }
-
-    this.s3.putObject(params, (err) => {
-      if (err) {
-        ExceptionReporter.captureException(err)
-      }
-      cb()
-    })
-  }
-
   static async upload(sectorUid, data, cb) {
-    let key = this.getSectorSavePath(sectorUid)
-
-    if (this.isStandalone()) {
-      await this.writeToSavesDirectory(key, data)
-      cb()
-    } else if (debugMode) {
-      await this.writeLocally(sectorUid, data)
-      cb()
-    } else {
-      this.writeRemotely(key, data, cb)
-    }
-  }
-
-  static getLocalPath(key) {
-    return os.tmpdir() + "/saves/" + key
-  }
-
-  static getLocalDirectory(filePath) {
-    return path.dirname(filePath)
+    await this.writeToSavesDirectory(this.getSectorSavePath(sectorUid), data)
+    cb()
   }
 
   static saveSector(sector) {

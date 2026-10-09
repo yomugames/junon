@@ -1,6 +1,6 @@
 const BaseCommand = require("./base_command")
 
-// Standalone only: lets the world owner take over one of the unclaimed
+// Lets the world owner take over one of the unclaimed
 // characters of an imported world (see junon-common/save_importer.js), or go
 // back to a new character. The character being left becomes unclaimed.
 class Character extends BaseCommand {
@@ -24,11 +24,6 @@ class Character extends BaseCommand {
 
   async perform(caller, args) {
     if (!caller.isPlayer()) return
-
-    if (env !== 'standalone') {
-      caller.showChatError("Command not available")
-      return
-    }
 
     if (!caller.isSectorOwner()) {
       caller.showChatError("permission denied")

@@ -3,8 +3,11 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../../../.e
 global.env = process.env.NODE_ENV || 'development'
 global.pid = process.pid
 
-if (require("os").hostname().match("kube-node")) {
-  env = "vm"
+// `npm run server` (development) keeps its worlds in the repository's
+// gitignored .dev-saves directory unless JUNON_SAVES_DIR is set. Must run
+// before junon-common/db/config.js is loaded.
+if (env === 'development' && !process.env.JUNON_SAVES_DIR) {
+  process.env.JUNON_SAVES_DIR = require('path').resolve(__dirname, '../../../.dev-saves')
 }
 
 global.require = require
@@ -13,20 +16,12 @@ global.require = require
 require("./util/polyfill")
 
 const path = require('path')
-const net = require('net')
 const os = require('os')
 const crypto = require('crypto')
 const http = require("http")
-const https = require("https")
 const express = require("express")
 const bodyParser = require('body-parser')
-const WebSocket = require('ws')
-const cors = require('cors')
 const fs = require("fs")
-const getPort = require('get-port')
-const dns = require("dns")
-const Sentry = require('@sentry/node')
-const promClient = require('prom-client')
 const Polyglot = require('node-polyglot')
 const englishTranslationMap = require('../common/translations/en')
 const japaneseTranslationMap = require('../common/translations/ja')
@@ -36,13 +31,11 @@ const ObjectPool = require("../common/entities/object_pool")
 const TileHit = require("./entities/tile_hit")
 const User = require("junon-common/db/user")
 const IpBan = require("junon-common/db/ip_ban")
-const Favorite = require("junon-common/db/favorite")
 const sequelize = require("junon-common/db/sequelize")
 const syncStandaloneSchema = require("junon-common/db/standalone_schema")
 const StandaloneWorlds = require("junon-common/standalone_worlds")
 const SaveImporter = require("junon-common/save_importer")
 const Item = require("./entities/item")
-const base64id = require('base64id')
 
 global.i18n = {
   init() {
@@ -67,45 +60,26 @@ global.appRoot = path.resolve(__dirname + '/../')
 
 debugMode = (env === 'development' || env === 'test') ? true : false
 
-// NODE_ENV=standalone is the offline desktop / listen-server runtime: one world
-// per process, saved under JUNON_SAVES_DIR, with no matchmaker, MySQL,
-// Firebase, S3 or Sentry. Gameplay runs with production settings (debugMode is
-// off), so only infrastructure branches check isStandalone.
-const isStandalone = env === 'standalone'
+// The game server hosts one world per process, saved under JUNON_SAVES_DIR,
+// with a SQLite registry. NODE_ENV only selects gameplay settings:
+// `standalone` plays like the released game, `development` and `test` turn on
+// debugMode (fast waves and building, admin mode, app_debug.proto).
 
-// The desktop shell (packages/junon-desktop) runs a standalone server in an
-// Electron utility process, which provides process.parentPort. It serves the
-// client itself and talks to this process over that port, so no page server.
-const isDesktop = isStandalone && !!process.parentPort
+// The desktop shell (packages/junon-desktop) runs the server in an Electron
+// utility process, which provides process.parentPort. It serves the client
+// itself and talks to this process over that port, so no page server.
+const isDesktop = !!process.parentPort
 
-// Firebase is an optional production integration. Local runs must not require
-// Application Default Credentials just because the machine has network access.
-if (isStandalone || (debugMode && process.env.JUNON_USE_FIREBASE !== 'true')) {
-  global.isOffline = true
-}
-
-// NODE_ENV=test normally isolates the game server from the matchmaker entirely
-// (no outbound socket, no heartbeat) so Jest unit tests never open real
-// sockets. E2E tests want the opposite: test env's sqlite db / isOffline
-// Firebase / fast sector init, but a real matchmaker-routed game creation
-// flow. JUNON_E2E_MATCHMAKER opts back into matchmaker communication while
-// keeping every other test-env behavior unchanged. Standalone servers never
-// have a matchmaker.
-global.isMatchmakerDisabled = isStandalone || (env === 'test' && process.env.JUNON_E2E_MATCHMAKER !== 'true')
-
-if (debugMode || isStandalone) {
-  // same hash as the client build's (gulpfile.js), read without shelling out
-  // to npm/cat, which a packaged desktop app doesn't have
-  let protocolDirectory = path.join(path.dirname(require.resolve("junon-common/package.json")), "protocol")
-  let protocolContents = ["enum.proto", "base.proto", "app.proto"].map((file) => {
-    return fs.readFileSync(path.join(protocolDirectory, file))
-  })
-  global.protocolHash = require('crypto').createHash('md5').update(Buffer.concat(protocolContents)).digest("hex").substring(0,8)
-}
+// same hash as the client build's (gulpfile.js), read without shelling out to
+// npm/cat, which a packaged desktop app doesn't have
+let protocolDirectory = path.join(path.dirname(require.resolve("junon-common/package.json")), "protocol")
+let protocolContents = ["enum.proto", "base.proto", "app.proto"].map((file) => {
+  return fs.readFileSync(path.join(protocolDirectory, file))
+})
+global.protocolHash = require('crypto').createHash('md5').update(Buffer.concat(protocolContents)).digest("hex").substring(0,8)
 
 const Protocol = require("../common/util/protocol")
 const Constants = require("../common/constants.json")
-const Config = require("junon-common/config")
 const SocketUtil = require("junon-common/socket_util")
 const GameLoop = require("./util/game_loop")
 const Game = require("./entities/game")
@@ -115,7 +89,6 @@ const Helper = require('../common/helper')
 const StandaloneSocketServer = require('./util/standalone_socket_server')
 const Profiler = require('../common/profiler')
 const RemoteEventHandler = require('./entities/remote_event_handler')
-const FirebaseAdminHelper = require("./util/firebase_admin_helper")
 const WorldSerializer = require("junon-common/world_serializer")
 const EventBus = require("eventbusjs")
 
@@ -123,7 +96,6 @@ const EventBus = require("eventbusjs")
 class Server {
   constructor() {
     this.games = {}
-    this.reservedSpots = {}
     this.stats = {}
     this.lastQueueIndex = {}
     this.lastAutoSaveTime = Date.now()
@@ -132,131 +104,46 @@ class Server {
     this.sectorSaveQueue = []
   }
 
-  getFirebase() {
-    return FirebaseAdminHelper
-  }
-
   getEventBus() {
     return EventBus
   }
 
-  determineDebugPort() {
-    if (debugMode || isStandalone) return
-
-    try {
-      let result = require('child_process').execSync(`lsof -p ${process.pid} | grep LISTEN`).toString()
-      this.debugPort = result.match(/localhost:(\d+)/)[1]
-    } catch(e) {
-      ExceptionReporter.captureException(e)
-    }
-  }
-
-  async allocatePort() {
-    if (debugMode || isStandalone) {
-      // uws.App#listen() (hosted debug servers) silently fails (falsy token,
-      // no error) when given a string port instead of a number -
-      // process.env.PORT is always a string, so this must be parsed
-      this.APP_SERVER_PORT = parseInt(process.env.PORT) || 8000
-    } else {
-      let availablePort = await FirebaseAdminHelper.claimFreePort(this.getNodeName())
-      this.APP_SERVER_PORT = await getPort({host: '0.0.0.0', port: availablePort })
-    }
-  }
-
   async run() {
-    if (isStandalone) {
-      if (process.env.JUNON_WORLD_ID && !process.env.JUNON_OWNER_UID) {
-        LOG.error("JUNON_OWNER_UID is not defined")
-        process.exit(1)
-      }
-      // the sqlite file lives in the saves directory (junon-common/db/config.js)
-      fs.mkdirSync(WorldSerializer.getSavesDirectory(), { recursive: true })
-      await syncStandaloneSchema(sequelize)
+    if (process.env.JUNON_WORLD_ID && !process.env.JUNON_OWNER_UID) {
+      LOG.error("JUNON_OWNER_UID is not defined")
+      process.exit(1)
     }
 
-    if (env === 'test') {
-      // sqlite :memory: (see junon-common/db/config.js) starts with no schema
-      // at all - real MySQL gets its schema from db/migrations, which never
-      // runs against the in-memory db, so any real query would 404 on a
-      // missing table instead of just returning no rows.
-      // sequelize.sync() (global, association-aware) fails here with a
-      // "cyclic dependency" toposort error over the sectors<->users FK loop;
-      // syncing each already-required model independently sidesteps that
-      // since sqlite doesn't enforce FK target existence at CREATE TABLE time
-      await Promise.all(Object.values(sequelize.models).map((model) => model.sync()))
-    }
+    // the sqlite file lives in the saves directory (junon-common/db/config.js);
+    // tests use an in-memory database, which starts empty
+    fs.mkdirSync(WorldSerializer.getSavesDirectory(), { recursive: true })
+    await syncStandaloneSchema(sequelize)
 
     this.fetchServerInfo()
-
-    if (!this.REGION) {
-      LOG.error("REGION is not defined. missing node label. Unable to run gameserver.")
-      return
-    }
-
-    if (env !== 'development' && !isStandalone) {
-      try {
-        let dnsEntry = await dns.promises.lookup('google.com')
-        if (!dnsEntry) {
-          LOG.error("DNS service not working. Unable to resolve google.com")
-          return
-        }
-      } catch(e) {
-        LOG.error("DNS service not working. Unable to resolve google.com")
-        return
-      }
-    }
 
     await this.initProtocol()
     await WorldSerializer.initSerializer()
 
-    FirebaseAdminHelper.init()
-    FirebaseAdminHelper.setRegion(this.getRegion())
-
-    this.determineDebugPort()
-
     await this.initConstants()
 
-    this.assignServerIp()
-    await this.allocatePort()
+    // process.env.PORT is a string
+    this.APP_SERVER_PORT = parseInt(process.env.PORT) || 8000
 
-    if (!debugMode && !isStandalone) {
-      this.systemdIndex = this.getSystemdServiceIndex()
-    }
-
-    this.initPrometheus()
-
-    // must be called after server ip/port allocated
     this.initExceptionReporter()
-
-    await this.initMatchmakerClient()
-
     this.initRemoteEventHandler()
 
-
     await this.initWebsocketServer()
-    this.sendServerInfoToMatchmaker()
 
     this.initObjectPools()
 
     if (this.onServerReadyListener) this.onServerReadyListener()
 
-    if (!debugMode) {
-      FirebaseAdminHelper.sendServerData(this.getFirebaseServerKey(), this.getServerData())
-      FirebaseAdminHelper.registerServerToNode(this.getNodeName(), this.getFirebaseServerKey())
-    }
-    
-    if (!debugMode && !isStandalone) {
-      await this.initLivenessProbeServer()
-    }
-
-    if (debugMode || (isStandalone && !isDesktop)) {
+    if (!isDesktop) {
       await this.initDevelopmentAppServer()
     }
 
-    if (isStandalone) {
-      this.initStandaloneProcessHandlers()
-      if (process.env.JUNON_WORLD_ID) await this.loadStandaloneWorld()
-    }
+    this.initStandaloneProcessHandlers()
+    if (process.env.JUNON_WORLD_ID) await this.loadStandaloneWorld()
 
     if (isDesktop) {
       this.initDesktopChannel()
@@ -264,7 +151,7 @@ class Server {
 
   }
 
-  // The launcher (desktop shell, or a developer running serveronly) picks the
+  // The launcher (desktop shell, or a developer running `npm run server`) picks the
   // world. As on hosted servers, the sectors table is the world registry
   // (there the matchmaker creates the row): it holds the world's name, game
   // mode and owner. A world without a row - new, or a save copied in from the
@@ -329,7 +216,7 @@ class Server {
       ExceptionReporter.captureException(reason instanceof Error ? reason : new Error(String(reason)))
     })
 
-    // save before exiting so closing the game (or Ctrl-C on serveronly)
+    // save before exiting so closing the game (or Ctrl-C on `npm run server`)
     // doesn't lose progress since the last autosave
     let shutdown = this.shutdownStandalone = async () => {
       if (this.isStandaloneShutdownInProgress) return
@@ -393,66 +280,11 @@ class Server {
     return Item.getKlassByName(klassName)
   }
 
-  initPrometheus() {
-    promClient.register.setDefaultLabels({
-      sid: this.systemdIndex
-    })
-
-    promClient.collectDefaultMetrics()
-
-    this.playerCountGauge = new promClient.Gauge({
-      name: 'process_player_count',
-      help: 'num of players'
-    })
-
-    this.gameCountGauge = new promClient.Gauge({
-      name: 'process_game_count',
-      help: 'num of games'
-    })
-  }
-
   initExceptionReporter() {
     ExceptionReporter.init(process.env["JUNON_SERVER_SENTRY_DSN"])
-
-    Sentry.getCurrentScope().setExtra('host', this.getHost())
-  }
-
-  getSystemdServiceIndex() {
-    let systemctlStatus = require('child_process').execSync(`systemctl status ${process.pid}`).toString()
-    let index = systemctlStatus.match(/junon-io@(\d+).service/)[1]
-    return index
-  }
-
-  initLivenessProbeServer() {
-    this.livenessServer = net.createServer((socket) => {
-      socket.end('pong\n')
-    })
-
-    let unixSocket
-    if (debugMode) {
-      unixSocket = process.env.HOME + "/liveness_probe"
-    } else {
-      unixSocket = "/var/run/liveness_probe_" + this.systemdIndex
-    }
-
-    if (fs.existsSync(unixSocket)) {
-      fs.unlinkSync(unixSocket)
-    }
-    this.livenessServer.listen(unixSocket, () => {
-      console.log('listening on ' + unixSocket)
-    })
-  }
-
-  generateSectorIdName() {
-    let randomNumber =  Math.random().toString().slice(2)
-    return {
-      id: base64id.generateId(),
-      name: "Sector " + randomNumber
-    }
   }
 
   fetchServerInfo() {
-    this.REGION = process.env.REGION || "localhost"
     this.gameRevision = this.readGameRevision()
     this.gameVersion = require('fs').readFileSync(appRoot + '/VERSION.txt', 'utf8')
                          .replace(".alpha","").trim()
@@ -464,7 +296,6 @@ class Server {
     } catch(e) {
       // packaged desktop builds have no git checkout; the client build
       // records the revision it was built from
-      if (!isStandalone) throw e
       let revisionFile = appRoot + '/dist/revision'
       return fs.existsSync(revisionFile) ? fs.readFileSync(revisionFile, 'utf8').trim() : 'unknown'
     }
@@ -521,79 +352,18 @@ class Server {
     this.lastSaveTime = Date.now()
   }
 
-  assignServerIp() {
-    if (env === 'development') {
-      this.SERVER_IP = '127.0.0.1'
-    } else if (isStandalone) {
-      this.SERVER_IP = this.getStandaloneBindHost()
-    } else {
-      this.SERVER_IP = process.env.IP_ADDRESS
-    }
-  }
-
-
-  ipToDomain(region, ip) {
-    return this.ipToSubdomain(region, ip) + ".junon.io"
-  }
-
-  ipToSubdomain(region, ip) {
-    let hexIp = ip.split(".").map((num) => {
-      let hex = parseInt(num).toString(16)
-      return hex.length === 1 ? "0" + hex : hex
-    }).join("")
-
-    let namespace = this.getNamespace()
-
-    return [namespace,region,hexIp].join("-")
-  }
-
-  // standalone servers only accept connections from this machine unless the
-  // host explicitly opens the world to other players
+  // the game socket only accepts connections from this machine; co-op hosting
+  // opens a separate guest listener (startHosting)
   getStandaloneBindHost() {
     return process.env.JUNON_HOST || '127.0.0.1'
   }
 
-  getNamespace() {
-    // prime servers are cheaper ovh servers with
-    // lots 8 cores/16 threads + 64gb memory ($100 CAD/month)
-    // can host 320 players??
-    if (process.env.PRIME) return "prime"
-    if (process.env.MINIGAME) return "mini"
-
-    return "game"
-  }
-
-  getEnvironment() {
-    return process.env["NODE_ENV"]
-  }
-
   getHost() {
-    let ip = this.SERVER_IP
-    let port = this.APP_SERVER_PORT
-
-    let environment = this.getEnvironment()
-
-    if (["staging", "production"].indexOf(environment) !== -1) {
-      let domain = this.ipToDomain(this.getRegion(), ip)
-      return [domain,port].join(":")
-    } else if (env === 'development') {
-      return ["localhost",port].join(":")
-    } else {
-      return [ip,port].join(":")
-    }
-  }
-
-  getHostName() {
-    let host = this.getHost().replace(".junon.io", "")
-    return host.split(":")[0]
+    return [this.getStandaloneBindHost(), this.APP_SERVER_PORT].join(":")
   }
 
   memsize(obj) {
     return Helper.roughSizeOfObject(obj)
-  }
-
-  getRegion() {
-    return this.REGION
   }
 
   getVersion() {
@@ -604,38 +374,6 @@ class Server {
     return this.gameRevision
   }
 
-  sendServerInfoToMatchmaker() {
-    if (global.isMatchmakerDisabled) return
-
-    this.sendToMatchmaker({ event: "ServerUpdated", data: this.getServerData() })
-  }
-
-  getServerData() {
-    let data = {
-      env: this.getEnvironment(),
-      region: this.getRegion(),
-      host: this.getHost(),
-      version: this.getVersion(),
-      revision: this.getRevision(),
-      memory: this.getMemoryUsageInMB(),
-      playerCount: this.getPlayerCount(),
-    }
-
-    if (this.systemdIndex) {
-      data.systemdIndex = this.systemdIndex
-    }
-
-    if (this.debugPort) {
-      data.debugPort = this.debugPort
-    }
-
-    if (this.isTroubleshooting) {
-      data.isTroubleshooting = true
-    }
-
-    return data
-  }
-
   getPlayerCount() {
     let total = 0
 
@@ -644,31 +382,6 @@ class Server {
     })
 
     return total
-  }
-
-  toggleStatusInMatchmaker() {
-//     let data = this.game.getSectorData()
-//
-//     this.isHidden = !this.isHidden
-//     data.status = this.isHidden ? "hidden" : null
-//
-//     this.sendToMatchmaker({ event: "ServerStatus", data: data  })
-//
-//     return data.status ? data.status : "shown"
-  }
-
-  increaseMemoryUsage() {
-    this.lastForceLeakIndex = this.lastForceLeakIndex || 0
-    this.forceLeak = this.forceLeak || {}
-
-    let iterations = 1000000
-    for (let i = this.lastForceLeakIndex; i < this.lastForceLeakIndex + iterations; i++) {
-      this.forceLeak[i] = "shit man" + i
-    }
-
-    this.lastForceLeakIndex = this.lastForceLeakIndex + iterations
-
-    this.lastMemoryReportTime = Date.now() - (15000 * 60) // force send new memory to firebase
   }
 
   get profiler() {
@@ -688,11 +401,6 @@ class Server {
 
     this.addGame(game)
     return { createdGame: game }
-  }
-
-  async getUidFromRequest(idToken, uid) {
-    if (debugMode || !idToken) return uid
-    return await FirebaseAdminHelper.verifyIdToken(idToken)
   }
 
   async createNormalGame(sectorId, options) {
@@ -719,11 +427,6 @@ class Server {
 
     if (options.creatorUid) {
       game.setCreatorUid(options.creatorUid)
-    } else if (options.idToken) {
-      let uid = await this.getUidFromRequest(options.idToken, options.uid)
-      if (uid) {
-        game.setCreatorUid(uid)
-      }
     }
 
     LOG.info("Creating game for " + sectorId)
@@ -770,12 +473,10 @@ class Server {
 
   addGame(game) {
     this.games[game.getId()] = game
-    this.onGameCountChanged()
   }
 
   removeGame(game) {
     delete this.games[game.getId()]
-    this.onGameCountChanged()
   }
 
   getGame(sectorId) {
@@ -810,7 +511,6 @@ class Server {
     const framesPerSecond = Constants.physicsTimeStep
     this.PHYSICS_TIMESTEP = (1000 / framesPerSecond)
     this.SEND_UPDATE_TIMESTEP = (1000 / framesPerSecond)
-    this.LEADERBOARD_TIMESTEP = 3000
     this.MIN_PLAYERS_PER_GAME = 1
 
   }
@@ -826,42 +526,40 @@ class Server {
     return changeLogs
   }
 
-  // only for debug mode. production uses s3->cloudlare for client side content
+  // Page server for playing in a browser (the desktop app serves the client
+  // itself): the client, and the local world menu's /local/* routes
   initDevelopmentAppServer() {
     const app = express()
-    if (!isStandalone) app.use(cors())
     app.use(bodyParser.json())
     app.use(express.static(appRoot + "/client/dist"))
     app.use(express.static(appRoot + "/client/"))
     app.set('views', appRoot + '/client')
     app.set('view engine', 'ejs')
 
-    if (isStandalone) {
-      // Browser management is bound to loopback. Reject cross-origin form
-      // submissions as well as CORS requests before they can mutate saves.
-      app.use('/local', (req, res, next) => {
-        let origin = req.get('origin')
-        if (!/^((localhost|127\.0\.0\.1):[0-9]+)$/.test(req.get('host') || '')) return res.sendStatus(403)
-        if (origin && origin !== `${req.protocol}://${req.get('host')}`) return res.sendStatus(403)
-        next()
-      })
-      const route = (handler) => async (req, res) => {
-        try { res.json(await handler(req)) } catch (e) { res.status(400).json({ error: e.message }) }
-      }
-      const api = this.getLocalWorldApi()
-      const raw = express.raw({ type: 'application/octet-stream', limit: '100mb' })
-      app.get('/local/worlds', route(() => api.listWorlds()))
-      app.post('/local/worlds', route((req) => api.createWorld(req.body)))
-      app.post('/local/worlds/open', route((req) => api.openWorld(req.body)))
-      app.post('/local/host', route((req) => api.hostWorld(req.body)))
-      app.post('/local/host/stop', route(() => api.stopHosting()))
-      app.post('/local/import/characters', raw, route((req) => api.listImportCharacters(req.body)))
-      app.post('/local/import', raw, route((req) => api.importWorld(req.body, {
-        ownerUid: req.get('x-junon-owner'),
-        ownerName: req.get('x-junon-name'),
-        characterUid: req.get('x-junon-character')
-      })))
+    // Browser management is bound to loopback. Reject cross-origin form
+    // submissions as well as CORS requests before they can mutate saves.
+    app.use('/local', (req, res, next) => {
+      let origin = req.get('origin')
+      if (!/^((localhost|127\.0\.0\.1):[0-9]+)$/.test(req.get('host') || '')) return res.sendStatus(403)
+      if (origin && origin !== `${req.protocol}://${req.get('host')}`) return res.sendStatus(403)
+      next()
+    })
+    const route = (handler) => async (req, res) => {
+      try { res.json(await handler(req)) } catch (e) { res.status(400).json({ error: e.message }) }
     }
+    const api = this.getLocalWorldApi()
+    const raw = express.raw({ type: 'application/octet-stream', limit: '100mb' })
+    app.get('/local/worlds', route(() => api.listWorlds()))
+    app.post('/local/worlds', route((req) => api.createWorld(req.body)))
+    app.post('/local/worlds/open', route((req) => api.openWorld(req.body)))
+    app.post('/local/host', route((req) => api.hostWorld(req.body)))
+    app.post('/local/host/stop', route(() => api.stopHosting()))
+    app.post('/local/import/characters', raw, route((req) => api.listImportCharacters(req.body)))
+    app.post('/local/import', raw, route((req) => api.importWorld(req.body, {
+      ownerUid: req.get('x-junon-owner'),
+      ownerName: req.get('x-junon-name'),
+      characterUid: req.get('x-junon-character')
+    })))
 
     let gameVersion        = fs.readFileSync(appRoot + "/VERSION.txt", 'utf8').replace("\n","")
     let changeLogs         = this.fetchChangeLogs().reverse()
@@ -873,12 +571,6 @@ class Server {
         res.send({ result: result })
       })
     }
-
-    app.get('/__status', (req, res) => {
-      res.render('status', {
-        nodeEnv: env
-      })
-    })
 
     app.get('/:language?', (req, res) => {
       let language = req.params.language || 'en'
@@ -905,10 +597,10 @@ class Server {
 
 
     this.developmentServer = http.Server(app)
-    let devAppServerPort = (isStandalone && parseInt(process.env.JUNON_CLIENT_PORT)) || 8001
+    let devAppServerPort = parseInt(process.env.JUNON_CLIENT_PORT) || 8001
 
-    // standalone serves the client to this machine only
-    let devAppServerHost = isStandalone ? '127.0.0.1' : undefined
+    // serves the client to this machine only
+    let devAppServerHost = '127.0.0.1'
 
     return new Promise((resolve, reject) => {
       this.developmentServer.listen(devAppServerPort, devAppServerHost, () => {
@@ -1106,32 +798,6 @@ class Server {
     return targetPlayer
   }
 
-  async getPlayersBy(options = {}) {
-    const ipAddress = options.ipAddress
-    const idToken = options.idToken
-    const userUid = options.userUid
-    const username = options.username
-
-    let players = []
-    let uid = ""
-
-    if (idToken || userUid) {
-      uid = await this.getUidFromRequest(idToken, userUid)
-    }
-
-    this.forEachGame((game) => {
-      game.forEachPlayer((player) => {
-        if (player.getRemoteAddress() === ipAddress ||
-            player.getUid() === uid ||
-            player.getName() === username) {
-          players.push(player)
-        }
-      })
-    })
-
-    return players
-  }
-
   onReady(listener) {
     this.onServerReadyListener = listener
   }
@@ -1151,280 +817,14 @@ class Server {
     })
   }
 
-  initMatchmakerClient() {
-    if (global.isMatchmakerDisabled) return
-
-    let url = Config[env].matchmakerGameServerWebsocketUrl
-
-    this.matchmakerClient = new WebSocket(url)
-
-    this.matchmakerClient.on('close', () => {
-      if (!this.isRestartCountdownSent) {
-        // only reconnect when we are not in process of shutting down
-        LOG.error("disconnected from matchmaker. reconnecting..")
-        setTimeout(this.initMatchmakerClient.bind(this), 5000)
-      }
-    })
-
-    this.matchmakerClient.on('error', (err) => {
-      if (debugMode) {
-        LOG.error("socket error matchmaker")
-        console.log(err)
-      }
-    })
-
-    this.matchmakerClient.onmessage = this.onMatchmakerMessage.bind(this)
-
-    this.matchmakerClient.on('open', () => {
-      console.log("GameServer connected to matchmaker via " + url)
-      setTimeout(() => {
-        this.informMatchmaker()
-      }, 3000)
-    })
-  }
-
-  informMatchmaker() {
-    // console.log("[informMatchmaker] socket.readystate: " + this.matchmakerClient.readyState)
-    this.sendServerInfoToMatchmaker()
-    this.forEachGame((game) => {
-      // console.log("[informMatchmaker] game: " + game.getSectorUid())
-      game.sendSectorInfoToMatchmaker()
-    })
-  }
-
-  restartServer(data) {
-    if (data.isDelayed) {
-      this.sendServerRestartCountdown(data.reason, data.seconds)
-    } else {
-      this.shouldRestart = true
-    }
-  }
-
-  restartOnZeroGames() {
-    if (!this.shouldRestart) return
-    if (this.getGameCount() > 0) return
-    if (this.disableRestart) return
-
-    // make sure games finish saving before shutting down
-    console.log("Restarting. shutting down..")
-    process.exit(0)
-  }
-
-  async removePlayerFromMatchmaker(data) {
-    if (data.playerTag) {
-      this.removePlayerLegacy(data)
-    } else {
-      let playersToRemove = await this.getPlayersBy({
-        ipAddress: data.ipAddress, 
-        idToken: data.idToken, 
-        userUid: data.uid
-      })
-      playersToRemove.forEach((player) => {
-        let duration = player.getSessionDuration()
-        LOG.info(player.name + " removePlayerFromMatchmaker. session duration: " + Helper.stringifyTimeShort(duration))
-        player.remove()
-      })
-    }
-  }
-
-  async onBanWorldAndOwner(data) {
-    let players = await this.getPlayersBy({ userUid: data.creatorUid })
-    let player = players[0]
-
-    let username
-    let targetIp
-
-    if (!player) {
-      // search on DB
-      let user = await User.findOne({
-        where: { uid: data.creatorUid }
-      })
-
-      if (!user) return
-
-      username = user.username
-      targetIp = user.ip
-    } else {
-      username = player.getName()
-      targetIp = player.getRemoteAddress()
-    }
-
-    let existingBan = await IpBan.findOne({
-      where: { ip: targetIp, username: username }
-    })
-
-    if (!existingBan) {
-      await IpBan.create({
-        ip: targetIp,
-        username: username,
-        dayCount: 60,
-        reason: "Ban World"
-      })
-    }
-
-    let game = junonServer.games[data.sectorUid]
-    if(game) {
-      game.deleteForever()
-    }
-  }
-
-  async onKickPlayer(data) {
-    let players = await this.getPlayersBy({ ipAddress: data.ip, username: data.username })
-    let player = players[0]
-    player.kick()
-  }
-
-  removePlayerLegacy(data) {
-    let game = this.games[data.sectorId]
-    if (!game) return
-
-    let player = game.findPlayerWithTag(data.playerTag)
-    if (!player) return
-
-    LOG.info(player.name + " left game. session duration: " + Helper.stringifyTimeShort(player.getSessionDuration()))
-
-    player.remove()
-  }
-
   async findSectorWithAttributers(sectorId) {
     return await SectorModel.findOne({
-      attributes: ['uid', 'name', 'daysAlive', 'creatorUid', 'screenshot', 'gameMode', 'isPrivate', 'upvoteCount', 'downvoteCount', 'rating', 'createdAt',
-                   [sequelize.fn('COUNT', 'favorites.id'), 'favoriteCount']],
+      attributes: ['uid', 'name', 'daysAlive', 'creatorUid', 'screenshot', 'gameMode', 'isPrivate', 'createdAt'],
       where: { uid: sectorId },
       include: [
-        { model: User, as: 'creator' },
-        { model: Favorite, as: 'favorites', attributes: [], required:false }
+        { model: User, as: 'creator' }
       ]
     })
-
-//       let query = "select *, COUNT(favorites.sectorUid) as favoriteCount from sectors " +
-//                   "left join users on users.uid = sectors.creatorUid " +
-//                   "left join favorites on favorites.sectorUid = sectors.uid " +
-//                   "where sectors.uid = '" + sectorId + "' " +
-//                   "group by sectors.uid"
-//
-//
-//       const sectors = await sequelize.query(query, {
-//         model: SectorModel,
-//         mapToModel: true // pass true here if you have any mapped fields
-//       })
-//
-//       const sectorModel = sectors[0]
-
-  }
-
-  async createGameFromMatchmaker(data) {
-    let sectorId = data.sectorId
-    if (!sectorId) return
-
-    let result = {}
-
-    if (data.isTutorial) {
-      result = await this.createGame({
-        creatorIp: data.creatorIp,
-        sectorData: { id: sectorId },
-        isTutorial: true,
-        gameMode: null
-      })
-    } else {
-      const sectorModel = await this.findSectorWithAttributers(sectorId)
-      if (sectorModel) {
-        result = await this.createGame({
-          isBootSector: data.isBootSector,
-          sessionId: data.sessionId,
-          creatorIp: data.creatorIp,
-          creatorUid: sectorModel.creatorUid,
-          sectorData: { id: sectorId, name: sectorModel.name, sectorModel: sectorModel },
-          gameMode: data.gameMode || sectorModel.gameMode,
-          rowCount: parseInt(data.rowCount),
-          colCount: parseInt(data.colCount),
-          isPrivate: data.isPrivate,
-          language: data.language
-        })
-      } else {
-        LOG.error(sectorId + " not found in firebase /sectors. CreateGame failed.")
-        result.error = "Save file not on registry"
-      }
-    }
-
-    let success = !!(result && result.createdGame)
-    let error = result && result.error
-
-    let resultData = {
-      socketId: data.socketId,
-      host: this.getHost(),
-      isBootSector: data.isBootSector,
-      gameMode: data.gameMode,
-      success: success,
-      error: error,
-      requestId: data.requestId
-    }
-
-    if (success) {
-      resultData.sectorId = result.createdGame.sectorUid
-      resultData.sector = result.createdGame.getSectorData()
-      resultData.sector.id = resultData.sector.sectorId
-      resultData.isGameReady = true
-      result.createdGame.onGameReady(() => {
-        this.sendToMatchmaker({
-          event: "GameCreateStatus",
-          data: resultData
-        })
-      })
-    } else {
-      this.sendToMatchmaker({
-        event: "GameCreateStatus",
-        data: resultData
-      })
-    }
-  }
-
-  async onMatchmakerMessage(event) {
-    try {
-      let message = JSON.parse(event.data)
-      let data = message.data
-
-      switch(message.event) {
-        case "CreateGame":
-          this.createGameFromMatchmaker(data)
-          break
-        case "RemovePlayer":
-          this.removePlayerFromMatchmaker(data)
-          break
-        case "Restart":
-          this.restartServer(data)
-          break
-        case "BanWorldAndOwner":
-          this.onBanWorldAndOwner(data)
-          break
-        case "KickPlayer":
-          this.onKickPlayer(data)
-          break
-        default:
-      }
-    } catch(e) {
-      ExceptionReporter.captureException(e)
-    }
-  }
-
-  getNodeName() {
-    return this.getHostName()
-  }
-
-  getFirebaseServerKey() {
-    return this.getHost().replace(".junon.io", "")
-  }
-
-  onGameCountChanged() {
-    let count = this.getGameCount()
-    this.gameCountGauge.set(count)
-  }
-
-  onPlayerCountChanged() {
-    let count = this.getPlayerCount()
-    this.playerCountGauge.set(count)
-    this.sendServerInfoToMatchmaker()
-    FirebaseAdminHelper.sendServerPlayerCount(this.getFirebaseServerKey(), count)
   }
 
   forEachGame(cb) {
@@ -1441,34 +841,6 @@ class Server {
     return Object.keys(this.games).length
   }
 
-  isShutdownInProgress() {
-    return this.isRestartCountdownSent
-  }
-
-  sendServerRestartCountdown(reason, seconds) {
-    if (this.isRestartCountdownSent) return
-
-    this.forEachGame((game) => {
-      game.sendServerRestartCountdown(reason, seconds)
-    })
-
-    this.isRestartCountdownSent = true
-  }
-
-  getMatchmakerSocket() {
-    return this.matchmakerClient
-  }
-
-  sendToMatchmaker(data) {
-    if (global.isMatchmakerDisabled) return
-
-    let socket = this.getMatchmakerSocket()
-    if (socket.readyState !== WebSocket.OPEN) return
-
-    const message = JSON.stringify(data)
-    socket.send(message)
-  }
-
   initWebsocketServer() {
 
     // register events
@@ -1476,16 +848,10 @@ class Server {
       this.socketUtil.on(eventName, this.onSocketMessage.bind(this, eventName))
     }
 
-    let listening
-    if (isStandalone) {
-      listening = this.initStandaloneSocketServer()
-    } else {
-      this.initUwsServer()
-    }
+    let listening = this.initStandaloneSocketServer()
 
     this.gameLoopHelper = new GameLoop()
     setInterval(this.mainLoop.bind(this), this.PHYSICS_TIMESTEP)
-    setInterval(this.scoreLoop.bind(this), this.LEADERBOARD_TIMESTEP)
 
     return listening
   }
@@ -1506,70 +872,6 @@ class Server {
     ws.isClosed = true
     this.socketUtil.unregisterSocket(ws)
     this.onClientDisconnect(ws)
-  }
-
-  // uWebSockets.js only loads under Node's own ABI, so it is required here
-  // rather than at the top: the standalone (Electron) runtime never loads it
-  initUwsServer() {
-    const uws = require('uWebSockets.js')
-
-    let app
-    if (debugMode) {
-      app = uws.App()
-    } else {
-      app = uws.SSLApp({
-        key_file_name:  "/var/secrets/ssl/tls.key",
-        cert_file_name: "/var/secrets/ssl/tls.crt"
-      })
-    }
-
-    app.ws("/*", {
-      maxPayloadLength: 16 * 1024 * 1024,
-      idleTimeout: 120,
-      upgrade: (res, req, context) => {
-        // ws.getRemoteAddress() is unreliable on this uWebSockets.js build -
-        // it returns an empty ArrayBuffer even when called synchronously in
-        // `open`, verified against v20.70.0. The HttpResponse's
-        // getRemoteAddress() still works correctly here, pre-upgrade, so
-        // capture it now and hand it to the WebSocket as user data; uWS
-        // merges that object's properties directly onto the resulting `ws`.
-        res.upgrade(
-          { remoteAddress: Helper.getSocketRemoteAddress(res) },
-          req.getHeader('sec-websocket-key'),
-          req.getHeader('sec-websocket-protocol'),
-          req.getHeader('sec-websocket-extensions'),
-          context
-        )
-      },
-      open: this.onSocketOpen.bind(this),
-      message: this.onSocketData.bind(this),
-      close: this.onSocketClose.bind(this)
-    })
-
-    app.get('/ping', (res, req) => {
-      res.writeHeader('Access-Control-Allow-Origin','*')
-      res.writeHeader('Content-Type','text/plain')
-      res.end('pong')
-    })
-
-    app.get('/join', (res, req) => {
-      res.writeHeader('Access-Control-Allow-Origin','*')
-      let ip = Helper.getSocketRemoteAddress(res)
-      let isSuccess = this.reserveSpot(ip)
-      res.end(JSON.stringify({ success: isSuccess }))
-    })
-
-    this.initOperatorEndpoints(app)
-
-    let onListen = (token) => {
-      if (token) {
-        console.log('Junon Gameserver listening to port ' + this.APP_SERVER_PORT)
-      } else {
-        console.log('Gameserver failed to listen to port ' + this.APP_SERVER_PORT)
-      }
-    }
-
-    app.listen(this.APP_SERVER_PORT, onListen)
   }
 
   initStandaloneSocketServer() {
@@ -1596,13 +898,6 @@ class Server {
           return true
         }
 
-        if (pathname === '/join') {
-          let ip = StandaloneSocketServer.normalizeAddress(req.socket.remoteAddress)
-          res.writeHead(200, { 'Access-Control-Allow-Origin': '*' })
-          res.end(JSON.stringify({ success: this.reserveSpot(ip) }))
-          return true
-        }
-
         return false
       }
     })
@@ -1617,88 +912,6 @@ class Server {
     })
   }
 
-  // hosted-infrastructure endpoints (metrics scraping, matchmaker visibility
-  // toggle); standalone servers use their own socket server without them
-  initOperatorEndpoints(app) {
-    app.get('/metrics', (res, req) => {
-      res.writeHeader('Access-Control-Allow-Origin','*')
-      res.writeHeader('Content-Type', promClient.register.contentType)
-      res.end(promClient.register.metrics())
-    })
-
-    app.post('/toggle', (res, req) => {
-      res.writeHeader('Access-Control-Allow-Origin','*')
-      let token = "aGlkZGVu"
-
-      this.readJson(res, (body) => {
-        if (body.token !== token) return
-
-        let result = this.toggleStatusInMatchmaker()
-
-        res.end(result)
-      })
-    })
-  }
-
-  readJson(res, cb, err) {
-    let buffer;
-    /* Register data cb */
-    res.onData((ab, isLast) => {
-      let chunk = Buffer.from(ab);
-      if (isLast) {
-        let json;
-        if (buffer) {
-          try {
-            json = JSON.parse(Buffer.concat([buffer, chunk]));
-          } catch (e) {
-            /* res.close calls onAborted */
-            res.close();
-            return;
-          }
-          cb(json);
-        } else {
-          try {
-            json = JSON.parse(chunk);
-          } catch (e) {
-            /* res.close calls onAborted */
-            res.close();
-            return;
-          }
-          cb(json);
-        }
-      } else {
-        if (buffer) {
-          buffer = Buffer.concat([buffer, chunk]);
-        } else {
-          buffer = Buffer.concat([chunk]);
-        }
-      }
-    });
-
-    /* Register error cb */
-    res.onAborted(err);
-  }
-
-  reserveSpot(ip) {
-    if (this.isShutdownInProgress()) return false
-
-    this.reservedSpots[ip] = { ip: ip, timestamp: Date.now() }
-
-    return true
-  }
-
-  hasReservedSpot(ip) {
-    return this.reservedSpots[ip]
-  }
-
-  removeReservedSpot(ip) {
-    delete this.reservedSpots[ip]
-  }
-
-  getNumReservedSpots() {
-    return Object.keys(this.reservedSpots).length
-  }
-
   mainLoop() {
     this.beginMeasure("tick")
 
@@ -1707,26 +920,8 @@ class Server {
 
       try {
         game.recordClock()
-        // less lag tolerance for guest worlds
-        let limit = game.isCreatedByAnonynmous() ? 400 : 1200
-        
-        let startProcessTime = (new Date()).getTime()
         game.stepWorld()
         game.sendUpdates()
-        let endProcessTime = (new Date()).getTime()
-        
-        // remove worlds that are likely too resource-intensive. A standalone
-        // server hosts only the player's own world, so it is never evicted.
-        if(!isStandalone && endProcessTime - startProcessTime >= limit){
-          game.isGameReady = false
-          game.forEachPlayer((player) => {
-            if (player.socket) player.socket.close()
-            player.remove()
-          })
-          game.prepareRemove()
-        }
-        game.shutdownOnZeroPlayers()
-        game.removeOnForced()
       } catch (e) {
         ExceptionReporter.captureException(e)
       }
@@ -1736,29 +931,10 @@ class Server {
     this.processSectorLoadQueue()
     this.processSectorSaveQueue()
     this.autoSaveWorlds()
-    this.shutdownStaleGames()
 
     this.endMeasure("tick")
 
     this.reportPerformance()
-    this.sendServerHeartbeat()
-    this.sendServerMemoryUsage()
-
-    this.restartOnZeroGames()
-  }
-
-  shutdownStaleGames() {
-    if (debugMode) return
-    if (Date.now() - this.lastStaleCheckTime < (2 * 60 * 1000)) return
-
-    for (let gameId in this.games) {
-      let game = this.games[gameId]
-      if (game.isStale()) {
-        game.remove()
-      }
-    }
-
-    this.lastStaleCheckTime = Date.now()
   }
 
   async autoSaveWorlds() {
@@ -1870,32 +1046,6 @@ class Server {
     this.getStat(stat).count += 1
   }
 
-  sendServerHeartbeat() {
-    let isOneMinute = (Date.now() - this.lastHeartBeatTime) > (1000 * 60)
-    let shouldSendHeartbeat = !this.lastHeartBeatTime || isOneMinute
-    if (shouldSendHeartbeat) {
-      // to keep ws connection alive
-      this.sendToMatchmaker({ event: "Heartbeat", data: this.getServerData() })
-      this.lastHeartBeatTime = Date.now()
-
-
-      this.forEachGame((game) => {
-        game.sendSectorInfoToMatchmaker()
-      })
-    }
-  }
-
-  sendServerMemoryUsage() {
-    if (debugMode) return
-
-    let isFiveMinute = (Date.now() - this.lastMemoryReportTime) > (5000 * 60)
-    let shouldSendMemUsage = !this.lastMemoryReportTime || isFiveMinute
-    if (shouldSendMemUsage) {
-      FirebaseAdminHelper.sendServerMemoryUsage(this.getFirebaseServerKey(), this.getMemoryUsageInMB())
-      this.lastMemoryReportTime = Date.now()
-    }
-  }
-
   getMemoryUsageInMB() {
     let memoryUsage = process.memoryUsage().rss
     return Math.round(memoryUsage / 1000000)
@@ -1976,55 +1126,16 @@ class Server {
     this.remoteEventHandler.onClientDisconnect(socket)
   }
 
-  scoreLoop() {
-    this.cleanupReservedSpots()
-  }
-
   isServerFull(socket) {
-    let ip = Helper.getSocketRemoteAddress(socket)
-    if (this.hasReservedSpot(ip)) return false
-
-    let totalCount = this.getPlayerCount() + this.getNumReservedSpots()
-    return totalCount >= 40
-  }
-
-  cleanupReservedSpots() {
-    let lastCleanupMoreThanFiveSeconds = this.lastCleanupCheck && (Date.now() - this.lastCleanupCheck) > 5000
-    let shouldPerformCleanup = !this.lastCleanupCheck || lastCleanupMoreThanFiveSeconds
-    if (shouldPerformCleanup) {
-      try {
-        for (let ip in this.reservedSpots) {
-          let spot = this.reservedSpots[ip]
-          let isSpotExpired = Date.now() - spot.timestamp > 5000
-          if (isSpotExpired) {
-            delete this.reservedSpots[ip]
-          }
-        }
-      } catch(e) {
-        ExceptionReporter.captureException(e)
-      }
-
-      this.lastCleanupCheck = Date.now()
-    }
+    return this.getPlayerCount() >= 40
   }
 
 }
 
 let isCalledDirectly = require.main === module
 if (isCalledDirectly) {
-  if (debugMode) {
-    require("dns").lookup("www.google.com", (err) => {
-      if (err) {
-        global.isOffline = true
-      }
-
-      global.server = new Server()
-      global.server.run()
-    })
-  } else {
-    global.server = new Server()
-    global.server.run()
-  }
+  global.server = new Server()
+  global.server.run()
 }
 
 global.JunonServer = Server

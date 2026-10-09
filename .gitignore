@@ -15,4 +15,6 @@ packages/junon-io/deploy/
 packages/junon-io/test-results/
 packages/junon-io/playwright-report/
 .env
+# default saves directory of `npm run server` (NODE_ENV=development)
+.dev-saves/
 .env*

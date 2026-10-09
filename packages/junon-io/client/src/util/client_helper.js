@@ -3,41 +3,12 @@ const BitmapText = require("./bitmap_text")
 let cachedPIXIText = {}
 
 module.exports = {
-  httpRequest(url, cb) {
-    var xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-         cb.success(xhttp.responseText)
-      }
-    }
-    xhttp.onerror = cb.error
-    xhttp.open("GET", url, true)
-    xhttp.send()
-
-    return xhttp
-  },
   escapeHTML(str) {
     return str.replace(/&/g, '&amp;')
              .replace(/</g, '&lt;')
              .replace(/>/g, '&gt;')
              .replace(/"/g, '&quot;')
              .replace(/'/g, '&#039;');
-  },
-  httpPost(url, body, cb) {
-    var xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-         cb.success(xhttp.responseText)
-      }
-    }
-
-    xhttp.onerror = cb.error
-
-    xhttp.open("POST", url)
-    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
-    xhttp.send(JSON.stringify(body))
-
-    return xhttp
   },
   getKeycode(event) {
     // similar to jquery
@@ -373,13 +344,6 @@ module.exports = {
         })
 
     return tween
-  },
-
-  replaceQueryParam(param, newval, search) {
-      var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
-      var query = search.replace(regex, "$1").replace(/&$/, '');
-
-      return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
   }
 
 

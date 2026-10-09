@@ -85,9 +85,7 @@ const terserOptions = {
 // `??=`/`??` operators uuid's browser build uses in v1.js/v6.js/v7.js), so
 // `require()`-ing a vendor package that ships it fails before bundling even
 // starts. Rather than transform every vendor file (which would also touch
-// pixi.js, @sentry/browser, protobufjs, howler, @fingerprintjs/fingerprintjs -
-// see docs/development.md's firebase section for why that's a much bigger,
-// riskier change), transpile just the offending syntax in the specific
+// pixi.js, protobufjs, howler - a much bigger, riskier change), transpile just the offending syntax in the specific
 // packages that need it. Add another entry to `only` if a future vendor
 // dependency hits the same parse error.
 let legacySyntaxTransform = babelify.configure({
@@ -279,15 +277,8 @@ function copyHTML(cb) {
   return file;
 }
 
-function copyAds(cb) {
-  let file = gulp.src(['./client/ads.txt'])
-                   .pipe(gulp.dest(paths.dist))
-  return file;
-}
-
 function copyStylesheets(cb) {
   let file = gulp.src(['./client/stylesheets/gemini-scrollbar.css',
-                       './client/stylesheets/firebaseui.css',
                        './client/stylesheets/style.css',
                        './client/stylesheets/mobile.css'])
                  .pipe(concat('application.css'))
@@ -315,16 +306,6 @@ function fetchChangeLogs() {
 function versionValue(version) {
   let tokens = version.replace(".alpha", "").replace("v", "").split(".")
   return parseInt(tokens[0]) * 100000 + parseInt(tokens[1]) * 1000 + parseInt(tokens[2]) * 1
-}
-
-function compileStatus() {
-  return gulp.src('client/status.ejs')
-    .pipe(ejs({
-      nodeEnv: env
-    }))
-    .pipe(rename('__status.html'))
-    .on('error', function(e){ console.log(e); })
-    .pipe(gulp.dest(paths.dist));
 }
 
 function compileIndexEnDefault() {
@@ -428,10 +409,8 @@ gulp.task('build', series(
   copyStylesheets,
   copyAssets,
   copyHTML,
-  copyAds,
   vendor,
   productionBrowserify,
-  compileStatus,
   compileIndexEnDefault,
   compileIndexEn,
   compileIndexJa,

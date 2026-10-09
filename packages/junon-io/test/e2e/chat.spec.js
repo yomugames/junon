@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test')
-const { createNewColonyAndJoin, selectGameMode } = require('./support/join')
+const { createNewColonyAndJoin } = require('./support/join')
 
 // Chat is opened with Enter, which focuses #chat_input, and submitted with
 // Enter again (input_controller.js#handleEnter -> chatMenu.submit ->
@@ -107,13 +107,10 @@ test.describe('chat', () => {
   })
 
   test('/caption puts a title on the screen in a sandbox colony', async ({ page }) => {
-    await createNewColonyAndJoin(page)
-
     // /caption is an admin command: BaseCommand#canExecute refuses anything
-    // that isn't isNonSandboxCommand() unless the colony is peaceful, so a
-    // colony with no game mode picked yet cannot run it. "peaceful" is the mode
-    // the menu labels "Sandbox".
-    await selectGameMode(page, 'peaceful')
+    // that isn't isNonSandboxCommand() unless the colony is peaceful.
+    // "peaceful" is the mode the New world form labels "Sandbox".
+    await createNewColonyAndJoin(page, { gameMode: 'peaceful' })
 
     const caption = 'Colony under attack'
     await sendChat(page, `/caption title ${caption}`)

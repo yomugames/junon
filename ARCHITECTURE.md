@@ -5,51 +5,41 @@ repository today; it is not a proposal to redesign the system.
 
 ## System context
 
-Junon is a multiplayer survival game composed of a browser client, authoritative
-game servers, a matchmaker/API service, shared persistence and wire-contract
-code, and a game-server liveness watchdog.
+Junon is an offline-first desktop survival game with co-op listen servers. The
+history of how it got here (it was a hosted browser game with a matchmaker,
+MySQL, Firebase and S3) is in the
+[execution plan](docs/exec-plans/active/electron-offline-coop.md).
 
-```text
-Browser client
-  | player HTTP/WebSocket traffic
-  v
-Matchmaker/API <------> MySQL / Firebase / AWS
-  | allocates and tracks sectors
-  v
-Authoritative game server <------> MySQL / Firebase / AWS
-  |
-  +-- shared protobuf and save formats
-```
-
-In development, `start_server.js` constructs both the game server and matchmaker.
-The workspace scripts can also start them independently.
-
-The repository is migrating to an offline-first desktop game with co-op listen
-servers ([execution plan](docs/exec-plans/active/electron-offline-coop.md)).
-`NODE_ENV=standalone` is that runtime's game server. It hosts one world per
-process, stores saves as files with a SQLite database in place of MySQL, and
-needs no matchmaker, Firebase or S3
-([how to run it](docs/development.md#standalone-offline-mode)). Gameplay code is
-shared with hosted servers. Only infrastructure branches check for standalone.
-Standalone servers use the pure-JS `ws` package for the game socket, because
-`uWebSockets.js` (still used by hosted servers) doesn't load under Electron.
-The local menu lists, creates, opens and imports worlds through
-`Server#getLocalWorldApi`, then joins the selected world over the ordinary game
-WebSocket. In a browser it reaches that API through loopback-only `/local/*`
-routes on the standalone page server. The desktop app reaches it over Electron
-IPC instead:
+Each world runs on an authoritative game server on the player's machine. The
+server hosts one world at a time, stores it as a file in a saves directory with
+a SQLite registry, and needs no network service. Singleplayer is that server on
+loopback; co-op opens a second listener for other players.
 
 ```text
 Electron main process (packages/junon-desktop)
-  | serves the standalone client build as app://junon/
+  | serves the client build as app://junon/
   | relays preload IPC (window.junonDesktop) to the server's parent port
   v
-utility process: standalone game server <------> saves dir (files + SQLite)
+utility process: game server <------> saves dir (sector.sav files + SQLite)
   ^                                  ^
   | game WebSocket                   | guest WebSocket, while hosting co-op
   | (ws://127.0.0.1:<free port>)     | (ws://0.0.0.0:<host port>, password)
-renderer: browser client             other players' clients
+renderer: game client                other players' clients
 ```
+
+The same server also runs without Electron (`npm run server`). It then serves
+the client to a browser from a loopback page server, whose `/local/*` routes
+replace the preload IPC.
+
+`NODE_ENV` only selects gameplay settings: `standalone` plays like the released
+game (the desktop app uses it), while `development` and `test` turn on
+`debugMode` (fast waves and building, admin mode, and the `app_debug.proto` wire
+format).
+
+The local world menu lists, creates, opens and imports worlds through
+`Server#getLocalWorldApi`, then joins the selected world over the game
+WebSocket. Players are identified by a local profile id that the client
+generates and keeps in `localStorage`.
 
 Co-op is a listen server. Hosting (`hostWorld`) opens a second listener on all
 interfaces at a port the host picks. Sockets from it are marked `isGuest`;
@@ -64,42 +54,42 @@ a reason.
 
 ### `packages/junon-io`
 
-- `server/server.js` initializes the authoritative runtime, networking,
-  persistence, metrics, protocols, and game instances.
+- `server/server.js` initializes the authoritative runtime: the game socket
+  (`server/util/standalone_socket_server.js`, on `ws`), the page server, the
+  local world API, co-op hosting, and the world's lifecycle (load, autosave,
+  save on exit).
 - `server/entities/` contains server-side game state and behavior.
 - `server/commands/` contains command handlers.
-- `server/ai/`, `server/interfaces/`, and `server/util/` support simulation logic.
-- `client/src/` is the browser application; `client/assets/` and
-  `client/stylesheets/` contain static presentation resources.
+- `server/ai/`, `server/interfaces/`, and `server/util/` support simulation
+  logic. `server/util/tasks/import_save.js` imports a hosted save from the
+  command line.
+- `client/src/` is the game client; `client/assets/` and `client/stylesheets/`
+  contain static presentation resources.
 - `common/` contains game concepts used by both sides, including interfaces,
   constants, translations, and entity definitions.
-- `gulpfile.js` builds and serves the browser bundle.
+- `gulpfile.js` builds and serves the client bundle.
 - `test/` contains Jest suites, including unit-like simulation tests and heavier
-  load/memory tests.
-
-### `packages/junon-matchmaker`
-
-The matchmaker exposes player-facing endpoints and WebSockets, authenticates and
-tracks players, maintains game-server connections, assigns sectors, and performs
-environment/region scaling. `src/index.js` contains the main service class;
-`src/server.js` is a thin runner.
+  load/memory tests, and the Playwright e2e suite.
 
 ### `packages/junon-common`
 
 This package is shared infrastructure:
 
-- `db/`: Sequelize models, configuration, and append-only migrations.
+- `db/`: Sequelize models on SQLite. The schema is built from the models at
+  startup (`db/standalone_schema.js`); there are no migrations.
 - `protocol/`: protobuf wire schemas and versioned world-save schemas.
-- `world_serializer.js`: initialization and conversion of persisted worlds.
+- `world_serializer.js`: reading and writing world saves in the saves directory.
+- `save_importer.js` and `standalone_worlds.js`: hosted-save import and the
+  world registry.
 - `socket_util.js`: common text/binary WebSocket framing and dispatch.
 - logging, validation, exception reporting, and configuration helpers.
 
-Changes here have the widest blast radius and must be checked against both
-runtime services and the browser/game shared code.
+Changes here have the widest blast radius and must be checked against the game
+server, the client and the shared game code.
 
 ### `packages/junon-desktop`
 
-The Electron shell for offline play. `src/main.js` serves the client built with
+The Electron shell. `src/main.js` serves the client built with
 `NODE_ENV=standalone npm run client:build` (`packages/junon-io/dist/`) over the
 `app://` protocol, and opens a sandboxed, context-isolated window.
 `src/server_process.js` runs `junon-io/server/server.js` in an Electron utility
@@ -107,21 +97,21 @@ process, with saves in `<userData>/saves`, and asks it to save and exit when the
 app quits. `src/preload.js` exposes the only privileged renderer API, the local
 world API.
 
-### `packages/junon-io-watchdog`
-
-A separately started process that probes the game-server liveness sockets and
-restarts only unresponsive systemd workers. It is not part of the deployment
-or revision-rollout path.
-
 ## Important contracts
 
 - The game server is authoritative for simulation state.
-- Protobuf files and the protocol hash couple client and server builds.
+- Protobuf files and the protocol hash couple client and server builds. Co-op
+  guests must run a build with the host's protocol hash.
 - Files under `protocol/save_formats/` preserve historical persisted-world
-  compatibility; add a version rather than silently changing an old format.
-- Sequelize migrations are the database history; models describe current access.
+  compatibility, including saves exported from the hosted game; add a version
+  rather than silently changing an old format.
+- The SQLite schema follows the models and only grows automatically (new
+  tables and columns). Renaming or removing a column needs an explicit step in
+  `db/standalone_schema.js`, because players' existing database files must keep
+  working.
 - WebSocket event names and payload shapes are public runtime contracts even when
-  JavaScript does not express them as types.
+  JavaScript does not express them as types. Messages of removed hosted features
+  stay in the schema so field numbers are never reused.
 - Entity concepts may be mirrored in `client`, `server`, and `common`. A change to
   one representation may require corresponding changes to the others.
 
@@ -141,14 +131,12 @@ new process globals require explicit justification in an execution plan.
 
 ## Runtime dependencies
 
-Local full-stack development requires Node.js 26.4.0, npm workspaces, and MySQL.
-Firebase, AWS, Sentry, DNS, and production host metadata are environment-specific.
-Development paths bypass or default some integrations; do not assume a successful
-local boot proves production integration behavior.
+Development requires Node.js 26.4.0 and npm workspaces. The game needs no
+network service. Sentry reporting is off unless `JUNON_SERVER_SENTRY_DSN` is set
+outside `development`/`test`.
 
-The game server and matchmaker load the repository-root `.env` file at startup;
-the file is local-only and provides development configuration such as database
-credentials.
+The game server loads the repository-root `.env` file at startup; the file is
+local-only.
 
 ## Where to record change
 

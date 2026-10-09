@@ -198,11 +198,6 @@ class InputController {
   }
 
   handleEsc() {
-    if (this.main.gameExplorer && this.main.gameExplorer.isAttachedToBody) {
-      this.main.gameExplorer.attachToMiddleContainer()
-      return
-    }
-
     if (this.game.chatMenu.isOpen()) {
       this.game.chatMenu.chatInput.blur()
       if (this.game.sector.shouldShowChat()) {
@@ -349,14 +344,6 @@ class InputController {
         game.toggleBlueprintMenu()
       } 
 
-      if (keyCode === this.game.keyBindings["view badges"]) { // b 
-        if(this.game.badgeMenu.isOpen()) {
-          this.game.badgeMenu.close()
-          return
-        }
-        this.game.badgeMenu.open()
-      }
-
       if (keyCode === this.game.keyBindings["map"]) { // m
         game.toggleMapMenu()
       } 
@@ -367,14 +354,6 @@ class InputController {
 
       if (keyCode === this.game.keyBindings["chat"]) { // z
         game.toggleChatMenu()
-      } 
-
-      if (keyCode === this.game.keyBindings["alliance"]) { // f
-        game.toggleFriendsMenu()
-      } 
-
-      if (keyCode === this.game.keyBindings["visit"]) { // v
-        game.toggleVisitColonyMenu()
       } 
 
       if (keyCode === this.game.keyBindings["command block"]) { // K

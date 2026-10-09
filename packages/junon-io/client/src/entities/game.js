@@ -32,7 +32,6 @@ const ClientHelper = require("./../util/client_helper")
 const ExceptionReporter = require("./../util/exception_reporter")
 const Bowser = require("bowser")
 const Cookies = require("js-cookie")
-const FirebaseClientHelper = require('../util/firebase_client_helper')
 const { v4: uuidv4 } = require('uuid')
 const Trigger = require("../menus/command_blocks/trigger")
 const ActionValue = require("../menus/command_blocks/action_value")
@@ -185,10 +184,6 @@ class Game {
     this.initDraggables()
   }
 
-  showNameInput() {
-    document.querySelector("#name_input_container").style.display = 'block'
-  }
-
   denyMenuOpen() {
     this.shouldDenyMenuOpen = true
   }
@@ -225,11 +220,9 @@ class Game {
     this.teamMenu = new Menus.TeamMenu(this, document.querySelector("#manage_team_menu"))
     this.teamRequestMenu = new Menus.TeamRequestMenu(this, document.querySelector("#team_request_menu"))
     this.teamStatusMenu = new Menus.TeamStatusMenu(this, document.querySelector("#team_status_menu"))
-    this.friendsMenu = new Menus.FriendsMenu(this, document.querySelector("#friends_menu"))
     this.npcDialogMenu = new Menus.NPCDialogMenu(this, document.querySelector("#npc_dialog_menu"))
     this.railStopMenu = new Menus.RailStopMenu(this, document.querySelector("#rail_stop_menu"))
     this.signMenu = new Menus.SignMenu(this, document.querySelector("#sign_menu"))
-    this.userProfileMenu = new Menus.UserProfileMenu(this, document.querySelector("#user_profile_menu"))
     this.confirmMenu = new Menus.ConfirmMenu(this, document.querySelector("#confirm_menu"))
     this.permissionsMenu = new Menus.PermissionsMenu(this, document.querySelector("#permissions_menu"))
     this.sendMoneyMenu = new Menus.SendMoneyMenu(this, document.querySelector("#send_money_menu"))
@@ -251,24 +244,11 @@ class Game {
     this.terminalMenu = new Menus.TerminalMenu(this, document.querySelector("#terminal_menu"))
     this.commandBlockMenu = new Menus.CommandBlockMenu(this, document.querySelector("#command_block_menu"))
     this.commandBlockPicker = new Menus.CommandBlockPicker(this, document.querySelector("#command_block_picker"))
-    this.friendRequestMenu = new Menus.FriendRequestMenu(this, document.querySelector("#friend_request_menu"))
-    this.badgeMenu = new Menus.BadgeMenu(this, document.querySelector("#badge_menu"))
-
-
-    this.visitColonyMenu = this.main.gameExplorer
 
     if (this.isMobile()) {
       this.createMobileBuildActionMenu()
       document.querySelector("#base_hud .resources").style.display = 'none'
     }
-  }
-
-  equipBadge(name) {
-    SocketUtil.emit("EquipBadge", { name: name })
-  }
-
-  onFriendRequestReceived(request) {
-    this.friendRequestMenu.createRequestEntry(request)
   }
 
   registerMenu(menu) {
@@ -1465,12 +1445,10 @@ class Game {
     this.updateLocalPause()
   }
 
-  // Standalone: tells the server when the local player is away (in-game menu
-  // open, or the window hidden), so a singleplayer world stands still. The
-  // server ignores it when co-op guests are playing.
+  // Tells the server when the local player is away (in-game menu open, or the
+  // window hidden), so a singleplayer world stands still. The server ignores
+  // it when co-op guests are playing.
   updateLocalPause(options = {}) {
-    if (!this.main.isStandalone()) return
-
     let menu = document.querySelector("#welcome_container")
     let isMenuOpen = menu.classList.contains("in_game") && menu.style.display === 'block'
     let isPaused = this.isActive && (document.hidden || isMenuOpen)
@@ -1559,7 +1537,6 @@ class Game {
     SocketUtil.on("PlaySound", this.onPlaySound.bind(this))
     SocketUtil.on("ScreenshotUpdated", this.onScreenshotUpdated.bind(this))
     SocketUtil.on("AccountBalance", this.onAccountBalance.bind(this))
-    SocketUtil.on("FavoriteUpdated", this.onFavoriteUpdated.bind(this))
     SocketUtil.on("SectorUpdated", this.onSectorUpdated.bind(this))
     SocketUtil.on("SellableUpdated", this.onSellableUpdated.bind(this))
     SocketUtil.on("TeamResidentsUpdated", this.onTeamResidentsUpdated.bind(this))
@@ -1590,31 +1567,7 @@ class Game {
     SocketUtil.on("OpenMenu", this.openMenu.bind(this))
     SocketUtil.on("CloseMenu", this.closeMenu.bind(this))
     SocketUtil.on("TempCommandBlockData", this.onTempCommandBlockData.bind(this))
-    SocketUtil.on("BadgesData", this.onBadgesData.bind(this))
-    SocketUtil.on("BadgeEquipped", this.onBadgeEquipped.bind(this))
     SocketUtil.on("RevitalizerActivate", this.onRevitalizerActivate.bind(this))
-  }
-
-  onBadgeEquipped(data) {
-    try {
-      let tint = Number("0x" + data.badge.color);
-      this.sector.players[data.playerId].sprite.children[1].children[0].tint = tint;
-    }
-    catch (e) {
-      //server sent this before the player was initialized
-    }
-  }
-
-  onBadgesData(data) {
-    document.querySelector('#badge_container').innerHTML = '';
-    for (let badge in data.badges) {
-      let el = `<div title="${data.badges[badge].description}" onclick="game.equipBadge('${data.badges[badge].name}')" style="display:inline-block;margin-right:10px;"><p style="margin:0px;font-size:10px;">${data.badges[badge].name}</p><div class="badge" id="${data.badges[badge].name}"><img class="${data.badges[badge].isQualified ? "qualified" : "unqualified"}" src="/assets/images/${data.badges[badge].imageUrl}" width="50" height="50"></div></div>`
-      document.querySelector('#badge_container').innerHTML += el;
-      if (!data.badges[badge].isQualified) {
-        let coveringEl = `<img class="cover-badge" src="/assets/images/badges/lock.png" width="50" height="50">`;
-        document.querySelector(`#${data.badges[badge].name}`).innerHTML += coveringEl;
-      }
-    }
   }
 
   onTempCommandBlockData(data) {
@@ -1996,10 +1949,6 @@ class Game {
     }
   }
 
-  sendToMatchmaker(json) {
-    this.main.sendToMatchmaker(json)
-  }
-
   onChunkPositionChanged(data) {
     if (!this.player) return
     let visibleChunks = this.player.getVisibleChunks()
@@ -2077,10 +2026,6 @@ class Game {
   onSectorUpdated(data) {
     if (!this.sector) return
 
-    if (data.hasOwnProperty("upvoteCount")) {
-      document.querySelector(".upvote_count").innerText = data.upvoteCount
-    }
-
     this.teamMenu.updateColonySettings(data.settings)
     this.sector.setSettings(data.settings)
 
@@ -2121,76 +2066,10 @@ class Game {
     this.isRoundStarted = true
   }
 
-  onFavoriteUpdated(data) {
-    if (data.hasOwnProperty("upvoteCount")) {
-      this.handleUpvoteUpdated(data)
-    }
-
-    if (data.hasOwnProperty("favoriteCount")) {
-      this.handleFavoriteUpdated(data)
-    }
-  }
-
-  handleUpvoteUpdated(data) {
-    let oldCount = parseInt(document.querySelector(".upvote_count").innerText)
-    document.querySelector(".upvote_count").innerText = data.upvoteCount
-
-    if (data.userUid === this.playerUid) {
-      this.renderUpvoteFilled(!data.isRemoved)
-    }
-  }
-
-  handleFavoriteUpdated(data) {
-    if (data.userUid === this.playerUid) {
-      if (data.isRemoved) {
-        this.main.gameExplorer.removeFavoriteColonies([this.getSectorEntryData()])
-      } else {
-        this.main.gameExplorer.addFavoriteColonies([this.getSectorEntryData()])
-      }
-    }
-
-    this.onFavoriteCountChanged()
-  }
-
   onTeamResidentsUpdated(data) {
     this.residents = data.residents
     if (this.slaveTradeMenu.isOpen()) {
       this.slaveTradeMenu.onResidentsChanged()
-    }
-  }
-
-  getSectorEntryData() {
-    let name = this.sector.name
-
-    let sectorEntry = main.gameExplorer.sectorEntries[this.sector.uid]
-    if (sectorEntry) {
-      name = sectorEntry.data.name
-    }
-
-    return {
-      "name": name,
-      "creatorUid": this.creatorUid,
-      "daysAlive": this.day,
-      "screenshot": null,
-      "uid": this.sector.uid
-    }
-  }
-
-  renderUpvoteFilled(shouldFill) {
-    if (shouldFill) {
-      document.querySelector(".upvote_btn").classList.add('filled')
-    } else {
-      document.querySelector(".upvote_btn").classList.remove('filled')
-    }
-  }
-
-  onFavoriteCountChanged() {
-    let favoriteEntries = this.main.gameExplorer.favoriteColonyEntries
-    if (favoriteEntries[this.sector.uid]) {
-      // already favorited
-      document.querySelector(".sector_favorite_btn").classList.add('filled')
-    } else {
-      document.querySelector(".sector_favorite_btn").classList.remove('filled')
     }
   }
 
@@ -2350,7 +2229,6 @@ class Game {
     document.addEventListener("visibilitychange", () => this.updateLocalPause())
 
     document.getElementById("manage_team_btn").addEventListener("click", this.onManageTeamBtnClick.bind(this), true)
-    document.getElementById("friends_btn").addEventListener("click", this.onFriendsBtnClick.bind(this), true)
     document.getElementById("hangar_controller_cancel_btn").addEventListener("click", this.onHangarControllerCancelBtnClick.bind(this), true)
     document.getElementById("range_toggle_btn").addEventListener("click", this.onRangeViewBtnClick.bind(this), true)
     document.getElementById("restart_btn").addEventListener("click", this.onRestartBtnClick.bind(this), true)
@@ -2361,15 +2239,11 @@ class Game {
     document.getElementById("blueprint_open_btn").addEventListener("click", this.onBlueprintOpenBtnClick.bind(this), true)
     document.getElementById("inventory_open_btn").addEventListener("click", this.onInventoryOpenBtnClick.bind(this), true)
     document.getElementById("map_open_btn").addEventListener("click", this.onMapOpenBtnClick.bind(this), true)
-    document.getElementById("visit_colony_hud_btn").addEventListener("click", this.onVisitColonyHudBtnClick.bind(this), true)
     document.getElementById("command_block_hud_btn").addEventListener("click", this.onCommandBlockHudBtnClick.bind(this), true)
-    document.getElementById("badge_hud_btn").addEventListener("click", this.onBadgeMenuHudBtnClick.bind(this), true)
     document.getElementById("room_display_toggle_btn").addEventListener("click", this.onRoomDisplayToggleBtnClick.bind(this), true)
     document.getElementById("home_area_display_toggle_btn").addEventListener("click", this.onHomeAreaDisplayToggleBtnClick.bind(this), true)
     document.getElementById("chunk_toggle_btn").addEventListener("click", this.onChunkToggleBtnClick.bind(this), true)
     document.getElementById("tutorial_toggle_btn").addEventListener("click", this.onTutorialOpenBtnClick.bind(this), true)
-    document.querySelector(".sector_favorite_btn").addEventListener("click", this.onSectorFavoriteBtnClick.bind(this), true)
-    document.querySelector(".upvote_btn").addEventListener("click", this.onSectorUpvoteBtnClick.bind(this), true)
 
     document.querySelector("#player_quick_inventory").addEventListener("click", this.onQuickInventoryClick.bind(this), true)
 
@@ -2395,10 +2269,6 @@ class Game {
 
   }
 
-  onBadgeMenuHudBtnClick(e) {
-    this.badgeMenu.toggle()
-  }
-
   onDockClicked(entity) {
     SocketUtil.emit("DockShip", { shipId: player.ship.id, hangarControllerId: entity.id })
   }
@@ -2410,11 +2280,6 @@ class Game {
   onManageTeamBtnClick(e) {
     if (this.isInGameMenuOpen()) return
     this.toggleTeamMenu()
-  }
-
-  onFriendsBtnClick(e) {
-    if (this.isInGameMenuOpen()) return
-    this.toggleFriendsMenu()
   }
 
   selectEntity(entity) {
@@ -2505,10 +2370,6 @@ class Game {
     document.querySelector("#status_list_menu").style.display = 'block'
     document.querySelector("#quest_menu").style.display = 'block'
 
-    if (this.shouldShowFavoriteButton()) {
-      document.querySelector("#sector_action_menu").style.display = "block"
-    }
-
     if (this.shouldShowLeaderboard()) {
       document.querySelector("#leaderboard_menu").style.display = "block"
     }
@@ -2548,7 +2409,6 @@ class Game {
     document.querySelector("#chat_container").style.display = "none"
     document.querySelector("#performance_stats").style.display = "none"
     document.querySelector("#team_status_menu").style.display = "none"
-    document.querySelector("#sector_action_menu").style.display = "none"
     document.querySelector("#leaderboard_menu").style.display = "none"
 
     document.querySelector(".resources").style.display = 'none'
@@ -2561,14 +2421,6 @@ class Game {
     document.querySelector("#sidebar_menu").style.display = 'none'
 
     // document.querySelector("#tutorial_toggle_btn").style.display = "none"
-  }
-
-  shouldShowFavoriteButton() {
-    if (this.isTutorial() || this.isAnonymousGame()) {
-      return false
-    }
-
-    return true
   }
 
   toggleChatMenu() {
@@ -2606,11 +2458,6 @@ class Game {
     this.toggleMapMenu()
   }
 
-  onVisitColonyHudBtnClick() {
-    if (this.isInGameMenuOpen()) return
-    this.toggleVisitColonyMenu()
-  }
-
   onCommandBlockHudBtnClick() {
     if (this.isInGameMenuOpen()) return
     this.toggleCommandBlockMenu()
@@ -2626,36 +2473,16 @@ class Game {
     this.mapMenu.toggle()
   }
 
-  toggleVisitColonyMenu() {
-
-    document.querySelector(".search_colony_list").style.display = 'none'
-    document.querySelector(".main_colony_list").style.display = 'block'
-
-    this.visitColonyMenu.toggle()
-  }
-
   toggleCommandBlockMenu() {
     if (this.isSandbox()) {
       this.commandBlockMenu.toggle()
     }
   }
 
-  toggleFriendsMenu() {
-    this.friendsMenu.toggle()
-  }
-
   onRoomDisplayToggleBtnClick() {
     let el = document.getElementById("room_display_toggle_btn")
     el.dataset.toggled = el.dataset.toggled === 'true' ? 'false' : true
     this.isRoomDisplayEnabled = el.dataset.toggled === 'true'
-  }
-
-  onSectorFavoriteBtnClick() {
-    SocketUtil.emit("SectorAction", { action: "favorite", sectorId: this.sector.uid })
-  }
-
-  onSectorUpvoteBtnClick() {
-    SocketUtil.emit("SectorAction", { action: "upvote", sectorId: this.sector.uid })
   }
 
   onTutorialOpenBtnClick() {
@@ -2932,14 +2759,14 @@ console.log(options)
     return this.sector.isHardcore()
   }
 
-  async submitGameRequest(username, options = {}) {
+  submitGameRequest(username, options = {}) {
     let data = {
       username: username,
       screenWidth: this.getScreenWidth(),
       screenHeight: this.getScreenHeight(),
       sessionId: this.main.sessionId,
       locale: window.language,
-      fingerprint: this.main.fingerprint
+      uid: this.main.localProfile.uid
     }
 
     if (options.sectorId) data["sectorId"] = options.sectorId
@@ -2948,31 +2775,15 @@ console.log(options)
     const isTroubleshooter = url.match(new RegExp(".*?stress=(.*)"))
     if (isTroubleshooter) data["isTroubleshooter"] = true
 
-    if (this.main.isStandalone()) {
-      data["uid"] = this.main.localProfile.uid
-      data["username"] = this.main.localProfile.name
-      SocketUtil.emit("RequestGame", data)
-    } else if (this.main.user) {
-      let idToken = await this.main.getFirebaseIdToken()
-      if (idToken) {
-        data["idToken"] = idToken
-        data["username"] = this.main.username
-        data["uid"] = this.main.uid
-      }
-
-      SocketUtil.emit("RequestGame", data)
-    } else {
-      SocketUtil.emit("RequestGame", data)
-    }
+    SocketUtil.emit("RequestGame", data)
   }
 
   requestGame(options = {}) {
     this.requestGameTime = (new Date()).getTime()
 
     document.getElementById("home_error_message").innerText = ""
-    const username = document.getElementById("name_input").value
 
-    this.submitGameRequest(username, options)
+    this.submitGameRequest(this.main.localProfile.name, options)
   }
 
   resumeGame() {
@@ -2984,14 +2795,8 @@ console.log(options)
       screenWidth: this.getScreenWidth(),
       screenHeight: this.getScreenHeight(),
       sectorId: this.sector.uid,
-      locale: window.language
-    }
-
-    if (this.main.isStandalone()) {
-      data.uid = this.main.localProfile.uid
-    } else if (this.main.idToken) {
-      data.idToken = this.main.idToken
-      data.uid = this.main.uid
+      locale: window.language,
+      uid: this.main.localProfile.uid
     }
 
     SocketUtil.emit("ResumeGame", data)
@@ -3467,7 +3272,7 @@ arrow.style.setProperty('--arrow-color',realColor)
   onDayChanged() {
     document.querySelector("#day_label").innerText = this.day + ""
 
-    if (this.isLoggedIn() && this.isCreatedByPlayer()) {
+    if (this.isCreatedByPlayer()) {
       this.updateScreenshot()
     }
   }
@@ -3867,18 +3672,6 @@ arrow.style.setProperty('--arrow-color',realColor)
       this.tutorialMenu.close()
     }
 
-    if (this.shouldShowFavoriteButton()) {
-      document.querySelector("#sector_action_menu").style.display = 'none'
-    } else {
-      document.querySelector("#sector_action_menu").style.display = 'block'
-    }
-
-    if (this.shouldShowFavoriteButton()) {
-      document.querySelector("#sector_action_menu").style.display = "block"
-    } else {
-      document.querySelector("#sector_action_menu").style.display = "none"
-    }
-
     if (this.shouldShowLeaderboard()) {
       this.leaderboardMenu.open()
     } else {
@@ -4077,14 +3870,7 @@ arrow.style.setProperty('--arrow-color',realColor)
 
     window.history.replaceState(null, null, "?")
 
-    this.main.enableJoin()
-    this.main.hideChangeLog()
     this.main.hideHomeMenu()
-    this.main.gameExplorer.hideScreenshotsPopup()
-
-    if (this.main.gameExplorer && this.main.gameExplorer.isAttachedToBody) {
-      this.main.gameExplorer.attachToMiddleContainer()
-    }
 
     if (this.requestGameTime) {
       this.joinedGameTime = (new Date()).getTime()
@@ -4144,7 +3930,6 @@ arrow.style.setProperty('--arrow-color',realColor)
     this.entityMenu.createPermissions()
     this.entityMenu.populateSpawnPointSelectors()
 
-    this.setTeamVisibility()
     this.mapMenu.reinit()
 
     if (!this.player) {
@@ -4161,8 +3946,6 @@ arrow.style.setProperty('--arrow-color',realColor)
     this.onEquipIndexChanged(data)
 
     this.updateInGameMenu()
-    this.chatMenu.setGlobalTabRegion()
-    this.chatMenu.requestChatHistory()
 
     if (data.serverRestartTimestamp) {
       this.onServerRestartCountdown({ timestamp: data.serverRestartTimestamp, reason: data.restartReason })
@@ -4188,10 +3971,6 @@ arrow.style.setProperty('--arrow-color',realColor)
       if (this.sector.shouldShowChat()) {
         document.querySelector("#chat_toggle_btn").style.display = 'inline-block'
       }
-
-      if (this.shouldBeAddedToMineColonies(this.sector.uid)) {
-        this.addToMineColonies(this.sector.uid)
-      }
     } else {
       this.walkthroughMenu.open()
       this.playBackgroundMusic()
@@ -4205,25 +3984,14 @@ arrow.style.setProperty('--arrow-color',realColor)
       document.querySelector(".command_block_tab_container").style.display = 'block'
     }
 
-    document.querySelector(".upvote_count").innerText = data.sector.upvoteCount
-
     this.teamMenu.updateColonySettings(data.sector.settings)
     this.selectDifficultyMenu.showGameMode(this.sector.gameMode)
 
-    if (data.hasUpvoted) {
-      this.renderUpvoteFilled(data.hasUpvoted)
-    }
-
-    this.onFavoriteCountChanged()
     this.resizeCanvas()
 
     this.initDialogue(data)
 
     this.displayStickyAnnouncement()
-
-    if (this.main.userData && !this.main.userData.isRulesRead) {
-      document.querySelector("#rules_menu").style.display = 'block'
-    }
 
     // let joinDuration = Date.now() - this.joinGameTime
     // console.log("map load after join took: " + joinDuration + "ms")
@@ -4237,12 +4005,6 @@ arrow.style.setProperty('--arrow-color',realColor)
     document.querySelector("#game_sticky_announcement").innerText = ""
   }
 
-  shouldBeAddedToMineColonies(sectorUid) {
-    return this.isLoggedIn() &&
-      this.isCreatedByPlayer() &&
-      !this.main.gameExplorer.mineColonyEntries[sectorUid]
-  }
-
   initSidebar(data) {
     this.sidebarMenu.setVisible(data.isVisible)
     for (let index in data.rows) {
@@ -4250,33 +4012,16 @@ arrow.style.setProperty('--arrow-color',realColor)
     }
   }
 
-  isLoggedIn() {
-    return this.main.isLoggedIn()
-  }
-
   updateInGameMenu() {
-    if (this.isLoggedIn() && this.isCreatedByPlayer()) {
+    if (this.isCreatedByPlayer()) {
       document.querySelector(".exit_game_menu_btn").innerText = i18n.t("Save and Quit")
     } else {
       document.querySelector(".exit_game_menu_btn").innerText = i18n.t("Exit Game")
     }
   }
 
-  async addToMineColonies(sectorUid) {
-    let result = await this.main.getUserRecord(this.main.uid)
-
-    if (!result.error) {
-      let saveEntries = result.saves
-      this.main.gameExplorer.addMyColonies(saveEntries)
-    }
-  }
-
   isTutorial() {
     return this.sector.isTutorial()
-  }
-
-  visitSector(sectorUid) {
-
   }
 
   setEffectsVolume(volume) {
@@ -4305,18 +4050,6 @@ arrow.style.setProperty('--arrow-color',realColor)
 
   isMobile() {
     return this.main.isMobile
-  }
-
-  setTeamVisibility() {
-    if (!this.isGameCreatedByPlayer()) return
-    if (this.isAnonymousGame()) return
-
-    let privacy = document.querySelector('.visibility_select').value
-    if (privacy === 'private') {
-      SocketUtil.emit("EditTeam", { id: this.player.teamId, isPrivate: true })
-    } else {
-      SocketUtil.emit("EditTeam", { id: this.player.teamId, isPrivate: false })
-    }
   }
 
   renderInventory(data) {
@@ -5094,8 +4827,6 @@ arrow.style.setProperty('--arrow-color',realColor)
       "inventory": 73,          // 'i'
       "map": 77,          // 'm'
       "colony": 80,          // 'p'
-      "alliance": 70,          // 'f'
-      "visit": 86,          // 'v'
       "command block": 75,        // k
       "interact": 69,          // 'e'
       "attack": 32,          // 'space'
@@ -5105,7 +4836,6 @@ arrow.style.setProperty('--arrow-color',realColor)
       "zoom out": 189,         // -
       "camera mode": 117,         // f6
       "stats view": 116,         // f5
-      "view badges": 66,          // b
     }
 
     if (navigator.userAgent.search("Firefox") !== -1) {

@@ -11,7 +11,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/start_server",
+            "program": "${workspaceFolder}/packages/junon-io/server/server.js",
             "runtimeVersion": "16.15.0"
         }
     ]

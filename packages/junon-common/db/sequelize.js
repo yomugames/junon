@@ -4,26 +4,14 @@ const Sequelize = require('sequelize');
 const config = require('./config')[env]
 
 const options = {
-  host: config.host,
   dialect: config.dialect,
-  storage: config.storage, // only used by the sqlite dialect (see config.js's "test" entry)
+  storage: config.storage,
   logging: config.logging,
   pool: {
     max: 20,
     min: 1,
     idle: 20000,
     acquire: 1000000
-  }
-}
-
-// charset/collate are mysql-specific table options; sqlite (used in tests, see
-// config.js) has no equivalent and errors on unknown dialectOptions.
-if (config.dialect === 'mysql') {
-  options.define = {
-    charset: 'utf8mb4',
-    dialectOptions: {
-      collate: 'utf8mb4_general_ci'
-    }
   }
 }
 

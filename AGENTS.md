@@ -15,15 +15,12 @@ This file is the entry point, not the complete manual. Keep durable knowledge in
 
 ## Repository map
 
-- `start_server.js`: starts the game server and matchmaker in one process.
-- `packages/junon-io/`: authoritative game server, browser client, shared game
-  model, assets, build pipeline, and Jest tests.
-- `packages/junon-matchmaker/`: player-facing HTTP/WebSocket matchmaking service.
-- `packages/junon-common/`: database models and migrations, protobuf schemas,
-  serialization, logging, and socket utilities shared by services.
-- `packages/junon-io-watchdog/`: standalone game-server liveness watchdog.
-- `packages/junon-desktop/`: Electron shell that runs the standalone game server
-  and client offline.
+- `packages/junon-io/`: authoritative game server, game client, shared game
+  model, assets, build pipeline, Jest and Playwright tests.
+- `packages/junon-common/`: SQLite models, protobuf wire and save schemas,
+  save serialization and import, logging, and socket utilities.
+- `packages/junon-desktop/`: Electron shell that runs the game server and
+  client offline.
 - `docs/`: versioned engineering knowledge and execution plans.
 
 ## Working rules
@@ -35,17 +32,19 @@ This file is the entry point, not the complete manual. Keep durable knowledge in
   names, and module paths unless the task explicitly includes a migration.
 - Treat external input as untrusted at HTTP, WebSocket, command, protobuf, save,
   and database boundaries. Validate before state mutation.
-- Never commit credentials, Firebase service-account data, Sentry DSNs, database
-  passwords, production hostnames, or exported player data.
+- Never commit credentials, Sentry DSNs, hostnames of real machines, or exported
+  player data (including hosted-game saves).
 - Do not edit generated build output under `packages/junon-io/dist/` or
   `packages/junon-io/client/dist/`; change sources and rebuild.
-- Database schema changes require a new migration. Do not rewrite a migration
-  that may already have run.
+- The SQLite schema is built from the models and only grows automatically.
+  Renaming or removing a column needs an explicit step in
+  `packages/junon-common/db/standalone_schema.js`, because players' existing
+  database files must keep working.
 - Protocol and save-format changes are compatibility-sensitive. Update all
   producers and consumers together and document the compatibility decision.
 - The server relies on process globals and initialization order. Avoid adding new
-  globals; if touching startup, verify both standalone workspace scripts and the
-  combined root entry point where practical.
+  globals; if touching startup, verify both `npm run server` and the desktop app
+  where practical.
 - A game concept often has server and client representations. Search both trees
   before declaring a gameplay change complete.
 - Fix causes, not only symptoms. If a repeated failure exposes missing repository
@@ -58,13 +57,10 @@ Run from the repository root unless noted otherwise.
 
 ```sh
 npm install
-npm run db:setup
 npm run client
-npm run serveronly
-npm run matchmaker
-npm run desktop
 npm run server
 npm run client:build
+npm run desktop
 ```
 
 Run a focused Jest file through the game workspace, for example:
@@ -75,7 +71,7 @@ npm exec --workspace packages/junon-io -- jest test/pressure/pressure.test.js --
 
 `npm test` runs the whole Jest tree, including the slow `load_testing` and
 `memleak` suites. The Playwright end-to-end suite is separate and boots the real
-matchmaker, game server and browser client:
+game server and browser client:
 
 ```sh
 npm run test:e2e --workspace packages/junon-io

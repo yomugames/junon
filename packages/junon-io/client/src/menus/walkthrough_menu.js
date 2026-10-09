@@ -23,16 +23,6 @@ class WalkthroughMenu extends BaseMenu {
     this.walkthroughIndex = data.index
     this.step = data.step
     this.updateText()
-
-    let isLastWalkthrough = data.step === "end"
-    if (isLastWalkthrough) {
-      setTimeout(() => {
-        this.game.confirmMenu.open({
-          message: i18n.t('TutorialCreateNewColonyMessage'),
-          proceedCallback: this.game.main.createNewColony.bind(this.game.main)
-        })
-      }, 4000)
-    }
   }
 
   open() {

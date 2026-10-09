@@ -122,7 +122,7 @@ class AtmMenu extends BaseMenu {
     let accountTab = this.el.querySelector(".atm_tab[data-tab='account']")
     let transferTab = this.el.querySelector(".atm_tab[data-tab='transfer']")
 
-    if (this.game.isPeaceful() || !this.game.isLoggedIn()) {
+    if (this.game.isPeaceful()) {
       accountTab.style.display = 'none'
       this.selectTab(transferTab)
     } else {

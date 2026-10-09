@@ -1,7 +1,6 @@
 const LOG = require('junon-common/logger')
 const Helper = require('../../common/helper')
 const Protocol = require('../../common/util/protocol')
-const FirebaseAdminHelper = require("../util/firebase_admin_helper")
 const BadWordsFilter = require("../util/bad_words_filter")
 const SectorBanModel = require("junon-common/db/sector_ban")
 class RemoteEventHandler {
@@ -26,7 +25,6 @@ class RemoteEventHandler {
   }
 
   onSetPaused(player, data, socket) {
-    if (env !== 'standalone') return
     player.setPauseRequested(data.isPaused)
   }
 
@@ -58,13 +56,7 @@ class RemoteEventHandler {
     }
   }
   onSectorAction(player, data, socket) {
-    if (data.action === 'favorite') {
-      player.toggleFavorite(data.sectorId)
-    } else if (data.action === 'upvote') {
-      player.toggleUpvote(data.sectorId)
-    } else if (data.action === 'downvote') {
-      // player.toggleDownvote(data.sectorId)
-    } else if (data.action === 'editSetting') {
+    if (data.action === 'editSetting') {
       if (player.isSectorOwner()) {
         player.sector.editSetting(data.key, data.value)
       }
@@ -114,8 +106,8 @@ class RemoteEventHandler {
         if (game) {
           game.join(socket, data)
         }
-      } else if (env === 'standalone') {
-        // a standalone server hosts a single world, so joining needs no id
+      } else {
+        // a server hosts a single world, so joining needs no id
         let game = this.server.getMainGame()
         if (game) {
           game.join(socket, data)
@@ -198,7 +190,7 @@ class RemoteEventHandler {
     socket.sessionId = data.sessionId
     socket.locale = data.locale || 'en'
     let game = this.server.getGame(data.sectorId)
-    if (!game && env === 'standalone') {
+    if (!game) {
       game = this.server.getMainGame()
     }
     if (!game) {
@@ -210,9 +202,7 @@ class RemoteEventHandler {
       return
     }
     if (game.hasPlayerAlreadyJoined({ sessionId: socket.sessionId })) return
-    if (data.idToken) {
-      game.resumeIdToken(socket, data.idToken, data.uid)
-    } else if (data.sessionId) {
+    if (data.sessionId) {
       game.resumeSession(socket, data.sessionId)
     }
   }
@@ -639,7 +629,6 @@ class RemoteEventHandler {
       let duration = player.getSessionDuration()
       LOG.info(player.name + " disconnected. session duration: " + Helper.stringifyTimeShort(duration))
       player.resetControls()
-      player.game.sendCreatorLeaveSectorToMatchmaker(player)
       player.game.addDisconnectedPlayer(player)
     }
   }

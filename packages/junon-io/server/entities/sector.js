@@ -34,7 +34,6 @@ const Item = require("./item")
 const Projectiles = require("./projectiles/index")
 const PathFinder = require("./../ai/path_finder")
 const MapGenerator = require("./../util/map_generator")
-const FirebaseAdminHelper = require("../util/firebase_admin_helper")
 const Chunk = require("./chunk")
 const Helper = require('../../common/helper')
 const FovManager = require('../../common/entities/fov')
@@ -50,9 +49,7 @@ const PlayerData = require("./player_data")
 const Continent = require("./continent")
 const Sharp = require("sharp")
 const SectorModel = require("junon-common/db/sector")
-const Favorite = require("junon-common/db/favorite")
 const SectorBan = require("junon-common/db/sector_ban")
-const Vote = require("junon-common/db/vote")
 const { v4: uuidv4 } = require('uuid')
 const Claim = require("./claim")
 const MobTaskQueue = require("./mob_task_queue")
@@ -135,8 +132,6 @@ class Sector {
     this.initRailManager()
     this.initSoilManager()
     this.fetchScreenshots()
-    this.initFavoriteCount()
-    this.initVotes()
     this.initBans()
     this.initExecutors()
     this.initMobManager()
@@ -808,10 +803,6 @@ initSettings(entities) {
     this.isChunkInvalidationDisabled = false
   }
 
-  isUpvotable() {
-    return !this.isLobby()
-  }
-
   onFinishedLoading() {
     this.forEachChunk((chunk) => {
       chunk.buildRegions()
@@ -833,96 +824,6 @@ initSettings(entities) {
     if (sectorModel) {
       this.isPrivate = sectorModel.isPrivate
     }
-  }
-
-  async initFavoriteCount() {
-    this.favoriteCount = 0
-
-    let sectorModel = this.game.sectorModel
-    if (sectorModel && sectorModel.dataValues.favoriteCount) {
-      this.favoriteCount = sectorModel.dataValues.favoriteCount
-    }
-
-    this.onFavoriteCountChanged(this.favoriteCount)
-  }
-
-  increaseUpvote() {
-    this.upvoteCount += 1
-    this.onVoteChanged()
-  }
-
-  decreaseUpvote() {
-    this.upvoteCount -= 1
-    this.onVoteChanged()
-  }
-
-  increaseDownvote() {
-    this.downvoteCount += 1
-    this.onVoteChanged()
-  }
-
-  decreaseDownvote() {
-    this.downvoteCount -= 1
-    this.onVoteChanged()
-  }
-
-  onVoteChanged() {
-    // after 2 second.. sum total upvote/downvote from votes and cache values in sector..
-    // prevent autoclicker spam sql
-    clearTimeout(this.cacheVoteTimeout)
-
-    this.cacheVoteTimeout = setTimeout(() => {
-      this.cacheUpvotes()
-    }, 2000)
-  }
-
-  async cacheUpvotes() {
-    try {
-      let result = await Vote.findAll({
-        attributes: [
-          'sectorUid',
-          [sequelize.fn('sum', sequelize.col('upvote')), 'totalUpvoteCount'],
-          [sequelize.fn('sum', sequelize.col('downvote')), 'totalDownvoteCount']
-        ],
-        group : ['sectorUid'],
-        raw: true,
-        where: { sectorUid: this.getUid() }
-      })
-
-      let baseCount = 10
-      let upvoteCount   = parseInt(result[0].totalUpvoteCount)
-      let downvoteCount = parseInt(result[0].totalDownvoteCount)
-      let normalizeUpvoteCount = upvoteCount + baseCount
-      let normalizeDownvoteCount = downvoteCount + baseCount
-
-      let rating = Math.round((normalizeUpvoteCount / (normalizeUpvoteCount + normalizeDownvoteCount)) * 100)
-
-      await SectorModel.update({
-        upvoteCount: upvoteCount,
-        downvoteCount: downvoteCount,
-        rating: rating
-      }, {
-        where: { uid: this.getUid() }
-      })
-    } catch(e) {
-      this.game.captureException(e)
-    }
-  }
-
-  initVotes() {
-    this.upvoteCount = 0
-    this.downvoteCount = 0
-
-    let sectorModel = this.game.sectorModel
-    if (sectorModel && sectorModel.dataValues.upvoteCount) {
-      this.upvoteCount = sectorModel.dataValues.upvoteCount
-    }
-
-    if (sectorModel && sectorModel.dataValues.downvoteCount) {
-      this.downvoteCount = sectorModel.dataValues.downvoteCount
-    }
-
-    this.onFavoriteCountChanged(this.favoriteCount)
   }
 
   async initBans() {
@@ -952,19 +853,6 @@ initSettings(entities) {
     this.getSocketUtil().broadcast(this.game.getSocketIds(), "SectorUpdated", {
       sectorBans: this.sectorBans
     })
-  }
-
-  async fetchFavoriteCount() {
-    let newFavoriteCount = await Favorite.count({
-      where: {
-        sectorUid: this.getUid()
-      }
-    })
-
-    if (newFavoriteCount !== this.favoriteCount) {
-      this.favoriteCount = newFavoriteCount
-      this.onFavoriteCountChanged(this.favoriteCount)
-    }
   }
 
   unregisterEventListeners() {
@@ -1014,20 +902,10 @@ initSettings(entities) {
 
   setName(name) {
     this.name = name
-    this.onNameChanged()
   }
 
   setIsPrivate(isPrivate) {
     this.isPrivate = isPrivate
-    this.onIsPrivateChanged()
-  }
-
-  onNameChanged() {
-    this.game.sendSectorInfoToMatchmaker()
-  }
-
-  onIsPrivateChanged() {
-    this.game.sendSectorInfoToMatchmaker()
   }
 
   initOtherGrids() {
@@ -3165,9 +3043,6 @@ initSettings(entities) {
   }
 
   async replaceScreenshot(data, player) {
-    // standalone is offline too, but keeps thumbnails with its saves
-    if (global.isOffline && env !== 'standalone') return
-
     for (let id in this.screenshots) {
       await this.removeScreenshot(id, player)
     }
@@ -3176,8 +3051,6 @@ initSettings(entities) {
   }
 
   async addScreenshot(data, player) {
-    if (global.isOffline && env !== 'standalone') return
-
     let imageData = data.imageData
     let position = data.position || 0
 
@@ -3201,7 +3074,6 @@ initSettings(entities) {
       sectorModel.screenshot = token
       await sectorModel.save()
 
-      this.onScreenshotsChanged()
       return token
     }
 
@@ -3223,14 +3095,6 @@ initSettings(entities) {
     await this.game.deleteImage(thumbnailPath)
 
     delete this.screenshots[screenshotId]
-    this.onScreenshotsChanged()
-  }
-
-  onScreenshotsChanged() {
-    this.game.sendSectorInfoToMatchmaker()
-  }
-
-  onFavoriteCountChanged(favoriteCount) {
   }
 
   getMaxActivityLogLength() {
@@ -3301,20 +3165,8 @@ initSettings(entities) {
     return buffer
   }
 
-  getScreenshotSavePath(key) {
-    if (env === "staging" || env === "production") {
-      return "screenshots/" + key + ".jpg"
-    } else {
-      return "screenshots/development/" + key + ".jpg"
-    }
-  }
-
   getScreenshotThumbnailPath(key) {
-    if (env === "staging" || env === "production") {
-      return "screenshots/" + key + "_thumb.jpg"
-    } else {
-      return key + "_thumb.jpg"
-    }
+    return key + "_thumb.jpg"
   }
 
   runRoomManager() {

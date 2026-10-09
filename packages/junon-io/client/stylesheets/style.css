@@ -8112,45 +8112,10 @@ body.imposter_mode .minigame_poster {
 }
 
 .middle_container {
-    padding-top: 10px;
     display: none;
-    width: calc(100% - 600px);
+    width: min(760px, calc(100% - 32px));
     margin: auto;
     position: relative;
-    background-color: #222;
-}
-
-body.standalone .left_sidebar,
-body.standalone .home_user_action_container,
-body.standalone .survival_list_container,
-body.standalone .browse_games_container,
-body.standalone #social_login_container,
-body.standalone #firebaseui-auth-container,
-body.standalone #home_footer,
-body.standalone #more_io_games,
-body.standalone .junon_ad_square {
-    display: none !important;
-}
-
-body.standalone #home_user_account_container,
-body.standalone #friends_btn,
-body.standalone #badge_hud_btn,
-body.standalone #friends_menu,
-body.standalone #friend_request_menu,
-body.standalone #user_profile_menu,
-body.standalone #badge_menu,
-body.standalone #event_manager_container,
-body.standalone #ban_manager_container,
-body.standalone .open_ban_list_btn,
-body.standalone .sector_upvote_container,
-body.standalone .sector_favorite_action_container,
-body.standalone .sector_favorite_btn,
-body.standalone .upvote_btn {
-    display: none !important;
-}
-
-body.standalone .middle_container {
-    width: min(760px, calc(100% - 32px));
     background: rgba(20, 24, 32, .94);
     padding: 24px;
     box-sizing: border-box;
@@ -8165,6 +8130,7 @@ body.standalone .middle_container {
 #local_world_menu .local_world_list { display: flex; flex-direction: column; gap: 8px; }
 #local_world_menu .local_world_entry { text-align: left; }
 #local_world_menu .local_menu_message { color: #ffad91; min-height: 24px; }
+#local_world_menu .local_menu_version { color: #888; font-size: 12px; margin-bottom: 0; }
 
 .home_action_row {
     display: block;

@@ -67,9 +67,6 @@ class EventManager {
   }
 
   shouldAllowEvents() {
-    if (this.game.isCreatedByAnonynmous()) return true
-
-    // if game is owned by signed-in user,
     // allow raids only if owner/creator is online
     let creatorTeam = this.game.getCreatorTeam()
     if (!creatorTeam) return false

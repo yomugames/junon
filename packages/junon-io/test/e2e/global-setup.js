@@ -1,23 +1,23 @@
 const { spawn } = require('child_process')
 const net = require('net')
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 
 const IO_DIR = path.resolve(__dirname, '../..')
-const MATCHMAKER_DIR = path.resolve(IO_DIR, '../junon-matchmaker')
 const WORKSPACE_ROOT = path.resolve(IO_DIR, '../..')
 
 // npm workspaces hoist shared devDependencies (gulp, playwright, etc) to the
 // workspace root node_modules instead of packages/junon-io/node_modules
 const GULP_BIN = path.join(WORKSPACE_ROOT, 'node_modules/.bin/gulp')
 
-const MATCHMAKER_PORT = 3000
+// the page server; playwright.config.js's baseURL points here
 const GAME_SERVER_DEV_PORT = 8001
 // default 8000 collides with an unrelated process on some hosts, and the
-// game server (in debug mode) binds a literal port number with no retry -
-// the actual player-facing game socket port is reported to the matchmaker
-// dynamically, so a random high port avoids both that collision and reusing
-// a port still being released by this harness's own previous run
+// game server binds a literal port number with no retry - the local menu
+// learns the socket port from the server, so a random high port avoids both
+// that collision and reusing a port still being released by this harness's
+// own previous run
 const GAME_WEBSOCKET_PORT = 20_000 + Math.floor(Math.random() * 20_000)
 // The harness sets up scenarios by attaching to the game server's V8 inspector
 // over the Chrome DevTools Protocol (see support/server_console.js), which is
@@ -76,10 +76,10 @@ function spawnProcess(name, command, args, opts) {
   return child
 }
 
-// Boots the real matchmaker + real game server (as separate processes, exactly
-// like local dev: `npm run matchmaker` + `npm run serveronly`) plus a gulp
-// watcher for the real browser client, so Playwright drives the actual game
-// end to end instead of a stubbed/mocked stack.
+// Boots the real game server (as `npm run server` does, with no world loaded,
+// so tests create theirs through the local menu) plus a gulp watcher for the
+// real browser client, so Playwright drives the actual game end to end
+// instead of a stubbed/mocked stack.
 module.exports = async (config) => {
   // resolved by playwright.config.js (defaults to /tmp/junon-io-e2e). Printed
   // up front so it's known before anything fails, and again on the way out
@@ -93,12 +93,7 @@ module.exports = async (config) => {
   console.log(`[e2e] artifacts (video/trace/screenshots): ${outputDir}`)
 
   fs.rmSync(CLIENT_BUNDLE, { force: true })
-
-  const matchmaker = spawnProcess('matchmaker', 'node', ['src/index.js'], {
-    cwd: MATCHMAKER_DIR,
-    env: { ...process.env, NODE_ENV: 'test' }
-  })
-  await waitForPort(MATCHMAKER_PORT, '127.0.0.1', 30_000)
+  const savesDir = fs.mkdtempSync(path.join(os.tmpdir(), 'junon-e2e-saves-'))
 
   const gulp = spawnProcess('gulp', GULP_BIN, [], {
     cwd: IO_DIR
@@ -109,17 +104,13 @@ module.exports = async (config) => {
     cwd: IO_DIR,
     env: {
       ...process.env,
+      // debugMode gameplay (fast building, admin mode), as the specs expect
       NODE_ENV: 'test',
-      // opts back into real matchmaker registration/heartbeat, which
-      // NODE_ENV=test otherwise disables for Jest's benefit - see server.js
-      JUNON_E2E_MATCHMAKER: 'true',
-      // env==='test' isn't 'development', so server.js won't default this to
-      // 127.0.0.1 itself - without it, the host handed back to the browser
-      // for the second (game) socket connection would be malformed
-      IP_ADDRESS: '127.0.0.1',
-      // default 8000 is already bound by an unrelated process on some hosts;
-      // pick a port dedicated to this harness instead
-      PORT: String(GAME_WEBSOCKET_PORT)
+      JUNON_SAVES_DIR: savesDir,
+      JUNON_WORLD_ID: '',
+      JUNON_OWNER_UID: '',
+      PORT: String(GAME_WEBSOCKET_PORT),
+      JUNON_CLIENT_PORT: String(GAME_SERVER_DEV_PORT)
     }
   })
   await waitForPort(GAME_SERVER_DEV_PORT, '127.0.0.1', 30_000)
@@ -130,9 +121,18 @@ module.exports = async (config) => {
   process.env.JUNON_E2E_INSPECT_PORT = String(INSPECT_PORT)
 
   return async () => {
-    for (const child of [gameServer, gulp, matchmaker]) {
+    // the server saves its world on SIGTERM; let it finish before the saves
+    // directory goes away
+    const serverExited = new Promise((resolve) => {
+      if (gameServer.exitCode !== null) return resolve()
+      gameServer.once('exit', resolve)
+      setTimeout(resolve, 30_000)
+    })
+    for (const child of [gameServer, gulp]) {
       child.kill('SIGTERM')
     }
+    await serverExited
+    fs.rmSync(savesDir, { recursive: true, force: true })
 
     reportArtifacts(outputDir)
   }

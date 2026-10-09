@@ -6,10 +6,9 @@
   Room/network allocation on placement is covered separately in test/rooms/partition.test.js.
 */
 
-// BaseBuilding pulls in Team -> firebase_admin_helper -> firebase-admin/auth,
-// which transitively depends on the ESM-only `jose` package and can't load
-// under Jest's CJS runtime. None of the logic under test here touches Team,
-// so we stub it out to keep this a hermetic unit test of BaseBuilding itself.
+// None of the logic under test here touches Team (which pulls in the database
+// models), so we stub it out to keep this a hermetic unit test of BaseBuilding
+// itself.
 jest.mock('../../server/entities/team', () => ({
   MemberRoleType: 0,
   AdminRoleType: 1,

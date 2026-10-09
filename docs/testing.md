@@ -59,14 +59,14 @@ Without it, every e2e test fails to launch a browser.
 ### What they run
 
 `test/e2e/global-setup.js` boots the real stack as separate processes, the same
-way local development does: the matchmaker (`packages/junon-matchmaker`), a gulp
-watcher that builds the browser client, and the game server under `--inspect`.
-Playwright then drives the actual browser client through the actual matchmaker
-handshake. Nothing is stubbed.
+way local development does: a gulp watcher that builds the browser client, and
+the game server (`NODE_ENV=test`, so `debugMode` gameplay, with a temporary
+saves directory) under `--inspect`, with no world loaded. Each test creates and
+joins its own new world through the local world menu (`support/join.js`); the
+server replaces the previous one. Nothing is stubbed.
 
 A full run therefore costs a client build (up to two minutes on a cold cache)
-plus roughly two minutes of tests, and each test creates and joins its own new
-colony.
+plus a few minutes of tests.
 
 ```sh
 npm run test:e2e --workspace packages/junon-io
@@ -101,7 +101,7 @@ Support modules:
 | `support/server_console.js` | Attaches to the game server's inspector; `evaluateInServer(fn, arg)` runs `fn` in the server process |
 | `support/scenario.js` | Scenario setup and server-authoritative reads (clear ground, terrain, items, inventory, storage, structures) |
 | `support/screen.js` | World coordinate to browser cursor position, for the actions that are aimed with the mouse |
-| `support/join.js` | The real new-colony flow, and picking a game mode |
+| `support/join.js` | The real New world flow of the local menu, with a game mode |
 | `support/combat.js` | Walking up to a mob and swinging at it, entirely inside the page |
 
 Functions passed to `evaluateInServer` are serialised, so each one closes over
@@ -119,15 +119,13 @@ server really applied the change instead of the client having predicted it.
   from `support/screen.js`. They also all fail silently while a modal menu is
   open, because `Game#isModalMenuOpen()` makes `triggerEntityMouseEvents()` bail
   out.
-- The harness runs without MySQL, so `sector.createdAt` stays 0 and the
-  "Choose a Game Mode" menu never opens by itself
-  (`SelectDifficultyMenu#showGameMode` gates on it). `selectGameMode()` opens it
-  and then drives it normally.
-- A colony with no game mode picked is not peaceful. Most chat commands only run
-  in a peaceful colony (`BaseCommand#canExecute`), and in a peaceful one the
-  owner's crafts succeed without the ingredients
-  (`Inventory#isSandboxMode`) - so a crafting test must *not* pick peaceful, and
-  an admin-command test must.
+- Under `NODE_ENV=test` every player starts in admin mode, in which the colony
+  owner crafts without ingredients. `disableAdminMode(page)` switches it off.
+- `createNewColonyAndJoin(page, { gameMode })` creates a `survival` world
+  unless told otherwise. Most chat commands only run in a peaceful colony
+  (`BaseCommand#canExecute`), and in a peaceful one the owner's crafts succeed
+  without the ingredients (`Inventory#isSandboxMode`) - so a crafting test must
+  *not* pick peaceful, and an admin-command test must.
 - The two sides file terrain differently: the server keeps everything on
   `sector.groundMap`, the client puts foreground tiles (asteroids, rocks) on
   `sector.map` and walkable ground on `sector.groundMap`. The client has no
@@ -163,10 +161,9 @@ xvfb-run -a npm run test:e2e --workspace packages/junon-desktop
 | Shared game entity/interface | Focused tests and client build; inspect both sides |
 | Protobuf contract | Client build and affected server/client message flow |
 | Save serialization | Round-trip fixtures across relevant format versions. Build synthetic saves (as `test/server/save_importer.test.js` does); real exported saves are player data and must not be committed |
-| Database model/migration | Migration on a disposable database and model path |
-| Matchmaker/API | Focused request/socket reproduction with isolated dependencies |
-| Startup/configuration | Start the affected service in the intended `NODE_ENV` |
-| Standalone (offline) mode | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real standalone server, checks save/reload, exercises the local world and import HTTP routes, checks the `ws` game socket, and covers co-op hosting (preflight, guest upgrade checks, owner-profile refusal, stop and shutdown notices) and the singleplayer pause |
+| Database model | `test/server/standalone_schema.test.js`, and a server start against a saves directory created before the change |
+| Startup/configuration | Start the server in the intended `NODE_ENV` (`standalone`, and `development` for `npm run server`) |
+| Server runtime, local menu, co-op | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real server, checks save/reload, exercises the local world and import HTTP routes, checks the `ws` game socket, and covers co-op hosting (preflight, guest upgrade checks, owner-profile refusal, stop and shutdown notices) and the singleplayer pause |
 | Desktop shell (`packages/junon-desktop`) | `NODE_ENV=standalone npm run client:build`, then the desktop e2e test (see below) |
 | Player-facing flow across client and server | The closest `test/e2e` spec, or a new one |
 
@@ -194,6 +191,6 @@ xvfb-run -a npm run test:e2e --workspace packages/junon-desktop
 
 ## Reporting
 
-At handoff, name the exact commands run and their outcomes. If MySQL, credentials,
-native modules, browsers, or external services prevented validation, state that
+At handoff, name the exact commands run and their outcomes. If native modules,
+browsers, a display, or a second machine prevented validation, state that
 constraint and the narrower checks that did run.

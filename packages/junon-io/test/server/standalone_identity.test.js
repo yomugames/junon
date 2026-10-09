@@ -47,24 +47,3 @@ describe('isValidLocalUsername', () => {
     expect(game.isValidLocalUsername(undefined)).toBe(false)
   })
 })
-
-describe('world lifecycle', () => {
-  test('a standalone world is never treated as anonymous, so it is not deleted on shutdown', () => {
-    const uuidCreator = '3f2b8c1e-9a7d-4e6f-8b0c-1d2e3f4a5b6c'
-
-    global.env = 'standalone'
-    expect(createGame({ creatorUid: uuidCreator }).isCreatedByAnonynmous()).toBe(false)
-    expect(createGame({ creatorUid: undefined }).isCreatedByAnonynmous()).toBe(false)
-
-    global.env = 'production'
-    expect(createGame({ creatorUid: uuidCreator }).isCreatedByAnonynmous()).toBe(true)
-  })
-
-  test('a standalone world stays loaded with nobody connected', () => {
-    global.env = 'standalone'
-    expect(createGame().canBeShutdown()).toBe(false)
-
-    global.env = 'production'
-    expect(createGame().canBeShutdown()).toBe(true)
-  })
-})

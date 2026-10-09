@@ -1,11 +1,10 @@
 const http = require("http")
 const WebSocket = require("ws")
 
-// Game socket for NODE_ENV=standalone. Hosted servers use uWebSockets.js, which
-// ships prebuilt binaries for Node's ABI only and doesn't load inside Electron,
-// so the desktop runtime uses the pure-JS `ws` package instead. Sockets are
-// wrapped to expose the subset of the uWS WebSocket API that SocketUtil, Game
-// and Player use: send(data, isBinary), close(), end(), and remoteAddress.
+// The game socket, on the pure-JS `ws` package (uWebSockets.js, which the
+// hosted servers used, doesn't load inside Electron). Sockets are wrapped to
+// keep the subset of the uWS WebSocket API that SocketUtil, Game and Player
+// use: send(data, isBinary), close(), end(), and remoteAddress.
 //
 // The main listener is the host's own (loopback by default). Co-op hosting
 // adds a guest listener on another address and port; its sockets are marked

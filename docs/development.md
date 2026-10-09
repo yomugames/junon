@@ -4,26 +4,22 @@
 
 - Node.js 26.4.0 (declared by the root `.nvmrc`)
 - npm with workspace support
-- MySQL for database-backed paths
 - system libraries required by native npm dependencies such as `sharp` and
-  `uWebSockets.js`
+  `sqlite3` (both normally install prebuilt binaries)
 
 The workspace `.nvmrc` files match the root Node.js version, so workspace and
 root commands use the same runtime.
 
-## Install and database setup
+## Install
 
 From the repository root:
 
 ```sh
 npm install
-npm run db:setup
 ```
 
-Database setup uses Sequelize configuration in `packages/junon-common/db/`.
-The existing development default assumes a local MySQL root user; use the
-supported environment configuration for non-default credentials and never commit
-real credentials.
+There is no database to set up: the game server creates its SQLite file in the
+saves directory on start (see [Running the game](#running-the-game)).
 
 ## Dependencies
 
@@ -67,9 +63,8 @@ None of them turned out to be blocked - they just needed more than
   named-export API (`const { v4 } = require('uuid')`) at v7, so the four call
   sites in `packages/junon-io/{server,client/src}` needed a source change, not
   just a version bump. A root `overrides` entry pins the resolved version to
-  `^11.1.1` everywhere, including inside `sequelize`, `aws-sdk`, and `gaxios`,
-  none of which needed code changes since they already used the named-export
-  API internally.
+  `^11.1.1` everywhere, including inside `sequelize`, which needed no code
+  change since it already used the named-export API internally.
 - uuid's browser build (`dist/cjs-browser/{v1,v6,v7}.js`) uses the `??=`
   operator, which the acorn version bundled with this project's browserify
   can't parse - `require('uuid')` pulls in the whole barrel (v1 through v7)
@@ -81,43 +76,31 @@ None of them turned out to be blocked - they just needed more than
   [/node_modules\/uuid\//]` limits it to uuid, with
   `@babel/plugin-transform-logical-assignment-operators` and
   `@babel/plugin-transform-nullish-coalescing-operator` transpiling `??=`/`??`
-  down to old-parser-safe code. Nothing else in the vendor bundle is touched -
-  see the "why not firebase 9+" section below for why a *global* transform
-  (needed for firebase, not for this) is a much bigger, riskier change than
-  this narrow one. `global: true` has to go on the `.transform()` call itself,
+  down to old-parser-safe code. Nothing else in the vendor bundle is touched;
+  a *global* transform (which an ESM-only dependency would need) is a much
+  bigger, riskier change than this narrow one. `global: true` has to go on the `.transform()` call itself,
   not inside `babelify.configure()`'s options - browserify's own transform
   flag and babel's option object share the object shape, but babel rejects an
   unrecognized `global` key. If a future dependency hits the same
   can't-parse-this-syntax error, add its path to `only` and, if the syntax
   isn't nullish-coalescing/logical-assignment, add the matching
   `@babel/plugin-transform-*` to `plugins`.
-- `@sentry/node` and `@sentry/browser` moved 5.x/4.x -> 10.x across
-  `junon-common`, `junon-io`, and `junon-matchmaker` (which declared
-  `@sentry/node` but never required it directly - the dependency was dead
-  weight and was removed instead of upgraded). The integration API changed
-  completely: `Sentry.configureScope(cb)` is gone
-  (`server.js`, `entities/game.js` now call `Sentry.getCurrentScope()`
-  directly), and the class-based `Integration#setupOnce(addGlobalEventProcessor,
-  getCurrentHub)` shape is gone in favor of `Integration#processEvent(event)`.
-  `better_dedupe.js` (both the server copy in `junon-common` and the client
-  copy in `junon-io/client/src/util`) was rewritten to the new shape; the
-  dedup logic itself (fingerprint/stacktrace hashing to avoid re-reporting and
-  the CPU cost of re-parsing stacks) is unchanged.
+- `@sentry/node` and `@sentry/browser` moved 5.x/4.x -> 10.x. The integration
+  API changed completely: `Sentry.configureScope(cb)` is gone (`entities/game.js`
+  now calls `Sentry.getCurrentScope()` directly), and the class-based
+  `Integration#setupOnce(addGlobalEventProcessor, getCurrentHub)` shape is gone
+  in favor of `Integration#processEvent(event)`. `junon-common/better_dedupe.js`
+  was rewritten to the new shape; the dedup logic itself (fingerprint/stacktrace
+  hashing to avoid re-reporting and the CPU cost of re-parsing stacks) is
+  unchanged.
 - Sentry's v10 packages ship dual CJS/ESM with a `require` condition that
-  resolves to CommonJS, so - unlike firebase below - there was no browserify
-  ESM blocker here.
+  resolves to CommonJS, so there was no browserify ESM blocker here.
 
 ### Vulnerabilities with no available fix right now
 
 `npm audit` is not clean, and won't be from a dependency bump alone. Every
-remaining advisory falls into one of three groups, none of which npm can
+remaining advisory falls into one of two groups, neither of which npm can
 resolve on its own:
-
-**Held for the browserify build (see firebase below for the general shape of
-this problem):**
-
-- `@firebase/app`, `@firebase/component`, `@firebase/database`,
-  `@firebase/util` - see "firebase: scoped packages, held on the 7-era line".
 
 **No upstream fix exists at all**, not even one that would require a breaking
 change - `npm audit fix` and `npm audit fix --force` both no-op on these
@@ -131,8 +114,7 @@ because there is nothing newer to move to:
   directly.
 
 **The only fix is ESM-only, which breaks the CommonJS consumer that needs
-it** - functionally the same blocker as firebase's `browser` field, but at the
-`require()` level instead of the bundler level:
+it** (browserify, and plain `require()`, can't load ESM-only packages):
 
 - `decode-uri-component` is vulnerable at `<=0.4.2`; the fix is `0.5.0`, but
   `0.5.0` ships `"type": "module"` with no CommonJS entry point.
@@ -146,100 +128,6 @@ it** - functionally the same blocker as firebase's `browser` field, but at the
   to `source-map-resolve@0.6.0`) can never be selected here. This whole chain
   only runs at build time, generating source maps for the gulp pipeline - it
   is not bundled into the shipped client.
-
-### aws-sdk v2: deferred, needs a v3 migration
-
-`aws-sdk` (the v2 SDK) carries a low-severity advisory
-(GHSA-j965-2qgj-vjmq, missing region-parameter validation).
-`npm audit fix --force` reports a fix by *downgrading* to `aws-sdk@1.18.0`,
-which is not a real fix - v2 has no patched release, since AWS considers v2
-end-of-support and ships no more updates to it at all. The only real fix is
-migrating to `@aws-sdk/client-s3` (SDK v3).
-
-This is deliberately deferred rather than attempted alongside the other
-advisories in this file, because it is not a version bump - it is a rewrite of
-every direct `aws-sdk` call site, and those call sites are the game's save/load
-path:
-
-- `packages/junon-io/server/util/s3_client.js`
-- `packages/junon-io/server/entities/game.js` (`putObject`/`deleteObject` for
-  sector saves)
-- `packages/junon-common/world_serializer.js` (`listObjects`/`getObject`/
-  `deleteObject`/`putObject` for sector saves)
-- `packages/junon-io/server/util/tasks/copy_s3_saves_to_all.js` (maintenance
-  script, talks to a DigitalOcean Spaces endpoint, not AWS)
-- `packages/junon-io-watchdog/index.js`
-
-The risky part isn't the client construction or the command objects - it's
-that SDK v3's `getObject` returns `Body` as a stream, not a Buffer, and every
-one of the call sites above (plus their callers) currently treats
-`data.Body` as a Buffer. `client.send(command, callback)` is supported in v3
-for a callback-shaped migration, but the stream-vs-Buffer change still needs
-to be handled explicitly (e.g. buffering `Body` before invoking the existing
-callback contract) and verified against real save/load, not just unit tests -
-`packages/junon-io/test` does not exercise real S3.
-
-### firebase: scoped packages, held on the 7-era line
-
-The client does not depend on the `firebase` umbrella. It depends on the three
-scoped packages it actually uses, pinned to the versions `firebase@7.24.0`
-resolved:
-
-```
-"@firebase/app": "0.6.11"
-"@firebase/auth": "0.15.0"
-"@firebase/database": "0.6.13"
-```
-
-`client/src/vendor.js` requires those directly. The umbrella's `firebase/app`
-was only `@firebase/app` plus a `registerVersion("firebase", "7.24.0", "app")`
-call, and vendor.js keeps that call so the SDK still reports the same version
-string. `firebase.SDK_VERSION` is unaffected either way - it is baked into
-`@firebase/app` (7.20.0), not set by the umbrella.
-
-The umbrella pulled analytics, firestore, functions, installations, messaging,
-performance, remote-config and storage into the tree for code the bundle never
-loaded. firestore and functions were the last two high advisories in the
-repository, both through an old `node-fetch`. Dropping the umbrella removed
-them along with six moderates. The shipped bundle barely changed - 314 bytes -
-which is the direct evidence that none of it was ever bundled.
-
-Verify a change here against the built artifact, not just the build exit code.
-Firebase is off in `development` and `test` (`server.js` sets `global.isOffline`
-unless `JUNON_USE_FIREBASE=true`), so neither Jest nor the e2e suite exercises
-sign-in; a broken namespace would still let every suite pass. Load the built
-vendor bundle in a browser and confirm `window.firebase` still carries
-`initializeApp`, `apps`, `auth()`, `database()` and
-`auth.GoogleAuthProvider` / `auth.FacebookAuthProvider` - the surface
-`client/src/util/firebase_client_helper.js` uses.
-
-#### Why not firebase 9+
-
-Moving to a current major is blocked by the client build, not by the API.
-firebase 9 removed the namespaced API but `firebase/compat/*` restores it
-exactly, so the source change is small. The problem is resolution: every
-`firebase/compat/*` and `@firebase/*-compat` package declares `main` as
-CommonJS but `browser` as ESM, browserify prefers `browser`, and browserify
-cannot parse ESM - the bundle fails with `'import' and 'export' may appear only
-with 'sourceType: module'`. Three routes were tried and none is contained:
-
-| Attempt | Result |
-| --- | --- |
-| `require("firebase/compat/app")` | resolves to `dist/esm/index.esm.js`, parse error |
-| the prebuilt UMD bundles (`firebase/firebase-app-compat.js`) | re-enters the same chain via `require('@firebase/app-compat')` |
-| a custom `resolve` for firebase ids in the browserify options | browserify applies the `browser` field independently of `resolve`; app, auth and database all still fail |
-
-Clearing it needs an ESM-to-CommonJS transform (`esmify`, or `babelify` with
-`@babel/preset-env`) applied with `global: true` to the vendor bundle, which
-changes how every other vendor package is processed - pixi.js, @sentry/browser,
-protobufjs, howler, @fingerprintjs/fingerprintjs. That is a build-pipeline
-change rather than a dependency bump.
-
-What staying on this line still carries is moderate, not high: `@firebase/util`
-and the packages that depend on it (`@firebase/app`, `@firebase/component`,
-`@firebase/database`) carry an uncontrolled-resource-consumption advisory, and
-GHSA-3wf4-68gx-mph8 (`_authTokenSyncURL`, moderate, `<10.9.0`) applies to the
-range. `@firebase/auth` itself carries no advisory.
 
 ### protobufjs is pinned below 8.2.0
 
@@ -271,42 +159,30 @@ change, protobufjs moved - before it can land, every presence-checked field
 needs explicit `optional` presence in `packages/junon-common/protocol/*.proto`,
 which is a protocol change affecting client and server together.
 
-## Run modes
+## Running the game
+
+The game server hosts one world per process and needs no network service (see
+[ARCHITECTURE.md](../ARCHITECTURE.md)). `NODE_ENV` selects gameplay settings:
+`standalone` plays like the released game, while `development` (the default)
+and `test` turn on `debugMode`: waves every 5 s, faster building and firing,
+admin mode for every player, and the `app_debug.proto` wire format.
 
 ```sh
-# Watch and serve the browser client
+# terminal 1: build and watch the browser client
 npm run client
 
-# Watch the authoritative game server
-npm run serveronly
-
-# Start the matchmaker
-npm run matchmaker
-
-# Watch the combined game server + matchmaker entry point
+# terminal 2: run the game server (development), restarting on changes
 npm run server
-
-# Create a production-oriented client bundle
-npm run client:build
 ```
 
-The root `server` script uses Nodemon with `start_server.js`. The game server's
-development HTTP port defaults to 8000 in code; the historical README mentions
-8001, so confirm the URL printed by the running processes rather than relying on
-the old value.
-
-## Standalone (offline) mode
-
-`NODE_ENV=standalone` runs one world per game-server process with no matchmaker,
-MySQL, Firebase, S3 or Sentry. It is the runtime for the offline desktop build
-and co-op listen servers (see
-[the execution plan](exec-plans/active/electron-offline-coop.md)). Gameplay uses
-production settings: `debugMode` is off, unlike `development`, where waves,
-build speed and admin mode differ.
+Then open `http://localhost:8001/`. Both use `development` unless `NODE_ENV` is
+set; build and run with `NODE_ENV=standalone` to play with release gameplay.
+`npm run client:build` creates the production client bundle in
+`packages/junon-io/dist/`, which the desktop app loads.
 
 | Variable | Meaning |
 | --- | --- |
-| `JUNON_SAVES_DIR` | Required. Worlds are stored as `<dir>/<worldId>/sector.sav`, the same bytes as the hosted S3 objects. |
+| `JUNON_SAVES_DIR` | Worlds are stored as `<dir>/<worldId>/sector.sav`, the same bytes as the hosted game's S3 objects, next to the SQLite file. Required, except in `development`, where it defaults to the repository's gitignored `.dev-saves/`. |
 | `JUNON_WORLD_ID` | Optional. The world to load at startup, or to generate if it has no save yet. `[A-Za-z0-9_-]` only. Without it, the local menu selects the first world. |
 | `JUNON_OWNER_UID` | Required when `JUNON_WORLD_ID` is set. Local profile id of the world's owner. |
 | `JUNON_WORLD_NAME`, `JUNON_GAME_MODE` | New worlds only; an existing save supplies its own name and mode. Mode defaults to `survival`. |
@@ -314,17 +190,7 @@ build speed and admin mode differ.
 | `JUNON_HOST` | Address the game socket binds to. Defaults to `127.0.0.1`, so nothing on the network can connect. Co-op hosting from the menu doesn't need it (see below). |
 | `JUNON_CLIENT_PORT` | Port of the page server for the browser client (default 8001, always on `127.0.0.1`). |
 
-```sh
-# terminal 1: build and watch the standalone browser client
-NODE_ENV=standalone npm run client
-
-# terminal 2: open the local world menu
-NODE_ENV=standalone JUNON_SAVES_DIR=/tmp/junon-saves \
-  node packages/junon-io/server/server.js
-```
-
-Then open `http://localhost:8001/`. The menu creates, lists, loads, and imports
-worlds, and joins a co-op host by address and port. It talks to loopback-only
+The menu creates, lists, loads, and imports worlds, and hosts or joins co-op. It talks to loopback-only
 `/local/*` routes on the page server; that server owns the SQLite registry and
 save directory. The optional `?server=ws://127.0.0.1:8000&name=YourName`
 direct-connect entry remains for tests and development.
@@ -377,17 +243,17 @@ can switch to any other unclaimed character with `/character list [search]`,
 unclaimed. Saved characters keep their own names. Hosted PvP and minigame
 saves are rejected.
 
-The server autosaves every three minutes and saves on `SIGINT`/`SIGTERM`. In
-this mode an unhandled promise rejection is logged instead of crashing the
-world.
+The server autosaves every three minutes (except in `development`/`test`) and
+saves on `SIGINT`/`SIGTERM`. An unhandled promise rejection is logged instead of
+crashing the world.
 
 A world stands still, clock included, while nobody is playing it: no player is
 connected, or the only one is the host with the in-game menu open or the window
 hidden (the client sends `SetPaused`). Co-op guests keep it running.
 
-Standalone uses a SQLite file, `<JUNON_SAVES_DIR>/junon.sqlite`, in place of
-MySQL. It has the same models and tables, and is shared by every world in that
-saves directory:
+The database is a SQLite file, `<JUNON_SAVES_DIR>/junon.sqlite` (in memory under
+`test`), with the models and tables the hosted game had in MySQL. It is shared
+by every world in that saves directory:
 - **`sectors`** is the world registry (name, game mode, owner). A world without
   a row is registered on first start from its save header, or from
   `JUNON_WORLD_NAME`/`JUNON_GAME_MODE` if it has no save yet.
@@ -397,14 +263,15 @@ saves directory:
   Balances from the hosted game can't be imported, because they were only ever
   in MySQL.
 
-The schema comes from the models (`junon-common/db/standalone_schema.js`), not
-from `db/migrations`, which are MySQL-only. Missing tables and newly added
-columns are created at startup. Renaming or removing a column needs an explicit
-standalone step.
+The schema comes from the models (`junon-common/db/standalone_schema.js`); there
+are no migrations. Missing tables and newly added columns are created at
+startup. Renaming or removing a column needs an explicit step there, since
+players' existing files must keep working. Tables of removed hosted features
+(favorites, votes, friends, sessions) may remain in older files, unused.
 
 ### Desktop app
 
-`packages/junon-desktop` is the Electron shell for the same runtime. It loads
+`packages/junon-desktop` is the Electron shell for the same server. It loads
 the production client build, so build that for standalone first and rebuild it
 after client changes:
 
@@ -426,25 +293,15 @@ Set `JUNON_USER_DATA_DIR` to run with a different user-data directory, for
 example to run two instances side by side. Server output appears in the
 terminal that ran `npm run desktop`.
 
-## Configuration and integrations
+## Configuration
 
-Runtime behavior depends on `NODE_ENV` and, depending on the service, variables
-such as `PORT`, `MATCHMAKER_PORT`, `REGION`, `NODE_NAME`, `IP_ADDRESS`, and
-`S3_BUCKET_NAME`. Sentry, Firebase, AWS, and production scaling require additional
-environment-specific credentials or metadata.
+The game server loads a root `.env` file before initializing configuration,
+including when its workspace scripts are run directly. Keep this file
+uncommitted. `direnv` remains useful when local setup requires `.envrc` shell
+logic beyond environment variables stored in `.env`.
 
-The game server and matchmaker automatically load a root `.env` file before
-initializing configuration, including when their workspace scripts are run
-directly. Keep this file uncommitted. `direnv` remains useful when local setup
-requires `.envrc` shell logic beyond environment variables stored in `.env`.
-
-Firebase is disabled by default in `development` and `test`, so local startup
-does not need Google Application Default Credentials. To intentionally exercise
-Firebase in a credentialed local environment, set `JUNON_USE_FIREBASE=true` in
-your uncommitted `.env` file. Do not use that flag with placeholder credentials.
-
-Do not invent placeholder production credentials to make local startup pass.
-Prefer focused tests for isolated code and report unavailable integrations.
+`JUNON_SERVER_SENTRY_DSN` turns on Sentry error reporting outside
+`development`/`test`; without it errors are only logged. Never commit a DSN.
 
 ## Generated output
 

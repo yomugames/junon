@@ -4,13 +4,12 @@ const BetterDedupe = require("./better_dedupe")
 
 const dedupeIntegration = new BetterDedupe()
 
-// standalone (offline desktop) builds never report to Sentry; errors are only
-// logged locally, the same as in development
-const isRemoteReportingEnabled = () => !debugMode && env !== 'standalone'
-
+// errors are only logged locally unless a Sentry DSN is configured (outside
+// development and tests)
 const ExceptionReporter = {
   init(dsn) {
-    if (isRemoteReportingEnabled()) {
+    this.isRemoteReportingEnabled = !!dsn && !debugMode
+    if (this.isRemoteReportingEnabled) {
       let defaultOptions = { 
         dsn: dsn,
         integrations: [dedupeIntegration]
@@ -34,7 +33,7 @@ const ExceptionReporter = {
   captureException(e) {
     if (!this.initialized) this.init()
 
-    if (!isRemoteReportingEnabled()) {
+    if (!this.isRemoteReportingEnabled) {
       LOG.error(e)
     }
 
@@ -43,7 +42,7 @@ const ExceptionReporter = {
     } else {
       this.registerPastException(e)
 
-      if (isRemoteReportingEnabled()) {
+      if (this.isRemoteReportingEnabled) {
         Sentry.captureException(e)
       }
     }

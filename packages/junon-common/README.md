@@ -1,14 +1,10 @@
 Junon Common
 ======
 
-create migrations
--------
+Code shared by the game server and client: protobuf wire and save schemas
+(`protocol/`), world-save reading and writing, hosted-save import, the SQLite
+models (`db/`), socket framing, logging and error reporting. See
+[ARCHITECTURE.md](../../ARCHITECTURE.md).
 
-    npx sequelize migration:generate --name xxx
-
-run migrations
--------
-
-    npx sequelize db:migrate
-    npx sequelize db:migrate:undo
-
+The database has no migrations: `db/standalone_schema.js` creates missing tables
+and columns from the models when the server starts.

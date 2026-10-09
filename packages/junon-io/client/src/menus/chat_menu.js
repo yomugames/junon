@@ -8,7 +8,6 @@ class ChatMenu extends BaseMenu {
     this.chatInputContainer = this.el.querySelector("#chat_input_container")
     this.chatHistory = {}
     this.chatHistory["local"]  = this.el.querySelector(".local_chat_history")
-    this.chatHistory["global"] = this.el.querySelector(".global_chat_history")
     this.chatHistory["team"] = this.el.querySelector(".team_chat_history")
     this.chatGroup = 'local'
 
@@ -21,27 +20,8 @@ class ChatMenu extends BaseMenu {
 
   }
 
-  setGlobalTabRegion() {
-    document.querySelector(".global_chat_tab .chat_tab_label").innerText = i18n.t("Global") + " " + this.game.main.getRegionName()
-  }
-
-  requestChatHistory() {
-    let region = this.game.main.region
-    this.game.sendToMatchmaker({ event: "RequestChatHistory", data: { region: region } })
-  }
-
-  onChatHistory(chatHistory) {
-    this.chatHistory["global"].innerText = ""
-
-    for (var i = 0; i < chatHistory.length; i++) {
-      let chat = chatHistory[i]
-      this.createChatEntry("global", chat)
-    }
-  }
-
   getTotalMessageCount() {
-    return this.chatHistory["global"].children.length +
-           this.chatHistory["local"].children.length
+    return this.chatHistory["local"].children.length
   }
 
   isControllingPlayerRequired() {
@@ -52,7 +32,6 @@ class ChatMenu extends BaseMenu {
     this.chatInput.addEventListener("keyup", this.onInputKeyup.bind(this), true)
     this.chatInput.addEventListener("focusout", this.onInputFocusOut.bind(this), true)
     document.querySelector("#chat_group_tab_container").addEventListener("click", this.onChatTabClick.bind(this), true)
-    document.querySelector("#chat_group_tab_content").addEventListener("click", this.onChatContentClick.bind(this), true)
     document.querySelector("#chat_group_tab_content").addEventListener("contextmenu", this.onChatContentRightClick.bind(this), true)
     document.querySelector("#chat_player_tooltip").addEventListener("click", this.onChatTooltipClick.bind(this), true)
   }
@@ -98,15 +77,6 @@ class ChatMenu extends BaseMenu {
     }
   }
 
-  onChatContentClick(e) {
-    let chatUser = e.target.closest(".chat_user")
-    if (chatUser) {
-      let uid = chatUser.dataset.uid
-      let username = chatUser.dataset.username
-      this.game.userProfileMenu.open({ username: username, uid: uid })
-    }
-  }
-
   showChatHistory(chatGroup) {
     let selected = document.querySelector(".chat_history.selected")
     if (selected) {
@@ -143,32 +113,14 @@ class ChatMenu extends BaseMenu {
     }
   }
 
-  isGlobalChat() {
-    return this.chatGroup === 'global'
-  }
-
   isTeamChat() {
     return this.chatGroup === 'team'
-  }
-
-  onGlobalServerChat(data) {
-    this.createChatEntry("global", data)
-
-    let chatMessages = Array.from(this.el.querySelectorAll(".global_chat_history .chat_message"))
-    if (chatMessages.length > this.MAX_HISTORY_CHAT_MESSAGES) {
-      let oldMessage = chatMessages[0]
-      if (oldMessage.parentElement) {
-        oldMessage.parentElement.removeChild(oldMessage)
-      }
-
-    }
-
   }
 
   submit() {
     let text = this.chatInput.value
 
-    SocketUtil.emit("ClientChat", { message: text, isGlobal: this.isGlobalChat(), isTeam: this.isTeamChat() })
+    SocketUtil.emit("ClientChat", { message: text, isTeam: this.isTeamChat() })
 
     if (text.length > 0) {
       this.commandHistory.unshift(text)
@@ -390,7 +342,6 @@ class ChatMenu extends BaseMenu {
       this.chatHideTween.stop()
     }
 
-    document.querySelector(".global_chat_tab").style.display = 'none'
     document.querySelector(".team_chat_tab").style.display = 'none'
 
     if (options.message) {

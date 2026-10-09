@@ -22,6 +22,8 @@ const Projectiles = require("./entities/projectiles/index")
 const Helper = require("../../common/helper")
 const SpritePoolInstance = require("./entities/sprite_pool_instance")
 
+const LANGUAGE_STORAGE_KEY = "junon_language"
+
 require('url-search-params-polyfill')
 
 require("./util/polyfills")
@@ -84,7 +86,7 @@ class Main {
   initTranslation() {
     window.language = window.location.pathname.split("/")[1]
     if (window.language.length === 0) {
-      let savedLanguage = Cookies.get("language")
+      let savedLanguage = this.getSavedLanguage()
       if (savedLanguage && savedLanguage !== 'en') {
         this.navigateToLanguage(savedLanguage)
       } else {
@@ -93,6 +95,7 @@ class Main {
     }
 
     window.isForeignLanguage = language !== 'en'
+    document.getElementById("language_select").value = window.language
 
     let phrases = englishTranslationMap
 
@@ -109,6 +112,33 @@ class Main {
       allowMissing: true
     })
     window.i18n = i18n
+  }
+
+  onLanguageSelectChange(e) {
+    let selectedLanguage = e.target.value
+    if (selectedLanguage !== window.language) {
+      this.saveLanguage(selectedLanguage)
+      this.navigateToLanguage(selectedLanguage)
+    }
+  }
+
+  // localStorage, not a cookie: the desktop app's app:// pages can't store
+  // cookies, and its fixed origin keeps localStorage (as for the local
+  // profile). Browsers may still have the older cookie.
+  getSavedLanguage() {
+    try {
+      return localStorage.getItem(LANGUAGE_STORAGE_KEY) || Cookies.get("language")
+    } catch(e) {
+      return Cookies.get("language")
+    }
+  }
+
+  saveLanguage(language) {
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
+    } catch(e) {
+      Cookies.set("language", language)
+    }
   }
 
   navigateToLanguage(language) {
@@ -306,6 +336,7 @@ class Main {
     document.querySelector(".resume_menu_btn").addEventListener("click", this.onResumeMenuBtnClick.bind(this), true)
     document.querySelector(".exit_game_menu_btn").addEventListener("click", this.onExitGameMenuBtnClick.bind(this), true)
     document.querySelector(".back_main_menu_btn").addEventListener("click", this.onBackMainMenuBtnClick.bind(this), true)
+    document.querySelector("#language_select").addEventListener("change", this.onLanguageSelectChange.bind(this), true)
 
     // disable right click because it causes some keyup event listener not firing bug (that causes player to move indefinitely)
     document.addEventListener("contextmenu", function(e){

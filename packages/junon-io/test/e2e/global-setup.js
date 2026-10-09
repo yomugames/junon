@@ -12,7 +12,7 @@ const WORKSPACE_ROOT = path.resolve(IO_DIR, '../..')
 const GULP_BIN = path.join(WORKSPACE_ROOT, 'node_modules/.bin/gulp')
 
 // the page server; playwright.config.js's baseURL points here
-const GAME_SERVER_DEV_PORT = 8001
+const GAME_SERVER_DEV_PORT = parseInt(process.env.JUNON_E2E_CLIENT_PORT || '8001', 10)
 // default 8000 collides with an unrelated process on some hosts, and the
 // game server binds a literal port number with no retry - the local menu
 // learns the socket port from the server, so a random high port avoids both
@@ -49,6 +49,14 @@ function waitForPort(port, host, timeoutMs) {
     }
 
     attempt()
+  })
+}
+
+function isPortInUse(port) {
+  return new Promise((resolve) => {
+    const socket = net.createConnection({ port, host: '127.0.0.1' })
+    socket.once('connect', () => { socket.end(); resolve(true) })
+    socket.once('error', () => { socket.destroy(); resolve(false) })
   })
 }
 
@@ -91,6 +99,12 @@ module.exports = async (config) => {
                     '/tmp/junon-io-e2e'
 
   console.log(`[e2e] artifacts (video/trace/screenshots): ${outputDir}`)
+
+  // waitForPort below can't tell our page server from another process on the
+  // same port, which would leave every test failing on a page that isn't ours
+  if (await isPortInUse(GAME_SERVER_DEV_PORT)) {
+    throw new Error(`Port ${GAME_SERVER_DEV_PORT} is already in use. Stop that process or set JUNON_E2E_CLIENT_PORT.`)
+  }
 
   fs.rmSync(CLIENT_BUNDLE, { force: true })
   const savesDir = fs.mkdtempSync(path.join(os.tmpdir(), 'junon-e2e-saves-'))

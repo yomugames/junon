@@ -718,8 +718,12 @@ Done as follows.
     stayed 0, which suppressed the menu.
   - Removed hosted features that leave player-visible gaps: world thumbnails
     are saved under `<saves>/screenshots` but nothing serves them, so the team
-    menu's Preview images are broken (they pointed at the hosted CDN); the
-    language selector is gone (`/ja/`, `/ru/` paths still work in a browser).
+    menu's Preview images are broken (they pointed at the hosted CDN).
+  - The language selector was removed with the hosted home screen by mistake
+    and is back on the local world menu. The choice is now kept in
+    `localStorage` (`junon_language`; the old `language` cookie is still read):
+    `app://` pages can't store cookies, so in the desktop app it was lost on
+    every restart.
   - `test/bots/player_bot.js` and the `load_testing` suites join with a username
     only, which the server no longer accepts; they need a local profile id
     before they can run again.

@@ -13,6 +13,14 @@
         <section id='local_world_menu' aria-label='Local worlds'>
             <h1>Junon</h1>
             <label>Your name <input class='local_player_name black_input' maxlength='16' autocomplete='nickname'></label>
+            <div id='language_selector'>
+                <img src="/assets/images/language_icon.png" class='language_icon' alt='Language' />
+                <select id='language_select' aria-label='Language'>
+                    <option value='en'>English</option>
+                    <option value='ru'>Русский</option>
+                    <option value='ja'>日本語</option>
+                </select>
+            </div>
             <nav class='local_menu_actions'>
                 <button class='local_new_btn ui_btn'>New world</button>
                 <button class='local_load_btn ui_btn'>Load world</button>

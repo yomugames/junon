@@ -9,6 +9,10 @@ const { defineConfig } = require('@playwright/test')
 // path at the start and end of every run.
 const OUTPUT_DIR = process.env.JUNON_E2E_OUTPUT_DIR || '/tmp/junon-io-e2e'
 
+// the game server's page server (global-setup.js); override when another
+// process already uses 8001
+const CLIENT_PORT = process.env.JUNON_E2E_CLIENT_PORT || '8001'
+
 module.exports = defineConfig({
   testDir: './test/e2e',
   outputDir: OUTPUT_DIR,
@@ -18,7 +22,7 @@ module.exports = defineConfig({
   retries: 0,
   globalSetup: require.resolve('./test/e2e/global-setup.js'),
   use: {
-    baseURL: 'http://localhost:8001',
+    baseURL: `http://127.0.0.1:${CLIENT_PORT}`,
     trace: 'retain-on-failure',
 
     // Video is the quickest way to confirm a *passing* run really did what it

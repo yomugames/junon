@@ -82,7 +82,9 @@ JUNON_E2E_VIDEO=on npm run test:e2e --workspace packages/junon-io
 Videos, traces and screenshots land in `/tmp/junon-io-e2e`
 (`JUNON_E2E_OUTPUT_DIR` overrides it); the path is printed at the start and end
 of every run. Ports for the game socket and the inspector are randomised per
-run, so a previous run still shutting down does not collide with the next.
+run, so a previous run still shutting down does not collide with the next. The
+page server uses 8001; if another process holds it, the run stops with a clear
+error, and `JUNON_E2E_CLIENT_PORT` picks another port.
 
 ### How scenarios are set up
 
@@ -143,7 +145,8 @@ the local menu, joins it, quits (which saves), relaunches, and loads the world
 again, and checks that the world clock stops while the in-game menu is open.
 A second test runs two instances: one hosts co-op with a password, the
 other joins through a non-loopback address of the machine (rejected with a wrong
-password first), quits, rejoins, and is told when the host quits. It needs the
+password first), quits, rejoins, and is told when the host quits. A third
+switches the language and checks it is kept after a restart. It needs the
 standalone client build. A Linux machine without a display
 needs `xvfb-run`; the test enables software WebGL itself.
 

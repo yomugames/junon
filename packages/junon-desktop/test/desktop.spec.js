@@ -170,3 +170,23 @@ test('a second instance joins a hosted world, leaves and rejoins', async () => {
     fs.rmSync(guestDataDir, { recursive: true, force: true })
   }
 })
+
+// the language is kept in localStorage: app:// pages can't store cookies
+test('keeps the chosen language after a restart', async () => {
+  let { app, page, errors } = await launch()
+  await page.selectOption('#language_select', 'ja')
+  await page.waitForURL(/\/ja\/$/)
+  await page.locator('#local_world_menu').waitFor({ state: 'visible', timeout: 60_000 })
+  await quit(app)
+
+  ;({ app, page, errors } = await launch())
+  await page.waitForURL(/\/ja\/$/)
+  await page.locator('#local_world_menu').waitFor({ state: 'visible', timeout: 60_000 })
+  await expect(page.locator('#language_select')).toHaveValue('ja')
+
+  await page.selectOption('#language_select', 'en')
+  await page.waitForURL(/\/en\/$/)
+  await page.locator('#local_world_menu').waitFor({ state: 'visible', timeout: 60_000 })
+  await quit(app)
+  expect(errors).toEqual([])
+})

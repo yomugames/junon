@@ -70,6 +70,12 @@ debugMode = (env === 'development' || env === 'test') ? true : false
 // itself and talks to this process over that port, so no page server.
 const isDesktop = !!process.parentPort
 
+// co-op join password checks (Server#isGuestProofValid)
+const GUEST_CHALLENGE_TTL_MS = 60 * 1000
+const GUEST_CHALLENGE_LIMIT = 1000
+const GUEST_MAX_FAILED_ATTEMPTS = 10
+const GUEST_THROTTLE_WINDOW_MS = 60 * 1000
+
 // same hash as the client build's (gulpfile.js), read without shelling out to
 // npm/cat, which a packaged desktop app doesn't have
 let protocolDirectory = path.join(path.dirname(require.resolve("junon-common/package.json")), "protocol")
@@ -685,9 +691,12 @@ class Server {
       throw e
     }
 
+    // only the password's hash is kept, as the key of the join proof
     this.coopHost = {
       port: port,
-      passwordDigest: password ? this.digestPassword(password) : null
+      passwordKey: password ? crypto.createHash('sha256').update(password, 'utf8').digest() : null,
+      challenges: new Map(),
+      failedAttempts: new Map()
     }
 
     LOG.info('Hosting co-op on port ' + port + (password ? ' with a password' : ''))
@@ -716,7 +725,7 @@ class Server {
       worldId: game ? game.getId() : null,
       port: this.coopHost.port,
       addresses: this.getLanAddresses(),
-      hasPassword: !!this.coopHost.passwordDigest
+      hasPassword: !!this.coopHost.passwordKey
     }
   }
 
@@ -746,39 +755,126 @@ class Server {
     return addresses
   }
 
-  digestPassword(password) {
-    return crypto.createHash('sha256').update(String(password)).digest()
+  // Join password check. The password never travels: /info hands out a
+  // single-use challenge, and the guest answers with
+  // HMAC-SHA256(key = SHA-256(password), challenge) in hex
+  // (client/src/util/coop_auth.js). Repeated wrong answers from one address
+  // are refused for a while.
+  issueGuestChallenge() {
+    let challenges = this.coopHost.challenges
+    let now = Date.now()
+    if (challenges.size >= GUEST_CHALLENGE_LIMIT) {
+      challenges.forEach((expiresAt, challenge) => {
+        if (expiresAt < now) challenges.delete(challenge)
+      })
+      // still full: drop the oldest
+      if (challenges.size >= GUEST_CHALLENGE_LIMIT) challenges.delete(challenges.keys().next().value)
+    }
+
+    let challenge = crypto.randomBytes(16).toString('hex')
+    challenges.set(challenge, now + GUEST_CHALLENGE_TTL_MS)
+    return challenge
   }
 
-  isHostPasswordAccepted(password) {
+  isGuestThrottled(ip) {
+    let attempts = this.coopHost.failedAttempts.get(ip)
+    if (!attempts) return false
+    if (Date.now() - attempts.since > GUEST_THROTTLE_WINDOW_MS) {
+      this.coopHost.failedAttempts.delete(ip)
+      return false
+    }
+
+    return attempts.count >= GUEST_MAX_FAILED_ATTEMPTS
+  }
+
+  recordFailedGuestAttempt(ip) {
+    let attempts = this.coopHost.failedAttempts.get(ip)
+    if (!attempts || Date.now() - attempts.since > GUEST_THROTTLE_WINDOW_MS) {
+      attempts = { count: 0, since: Date.now() }
+      this.coopHost.failedAttempts.set(ip, attempts)
+    }
+    attempts.count += 1
+  }
+
+  // consume: the upgrade uses the challenge up; the preflight only checks
+  isGuestProofValid(ip, challenge, proof, consume) {
     if (!this.coopHost) return false
-    if (!this.coopHost.passwordDigest) return true
-    if (typeof password !== 'string') return false
-    return crypto.timingSafeEqual(this.digestPassword(password), this.coopHost.passwordDigest)
+    if (!this.coopHost.passwordKey) return true
+    if (this.isGuestThrottled(ip)) return false
+
+    let expiresAt = typeof challenge === 'string' && this.coopHost.challenges.get(challenge)
+    let isValid = false
+    if (expiresAt && expiresAt >= Date.now() && typeof proof === 'string' && /^[a-f0-9]{64}$/.test(proof)) {
+      let expected = crypto.createHmac('sha256', this.coopHost.passwordKey).update(challenge).digest()
+      isValid = crypto.timingSafeEqual(expected, Buffer.from(proof, 'hex'))
+    }
+
+    if (consume && expiresAt) this.coopHost.challenges.delete(challenge)
+    if (!isValid) this.recordFailedGuestAttempt(ip)
+    return isValid
   }
 
-  // guest upgrades carry ?protocol=<hash>&password=<password>; a client with
-  // another protocol would send messages this server decodes as garbage
+  // guest upgrades carry ?protocol=<hash>&challenge=<challenge>&proof=<proof>;
+  // a client with another protocol would send messages this server decodes as
+  // garbage
   authorizeGuest(req) {
     let query = new URL(req.url, 'http://localhost').searchParams
     if (query.get('protocol') !== protocolHash) return false
-    return this.isHostPasswordAccepted(query.get('password') || '')
+
+    let ip = StandaloneSocketServer.normalizeAddress(req.socket.remoteAddress)
+    return this.isGuestProofValid(ip, query.get('challenge'), query.get('proof'), true)
+  }
+
+  // World thumbnails (Sector#addScreenshot) are files in the saves directory.
+  // They are served from the game server, so co-op guests load them from the
+  // host; only the open world's current thumbnail is available.
+  serveScreenshotThumbnail(token, res) {
+    let game = this.getMainGame()
+    // the values are gallery positions, which may be 0
+    if (!game || !game.sector || !Object.prototype.hasOwnProperty.call(game.sector.screenshots, token)) {
+      res.writeHead(404)
+      res.end()
+      return
+    }
+
+    fs.readFile(game.getLocalImagePath(game.sector.getScreenshotThumbnailPath(token)), (err, data) => {
+      if (err) {
+        res.writeHead(404)
+        res.end()
+        return
+      }
+
+      res.writeHead(200, { 'Content-Type': 'image/jpeg', 'Content-Length': data.length })
+      res.end(data)
+    })
   }
 
   // join preflight: lets a client show a clear version or password error
-  // before connecting, instead of a failed socket
+  // before connecting, instead of a failed socket. Each call hands out a new
+  // challenge; with ?challenge=&proof= it also checks an answer.
   getJoinInfo(req, isGuest) {
     let query = new URL(req.url, 'http://localhost').searchParams
     let game = this.getMainGame()
-    let requiresPassword = isGuest && !!(this.coopHost && this.coopHost.passwordDigest)
+    let requiresPassword = isGuest && !!(this.coopHost && this.coopHost.passwordKey)
 
-    return {
+    let info = {
       protocolHash: protocolHash,
       version: this.gameVersion,
       worldName: game && game.sector ? game.sector.name : null,
       requiresPassword: requiresPassword,
-      passwordAccepted: !requiresPassword || this.isHostPasswordAccepted(query.get('password') || '')
+      passwordAccepted: !requiresPassword
     }
+
+    if (requiresPassword) {
+      let ip = StandaloneSocketServer.normalizeAddress(req.socket.remoteAddress)
+      if (query.has('proof')) {
+        info.passwordAccepted = this.isGuestProofValid(ip, query.get('challenge'), query.get('proof'), false)
+      }
+      info.isThrottled = this.isGuestThrottled(ip)
+      info.challenge = this.issueGuestChallenge()
+    }
+
+    return info
   }
 
   getMainGame() {
@@ -889,6 +985,12 @@ class Server {
         if (pathname === '/info') {
           res.writeHead(200, { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' })
           res.end(JSON.stringify(this.getJoinInfo(req, isGuest)))
+          return true
+        }
+
+        let screenshot = pathname.match(/^\/screenshots\/([a-f0-9]{32})_thumb\.jpg$/)
+        if (screenshot) {
+          this.serveScreenshotThumbnail(screenshot[1], res)
           return true
         }
 
@@ -1102,20 +1204,6 @@ class Server {
     }
 
     return this.stats[stat]
-  }
-
-  getAvailableGame() {
-    let result
-
-    for (let gameId in this.games) {
-      let game = this.games[gameId]
-      if (!game.isFull()) {
-        result = game
-        break
-      }
-    }
-
-    return result
   }
 
   onSocketMessage(eventName, data, socket) {

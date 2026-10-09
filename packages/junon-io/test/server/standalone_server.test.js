@@ -244,12 +244,28 @@ test('hosts a world for co-op guests', async () => {
     response = await fetch(base + 'worlds')
     expect((await response.json()).hosting).toMatchObject({ worldId, port: guestPort })
 
+    // the password never travels: guests answer a single-use challenge with
+    // HMAC-SHA256(SHA-256(password), challenge) (client/src/util/coop_auth.js)
+    const crypto = require('crypto')
+    const proofFor = (password, challenge) => {
+      const key = crypto.createHash('sha256').update(password, 'utf8').digest()
+      return crypto.createHmac('sha256', key).update(challenge).digest('hex')
+    }
     const guestBase = `http://127.0.0.1:${guestPort}`
-    let info = await (await fetch(guestBase + '/info')).json()
+    const fetchInfo = async (query = '') => (await fetch(guestBase + '/info' + query)).json()
+    // the query for one connection attempt
+    const answer = async (password) => {
+      const { challenge } = await fetchInfo()
+      return `challenge=${challenge}&proof=${proofFor(password, challenge)}`
+    }
+
+    let info = await fetchInfo()
     expect(info).toMatchObject({ worldName: 'Coop World', requiresPassword: true, passwordAccepted: false })
     expect(info.protocolHash).toMatch(/^[a-f0-9]{8}$/)
-    info = await (await fetch(guestBase + '/info?password=secret')).json()
-    expect(info.passwordAccepted).toBe(true)
+    expect(info.challenge).toMatch(/^[a-f0-9]{32}$/)
+    expect((await fetchInfo('?' + await answer('secret'))).passwordAccepted).toBe(true)
+    expect((await fetchInfo('?' + await answer('wrong'))).passwordAccepted).toBe(false)
+    expect((await fetchInfo('?password=secret')).passwordAccepted).toBe(false)
 
     // the host's loopback socket needs no password
     info = await (await fetch(`http://127.0.0.1:${server.port}/info`)).json()
@@ -279,18 +295,32 @@ test('hosts a world for co-op guests', async () => {
 
     const protocol = 'protocol=' + info.protocolHash
     expect(await connect('')).toBe(403)
-    expect(await connect(protocol + '&password=wrong')).toBe(403)
-    expect(await connect('protocol=00000000&password=secret')).toBe(403)
+    expect(await connect(protocol + '&password=secret')).toBe(403)
+    expect(await connect(protocol + '&' + await answer('wrong'))).toBe(403)
+    expect(await connect('protocol=00000000&' + await answer('secret'))).toBe(403)
+
+    // a challenge works once: a captured URL can't be replayed
+    const once = await answer('secret')
+    const first = await connect(protocol + '&' + once)
+    expect(typeof first).toBe('object')
+    first.close()
+    expect(await connect(protocol + '&' + once)).toBe(403)
 
     // the owner's profile can't come in through the guest port
-    const impostor = await connect(protocol + '&password=secret')
+    const impostor = await connect(protocol + '&' + await answer('secret'))
     requestGame(impostor, ownerUid, 'Impostor')
     expect((await waitForMessage(impostor, 'CantJoin')).message).toContain('owns the world')
     impostor.close()
 
-    const guest = await connect(protocol + '&password=secret')
+    const guest = await connect(protocol + '&' + await answer('secret'))
     requestGame(guest, 'guestProfile1234', 'Guest')
     expect((await waitForMessage(guest, 'JoinGame')).uid).toBe('guestProfile1234')
+
+    // repeated wrong passwords lock that address out for a while, even with
+    // the right one
+    for (let attempt = 0; attempt < 10; attempt++) await fetchInfo('?' + await answer('guess' + attempt))
+    expect((await fetchInfo()).isThrottled).toBe(true)
+    expect(await connect(protocol + '&' + await answer('secret'))).toBe(403)
 
     // stopping disconnects guests with a reason, and closes the port
     response = await post('host/stop', {})
@@ -379,6 +409,71 @@ test('pauses a singleplayer world while the host is away', async () => {
     await new Promise((resolve) => setTimeout(resolve, 300))
     expect(await clockAdvance(guest)).toBeGreaterThan(0)
     guest.close()
+  } finally {
+    server.kill('SIGTERM')
+    await server.exited
+  }
+})
+
+// World thumbnails are files in the saves directory, served by the game
+// server so co-op guests can load them from the host
+test('serves the open world\'s thumbnail', async () => {
+  const WebSocket = require('ws')
+  const sharp = require('sharp')
+  const MessageWrapper = protobuf.loadSync(APP_PROTO).lookupType('app.MessageWrapper')
+
+  const server = startServer({ JUNON_WORLD_ID: '', JUNON_OWNER_UID: '' })
+  try {
+    await waitForOutput(server, 'Webpage available')
+    const base = `http://127.0.0.1:${server.clientPort}/local/`
+    const ownerUid = '0123456789abcdef0123456789abcdef'
+    const post = (route, body) => fetch(base + route, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    })
+    const { worldId } = await (await post('worlds', { ownerUid, name: 'Pictured', gameMode: 'survival' })).json()
+
+    const messages = []
+    const owner = await new Promise((resolve, reject) => {
+      const ws = new WebSocket(`ws://127.0.0.1:${server.port}`)
+      ws.on('message', (data) => {
+        const message = MessageWrapper.decode(data)
+        messages.push(message)
+        if (message.kind === 'JoinGame') resolve(ws)
+      })
+      ws.on('open', () => ws.send(MessageWrapper.encode({ RequestGame: { uid: ownerUid, username: 'Owner', screenWidth: 800, screenHeight: 600, sessionId: ownerUid } }).finish()))
+      ws.on('error', reject)
+    })
+
+    const image = await sharp({ create: { width: 600, height: 480, channels: 3, background: '#335577' } }).jpeg().toBuffer()
+    owner.send(MessageWrapper.encode({ AddScreenshot: { imageData: image.toString('base64'), position: 0 } }).finish())
+
+    const deadline = Date.now() + 30_000
+    let updated
+    while (!updated && Date.now() < deadline) {
+      updated = messages.find((message) => message.kind === 'ScreenshotUpdated' && !message.ScreenshotUpdated.clientMustDelete)
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
+    const id = updated.ScreenshotUpdated.id
+    expect(id).toMatch(/^[a-f0-9]{32}$/)
+    expect(fs.existsSync(path.join(savesDir, 'screenshots', id + '_thumb.jpg'))).toBe(true)
+
+    let response = await fetch(`http://127.0.0.1:${server.port}/screenshots/${id}_thumb.jpg`)
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('image/jpeg')
+    expect((await sharp(Buffer.from(await response.arrayBuffer())).metadata()).width).toBe(300)
+
+    // guests load it from the host
+    const guestPort = randomPort()
+    await post('host', { worldId, ownerUid, port: guestPort, password: '' })
+    response = await fetch(`http://127.0.0.1:${guestPort}/screenshots/${id}_thumb.jpg`)
+    expect(response.status).toBe(200)
+
+    // only the open world's current thumbnail, and nothing else
+    response = await fetch(`http://127.0.0.1:${server.port}/screenshots/${'0'.repeat(32)}_thumb.jpg`)
+    expect(response.status).toBe(404)
+    response = await fetch(`http://127.0.0.1:${server.port}/screenshots/..%2Fjunon.sqlite`)
+    expect(response.status).toBe(404)
+    owner.close()
   } finally {
     server.kill('SIGTERM')
     await server.exited

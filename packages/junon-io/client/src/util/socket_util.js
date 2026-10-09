@@ -94,7 +94,7 @@ class SocketUtil {
     // a message this client has no use for is skipped rather than fatal
     const isMessageHandlerDefined = typeof this.handlers[messageWrapper.kind] === "function"
     if (!isMessageHandlerDefined) {
-      if (isDebug() && !this.options.allowMissingHandlers) {
+      if (isDebug()) {
         console.warn("No socket handler for " + messageWrapper.kind)
       }
       return

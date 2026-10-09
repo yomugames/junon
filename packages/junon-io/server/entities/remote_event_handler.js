@@ -97,12 +97,7 @@ class RemoteEventHandler {
       socket.screenHeight = data.screenWidth
       socket.sessionId    = data.sessionId
       if (data.sectorId) {
-        let game
-        if (data.sectorId === 'test_bot') {
-          game = this.server.getAvailableGame()
-        } else {
-          game = this.server.getGame(data.sectorId)
-        }
+        let game = this.server.getGame(data.sectorId)
         if (game) {
           game.join(socket, data)
         }

@@ -69,9 +69,8 @@ Run a focused Jest file through the game workspace, for example:
 npm exec --workspace packages/junon-io -- jest test/pressure/pressure.test.js --runInBand
 ```
 
-`npm test` runs the whole Jest tree, including the slow `load_testing` and
-`memleak` suites. The Playwright end-to-end suite is separate and boots the real
-game server and browser client:
+`npm test` runs the whole Jest tree. The Playwright end-to-end suite is separate
+and boots the real game server and browser client:
 
 ```sh
 npm run test:e2e --workspace packages/junon-io

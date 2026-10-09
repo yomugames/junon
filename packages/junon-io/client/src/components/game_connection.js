@@ -4,8 +4,11 @@ const ClientHelper = require("../util/client_helper")
 
 class GameConnection {
 
-  constructor(url) {
+  // options.authorize: async () => the URL to open, for each connection
+  // attempt (co-op guests; see util/coop_auth.js)
+  constructor(url, options = {}) {
     this.url = url
+    this.authorize = options.authorize
 
     this.reconnectAttemptCount = 0
     this.isFirstSocketSetup = true
@@ -38,8 +41,23 @@ class GameConnection {
     this.setupSocket(options)
   }
 
-  setupSocket(callback) {
-    this.socket = new WebSocket(this.url)
+  async setupSocket(callback) {
+    let url = this.url
+    if (this.authorize) {
+      try {
+        url = await this.authorize()
+      } catch (e) {
+        // the same paths as a socket that failed to open
+        if (this.isFirstSocketSetup) {
+          if (callback.error) callback.error(true)
+        } else {
+          this.onSocketDisconnect()
+        }
+        return false
+      }
+    }
+
+    this.socket = new WebSocket(url)
     this.socket.binaryType = "arraybuffer"
 
     this.socket.onopen = () => {
@@ -58,6 +76,7 @@ class GameConnection {
     }
 
     this.socket.onclose = this.onSocketDisconnect.bind(this)
+    return true
   }
 
   onSocketDisconnect(event) {
@@ -165,12 +184,13 @@ class GameConnection {
     document.querySelector(".disconnected_msg").style.display = 'none'
   }
 
-  reconnectWebsocket(callback) {
+  async reconnectWebsocket(callback) {
     console.log("Reconnecting...")
 
     this.reconnectAttemptCount += 1
-    this.setupSocket(callback)
-    this.game.reinitConnection()
+    // a co-op guest's new socket only exists once its URL is authorized
+    let isSocketCreated = await this.setupSocket(callback)
+    if (isSocketCreated) this.game.reinitConnection()
   }
 
 }

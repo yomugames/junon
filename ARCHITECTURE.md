@@ -23,7 +23,7 @@ Electron main process (packages/junon-desktop)
 utility process: game server <------> saves dir (sector.sav files + SQLite)
   ^                                  ^
   | game WebSocket                   | guest WebSocket, while hosting co-op
-  | (ws://127.0.0.1:<free port>)     | (ws://0.0.0.0:<host port>, password)
+  | (ws://127.0.0.1:<free port>)     | (ws://0.0.0.0:<host port>, password proof)
 renderer: game client                other players' clients
 ```
 
@@ -43,8 +43,9 @@ generates and keeps in `localStorage`.
 
 Co-op is a listen server. Hosting (`hostWorld`) opens a second listener on all
 interfaces at a port the host picks. Sockets from it are marked `isGuest`;
-their upgrade must carry the server's protocol hash and the optional password,
-and they can't join with the owner's profile id. The host keeps playing over
+their upgrade must carry the server's protocol hash and, if the world has a
+password, an answer to a single-use challenge from `/info` (the password itself
+is never sent), and they can't join with the owner's profile id. The host keeps playing over
 loopback, which guests can't reach. Clients check a host's `/info` endpoint
 before connecting, to report version and password problems. Hosting ends when
 the host stops it, switches worlds or quits; guests then get a `PlayerKick` with

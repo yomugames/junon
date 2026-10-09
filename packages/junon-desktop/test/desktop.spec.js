@@ -126,6 +126,10 @@ test('a second instance joins a hosted world, leaves and rejoins', async () => {
     await host.page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
     await host.page.waitForFunction(() => document.body.innerText.includes('Co-op is open'), null, { timeout: 30_000 })
 
+    // a world thumbnail, which the guest will load from the host
+    await host.page.evaluate(() => window.game.screenshot())
+    await host.page.waitForFunction(() => Object.keys(window.game.sector.screenshots).length === 1, null, { timeout: 30_000 })
+
     const status = await host.page.evaluate(() => window.junonDesktop.localWorldApi('listWorlds', []))
     expect(status.hosting).toMatchObject({ port, hasPassword: true })
     const address = pickAddress(status.hosting.addresses) + ':' + port
@@ -144,6 +148,28 @@ test('a second instance joins a hosted world, leaves and rejoins', async () => {
     await joinAs(guest.page, 'secret')
     await guest.page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
     expect(await guest.page.evaluate(() => [window.game.sector.name, window.player.name])).toEqual(['Coop World', 'Guest'])
+
+    // the team menu's thumbnail loads, from the host for the guest
+    const loadThumbnail = (page) => page.evaluate(() => new Promise((resolve) => {
+      const image = new Image()
+      image.onload = () => resolve(image.naturalWidth)
+      image.onerror = () => resolve(0)
+      image.src = window.main.getScreenshotThumbnailPath(Object.keys(window.game.sector.screenshots)[0])
+    }))
+    expect(await loadThumbnail(host.page)).toBe(300)
+    expect(await loadThumbnail(guest.page)).toBe(300)
+
+    // a dropped connection reconnects on its own, with a fresh password proof
+    await guest.page.evaluate(() => {
+      window.droppedSocket = window.game.gameConnection.socket
+      window.droppedSocket.close()
+    })
+    await guest.page.waitForFunction(() => {
+      const connection = window.game.gameConnection
+      return connection.socket !== window.droppedSocket && connection.isConnected() &&
+        getComputedStyle(document.querySelector('.disconnected_msg')).display === 'none'
+    }, null, { timeout: 30_000 })
+    expect(await guest.page.evaluate(() => window.player.name)).toBe('Guest')
 
     // leaving and coming back (same profile, new app session) keeps the
     // character's identity

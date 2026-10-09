@@ -267,7 +267,8 @@ class Main {
       this.gameConnection.close()
     }
 
-    this.gameConnection = new GameConnection(url)
+    // co-op guests build each socket URL with a fresh password proof
+    this.gameConnection = new GameConnection(url, { authorize: this.standaloneAuthorize })
     this.gameConnection.init({
       success: (gameConnection) => {
         this.game.setGameConnection(this.gameConnection)
@@ -287,12 +288,11 @@ class Main {
     window.game = this.game = new Game(this)
   }
 
+  // served by the game server this client is connected to (the host, for a
+  // co-op guest): Server#serveScreenshotThumbnail
   getScreenshotThumbnailPath(key) {
-    if (debugMode) {
-      return `http://localhost:8001/assets/screenshots/${key}_thumb.jpg`
-    } else {
-      return `https://junon.nyc3.cdn.digitaloceanspaces.com/screenshots/${key}_thumb.jpg`
-    }
+    let serverUrl = this.gameConnection ? this.gameConnection.url : ""
+    return serverUrl.replace(/^ws:/, "http:").replace(/\/$/, "") + `/screenshots/${key}_thumb.jpg`
   }
 
   onPlayerCantJoin(data) {

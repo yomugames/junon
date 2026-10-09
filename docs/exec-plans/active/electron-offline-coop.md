@@ -587,6 +587,20 @@ Done as follows.
   debug variant avoids rewriting the Jest suites and keeps developer cheats.
   Alternative considered: removing `debugMode` entirely, which changes
   gameplay that many tests assert on.
+- 2026-10-09 (user decision: passwords must be protected): co-op passwords no
+  longer travel in clear text. Challenge-response: `/info` issues a single-use
+  random challenge (1 minute), the guest answers with
+  HMAC-SHA256(SHA-256(password), challenge), and the host stores only the hash.
+  Wrong answers are throttled per address (10 per minute). Hashing on the
+  client uses `create-hash`/`create-hmac`, because the desktop page
+  (`app://`, deliberately not a secure context) has no Web Crypto.
+  `GameConnection` gets an `authorize` hook so every connection attempt,
+  reconnects included, gets a fresh challenge. Alternative considered: TLS
+  (`wss://`), which would also encrypt game traffic, but a LAN host has no
+  trusted certificate, a self-signed one fails in browsers and needs
+  certificate pinning in Electron, and the guest would still need to verify it
+  some way. Remaining exposure: game traffic is unencrypted, and a recorded
+  join allows offline guessing of a weak password.
 - 2026-10-08: Server Sentry (`ExceptionReporter`) stays, opt-in: it reports
   only when `JUNON_SERVER_SENTRY_DSN` is set outside `development`/`test`. It
   isn't on the Phase 8 list and may be useful for desktop crash reports. Client
@@ -693,11 +707,8 @@ Done as follows.
 - 2026-10-07: Without a GPU (xvfb), Chromium blocklists WebGL and the client
   never shows the menu. Tests pass `--ignore-gpu-blocklist
   --enable-unsafe-swiftshader`. Real machines don't need these flags.
-- 2026-10-08: Phase 6 risks. Wrong passwords are not rate-limited; this is
-  acceptable for friends-only hosting on a LAN or VPN, but forwarding the port
-  to the internet exposes it to guessing. The password travels in clear text
-  (no TLS on `ws://`), and the per-IP limit of 2 players (from hosted servers)
-  applies to guests behind one NAT. Two players can't both use the default
+- 2026-10-08: Phase 6 risks. The per-IP limit of 2 players (from hosted
+  servers) applies to guests behind one NAT. Two players can't both use the default
   name "Player" at once; the second gets "username is already taken".
   Disconnected guests linger for the usual resume window, so a quick rejoin
   resumes the same session instead of a fresh join.
@@ -716,17 +727,23 @@ Done as follows.
     new e2e world had no mode and opened "Choose a Game Mode" over the game.
     The hosted harness never saw it because without MySQL `sector.createdAt`
     stayed 0, which suppressed the menu.
-  - Removed hosted features that leave player-visible gaps: world thumbnails
-    are saved under `<saves>/screenshots` but nothing serves them, so the team
-    menu's Preview images are broken (they pointed at the hosted CDN).
+  - World thumbnails were saved under `<saves>/screenshots`, but nothing served
+    them, so the team menu's Preview images were broken (they pointed at the
+    hosted CDN). Fixed 2026-10-09: the game server serves the open world's
+    thumbnail at `/screenshots/<id>_thumb.jpg`, and the client builds the URL
+    from the server it is connected to, so co-op guests load it from the host.
+    The thumbnail's gallery position is the map value, and `0` is falsy, so
+    the route checks for the key.
   - The language selector was removed with the hosted home screen by mistake
     and is back on the local world menu. The choice is now kept in
     `localStorage` (`junon_language`; the old `language` cookie is still read):
     `app://` pages can't store cookies, so in the desktop app it was lost on
     every restart.
-  - `test/bots/player_bot.js` and the `load_testing` suites join with a username
-    only, which the server no longer accepts; they need a local profile id
-    before they can run again.
+  - `test/bots/player_bot.js` and the `load_testing` scripts joined with a
+    username only, which the server no longer accepts. They were removed
+    (2026-10-09, user decision) rather than updated, with the server's
+    `test_bot` join shortcut and the client's `allowMissingHandlers` option
+    that only they used.
   - Existing SQLite files may keep the unused favorites, votes, friends and
     sessions tables; the schema sync only adds.
   - Merging to `master` no longer deploys the hosted game (the workflow is

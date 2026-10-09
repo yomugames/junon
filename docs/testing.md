@@ -14,9 +14,8 @@ Two independent suites live under `packages/junon-io/test/`:
 
 There is no repository-level lint command. Do not claim a lint suite passed.
 
-Some Jest suites are focused simulation tests; directories named `load_testing`
-and `memleak` may be slow, stateful, or resource-intensive, and `npm test` does
-not exclude them. Inspect a test before running it.
+Some Jest suites boot a real game server (`test/server/standalone_server.test.js`)
+and take tens of seconds; the rest are focused unit and simulation tests.
 
 ## Commands
 
@@ -26,18 +25,7 @@ From the repository root, run one focused suite:
 npm exec --workspace packages/junon-io -- jest test/pressure/pressure.test.js --runInBand
 ```
 
-Run the ordinary test tree while excluding explicitly heavy suites. The flag
-*replaces* the config's list rather than adding to it, so `/node_modules/` and
-`/test/e2e/` have to be repeated or Jest will pick up the Playwright specs and
-fail on them:
-
-```sh
-npm exec --workspace packages/junon-io -- jest test --runInBand \
-  --testPathIgnorePatterns=/node_modules/ /test/e2e/ /load_testing/ /memleak/
-```
-
-Run all discovered Jest tests, `load_testing` and `memleak` included, only when
-the environment and task justify the heavier checks:
+Run the whole Jest tree (the Playwright specs are excluded by `jest.config.js`):
 
 ```sh
 npm exec --workspace packages/junon-io -- jest test --runInBand
@@ -145,7 +133,8 @@ the local menu, joins it, quits (which saves), relaunches, and loads the world
 again, and checks that the world clock stops while the in-game menu is open.
 A second test runs two instances: one hosts co-op with a password, the
 other joins through a non-loopback address of the machine (rejected with a wrong
-password first), quits, rejoins, and is told when the host quits. A third
+password first), loads the world thumbnail from the host, reconnects after its
+socket drops, quits, rejoins, and is told when the host quits. A third
 switches the language and checks it is kept after a restart. It needs the
 standalone client build. A Linux machine without a display
 needs `xvfb-run`; the test enables software WebGL itself.
@@ -166,7 +155,7 @@ xvfb-run -a npm run test:e2e --workspace packages/junon-desktop
 | Save serialization | Round-trip fixtures across relevant format versions. Build synthetic saves (as `test/server/save_importer.test.js` does); real exported saves are player data and must not be committed |
 | Database model | `test/server/standalone_schema.test.js`, and a server start against a saves directory created before the change |
 | Startup/configuration | Start the server in the intended `NODE_ENV` (`standalone`, and `development` for `npm run server`) |
-| Server runtime, local menu, co-op | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real server, checks save/reload, exercises the local world and import HTTP routes, checks the `ws` game socket, and covers co-op hosting (preflight, guest upgrade checks, owner-profile refusal, stop and shutdown notices) and the singleplayer pause |
+| Server runtime, local menu, co-op | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real server, checks save/reload, exercises the local world and import HTTP routes, checks the `ws` game socket, and covers co-op hosting (preflight, password challenge and proof, replay and throttling, guest upgrade checks, owner-profile refusal, stop and shutdown notices), world thumbnails, and the singleplayer pause |
 | Desktop shell (`packages/junon-desktop`) | `NODE_ENV=standalone npm run client:build`, then the desktop e2e test (see below) |
 | Player-facing flow across client and server | The closest `test/e2e` spec, or a new one |
 

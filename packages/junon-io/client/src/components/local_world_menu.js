@@ -1,4 +1,5 @@
 const LocalWorldApi = require('../util/local_world_api')
+const CoopAuth = require('../util/coop_auth')
 
 const DEFAULT_HOST_PORT = 7777
 
@@ -41,6 +42,7 @@ class LocalWorldMenu {
 
   open(worldId, serverUrl) {
     this.main.standaloneServerUrl = serverUrl
+    this.main.standaloneAuthorize = null
     this.el.style.display = 'none'
     this.main.joinStandaloneWorld()
   }
@@ -170,34 +172,14 @@ class LocalWorldMenu {
       const port = Number(address.split(':').pop())
       if (port < 1 || port > 65535) throw new Error('Invalid port')
       const password = this.panel.querySelector('.join_password').value
-      await this.checkHost(address, password)
-      this.main.standaloneServerUrl = 'ws://' + address + '?protocol=' + encodeURIComponent(window.protocolHash) + '&password=' + encodeURIComponent(password)
+      await CoopAuth.checkHost(address, password)
+      this.main.standaloneServerUrl = 'ws://' + address
+      this.main.standaloneAuthorize = () => CoopAuth.socketUrl(address, password)
       this.el.style.display = 'none'
       this.main.joinStandaloneWorld()
     }))
   }
 
-  // the host's /info preflight turns version and password problems into
-  // clear messages; the game socket itself would only fail to connect
-  async checkHost(address, password) {
-    let info
-    try {
-      const response = await fetch('http://' + address + '/info?password=' + encodeURIComponent(password))
-      if (!response.ok) throw new Error('outdated')
-      info = await response.json()
-    } catch (e) {
-      if (e.message === 'outdated') throw new Error('The host runs a different version of Junon. Both players need the same version.')
-      throw new Error('Can\'t reach ' + address + '. Check the address and that the world is being hosted.')
-    }
-
-    if (info.protocolHash !== window.protocolHash) {
-      const ownVersion = (document.querySelector('.game_version') || {}).textContent || 'another version'
-      throw new Error('Version mismatch: the host runs Junon ' + info.version + ', you run ' + ownVersion + '. Both players need the same version.')
-    }
-    if (!info.passwordAccepted) {
-      throw new Error(password ? 'Wrong password' : 'This world needs a password')
-    }
-  }
 }
 
 module.exports = LocalWorldMenu

@@ -52,6 +52,8 @@
     "babelify": "^10.0.0",
     "bowser": "^2.4.0",
     "browserify": "^17.0.1",
+    "create-hash": "^1.2.0",
+    "create-hmac": "^1.1.7",
     "element-closest": "^3.0.1",
     "gemini-scrollbar": "^1.5.3",
     "gulp": "^5.0.1",

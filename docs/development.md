@@ -204,14 +204,28 @@ you choose (default 7777), with an optional password, and joins it. The server
 keeps your own socket on loopback and adds a guest listener on all interfaces.
 The Host panel and an in-game chat line list the machine's IPv4 addresses.
 Friends use **Join co-op** with `address:port`. Their client first asks the
-host's `GET /info` for its protocol hash and whether the password is right, so
-a different game version or a wrong password gets a clear message. The socket
-URL then carries `?protocol=<hash>&password=<password>`, and the server refuses
-upgrades without them.
+host's `GET /info` for its protocol hash and checks the password, so a
+different game version or a wrong password gets a clear message. The socket
+URL then carries `?protocol=<hash>&challenge=<challenge>&proof=<proof>`, and the
+server refuses upgrades without them.
+
+The password itself never leaves the guest's machine. Each `/info` response
+holds a random single-use challenge (valid for a minute), and the guest answers
+with HMAC-SHA256 of it keyed by SHA-256 of the password
+(`client/src/util/coop_auth.js`, `Server#isGuestProofValid`). The host keeps
+only that hash. A captured URL can't be replayed, and after 10 wrong answers
+from one address in a minute, that address is refused until the minute is up.
+Each connection attempt, reconnects included, fetches a new challenge. The
+game traffic itself is not encrypted (`ws://`), and someone who records a
+guest's join could still try to guess a weak password offline, so use a strong
+one when the port is open to the internet.
 
 - Guests are identified by their own local profile. Their characters, and their
   ATM balance, are stored in the host's world and SQLite file. A guest can't
   join with the owner's profile id.
+- World thumbnails (the team menu's Preview) are served by the game server at
+  `/screenshots/<id>_thumb.jpg`, only for the open world, so guests load them
+  from the host.
 - Hosting stops when the host clicks Stop hosting, opens another world, or
   quits. Guests are disconnected with a message saying why. Their characters are
   saved with the world.

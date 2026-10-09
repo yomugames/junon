@@ -18,6 +18,10 @@ class Sidebar extends BaseCommand {
     ]
   }
 
+  isNonSandboxCommand() {
+    return true
+  }
+
   perform(caller, args) {
     let selector = args[0]
     let subcommand

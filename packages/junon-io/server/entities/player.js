@@ -2995,6 +2995,8 @@ class Player extends BaseEntity {
 
     let pickups = this.sector.pickupTree.search(this.getBoundingBox())
     pickups.forEach((pickup) => {
+      // count might be altered when item is given to player (usually from merging stacks)
+      let pickupCount = pickup.item.getCount()
       let isSuccessful = pickup.giveTo(this)
       if (isSuccessful) {
         this.getSocketUtil().emit(this.socket, "PlaySound", { id: Protocol.definition().SoundType.Pickup })
@@ -3003,7 +3005,7 @@ class Player extends BaseEntity {
           playerId: this.getId(),
           player: this.getName(),
           itemType: pickup.item.getTypeName(),
-          count: pickup.item.getCount()
+          count: pickupCount
         })
       }
     })

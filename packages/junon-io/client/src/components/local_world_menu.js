@@ -2,6 +2,7 @@ const LocalWorldApi = require('../util/local_world_api')
 const CoopAuth = require('../util/coop_auth')
 
 const DEFAULT_HOST_PORT = 7777
+const MODE_LABELS = { survival: 'Survival', peaceful: 'Sandbox', hardcore: 'Hardcore' }
 
 // Standalone home menu. World management goes through LocalWorldApi (loopback
 // page server, or the desktop app's game server process); game traffic still
@@ -17,9 +18,39 @@ class LocalWorldMenu {
     this.nameInput.addEventListener('change', () => {
       try { this.saveName(); this.message.textContent = '' } catch (e) { this.message.textContent = e.message }
     })
-    const actions = { new: 'newWorld', load: 'loadWorlds', import: 'importWorld', host: 'hostWorld', join: 'joinWorld' }
+    const actions = { new: 'newWorld', load: 'loadWorlds', tutorial: 'startTutorial', import: 'importWorld', host: 'hostWorld', join: 'joinWorld' }
     Object.keys(actions).forEach((name) => {
       this.el.querySelector('.local_' + name + '_btn').addEventListener('click', () => this[actions[name]]())
+    })
+    this.continueBtn = this.el.querySelector('.local_continue_btn')
+    this.continueBtn.addEventListener('click', () => {
+      if (this.latestWorld) this.openWorld(this.latestWorld)
+    })
+  }
+
+  // highlights the menu entry whose panel is showing, and drops the
+  // previous panel's error
+  setActive(panel) {
+    this.message.textContent = ''
+    this.el.querySelectorAll('.local_menu_actions [data-panel]').forEach((button) => {
+      button.classList.toggle('selected', button.dataset.panel === panel)
+    })
+  }
+
+  // listWorlds is ordered by updatedAt, so the first world is the last played
+  renderContinue(worlds) {
+    this.latestWorld = worlds[0]
+    this.continueBtn.style.display = this.latestWorld ? 'block' : 'none'
+    if (this.latestWorld) {
+      this.continueBtn.querySelector('.local_continue_detail').textContent = this.latestWorld.name + ' · Day ' + this.latestWorld.days
+    }
+  }
+
+  openWorld(world) {
+    this.run(async () => {
+      this.saveName()
+      const opened = await LocalWorldApi.openWorld({ worldId: world.id, ownerUid: this.main.localProfile.uid })
+      this.open(world.id, opened.serverUrl)
     })
   }
 
@@ -48,6 +79,7 @@ class LocalWorldMenu {
   }
 
   newWorld() {
+    this.setActive('new')
     this.panel.innerHTML = '<h2>New world</h2><label>World name <input class="world_name black_input" maxlength="40"></label><label>Mode <select class="world_mode ui_select"><option value="survival">Survival</option><option value="peaceful">Sandbox</option><option value="hardcore">Hardcore</option></select></label><button class="create_world ui_btn">Create and play</button>'
     this.panel.querySelector('.create_world').addEventListener('click', () => this.run(async () => {
       this.saveName()
@@ -57,28 +89,69 @@ class LocalWorldMenu {
   }
 
   loadWorlds() {
-    this.panel.innerHTML = '<h2>Local worlds</h2><div class="local_world_list">Loading…</div>'
+    this.setActive('load')
+    this.panel.innerHTML = '<h2>Your worlds <span class="local_world_count"></span></h2><div class="local_world_list">Loading…</div>'
     this.run(async () => {
       const result = await LocalWorldApi.listWorlds()
+      this.renderContinue(result.worlds)
       const list = this.panel.querySelector('.local_world_list')
       list.textContent = ''
-      if (!result.worlds.length) list.textContent = 'No local worlds yet.'
+      if (!result.worlds.length) return this.renderNoWorlds(list)
+
+      this.panel.querySelector('.local_world_count').textContent = result.worlds.length
+      const hostedWorldId = result.hosting && result.hosting.worldId
       result.worlds.forEach((world) => {
-        const button = document.createElement('button')
-        button.className = 'local_world_entry ui_btn'
-        button.textContent = world.name + ' · ' + world.mode + ' · day ' + world.days
-        button.addEventListener('click', () => this.run(async () => {
-          this.saveName()
-          const opened = await LocalWorldApi.openWorld({ worldId: world.id, ownerUid: this.main.localProfile.uid })
-          this.open(world.id, opened.serverUrl)
-        }))
-        list.appendChild(button)
+        list.appendChild(this.createWorldEntry(world, world.id === hostedWorldId))
       })
     })
   }
 
+  // world names are player input, so entries are built with textContent
+  createWorldEntry(world, isHosted) {
+    const button = document.createElement('button')
+    button.className = 'local_world_entry'
+    button.dataset.mode = world.mode
+
+    const name = document.createElement('span')
+    name.className = 'local_world_name'
+    name.textContent = world.name
+    button.appendChild(name)
+
+    const details = document.createElement('span')
+    details.className = 'local_world_details'
+    details.textContent = (MODE_LABELS[world.mode] || world.mode) + ' · Day ' + world.days
+    button.appendChild(details)
+
+    if (isHosted) {
+      const badge = document.createElement('span')
+      badge.className = 'local_world_badge'
+      badge.textContent = 'Hosting'
+      button.appendChild(badge)
+    }
+
+    button.addEventListener('click', () => this.openWorld(world))
+    return button
+  }
+
+  renderNoWorlds(list) {
+    list.innerHTML = '<div class="local_world_empty"><div class="local_world_empty_title">No worlds yet</div><p>Create a world, import a save, or join a friend\'s game.</p><button class="ui_btn">New world</button></div>'
+    list.querySelector('button').addEventListener('click', () => this.newWorld())
+  }
+
+  // the server swaps the open world for a fresh tutorial (not saved or listed)
+  startTutorial() {
+    this.setActive('tutorial')
+    this.panel.innerHTML = '<h2>Tutorial</h2><p>Starting the tutorial…</p>'
+    this.run(async () => {
+      this.saveName()
+      const result = await LocalWorldApi.startTutorial({ ownerUid: this.main.localProfile.uid })
+      this.open(null, result.serverUrl)
+    })
+  }
+
   importWorld() {
-    this.panel.innerHTML = '<h2>Import hosted save</h2><input type="file" class="local_save_file" accept=".sav"><button class="preview_import ui_btn">Choose character</button><div class="import_characters"></div>'
+    this.setActive('import')
+    this.panel.innerHTML = '<h2>Import hosted save</h2><p>Choose a .sav file exported from the online game, then pick the character you want to play as.</p><input type="file" class="local_save_file" accept=".sav"><button class="preview_import ui_btn">Choose character</button><div class="import_characters"></div>'
     this.panel.querySelector('.preview_import').addEventListener('click', () => this.run(async () => {
       const file = this.panel.querySelector('.local_save_file').files[0]
       if (!file) throw new Error('Choose a .sav file')
@@ -115,6 +188,7 @@ class LocalWorldMenu {
   // Opens one of the player's worlds to other machines: guests connect to
   // this port on any of the listed addresses, the host plays locally
   hostWorld() {
+    this.setActive('host')
     this.panel.innerHTML = '<h2>Host co-op</h2><div class="host_status">Loading…</div>'
     this.run(async () => {
       const result = await LocalWorldApi.listWorlds()
@@ -125,7 +199,7 @@ class LocalWorldMenu {
       result.worlds.forEach((world) => {
         const option = document.createElement('option')
         option.value = world.id
-        option.textContent = world.name + ' · ' + world.mode
+        option.textContent = world.name + ' · ' + (MODE_LABELS[world.mode] || world.mode)
         option.selected = world.id === result.activeWorldId
         select.appendChild(option)
       })
@@ -164,6 +238,7 @@ class LocalWorldMenu {
   }
 
   joinWorld() {
+    this.setActive('join')
     this.panel.innerHTML = '<h2>Join co-op</h2><label>Address <input class="join_address black_input" placeholder="192.168.1.10:' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="join_password black_input" type="password" maxlength="64" placeholder="if the host set one"></label><button class="connect_world ui_btn">Join</button>'
     this.panel.querySelector('.connect_world').addEventListener('click', () => this.run(async () => {
       this.saveName()

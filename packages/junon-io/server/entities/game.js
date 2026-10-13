@@ -797,12 +797,7 @@ class Game {
     let rowCount = options.rowCount
     let colCount = options.colCount
 
-    // tests always start from a new map
-    if (env === 'test') {
-      this.initSurvivalSector({ rowCount: rowCount, colCount: colCount, uid: this.sectorUid, name: this.sectorName, gameMode: gameMode })
-      return
-    }
-
+    // the tutorial is always the bundled map, tests included
     if (this.isTutorial) {
       let compressed = require("fs").readFileSync(global.appRoot + "/common/tutorial.sav.gz")
       let buffer = await this.decompressGzip(compressed)
@@ -811,6 +806,12 @@ class Game {
       let version = WorldSerializer.parseSaveFileVersion(buffer)
       let sectorData = WorldSerializer.parseSaveGame(buffer, version)
       this.initLobby(sectorData)
+      return
+    }
+
+    // tests always start from a new map
+    if (env === 'test') {
+      this.initSurvivalSector({ rowCount: rowCount, colCount: colCount, uid: this.sectorUid, name: this.sectorName, gameMode: gameMode })
       return
     }
 

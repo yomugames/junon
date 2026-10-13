@@ -13,7 +13,7 @@ const CLIENT_DIR = path.join(path.dirname(require.resolve("junon-io/package.json
 const APP_ORIGIN = "app://junon"
 
 // the subset of Server#getLocalWorldApi the renderer may call
-const LOCAL_WORLD_API_METHODS = ["listWorlds", "createWorld", "openWorld", "hostWorld", "stopHosting", "listImportCharacters", "importWorld"]
+const LOCAL_WORLD_API_METHODS = ["listWorlds", "createWorld", "openWorld", "hostWorld", "stopHosting", "startTutorial", "listImportCharacters", "importWorld"]
 
 // Separate user-data directories let two instances run side by side on one
 // machine, e.g. a co-op host and a guest when testing

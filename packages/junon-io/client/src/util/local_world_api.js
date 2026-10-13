@@ -23,6 +23,10 @@ const LocalWorldApi = {
     return this.call('stopHosting', [], () => this.request('host/stop', this.json({})))
   },
 
+  startTutorial(details) {
+    return this.call('startTutorial', [details], () => this.request('tutorial', this.json(details)))
+  },
+
   listImportCharacters(bytes) {
     return this.call('listImportCharacters', [new Uint8Array(bytes)], () => {
       return this.request('import/characters', { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: bytes })

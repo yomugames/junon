@@ -8111,26 +8111,539 @@ body.imposter_mode .minigame_poster {
     width: 20px;
 }
 
+/*
+ * Home screen: desktop main menu (client/src/components/local_world_menu.js)
+ *
+ * #local_world_menu covers the window: a left rail (logo, menu, version), a
+ * top bar (player name, language) and a content panel on the right that the
+ * menu entries swap (worlds, new world, host, join, import). The shade lives
+ * inside the menu so it disappears with it when a world opens.
+ */
+
 .middle_container {
     display: none;
-    width: min(760px, calc(100% - 32px));
-    margin: auto;
-    position: relative;
-    background: rgba(20, 24, 32, .94);
-    padding: 24px;
-    box-sizing: border-box;
 }
 
-#local_world_menu { color: #eee; font-family: 'cc'; text-align: left; }
-#local_world_menu h1 { margin-top: 0; }
-#local_world_menu h2 { font-size: 22px; }
-#local_world_menu label { display: block; margin: 12px 0; }
-#local_world_menu input, #local_world_menu select { margin-left: 10px; }
-#local_world_menu .local_menu_actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
-#local_world_menu .local_world_list { display: flex; flex-direction: column; gap: 8px; }
-#local_world_menu .local_world_entry { text-align: left; }
-#local_world_menu .local_menu_message { color: #ffad91; min-height: 24px; }
-#local_world_menu .local_menu_version { color: #888; font-size: 12px; margin-bottom: 0; }
+#local_world_menu {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    color: #c4ccd8;
+    font-family: 'cc';
+    text-align: left;
+}
+
+#local_world_menu .home_shade {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(3, 7, 15, 0.92) 0px, rgba(3, 7, 15, 0.7) 380px, rgba(3, 7, 15, 0.2) 65%, rgba(3, 7, 15, 0.45) 100%),
+        linear-gradient(0deg, rgba(3, 7, 15, 0.6) 0%, rgba(3, 7, 15, 0) 30%);
+}
+
+/* left rail */
+
+#local_world_menu .home_rail {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    width: 400px;
+    box-sizing: border-box;
+    padding: 56px 0px 32px 56px;
+    display: flex;
+    flex-direction: column;
+}
+
+#local_world_menu #game_caption {
+    width: auto;
+    margin: 0px;
+    font-size: 56px;
+    font-weight: normal;
+    letter-spacing: 2px;
+    text-align: left;
+}
+
+#local_world_menu .home_tagline {
+    margin-top: 8px;
+    font-size: 15px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #8a96a8;
+}
+
+#local_world_menu .local_menu_actions {
+    margin-top: 56px;
+}
+
+#local_world_menu .home_nav_item {
+    position: relative;
+    display: block;
+    width: 300px;
+    box-sizing: border-box;
+    padding: 8px 16px 8px 20px;
+    margin: 0px 0px 0px -20px;
+    font-family: 'cc';
+    font-size: 28px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: left;
+    color: #c4ccd8;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s, padding-left 0.15s, background 0.15s;
+}
+
+#local_world_menu .home_nav_item::before {
+    content: '';
+    position: absolute;
+    left: 0px;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    background-color: #e0673f;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+#local_world_menu .home_nav_item:hover,
+#local_world_menu .home_nav_item:focus-visible,
+#local_world_menu .home_nav_item.selected {
+    color: white;
+    padding-left: 30px;
+    outline: none;
+    background: linear-gradient(90deg, rgba(224, 103, 63, 0.22), rgba(224, 103, 63, 0) 85%);
+}
+
+#local_world_menu .home_nav_item:hover::before,
+#local_world_menu .home_nav_item:focus-visible::before,
+#local_world_menu .home_nav_item.selected::before {
+    opacity: 1;
+}
+
+#local_world_menu .local_continue_btn {
+    display: none;
+    margin-bottom: 8px;
+    color: white;
+}
+
+#local_world_menu .local_continue_detail {
+    display: block;
+    margin-top: 2px;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    color: #8a96a8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#local_world_menu .local_menu_version {
+    margin: auto 0px 0px;
+    font-size: 13px;
+    color: #6f7b8e;
+}
+
+/* top bar */
+
+#local_world_menu .home_topbar {
+    position: absolute;
+    top: 24px;
+    right: 40px;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+}
+
+#local_world_menu .local_profile {
+    display: flex;
+    align-items: center;
+    margin: 0px 18px 0px 0px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #8a96a8;
+}
+
+#local_world_menu .local_player_name {
+    width: 150px;
+    height: 30px;
+    box-sizing: border-box;
+    margin: 0px 0px 0px 10px;
+    padding: 0px 10px;
+    font-family: 'cc';
+    font-size: 15px;
+    color: white;
+    background-color: rgba(9, 14, 26, 0.72);
+    border: solid 1px rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    outline: none;
+}
+
+#local_world_menu #language_selector {
+    margin: 0px;
+}
+
+#local_world_menu #language_select {
+    width: 120px;
+    height: 30px;
+    font-size: 16px;
+    color: #c4ccd8;
+    background-color: rgba(9, 14, 26, 0.72);
+    border: solid 1px rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+}
+
+/* content panel */
+
+#local_world_menu .home_content {
+    position: absolute;
+    top: 84px;
+    left: 440px;
+    right: 40px;
+    bottom: 40px;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+}
+
+#local_world_menu .local_menu_message {
+    margin: 0px 0px 10px;
+    color: #ffad91;
+}
+
+#local_world_menu .local_menu_message:empty {
+    display: none;
+}
+
+#local_world_menu .local_menu_panel {
+    min-height: 0px;
+    max-height: 100%;
+    box-sizing: border-box;
+    padding: 22px 28px 28px;
+    overflow-y: auto;
+    background-color: rgba(9, 14, 26, 0.82);
+    border: solid 1px rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    box-shadow: 0px 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+#local_world_menu .local_menu_panel h2 {
+    margin: 0px 0px 20px;
+    padding-bottom: 14px;
+    font-size: 22px;
+    font-weight: normal;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #e8edf4;
+    border-bottom: solid 1px rgba(255, 255, 255, 0.08);
+}
+
+#local_world_menu .local_world_count {
+    margin-left: 10px;
+    padding: 2px 9px;
+    font-size: 14px;
+    letter-spacing: 0px;
+    vertical-align: middle;
+    color: #8a96a8;
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+}
+
+#local_world_menu .local_world_count:empty {
+    display: none;
+}
+
+#local_world_menu .local_menu_panel p {
+    max-width: 560px;
+    margin: 0px 0px 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #8a96a8;
+}
+
+#local_world_menu .local_menu_panel label {
+    display: flex;
+    flex-direction: column;
+    max-width: 420px;
+    margin: 0px 0px 16px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #8a96a8;
+}
+
+#local_world_menu .local_menu_panel input,
+#local_world_menu .local_menu_panel select {
+    width: auto;
+    height: 38px;
+    box-sizing: border-box;
+    margin: 6px 0px 0px;
+    padding: 0px 12px;
+    font-family: 'cc';
+    font-size: 16px;
+    letter-spacing: 0px;
+    text-transform: none;
+    text-align: left;
+    text-align-last: auto;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.45);
+    border: solid 1px rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    outline: none;
+}
+
+#local_world_menu .local_menu_panel input[type='file'] {
+    display: block;
+    height: auto;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+}
+
+#local_world_menu .local_menu_panel input:focus,
+#local_world_menu .local_menu_panel select:focus,
+#local_world_menu .local_player_name:focus {
+    border-color: #e0673f;
+}
+
+#local_world_menu .local_menu_panel .ui_btn {
+    float: none;
+    display: inline-block;
+    margin: 8px 8px 0px 0px;
+    padding: 0px 22px;
+    line-height: 38px;
+    font-family: 'cc';
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: white;
+    background-color: #e0673f;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#local_world_menu .local_menu_panel .ui_btn:hover {
+    filter: brightness(1.15);
+}
+
+#local_world_menu .local_menu_panel .stop_hosting {
+    background-color: #3a4558;
+}
+
+#local_world_menu .import_characters select {
+    display: block;
+    margin: 4px 0px 8px;
+}
+
+#local_world_menu .host_addresses {
+    max-width: 420px;
+    margin: 0px 0px 12px;
+    padding: 0px;
+    list-style: none;
+}
+
+#local_world_menu .host_addresses li {
+    margin-bottom: 6px;
+    padding: 8px 12px;
+    font-size: 18px;
+    color: #e8edf4;
+    background-color: rgba(0, 0, 0, 0.35);
+    border: solid 1px rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    user-select: text;
+}
+
+/* world cards */
+
+#local_world_menu .local_world_list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+#local_world_menu .local_world_entry {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 0px;
+    overflow: hidden;
+    text-align: left;
+    font-family: 'cc';
+    color: inherit;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: solid 1px rgba(255, 255, 255, 0.08);
+    border-top: solid 3px #5b8fd9;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+#local_world_menu .local_world_entry[data-mode='peaceful'] {
+    border-top-color: #4caf6a;
+}
+
+#local_world_menu .local_world_entry[data-mode='hardcore'] {
+    border-top-color: #d9534f;
+}
+
+#local_world_menu .local_world_entry::before {
+    content: '';
+    display: block;
+    height: 110px;
+    background: url(/assets/images/background/default_junon_thumb.png) center / cover;
+}
+
+#local_world_menu .local_world_entry:hover,
+#local_world_menu .local_world_entry:focus-visible {
+    transform: translateY(-2px);
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(224, 103, 63, 0.7);
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+#local_world_menu .local_world_name {
+    padding: 12px 14px 2px;
+    font-size: 16px;
+    color: #e8edf4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#local_world_menu .local_world_details {
+    padding: 0px 14px 12px;
+    font-size: 13px;
+    color: #8a96a8;
+}
+
+#local_world_menu .local_world_badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 2px 8px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: white;
+    background-color: rgba(46, 160, 67, 0.9);
+    border-radius: 10px;
+}
+
+#local_world_menu .local_world_empty {
+    grid-column: 1 / -1;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+#local_world_menu .local_world_empty_title {
+    margin-bottom: 10px;
+    font-size: 24px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #e8edf4;
+}
+
+#local_world_menu .local_world_empty p {
+    margin: 0px auto 10px;
+}
+
+/* narrow windows: smaller rail, then stack everything */
+@media only screen and (max-width: 1100px) {
+    #local_world_menu .home_rail {
+        width: 340px;
+        padding-left: 40px;
+    }
+
+    #local_world_menu .home_content {
+        left: 360px;
+    }
+
+    #local_world_menu #game_caption {
+        font-size: 46px;
+    }
+
+    #local_world_menu .home_nav_item {
+        font-size: 24px;
+    }
+}
+
+@media only screen and (max-width: 760px) {
+    #local_world_menu {
+        position: absolute;
+        bottom: auto;
+        min-height: 100%;
+    }
+
+    #local_world_menu .home_shade {
+        background: linear-gradient(180deg, rgba(3, 7, 15, 0.85) 0%, rgba(3, 7, 15, 0.5) 100%);
+    }
+
+    #local_world_menu .home_topbar,
+    #local_world_menu .home_rail,
+    #local_world_menu .home_content {
+        position: relative;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        width: auto;
+    }
+
+    #local_world_menu .home_topbar {
+        justify-content: flex-end;
+        padding: 12px 16px 0px;
+    }
+
+    #local_world_menu .local_player_name {
+        width: 110px;
+    }
+
+    #local_world_menu .home_rail {
+        padding: 12px 20px 8px;
+    }
+
+    #local_world_menu #game_caption {
+        font-size: 40px;
+    }
+
+    #local_world_menu .local_menu_actions {
+        margin-top: 20px;
+    }
+
+    #local_world_menu .home_nav_item {
+        width: 100%;
+        font-size: 22px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+
+    #local_world_menu .local_menu_version {
+        display: none;
+    }
+
+    #local_world_menu .home_content {
+        margin: 12px;
+    }
+
+    #local_world_menu .local_menu_panel {
+        padding: 18px 16px 20px;
+    }
+
+    #local_world_menu .local_world_list {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}
 
 .home_action_row {
     display: block;
@@ -9170,14 +9683,14 @@ body.moderator .team_entry_row .ban_world_btn {
 }
 
 #home_background {
-    background-color:rgba(0,0,0,0);
+    background-color: #15233a;
 }
 #home_background_image {
-    top: -5vh;
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
-    height: 120vh;
+    height: 100vh;
     object-fit: cover;
+    opacity: 1;
 }

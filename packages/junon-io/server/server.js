@@ -214,6 +214,23 @@ class Server {
     await this.loadStandaloneWorld(options)
   }
 
+  // The tutorial is a throwaway world built from common/tutorial.sav.gz
+  // (Game#initSector). It has no sectors row, so it is never listed, and
+  // Game#canBeSaved refuses it; opening any other world discards it.
+  async activateTutorialWorld() {
+    let current = this.getMainGame()
+    this.stopHosting("The host closed the world.")
+    if (current) await current.prepareRemove()
+
+    let worldId = "tutorial-" + crypto.randomBytes(6).toString("hex")
+    let result = await this.createGame({ isTutorial: true, sectorData: { id: worldId } })
+    if (!result.createdGame) {
+      throw new Error("Unable to start the tutorial: " + result.error)
+    }
+
+    await new Promise((resolve) => result.createdGame.onGameReady(resolve))
+  }
+
   initStandaloneProcessHandlers() {
     // hosted servers crash and get restarted by systemd; a player's own world
     // would instead lose everything since the last autosave, so log a failed
@@ -560,6 +577,7 @@ class Server {
     app.post('/local/worlds/open', route((req) => api.openWorld(req.body)))
     app.post('/local/host', route((req) => api.hostWorld(req.body)))
     app.post('/local/host/stop', route(() => api.stopHosting()))
+    app.post('/local/tutorial', route((req) => api.startTutorial(req.body)))
     app.post('/local/import/characters', raw, route((req) => api.listImportCharacters(req.body)))
     app.post('/local/import', raw, route((req) => api.importWorld(req.body, {
       ownerUid: req.get('x-junon-owner'),
@@ -664,6 +682,11 @@ class Server {
       stopHosting: async () => {
         this.stopHosting("The host stopped hosting the world.")
         return { hosting: null }
+      },
+      startTutorial: async ({ ownerUid } = {}) => {
+        if (!validOwner(ownerUid)) throw new Error('Invalid profile')
+        await this.activateTutorialWorld()
+        return { serverUrl: serverUrl() }
       },
       listImportCharacters: async (bytes) => {
         return { characters: SaveImporter.listCharacters(validSave(bytes)) }

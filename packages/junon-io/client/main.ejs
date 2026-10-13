@@ -1,36 +1,55 @@
 <canvas id='game_canvas'></canvas>
 
 <div id='home_background'>
-    <img id="home_background_image" src="\assets\images\background\space.jpg">
+    <img id="home_background_image" src="/assets/images/background/space.jpg" alt="">
 </div>
 
 <div id='welcome_container'>
     <div id='home_error_message'></div>
     <div id='connecting_message'><%= t('Connecting') %> <div class="lds-ring"><div></div><div></div><div></div><div></div></div></div>
 
-    <p id='game_caption'>JUNON . IO </p>    
     <div class='middle_container'>
         <section id='local_world_menu' aria-label='Local worlds'>
-            <h1>Junon</h1>
-            <label>Your name <input class='local_player_name black_input' maxlength='16' autocomplete='nickname'></label>
-            <div id='language_selector'>
-                <img src="/assets/images/language_icon.png" class='language_icon' alt='Language' />
-                <select id='language_select' aria-label='Language'>
-                    <option value='en'>English</option>
-                    <option value='ru'>Русский</option>
-                    <option value='ja'>日本語</option>
-                </select>
+            <div class='home_shade'></div>
+
+            <div class='home_topbar'>
+                <label class='local_profile'>Playing as <input class='local_player_name' maxlength='16' autocomplete='nickname' aria-label='Your name'></label>
+                <div id='language_selector'>
+                    <img src="/assets/images/language_icon.png" class='language_icon' alt='Language' />
+                    <select id='language_select' aria-label='Language'>
+                        <option value='en'>English</option>
+                        <option value='ru'>Русский</option>
+                        <option value='ja'>日本語</option>
+                    </select>
+                </div>
             </div>
-            <nav class='local_menu_actions'>
-                <button class='local_new_btn ui_btn'>New world</button>
-                <button class='local_load_btn ui_btn'>Load world</button>
-                <button class='local_import_btn ui_btn'>Import save</button>
-                <button class='local_host_btn ui_btn'>Host co-op</button>
-                <button class='local_join_btn ui_btn'>Join co-op</button>
-            </nav>
-            <div class='local_menu_panel'></div>
-            <p class='local_menu_message' role='status'></p>
-            <p class='local_menu_version'>Version <span class='game_version'><%= gameVersion %></span></p>
+
+            <div class='home_rail'>
+                <div class='home_brand'>
+                    <h1 id='game_caption'>JUNON . IO</h1>
+                    <div class='home_tagline'>Space Colony Survival &middot; Co-op</div>
+                </div>
+
+                <nav class='local_menu_actions'>
+                    <button class='local_continue_btn home_nav_item'>
+                        <span>Continue</span>
+                        <span class='local_continue_detail'></span>
+                    </button>
+                    <button class='local_new_btn home_nav_item' data-panel='new'>New world</button>
+                    <button class='local_load_btn home_nav_item' data-panel='load'>Load world</button>
+                    <button class='local_tutorial_btn home_nav_item' data-panel='tutorial'>Tutorial</button>
+                    <button class='local_host_btn home_nav_item' data-panel='host'>Host co-op</button>
+                    <button class='local_join_btn home_nav_item' data-panel='join'>Join co-op</button>
+                    <button class='local_import_btn home_nav_item' data-panel='import'>Import save</button>
+                </nav>
+
+                <p class='local_menu_version'>Version <span class='game_version'><%= gameVersion %></span></p>
+            </div>
+
+            <div class='home_content'>
+                <p class='local_menu_message' role='status'></p>
+                <div class='local_menu_panel'></div>
+            </div>
         </section>
     </div>
     
@@ -1455,14 +1474,9 @@
     <div id='save_progress'>Saving world...</div>
 </div>
 
-<div class='colony_preview_popup'>
-    
-</div>
-
 <div id="preroll_container">
     <div id="preroll"></div>
 </div>
 
 <div id='welcome_hud'>
-    <div id="total_online_count" style="background-color: #00000080; padding: 10px">0 online</div>
 </div>

@@ -40,38 +40,6 @@
     </div>
     <script type="text/javascript">
         onload = () => {
-            const img_src = [
-                'menubg1.png',
-                'menubg2.png',
-                'menubg3.png',
-                'menubg4.png',
-                'menubg5.png',
-                'menubg6.png',
-                'menubg7.png',
-                'menubg8.png',
-                'menubg9.png',
-                'menubg10.png',
-                'menubg11.png',
-                'menubg12.png',
-                'menubg13.png',
-                'menubg14.png',
-                'menubg15.png',
-                'menubg16.png',
-                'menubg17.png',
-                'menubg18.png',
-            ];
-            document.getElementById('home_background_image').src = "/assets/images/background/" + img_src[Math.floor(Math.random() * img_src.length)];
-
-            window.addEventListener('scroll', function() {
-              const scrolled = window.scrollY; 
-              const viewportHeight = window.innerHeight; 
-            
-              const scrollInVh = (scrolled / viewportHeight) * 100;
-              const backgroundImage = document.getElementById('home_background_image');
-            
-              backgroundImage.style.transform = `translateY(${scrollInVh * 0.15}vh)`;
-            });
-
             const function_table = {
                 Location: [
                     [   `$getY`,

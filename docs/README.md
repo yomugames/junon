@@ -12,6 +12,8 @@ with the code.
 - [Testing](testing.md): test layout, focused commands, and validation strategy.
 - [Execution plans](exec-plans/README.md): format and lifecycle for substantial
   work.
+- [Home screen](homepage.md): main menu layout and behavior, and the selectors
+  tests depend on.
 
 ## Documentation rules
 

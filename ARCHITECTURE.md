@@ -36,10 +36,11 @@ game (the desktop app uses it), while `development` and `test` turn on
 `debugMode` (fast waves and building, admin mode, and the `app_debug.proto` wire
 format).
 
-The local world menu lists, creates, opens and imports worlds through
-`Server#getLocalWorldApi`, then joins the selected world over the game
-WebSocket. Players are identified by a local profile id that the client
-generates and keeps in `localStorage`.
+The local world menu lists, creates, opens and imports worlds, and starts the
+tutorial, through `Server#getLocalWorldApi`, then joins the selected world over
+the game WebSocket. Players are identified by a local profile id that the client
+generates and keeps in `localStorage`. Its layout is described in
+[docs/homepage.md](docs/homepage.md).
 
 Co-op is a listen server. Hosting (`hostWorld`) opens a second listener on all
 interfaces at a port the host picks. Sockets from it are marked `isGuest`;

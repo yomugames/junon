@@ -437,6 +437,9 @@ Done as follows.
 ### Phase 9: packaging
 
 `electron-builder` for Windows, macOS, and Linux; code signing and notarization.
+Steam builds add their own packaging steps (Steamworks redistributables,
+`koffi` and `steamworks-ffi-node` outside the asar, no `steam_appid.txt`); see
+Milestone 6 of [steam-coop.md](steam-coop.md).
 
 ## Validation
 

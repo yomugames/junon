@@ -19,6 +19,7 @@ loopback; co-op opens a second listener for other players.
 Electron main process (packages/junon-desktop)
   | serves the client build as app://junon/
   | relays preload IPC (window.junonDesktop) to the server's parent port
+  | runs Steamworks, if available, and relays Steam co-op guests' frames
   v
 utility process: game server <------> saves dir (sector.sav files + SQLite)
   ^                                  ^
@@ -119,6 +120,11 @@ which tests can also back with Node IPC (`JUNON_DESKTOP_IPC=1`).
 - The game server is authoritative for simulation state.
 - Protobuf files and the protocol hash couple client and server builds. Co-op
   guests must run a build with the host's protocol hash.
+- Steam co-op adds `STEAM_TRANSPORT_VERSION` (`junon-common/steam_framing.js`),
+  which the guest's hello carries and the host checks. Bump it when the
+  framing or the control messages change. The parent-port messages between
+  main and the server (`steamOpen`, `steamFrame`, `steamClose`,
+  `steamHosting`) are documented in `server/util/steam_socket_bridge.js`.
 - Files under `protocol/save_formats/` preserve historical persisted-world
   compatibility, including saves exported from the hosted game; add a version
   rather than silently changing an old format.

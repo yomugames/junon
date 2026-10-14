@@ -17,6 +17,8 @@ class ServerProcess {
   constructor(options) {
     this.savesDir = options.savesDir
     this.onUnexpectedExit = options.onUnexpectedExit
+    // other messages from the server (Steam co-op relay; see steam_host.js)
+    this.onMessage = options.onMessage || (() => {})
     this.pending = new Map()
     this.nextRequestId = 1
   }
@@ -56,7 +58,8 @@ class ServerProcess {
       this.exited.then((code) => reject(new Error("The game server exited during startup (code " + code + ")")))
       this.child.on("message", (message) => {
         if (message.type === "ready") return resolve(message.port)
-        if (message.type === "localApiResult") this.onLocalApiResult(message)
+        if (message.type === "localApiResult") return this.onLocalApiResult(message)
+        this.onMessage(message)
       })
     })
   }
@@ -81,6 +84,11 @@ class ServerProcess {
     } else {
       request.resolve(message.result)
     }
+  }
+
+  // a message for the server outside the request/response local API
+  post(message) {
+    if (this.child) this.child.postMessage(message)
   }
 
   rejectPending(error) {

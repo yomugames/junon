@@ -35,6 +35,8 @@ const sequelize = require("junon-common/db/sequelize")
 const syncStandaloneSchema = require("junon-common/db/standalone_schema")
 const StandaloneWorlds = require("junon-common/standalone_worlds")
 const SaveImporter = require("junon-common/save_importer")
+const getDesktopChannel = require("./util/desktop_channel")
+const SteamSocketBridge = require("./util/steam_socket_bridge")
 const Item = require("./entities/item")
 
 global.i18n = {
@@ -68,7 +70,8 @@ debugMode = (env === 'development' || env === 'test') ? true : false
 // The desktop shell (packages/junon-desktop) runs the server in an Electron
 // utility process, which provides process.parentPort. It serves the client
 // itself and talks to this process over that port, so no page server.
-const isDesktop = !!process.parentPort
+const desktopChannel = getDesktopChannel()
+const isDesktop = !!desktopChannel
 
 // co-op join password checks (Server#isGuestProofValid)
 const GUEST_CHALLENGE_TTL_MS = 60 * 1000
@@ -268,13 +271,27 @@ class Server {
   }
 
   // Messages from the desktop main process: local menu requests (see
-  // getLocalWorldApi) and a save-and-exit request when the app quits, since
-  // killing a utility process on Windows skips the SIGTERM handler.
+  // getLocalWorldApi), Steam co-op guest traffic (SteamSocketBridge), and a
+  // save-and-exit request when the app quits, since killing a utility process
+  // on Windows skips the SIGTERM handler.
   initDesktopChannel() {
     let api = this.getLocalWorldApi()
 
-    process.parentPort.on('message', async ({ data }) => {
+    this.steamSocketBridge = new SteamSocketBridge({
+      postMessage: (message) => desktopChannel.postMessage(message),
+      sockets: this.standaloneSocketServer.sockets,
+      handlers: {
+        open: this.onSocketOpen.bind(this),
+        message: this.onSocketData.bind(this),
+        close: this.onSocketClose.bind(this)
+      },
+      protocolHash: protocolHash,
+      isAccepting: () => !!this.steamHost && !!this.getMainGame()
+    })
+
+    desktopChannel.onMessage(async (data) => {
       if (!data) return
+      if (this.steamSocketBridge.handle(data)) return
       if (data.type === 'shutdown') return this.shutdownStandalone()
       if (data.type !== 'localApi') return
 
@@ -282,13 +299,13 @@ class Server {
         if (!Object.prototype.hasOwnProperty.call(api, data.method)) throw new Error('Unknown request')
         let args = Array.isArray(data.args) ? data.args : []
         let result = await api[data.method](...args)
-        process.parentPort.postMessage({ type: 'localApiResult', id: data.id, result: result })
+        desktopChannel.postMessage({ type: 'localApiResult', id: data.id, result: result })
       } catch(e) {
-        process.parentPort.postMessage({ type: 'localApiResult', id: data.id, error: e.message })
+        desktopChannel.postMessage({ type: 'localApiResult', id: data.id, error: e.message })
       }
     })
 
-    process.parentPort.postMessage({ type: 'ready', port: this.APP_SERVER_PORT })
+    desktopChannel.postMessage({ type: 'ready', port: this.APP_SERVER_PORT })
   }
 
   initObjectPools() {
@@ -681,9 +698,19 @@ class Server {
         await validOwnedWorld(worldId, ownerUid)
         if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Choose a port between 1024 and 65535')
         if (typeof password !== 'string' || !/^[\x20-\x7e]{0,64}$/.test(password)) throw new Error('Use up to 64 plain characters for the password')
-        if (this.getHostingStatus()) throw new Error('Already hosting. Stop hosting first.')
+        if (this.coopHost) throw new Error('Already hosting. Stop hosting first.')
         await this.activateStandaloneWorld({ worldId, ownerUid })
         await this.startHosting({ port, password })
+        return { worldId, serverUrl: serverUrl(), hosting: this.getHostingStatus() }
+      },
+      // the same, for Steam friends; desktop only, where main owns the Steam
+      // connections (SteamSocketBridge)
+      hostWorldOnSteam: async ({ worldId, ownerUid } = {}) => {
+        await validOwnedWorld(worldId, ownerUid)
+        if (!this.steamSocketBridge) throw new Error('Steam co-op needs the desktop app')
+        if (this.steamHost) throw new Error('Already hosting on Steam. Stop hosting first.')
+        await this.activateStandaloneWorld({ worldId, ownerUid })
+        this.startSteamHosting()
         return { worldId, serverUrl: serverUrl(), hosting: this.getHostingStatus() }
       },
       stopHosting: async () => {
@@ -735,27 +762,49 @@ class Server {
     })
   }
 
+  // Steam co-op: main runs the Steam listen socket while this is set and
+  // relays its connections (SteamSocketBridge)
+  startSteamHosting() {
+    this.steamHost = { startedAt: Date.now() }
+    desktopChannel.postMessage({ type: 'steamHosting', isHosting: true })
+
+    LOG.info('Hosting co-op on Steam')
+    this.forEachGame((game) => {
+      game.forEachPlayer((player) => this.sendHostingStatus(player))
+    })
+  }
+
+  // ends both kinds of hosting: every guest, LAN or Steam, gets the reason
   stopHosting(reason) {
-    if (!this.coopHost) return
+    if (!this.coopHost && !this.steamHost) return
 
     this.standaloneSocketServer.sockets.forEach((socket) => {
       if (socket.isGuest) this.socketUtil.emit(socket, "PlayerKick", { reason: reason })
     })
     this.standaloneSocketServer.closeGuestListener()
+    this.standaloneSocketServer.endGuestSockets()
+
+    if (this.steamHost) {
+      this.steamSocketBridge.closePending()
+      desktopChannel.postMessage({ type: 'steamHosting', isHosting: false })
+    }
+
     this.coopHost = null
+    this.steamHost = null
 
     LOG.info('Stopped hosting co-op')
   }
 
   getHostingStatus() {
-    if (!this.coopHost) return null
+    if (!this.coopHost && !this.steamHost) return null
     let game = this.getMainGame()
 
     return {
       worldId: game ? game.getId() : null,
-      port: this.coopHost.port,
-      addresses: this.getLanAddresses(),
-      hasPassword: !!this.coopHost.passwordKey
+      port: this.coopHost ? this.coopHost.port : null,
+      addresses: this.coopHost ? this.getLanAddresses() : [],
+      hasPassword: !!(this.coopHost && this.coopHost.passwordKey),
+      isOnSteam: !!this.steamHost
     }
   }
 
@@ -763,6 +812,9 @@ class Server {
   sendHostingStatus(player) {
     let status = this.getHostingStatus()
     if (!status || !player.isSectorOwner() || !player.isPlayerReady) return
+
+    if (status.isOnSteam) player.showChatSuccess('Co-op is open to your Steam friends.')
+    if (!status.port) return
 
     let addresses = status.addresses.map((address) => address + ':' + status.port)
     let where = addresses.length ? addresses.join(', ') : 'port ' + status.port

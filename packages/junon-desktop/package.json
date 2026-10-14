@@ -11,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "get-port": "^5.0.0",
-    "junon-io": "*"
+    "junon-common": "*",
+    "junon-io": "*",
+    "steamworks-ffi-node": "^0.11.3"
   },
   "devDependencies": {
     "electron": "^44.6.0",

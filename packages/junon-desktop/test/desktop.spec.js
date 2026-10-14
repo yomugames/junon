@@ -26,7 +26,8 @@ test.afterEach(() => {
 async function launch(dataDir = userDataDir) {
   const app = await electron.launch({
     args: CHROMIUM_ARGS.concat([APP_DIR]),
-    env: Object.assign({}, process.env, { JUNON_USER_DATA_DIR: dataDir })
+    // Steam off, so a machine with Steam running behaves like CI
+    env: Object.assign({}, process.env, { JUNON_USER_DATA_DIR: dataDir, JUNON_STEAM: '0' })
   })
   const page = await app.firstWindow()
   const errors = []
@@ -55,6 +56,11 @@ test('creates a world, saves it on quit and loads it after a restart', async () 
   // the page gets the narrow preload API and no Node access
   expect(await page.evaluate(() => [typeof window.junonDesktop, typeof window.require, typeof window.process])).toEqual(['object', 'undefined', 'undefined'])
   expect(await page.evaluate(() => window.junonDesktop.localWorldApi('constructor', []).catch((e) => e.message))).toBe('Unknown request')
+
+  // without Steam, the Steam co-op API says so and refuses to host or connect
+  expect(await page.evaluate(() => window.junonDesktop.steam.getStatus())).toEqual({ isAvailable: false })
+  expect(await page.evaluate(() => window.junonDesktop.localWorldApi('hostWorldOnSteam', [{}]).catch((e) => e.message))).toBe('Steam is not available')
+  expect(await page.evaluate(() => window.junonDesktop.steam.openSocket('76561198000000001', 'abcd1234', {}).catch((e) => e.message))).toBe('Steam is not available')
 
   await page.click('.local_new_btn')
   await page.fill('.world_name', 'Desktop World')

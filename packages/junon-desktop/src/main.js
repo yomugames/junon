@@ -3,6 +3,9 @@ const fs = require("fs")
 const path = require("path")
 const { pathToFileURL } = require("url")
 const ServerProcess = require("./server_process")
+const SteamRuntime = require("./steam")
+const SteamHost = require("./steam_host")
+const SteamGuest = require("./steam_guest")
 
 // The client is the junon-io production build for NODE_ENV=standalone
 // (`NODE_ENV=standalone npm run client:build`), served from app://junon/.
@@ -13,7 +16,7 @@ const CLIENT_DIR = path.join(path.dirname(require.resolve("junon-io/package.json
 const APP_ORIGIN = "app://junon"
 
 // the subset of Server#getLocalWorldApi the renderer may call
-const LOCAL_WORLD_API_METHODS = ["listWorlds", "createWorld", "openWorld", "hostWorld", "stopHosting", "startTutorial", "listImportCharacters", "importWorld"]
+const LOCAL_WORLD_API_METHODS = ["listWorlds", "createWorld", "openWorld", "hostWorld", "hostWorldOnSteam", "stopHosting", "startTutorial", "listImportCharacters", "importWorld"]
 
 // Separate user-data directories let two instances run side by side on one
 // machine, e.g. a co-op host and a guest when testing
@@ -29,6 +32,11 @@ protocol.registerSchemesAsPrivileged([
 let serverProcess
 let mainWindow
 let isQuitting = false
+
+// Steam co-op (steam.js); without Steam these stay null
+let steam = new SteamRuntime()
+let steamHost = null
+let steamGuest = null
 
 function isClientBuilt() {
   let indexPath = path.join(CLIENT_DIR, "index.html")
@@ -63,6 +71,8 @@ function registerIpc() {
   ipcMain.handle("junon:local-world-api", async (event, method, args) => {
     if (!isAppFrame(event.senderFrame)) return { error: "Forbidden" }
     if (!LOCAL_WORLD_API_METHODS.includes(method) || !Array.isArray(args)) return { error: "Unknown request" }
+    // the server can't tell whether this process has Steam
+    if (method === "hostWorldOnSteam" && !steamHost) return { error: "Steam is not available" }
 
     try {
       return { result: await serverProcess.request(method, args) }
@@ -70,6 +80,49 @@ function registerIpc() {
       return { error: e.message }
     }
   })
+
+  // Steam co-op for the renderer (preload.js). Without Steam, getStatus says
+  // so and the client hides the Steam controls.
+  ipcMain.handle("junon:steam-status", (event) => {
+    if (!isAppFrame(event.senderFrame)) return { isAvailable: false }
+    return steam.getStatus()
+  })
+
+  ipcMain.handle("junon:steam-socket-open", (event, hostSteamId, protocolHash) => {
+    if (!isAppFrame(event.senderFrame)) return { error: "Forbidden" }
+    if (!steamGuest) return { error: "Steam is not available" }
+
+    try {
+      return { result: steamGuest.open(event.sender, hostSteamId, protocolHash) }
+    } catch (e) {
+      return { error: e.message }
+    }
+  })
+
+  ipcMain.on("junon:steam-socket-send", (event, socketId, kind, data) => {
+    if (!isAppFrame(event.senderFrame) || !steamGuest) return
+    steamGuest.send(socketId, event.sender, kind, data)
+  })
+
+  ipcMain.on("junon:steam-socket-close", (event, socketId) => {
+    if (!isAppFrame(event.senderFrame) || !steamGuest) return
+    steamGuest.close(socketId, event.sender)
+  })
+}
+
+// the game server tells main when Steam hosting starts and stops, and relays
+// Steam guests' frames
+function onServerMessage(message) {
+  if (!steamHost) return
+  if (message.type === "steamHosting") return steamHost.setHosting(!!message.isHosting)
+  if (SteamHost.isServerMessage(message)) steamHost.onServerMessage(message)
+}
+
+function initSteam() {
+  if (!steam.init()) return
+
+  steamHost = new SteamHost(steam, (message) => serverProcess.post(message))
+  steamGuest = new SteamGuest(steam)
 }
 
 function createWindow() {
@@ -110,9 +163,11 @@ async function start() {
 
   protocol.handle("app", serveClient)
   registerIpc()
+  initSteam()
 
   serverProcess = new ServerProcess({
     savesDir: path.join(app.getPath("userData"), "saves"),
+    onMessage: onServerMessage,
     onUnexpectedExit: (code) => {
       if (isQuitting) return
       dialog.showErrorBox("Junon", "The game server stopped unexpectedly (code " + code + ").")
@@ -150,6 +205,9 @@ if (!app.requestSingleInstanceLock()) {
     if (isQuitting || !serverProcess) return
     event.preventDefault()
     isQuitting = true
-    serverProcess.stop().finally(() => app.quit())
+    serverProcess.stop().finally(() => {
+      steam.shutdown()
+      app.quit()
+    })
   })
 }

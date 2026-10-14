@@ -52,6 +52,19 @@ before connecting, to report version and password problems. Hosting ends when
 the host stops it, switches worlds or quits; guests then get a `PlayerKick` with
 a reason.
 
+Steam co-op (in progress, [plan](docs/exec-plans/active/steam-coop.md)) uses
+Steam Networking Sockets P2P instead of a guest listener. Steamworks runs only
+in the Electron main process (`junon-desktop/src/steam.js`), and the game server
+never loads it. On the host, `steam_host.js` accepts Steam connections and
+relays whole frames to the server over the parent port, where
+`server/util/steam_socket_bridge.js` turns each one into a guest socket with
+the same shape as a `ws` one (`isGuest`, `remoteAddress` `steam:<id>`). On the
+guest, `steam_guest.js` carries the renderer's game socket
+(`client/src/util/steam_socket.js`, for `steam:<id>` URLs) through preload.
+`junon-common/steam_framing.js` defines the framing: fragments under Steam's
+512 KB message limit, plus a control hello with the transport version and
+protocol hash that the host checks before any game message.
+
 ## Packages and responsibilities
 
 ### `packages/junon-io`
@@ -96,8 +109,10 @@ The Electron shell. `src/main.js` serves the client built with
 `app://` protocol, and opens a sandboxed, context-isolated window.
 `src/server_process.js` runs `junon-io/server/server.js` in an Electron utility
 process, with saves in `<userData>/saves`, and asks it to save and exit when the
-app quits. `src/preload.js` exposes the only privileged renderer API, the local
-world API.
+app quits. `src/preload.js` exposes the only privileged renderer API: the local
+world API and Steam co-op sockets. `src/steam*.js` hold the optional Steam
+integration. The server reaches main through `server/util/desktop_channel.js`,
+which tests can also back with Node IPC (`JUNON_DESKTOP_IPC=1`).
 
 ## Important contracts
 
@@ -135,7 +150,9 @@ new process globals require explicit justification in an execution plan.
 
 Development requires Node.js 26.4.0 and npm workspaces. The game needs no
 network service. Sentry reporting is off unless `JUNON_SERVER_SENTRY_DSN` is set
-outside `development`/`test`.
+outside `development`/`test`. Steam is optional: without the Steam client or
+the Steamworks redistributables, the desktop app runs without Steam features
+(see [docs/development.md](docs/development.md#steam)).
 
 The game server loads the repository-root `.env` file at startup; the file is
 local-only.

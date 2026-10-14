@@ -18,3 +18,7 @@ packages/junon-io/playwright-report/
 # default saves directory of `npm run server` (NODE_ENV=development)
 .dev-saves/
 .env*
+# Steamworks SDK redistributables (Valve's license) and the development app
+# id file; see docs/development.md#steam
+steamworks_sdk/
+steam_appid.txt

@@ -307,6 +307,30 @@ Set `JUNON_USER_DATA_DIR` to run with a different user-data directory, for
 example to run two instances side by side. Server output appears in the
 terminal that ran `npm run desktop`.
 
+### Steam
+
+Steam co-op is being built ([execution plan](exec-plans/active/steam-coop.md)).
+The transport is in place; there is no menu entry for it yet. The desktop
+app's main process loads Steamworks through `steamworks-ffi-node`
+(`packages/junon-desktop/src/steam.js`) and, if anything is missing, logs one
+`Steam: ...` line and runs without Steam. It needs:
+
+- the Steam client running and logged in;
+- the Steamworks SDK redistributables, which Valve's license keeps out of the
+  repository. Download the SDK from the Steamworks partner site and either
+  copy its `redistributable_bin/` to `steamworks_sdk/redistributable_bin/` at
+  the repository root (gitignored) or set `JUNON_STEAMWORKS_SDK` to the SDK's
+  `sdk/` directory.
+
+| Variable | Meaning |
+| --- | --- |
+| `JUNON_STEAM` | `0` turns Steam off. The desktop e2e tests set it. |
+| `JUNON_STEAM_APP_ID` | Steam app id. Defaults to 480 (Valve's "Spacewar" test app) until Junon has its own. Any Steam account can use 480. |
+| `JUNON_STEAMWORKS_SDK` | Path to an unpacked Steamworks SDK's `sdk/` directory. |
+
+Testing Steam co-op by hand takes two Steam accounts on two machines; one
+account can't be both host and guest.
+
 ## Configuration
 
 The game server loads a root `.env` file before initializing configuration,

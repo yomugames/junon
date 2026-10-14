@@ -275,9 +275,9 @@ class Main {
 
         if (cb) cb()
       },
-      error: (wasNeverConnected) => {
+      error: (wasNeverConnected, reason) => {
         if (wasNeverConnected) {
-          this.onPlayerCantJoin({ message: "Cant connect to server " + url })
+          this.onPlayerCantJoin({ message: reason || "Cant connect to server " + url })
           this.localWorldMenu.show()
         }
       }

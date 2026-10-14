@@ -1,6 +1,7 @@
 const Cookies = require("js-cookie")
 const SocketUtil = require("../util/socket_util")
 const ClientHelper = require("../util/client_helper")
+const SteamSocket = require("../util/steam_socket")
 
 class GameConnection {
 
@@ -57,7 +58,8 @@ class GameConnection {
       }
     }
 
-    this.socket = new WebSocket(url)
+    // steam:<id> URLs are Steam co-op hosts, reached through the desktop app
+    this.socket = SteamSocket.isSteamUrl(url) ? new SteamSocket(url) : new WebSocket(url)
     this.socket.binaryType = "arraybuffer"
 
     this.socket.onopen = () => {
@@ -70,9 +72,10 @@ class GameConnection {
       if (callback.success) callback.success(this.socket)
     }
 
-    this.socket.onerror = () => {
+    // a Steam socket says why it failed, e.g. a version mismatch
+    this.socket.onerror = (event) => {
       let wasNeverConnected = this.isFirstSocketSetup
-      if (callback.error) callback.error(wasNeverConnected)
+      if (callback.error) callback.error(wasNeverConnected, event && event.reason)
     }
 
     this.socket.onclose = this.onSocketDisconnect.bind(this)

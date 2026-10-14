@@ -144,6 +144,15 @@ NODE_ENV=standalone npm run client:build
 xvfb-run -a npm run test:e2e --workspace packages/junon-desktop
 ```
 
+The desktop tests run with `JUNON_STEAM=0`. They check that the Steam preload
+API reports Steam as unavailable and refuses to host or connect.
+`test/steam_relay.spec.js` runs in Node, without Electron: it puts the
+main-process Steam relays (`src/steam_host.js`, `src/steam_guest.js`) on an
+in-memory stand-in for Steam Networking Sockets, with a real game server behind
+the host, and covers the hello, version refusal, joining, a full Steam send
+buffer, and the end of hosting. Real Steam can only be checked by hand
+([steam-coop.md](exec-plans/active/steam-coop.md#validation)).
+
 ## Validation by change type
 
 | Change | Minimum useful validation |
@@ -156,6 +165,7 @@ xvfb-run -a npm run test:e2e --workspace packages/junon-desktop
 | Database model | `test/server/standalone_schema.test.js`, and a server start against a saves directory created before the change |
 | Startup/configuration | Start the server in the intended `NODE_ENV` (`standalone`, and `development` for `npm run server`) |
 | Server runtime, local menu, co-op | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real server, checks save/reload, exercises the local world and import HTTP routes, checks the `ws` game socket, and covers co-op hosting (preflight, password challenge and proof, replay and throttling, guest upgrade checks, owner-profile refusal, stop and shutdown notices), world thumbnails, and the singleplayer pause |
+| Steam co-op transport | `test/server/steam_framing.test.js` (fragmentation, malformed input, send back-pressure) and `test/server/steam_coop.test.js` (forks the server with `JUNON_DESKTOP_IPC=1` and plays the desktop main process: hello and version check, Steam guests joining, owner-profile refusal, stop and shutdown notices), then `packages/junon-desktop/test/steam_relay.spec.js` |
 | Desktop shell (`packages/junon-desktop`) | `NODE_ENV=standalone npm run client:build`, then the desktop e2e test (see below) |
 | Player-facing flow across client and server | The closest `test/e2e` spec, or a new one |
 

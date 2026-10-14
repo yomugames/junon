@@ -9,7 +9,7 @@ menu" block in `client/stylesheets/style.css`.
 ## Layout
 
 - Left rail (`.home_rail`): logo, the menu (`.local_menu_actions`) and the game
-  version.
+  version, which opens the Patch notes panel.
 - Top bar (`.home_topbar`): the player name (`.local_player_name`, saved to the
   local profile) and the language select.
 - Content panel (`.local_menu_panel`): each menu entry renders its panel here
@@ -26,6 +26,15 @@ menu" block in `client/stylesheets/style.css`.
 - World cards show the name, mode (`peaceful` is labelled Sandbox) and day; the
   colored top edge marks the mode, and the world being hosted gets a "Hosting"
   badge. Names are player input, so cards are built with `textContent`.
+- A card shows the world's preview (taken with the camera button in the colony
+  menu's Preview tab) or placeholder art. `listWorlds` returns each preview as a
+  `data:` URL (`Server#readWorldThumbnail`), because closed worlds' thumbnails
+  aren't served over HTTP and the desktop app has no page server.
+  `test/e2e/world_thumbnail.spec.js` covers this.
+- **Patch notes** shows the 10 latest `changelogs/` entries, newest first. They
+  are rendered into `#local_changelog_template` when the page is built, so the
+  desktop app needs a client rebuild to show a new release.
+  `test/e2e/patch_notes.spec.js` covers this.
 - **Tutorial** calls `startTutorial`: the server closes the open world (saving
   it), stops hosting, and starts a fresh tutorial game from
   `common/tutorial.sav.gz` (`Server#activateTutorialWorld`). The tutorial has

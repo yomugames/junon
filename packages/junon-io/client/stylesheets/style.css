@@ -8248,9 +8248,22 @@ body.imposter_mode .minigame_poster {
 }
 
 #local_world_menu .local_menu_version {
+    align-self: flex-start;
     margin: auto 0px 0px;
+    padding: 0px;
+    font-family: 'cc';
     font-size: 13px;
     color: #6f7b8e;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+#local_world_menu .local_menu_version:hover,
+#local_world_menu .local_menu_version:focus-visible {
+    color: #e0673f;
+    outline: none;
+    text-decoration: underline;
 }
 
 /* top bar */
@@ -8463,6 +8476,62 @@ body.imposter_mode .minigame_poster {
     user-select: text;
 }
 
+/* patch notes */
+
+#local_world_menu .local_changelog_entry {
+    padding: 0px 0px 20px;
+    margin-bottom: 20px;
+    border-bottom: solid 1px rgba(255, 255, 255, 0.06);
+}
+
+#local_world_menu .local_changelog_entry:last-child {
+    margin-bottom: 0px;
+    border-bottom: none;
+}
+
+#local_world_menu .local_changelog_heading {
+    display: flex;
+    align-items: baseline;
+}
+
+#local_world_menu .local_changelog_version {
+    font-size: 18px;
+    color: #e8edf4;
+}
+
+#local_world_menu .local_changelog_date {
+    margin-left: 12px;
+    font-size: 13px;
+    color: #6f7b8e;
+}
+
+#local_world_menu .local_changelog_title {
+    margin-top: 4px;
+    font-size: 15px;
+    color: #e0673f;
+}
+
+#local_world_menu .local_changelog_section {
+    margin: 14px 0px 6px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8a96a8;
+}
+
+#local_world_menu .local_changelog_entry ul {
+    margin: 0px;
+    padding-left: 18px;
+    font-family: arial;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #c4ccd8;
+}
+
+#local_world_menu .local_changelog_entry li {
+    margin-bottom: 4px;
+}
+
 /* world cards */
 
 #local_world_menu .local_world_list {
@@ -8496,11 +8565,18 @@ body.imposter_mode .minigame_poster {
     border-top-color: #d9534f;
 }
 
-#local_world_menu .local_world_entry::before {
+#local_world_menu .local_world_entry:not(.has_thumbnail)::before {
     content: '';
     display: block;
     height: 110px;
     background: url(/assets/images/background/default_junon_thumb.png) center / cover;
+}
+
+#local_world_menu .local_world_thumbnail {
+    display: block;
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
 }
 
 #local_world_menu .local_world_entry:hover,

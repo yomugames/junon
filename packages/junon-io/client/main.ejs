@@ -43,8 +43,28 @@
                     <button class='local_import_btn home_nav_item' data-panel='import'>Import save</button>
                 </nav>
 
-                <p class='local_menu_version'>Version <span class='game_version'><%= gameVersion %></span></p>
+                <button class='local_menu_version local_changelog_btn' title='Patch notes'>Version <span class='game_version'><%= gameVersion %></span></button>
             </div>
+
+            <%# the latest releases, newest first, for the Patch notes panel %>
+            <template id='local_changelog_template'>
+                <h2>Patch notes</h2>
+                <% const changeLogSectionLabels = { features: 'New', bugs: 'Fixes' } %>
+                <% changeLogs.slice(0, 10).forEach((changeLog) => { %>
+                    <article class='local_changelog_entry'>
+                        <div class='local_changelog_heading'><span class='local_changelog_version'><%= changeLog.version %></span><span class='local_changelog_date'><%= changeLog.date %></span></div>
+                        <% if (changeLog.title) { %><div class='local_changelog_title'><%= changeLog.title %></div><% } %>
+                        <% Object.keys(changeLog.content).forEach((section) => { %>
+                            <% if (changeLog.content[section].length > 0) { %>
+                                <div class='local_changelog_section'><%= changeLogSectionLabels[section] || section %></div>
+                                <ul>
+                                    <% changeLog.content[section].forEach((item) => { %><li><%= item %></li><% }) %>
+                                </ul>
+                            <% } %>
+                        <% }) %>
+                    </article>
+                <% }) %>
+            </template>
 
             <div class='home_content'>
                 <p class='local_menu_message' role='status'></p>

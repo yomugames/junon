@@ -538,9 +538,15 @@ class Server {
 
   }
 
+  // oldest first by version number, like gulpfile.js fetchChangeLogs (a plain
+  // directory listing puts v0.0.10 before v0.0.9)
   fetchChangeLogs() {
     let changeLogsDir = appRoot + "/changelogs"
-    let changeLogFiles = fs.readdirSync(changeLogsDir)
+    let versionValue = (filename) => {
+      let tokens = filename.replace(".alpha", "").replace("v", "").split(".")
+      return parseInt(tokens[0]) * 100000 + parseInt(tokens[1]) * 1000 + parseInt(tokens[2])
+    }
+    let changeLogFiles = fs.readdirSync(changeLogsDir).sort((a, b) => versionValue(a) - versionValue(b))
     let changeLogs = changeLogFiles.map((filename) => {
       let changeLogContent = JSON.parse(fs.readFileSync(path.resolve(changeLogsDir, filename), 'utf8'))
       return changeLogContent
@@ -656,7 +662,8 @@ class Server {
     return {
       listWorlds: async () => {
         let rows = await SectorModel.findAll({ order: [['updatedAt', 'DESC']] })
-        return { worlds: rows.map((row) => ({ id: row.uid, name: row.name, mode: row.gameMode, days: row.daysAlive })), activeWorldId: this.getMainGame() && this.getMainGame().getId(), serverUrl: serverUrl(), hosting: this.getHostingStatus() }
+        let worlds = await Promise.all(rows.map(async (row) => ({ id: row.uid, name: row.name, mode: row.gameMode, days: row.daysAlive, thumbnail: await this.readWorldThumbnail(row.screenshot) })))
+        return { worlds: worlds, activeWorldId: this.getMainGame() && this.getMainGame().getId(), serverUrl: serverUrl(), hosting: this.getHostingStatus() }
       },
       createWorld: async ({ ownerUid, name, gameMode } = {}) => {
         if (!validOwner(ownerUid) || typeof name !== 'string' || !/^[\p{L}\p{N} _-]{1,40}$/u.test(name.trim()) || !['peaceful', 'survival', 'hardcore'].includes(gameMode)) throw new Error('Invalid world details')
@@ -846,6 +853,21 @@ class Server {
 
     let ip = StandaloneSocketServer.normalizeAddress(req.socket.remoteAddress)
     return this.isGuestProofValid(ip, query.get('challenge'), query.get('proof'), true)
+  }
+
+  // The local menu shows every world's thumbnail, including closed worlds,
+  // which serveScreenshotThumbnail doesn't serve. It gets them inline from
+  // listWorlds, which works the same over desktop IPC and the /local routes.
+  async readWorldThumbnail(screenshot) {
+    if (typeof screenshot !== 'string' || !/^[a-f0-9]{32}$/.test(screenshot)) return null
+
+    try {
+      let filePath = Game.prototype.getLocalImagePath(screenshot + "_thumb.jpg")
+      let data = await fs.promises.readFile(filePath)
+      return "data:image/jpeg;base64," + data.toString("base64")
+    } catch(e) {
+      return null
+    }
   }
 
   // World thumbnails (Sector#addScreenshot) are files in the saves directory.

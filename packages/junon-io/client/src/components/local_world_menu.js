@@ -22,6 +22,7 @@ class LocalWorldMenu {
     Object.keys(actions).forEach((name) => {
       this.el.querySelector('.local_' + name + '_btn').addEventListener('click', () => this[actions[name]]())
     })
+    this.el.querySelector('.local_changelog_btn').addEventListener('click', () => this.showChangelog())
     this.continueBtn = this.el.querySelector('.local_continue_btn')
     this.continueBtn.addEventListener('click', () => {
       if (this.latestWorld) this.openWorld(this.latestWorld)
@@ -112,6 +113,16 @@ class LocalWorldMenu {
     button.className = 'local_world_entry'
     button.dataset.mode = world.mode
 
+    // a preview taken from the colony menu's Preview tab, if there is one
+    if (world.thumbnail) {
+      button.classList.add('has_thumbnail')
+      const thumbnail = document.createElement('img')
+      thumbnail.className = 'local_world_thumbnail'
+      thumbnail.alt = ''
+      thumbnail.src = world.thumbnail
+      button.appendChild(thumbnail)
+    }
+
     const name = document.createElement('span')
     name.className = 'local_world_name'
     name.textContent = world.name
@@ -136,6 +147,14 @@ class LocalWorldMenu {
   renderNoWorlds(list) {
     list.innerHTML = '<div class="local_world_empty"><div class="local_world_empty_title">No worlds yet</div><p>Create a world, import a save, or join a friend\'s game.</p><button class="ui_btn">New world</button></div>'
     list.querySelector('button').addEventListener('click', () => this.newWorld())
+  }
+
+  // release notes are rendered into a <template> when the page is built
+  showChangelog() {
+    this.setActive('changelog')
+    this.panel.textContent = ''
+    this.panel.appendChild(document.querySelector('#local_changelog_template').content.cloneNode(true))
+    this.panel.scrollTop = 0
   }
 
   // the server swaps the open world for a fresh tutorial (not saved or listed)

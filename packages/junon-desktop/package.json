@@ -6,7 +6,8 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "screenshot": "node scripts/screenshot.js"
   },
   "license": "ISC",
   "dependencies": {

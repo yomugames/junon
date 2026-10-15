@@ -144,6 +144,17 @@ NODE_ENV=standalone npm run client:build
 xvfb-run -a npm run test:e2e --workspace packages/junon-desktop
 ```
 
+To look at a UI change in the real app, `scripts/screenshot.js` launches it the
+same way, creates and plays a world, and saves PNGs (options at the top of the
+script). `--online` hosts the world against a signalling server started in the
+script's process, and `--colony-menu` opens the colony menu, for example to see
+the owner's room code:
+
+```sh
+NODE_ENV=standalone npm run client:build
+xvfb-run -a npm run screenshot --workspace packages/junon-desktop -- --online --colony-menu --copy --out /tmp/shots
+```
+
 The desktop tests run with `JUNON_STEAM=0`. They check that the Steam preload
 API reports Steam as unavailable and refuses to host or connect.
 `test/steam_relay.spec.js` runs in Node, without Electron: it puts the

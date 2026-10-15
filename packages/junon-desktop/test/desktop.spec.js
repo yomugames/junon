@@ -29,8 +29,9 @@ test.afterEach(() => {
 async function launch(dataDir = userDataDir, extraEnv = {}) {
   const app = await electron.launch({
     args: CHROMIUM_ARGS.concat([APP_DIR]),
-    // Steam off, so a machine with Steam running behaves like CI
-    env: Object.assign({}, process.env, { JUNON_USER_DATA_DIR: dataDir, JUNON_STEAM: '0' }, extraEnv)
+    // Steam off, so a machine with Steam running behaves like CI, and online
+    // co-op off unless a test runs its own signalling server
+    env: Object.assign({}, process.env, { JUNON_USER_DATA_DIR: dataDir, JUNON_STEAM: '0', JUNON_SIGNAL_URL: 'off' }, extraEnv)
   })
   const page = await app.firstWindow()
   const errors = []
@@ -64,7 +65,7 @@ test('creates a world, saves it on quit and loads it after a restart', async () 
   expect(await page.evaluate(() => window.junonDesktop.steam.call('getStatus'))).toEqual({ isAvailable: false })
   expect(await page.evaluate(() => window.junonDesktop.localWorldApi('hostWorldOnSteam', [{}]).catch((e) => e.message))).toBe('Steam is not available')
   expect(await page.evaluate(() => window.junonDesktop.steam.openSocket('76561198000000001', 'abcd1234', {}).catch((e) => e.message))).toBe('Steam is not available')
-  // without a signalling server, no online co-op
+  // with online co-op off, no signalling server
   expect(await page.evaluate(() => window.junonDesktop.online.getStatus())).toEqual({ isAvailable: false, signalUrl: null })
   expect(await page.evaluate(() => window.junonDesktop.localWorldApi('hostWorldOnline', [{}]).catch((e) => e.message))).toBe('Online co-op is not available')
 

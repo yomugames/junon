@@ -164,8 +164,8 @@ over WebRTC" starts a signalling server (`packages/junon-signal`) in the test
 process with no STUN servers and runs two app instances against it, so the
 data channel is real WebRTC between local addresses and nothing leaves the
 machine. It runs twice: with the Node server, and with the Cloudflare Worker
-in `workerd` through Miniflare (`junon-signal/testing.js`). Other desktop tests run without `JUNON_SIGNAL_URL` and check that
-online co-op is unavailable. Connections across real networks and NATs can
+in `workerd` through Miniflare (`junon-signal/testing.js`). Other desktop tests run with `JUNON_SIGNAL_URL=off`, so they never reach the
+deployed signalling server, and check that online co-op is unavailable. Connections across real networks and NATs can
 only be checked by hand
 ([webrtc-coop.md](exec-plans/active/webrtc-coop.md#validation)).
 

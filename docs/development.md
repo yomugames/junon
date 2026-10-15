@@ -351,7 +351,7 @@ controls only when it knows a signalling server:
 
 | Variable | Meaning |
 | --- | --- |
-| `JUNON_SIGNAL_URL` | Desktop app: the signalling server, `ws://` or `wss://`. Overrides `DEFAULT_SIGNAL_URL` in `packages/junon-desktop/src/main.js`, which release builds set to the deployed server and which is `null` in the repository. |
+| `JUNON_SIGNAL_URL` | Desktop app: the signalling server, `ws://` or `wss://`, in place of `DEFAULT_SIGNAL_URL` in `packages/junon-desktop/src/main.js` (the deployed Cloudflare Worker). `off` turns online co-op off; the desktop tests set it. |
 
 To try it on one machine, run the signalling server, then two desktop
 instances with separate user-data directories:
@@ -386,8 +386,8 @@ npx wrangler deploy
 npx wrangler secret put TURN_SECRET
 ```
 
-The deployed `wss://junon-signal.<account>.workers.dev` (or a custom domain)
-is what `DEFAULT_SIGNAL_URL` should be. Settings are `[vars]` in
+`DEFAULT_SIGNAL_URL` is the deployed Worker's `wss://` address (a
+`workers.dev` one; a custom domain can replace it). Settings are `[vars]` in
 `wrangler.toml`, documented at the top of `worker/index.mjs`: `ICE_SERVERS`,
 `TURN_URLS`, `TURN_SECRET`, `TURN_TTL`, and limits for tests. Unlike the Node
 server, it limits rooms opened per address per 10 minutes (10), not rooms

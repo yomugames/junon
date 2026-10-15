@@ -49,9 +49,10 @@ Acceptance criteria:
   per room (hibernating WebSockets, alarms), sharing `protocol.mjs` with the
   Node server; host keepalive; both backends under one test suite and the
   desktop WebRTC test.
-- [ ] Deploy the Worker and set `DEFAULT_SIGNAL_URL` for release
-  builds (with packaging, Phase 9 of
-  [electron-offline-coop.md](electron-offline-coop.md)).
+- [x] 2026-10-15: Worker deployed to Cloudflare; `DEFAULT_SIGNAL_URL`
+  points at it, and `JUNON_SIGNAL_URL=off` keeps the desktop tests off it.
+  The full protocol and a room idle for 40 s (pings only, so the room
+  hibernated) then joined passed against the deployment.
 - [ ] Manual validation across real networks (see Validation); decide on
   TURN from the failure rate.
 
@@ -177,9 +178,12 @@ URLs, so reconnects go through the room again.
   them, though it does drop the sockets.
 - 2026-10-15: Miniflare never evicts objects, so tests don't prove that rooms
   survive hibernation; the room keeps no in-memory state besides its
-  configuration, by design. Check on Cloudflare after the first deploy.
-- Rollback: release builds without `DEFAULT_SIGNAL_URL` hide online co-op;
-  the other co-op modes don't depend on it.
+  configuration, by design. Checked on Cloudflare (2026-10-15): a room left
+  idle for 40 s with pings only took a guest and relayed signals.
+- Rollback: `DEFAULT_SIGNAL_URL = null` in a release hides online co-op; the
+  other co-op modes don't depend on it. Taking the Worker down leaves the
+  online controls showing, with an "can't reach the online co-op service"
+  message.
 
 ## Result
 

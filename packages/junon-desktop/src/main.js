@@ -20,11 +20,15 @@ const APP_ORIGIN = "app://junon"
 // the subset of Server#getLocalWorldApi the renderer may call
 const LOCAL_WORLD_API_METHODS = ["listWorlds", "createWorld", "openWorld", "hostWorld", "hostWorldOnSteam", "hostWorldOnline", "stopHosting", "startTutorial", "listImportCharacters", "importWorld"]
 
-// The signalling server for online (WebRTC) co-op, packages/junon-signal.
-// Release builds set DEFAULT_SIGNAL_URL to the deployed server; without
-// one, the online co-op controls are hidden.
-const DEFAULT_SIGNAL_URL = null
-const SIGNAL_URL = /^wss?:\/\/[^\s]+$/.test(process.env.JUNON_SIGNAL_URL || "") ? process.env.JUNON_SIGNAL_URL : DEFAULT_SIGNAL_URL
+// The signalling server for online (WebRTC) co-op, packages/junon-signal,
+// deployed as a Cloudflare Worker. JUNON_SIGNAL_URL points elsewhere, or
+// `off` hides the online co-op controls (the desktop tests use it).
+const DEFAULT_SIGNAL_URL = "wss://junon-signal.yomusolutions.workers.dev"
+function signalUrl(value) {
+  if (value === "off") return null
+  return /^wss?:\/\/[^\s]+$/.test(value || "") ? value : DEFAULT_SIGNAL_URL
+}
+const SIGNAL_URL = signalUrl(process.env.JUNON_SIGNAL_URL)
 
 // Separate user-data directories let two instances run side by side on one
 // machine, e.g. a co-op host and a guest when testing

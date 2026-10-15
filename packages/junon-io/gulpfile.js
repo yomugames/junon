@@ -93,7 +93,7 @@ const terserOptions = {
 // packages that need it. Add another entry to `only` if a future vendor
 // dependency hits the same parse error.
 let legacySyntaxTransform = babelify.configure({
-  only: [/node_modules\/uuid\//],
+  only: [/node_modules[\\/]uuid[\\/]/], // either path separator, for Windows
   babelrc: false,
   configFile: false,
   presets: [],

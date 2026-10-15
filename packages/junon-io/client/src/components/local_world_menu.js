@@ -18,6 +18,8 @@ class LocalWorldMenu {
     this.el = document.querySelector('#local_world_menu')
     this.panel = this.el.querySelector('.local_menu_panel')
     this.message = this.el.querySelector('.local_menu_message')
+    this.error = this.el.querySelector('.local_menu_error')
+    this.error.querySelector('.local_menu_error_close').addEventListener('click', () => this.hideError())
     this.nameInput = this.el.querySelector('.local_player_name')
     this.nameInput.value = main.localProfile.name || 'Player'
     this.nameInput.addEventListener('change', () => {
@@ -123,6 +125,18 @@ class LocalWorldMenu {
     document.querySelector('.middle_container').style.display = 'block'
     this.el.style.display = 'block'
     this.loadWorlds()
+  }
+
+  // why the last world couldn't be joined, or why the player left it (e.g.
+  // a name already taken, a kick, the host closing the world). Stays up until
+  // closed or another world is joined, unlike a panel's message.
+  showError(message) {
+    this.error.querySelector('.local_menu_error_text').textContent = message
+    this.error.classList.add('visible')
+  }
+
+  hideError() {
+    this.error.classList.remove('visible')
   }
 
   saveName() {

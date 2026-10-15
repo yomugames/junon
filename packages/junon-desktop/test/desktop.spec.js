@@ -155,6 +155,16 @@ test('a second instance joins a hosted world, leaves and rejoins', async () => {
     }
 
     guest = await launch(guestDataDir)
+
+    // the host's name is taken: back on the home menu with the reason, which
+    // the player closes before joining under another name
+    await setName(guest.page, 'Host')
+    await joinAs(guest.page, 'secret')
+    await expect(guest.page.locator('.local_menu_error_text')).toHaveText('Someone in this world is already called Host. Change your name and join again.', { timeout: 60_000 })
+    await expect(guest.page.locator('#local_world_menu')).toBeVisible()
+    await guest.page.click('.local_menu_error_close')
+    await expect(guest.page.locator('.local_menu_error')).toBeHidden()
+
     await setName(guest.page, 'Guest')
     await joinAs(guest.page, 'wrong')
     await expect(guest.page.locator('.local_menu_message')).toHaveText('Wrong password')

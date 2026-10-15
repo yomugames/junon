@@ -8318,6 +8318,36 @@ body.imposter_mode .minigame_poster {
     display: none;
 }
 
+#local_world_menu .local_menu_error {
+    display: none;
+    align-items: center;
+    margin: 0px 0px 10px;
+    padding: 10px 14px;
+    color: #ffad91;
+    background-color: rgba(60, 14, 10, 0.9);
+    border: solid 1px rgba(255, 173, 145, 0.4);
+    border-radius: 8px;
+}
+
+#local_world_menu .local_menu_error.visible {
+    display: flex;
+}
+
+#local_world_menu .local_menu_error_text {
+    flex: 1;
+}
+
+#local_world_menu .local_menu_error_close {
+    margin-left: 14px;
+    padding: 0px 6px;
+    color: #ffad91;
+    background: none;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
 #local_world_menu .local_menu_panel {
     min-height: 0px;
     max-height: 100%;

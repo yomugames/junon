@@ -1878,6 +1878,9 @@ class Game {
 
   onPlayerKick(data) {
     this.gameConnection.close()
+    window.history.replaceState(null, null, "?")
+    this.displayHomePage()
+
     if (data.reason) {
       // e.g. a co-op host closing the world
       this.main.onPlayerCantJoin({ message: data.reason })
@@ -1886,9 +1889,6 @@ class Game {
     } else {
       this.main.onPlayerCantJoin({ message: i18n.t("Player.Kicked") })
     }
-
-    window.history.replaceState(null, null, "?")
-    this.displayHomePage()
   }
 
   onRemovedFromGame(data) {
@@ -3711,7 +3711,11 @@ arrow.style.setProperty('--arrow-color',realColor)
     }
   }
 
+  // the server refused the join (e.g. the name is taken): stop the
+  // connection, or it would reconnect and be refused again
   onPlayerCantJoin(data) {
+    if (this.gameConnection) this.gameConnection.close()
+    if (this.player) this.displayHomePage()
     this.main.onPlayerCantJoin(data)
   }
 

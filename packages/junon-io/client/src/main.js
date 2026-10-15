@@ -195,6 +195,7 @@ class Main {
   }
 
   joinStandaloneWorld() {
+    this.localWorldMenu.hideError()
     let url = this.standaloneServerUrl || this.getUrlParam().get("server") || "ws://127.0.0.1:8000"
 
     document.querySelector("#connecting_message").style.display = 'none'
@@ -278,7 +279,6 @@ class Main {
       error: (wasNeverConnected, reason) => {
         if (wasNeverConnected) {
           this.onPlayerCantJoin({ message: reason || "Cant connect to server " + url })
-          this.localWorldMenu.show()
         }
       }
     })
@@ -295,20 +295,19 @@ class Main {
     return serverUrl.replace(/^ws:/, "http:").replace(/\/$/, "") + `/screenshots/${key}_thumb.jpg`
   }
 
+  // a refused join, a kick or a lost host: back on the home menu, with the
+  // reason in a banner the player can close before trying again
   onPlayerCantJoin(data) {
     document.querySelector("#connecting_message").style.display = 'none'
     console.log(data.message)
+    // e.g. the client's protocol failing to load, before the menu exists
+    if (!this.localWorldMenu) {
+      document.getElementById("home_error_message").innerText = data.message || "Unable to join the world"
+      return
+    }
 
-    setTimeout(() => {
-      let message = data.message || "Unable to join the world"
-      document.getElementById("home_error_message").innerText = message
-
-      if (this.isMobile) {
-        setTimeout(() => {
-          this.clearHomeErrorMessage()
-        }, 2000)
-      }
-    }, 1000)
+    this.localWorldMenu.showError(data.message || "Unable to join the world")
+    if (this.localWorldMenu.el.style.display !== 'block') this.localWorldMenu.show()
   }
 
   initSettingsMenu() {

@@ -67,6 +67,12 @@ menu" block in `client/stylesheets/style.css`.
   server first, so a wrong code or another version shows in the menu message.
   With Steam or online co-op, the address form gets a "By address" heading.
 - Switching panels clears the previous panel's error message.
+- When the game server refuses a join (`CantJoin`, e.g. a name already in the
+  world), kicks the player, or the host goes away, the client closes the
+  connection, returns to this menu and shows the reason in a banner above the
+  panel (`.local_menu_error`, closed with `.local_menu_error_close`). It stays
+  across panels until closed or another world is joined
+  (`Main#onPlayerCantJoin`, `LocalWorldMenu#showError`).
 
 ## Selectors other code depends on
 

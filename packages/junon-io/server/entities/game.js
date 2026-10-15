@@ -2052,7 +2052,7 @@ async setGameMode(gameMode) {
 
     let isNameUsedByOtherPlayer = this.isUsernameTakenInServer(data.username) && !this.getPlayerByUID(uid)
     if (isNameUsedByOtherPlayer) {
-      this.getSocketUtil().emit(socket, "CantJoin", { message: "username is already taken" })
+      this.getSocketUtil().emit(socket, "CantJoin", { message: "Someone in this world is already called " + data.username + ". Change your name and join again." })
       return
     }
 

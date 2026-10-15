@@ -286,12 +286,14 @@ players' existing files must keep working. Tables of removed hosted features
 ### Desktop app
 
 `packages/junon-desktop` is the Electron shell for the same server. It loads
-the production client build, so build that for standalone first and rebuild it
-after client changes:
+the production client build for standalone, which `npm run desktop` builds
+before every launch (`cross-env NODE_ENV=standalone npm run client:build`,
+about half a minute). To launch without rebuilding, when only server or desktop
+code changed (both run from source):
 
 ```sh
-NODE_ENV=standalone npm run client:build
 npm run desktop
+npm run start --workspace packages/junon-desktop   # no client build
 ```
 
 The window loads `app://junon/` from `packages/junon-io/dist/`, and the app

@@ -3,7 +3,7 @@
   "scripts": {
     "server": "npm run inspect --workspace packages/junon-io",
     "client": "npm run client --workspace packages/junon-io",
-    "desktop": "npm run start --workspace packages/junon-desktop",
+    "desktop": "cross-env NODE_ENV=standalone npm run client:build && npm run start --workspace packages/junon-desktop",
     "signal": "npm run start --workspace packages/junon-signal",
     "test": "npm run test --workspace packages/junon-io",
     "client:build": "npm run client:build --workspace packages/junon-io"
@@ -23,5 +23,8 @@
   },
   "allowScripts": {
     "sqlite3@6.0.1": true
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
   }
 }

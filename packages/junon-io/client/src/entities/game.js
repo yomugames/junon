@@ -2043,7 +2043,6 @@ class Game {
 
     if (data.hasOwnProperty("isPrivate")) {
       this.sector.setIsPrivate(data.isPrivate)
-      this.teamMenu.setSectorIsPrivate(data.isPrivate)
     }
 
     if (data.hasOwnProperty("buildSpeed")) {

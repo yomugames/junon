@@ -247,6 +247,12 @@ for (const backend of ['node', 'worker']) test(`hosts online with a room code, a
     expect(hosting.roomCode).toMatch(/^[2-9A-HJKMNP-TV-Z]{8}$/)
     expect(await lookupRoom(signal.url, hosting.roomCode)).toMatchObject({ type: 'room', worldName: 'Online World' })
 
+    // the colony menu's Info tab shows the owner the code too
+    await host.page.evaluate(() => window.game.teamMenu.open())
+    await expect(host.page.locator('.room_code_input')).toHaveValue(hosting.roomCode.slice(0, 4) + '-' + hosting.roomCode.slice(4))
+    await expect(host.page.locator('.copy_room_code_btn')).toBeVisible()
+    await host.page.evaluate(() => window.game.teamMenu.close())
+
     guest = await launch(guestDataDir, onlineEnv)
     await setName(guest.page, 'Guest')
     const joinWith = async (code) => {
@@ -303,7 +309,11 @@ for (const backend of ['node', 'worker']) test(`hosts online with a room code, a
     // hosting again opens a new room; the host quitting saves the world and
     // tells the guest why they left
     await host.page.click('.start_online_hosting')
-    await host.page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
+    // the new room's code comes from the signalling server a moment later
+    await host.page.waitForFunction(async () => {
+      const hosting = (await window.junonDesktop.localWorldApi('getHosting', [])).hosting
+      return !!(hosting && hosting.roomCode)
+    }, null, { timeout: 30_000 })
     const rehosting = (await host.page.evaluate(() => window.junonDesktop.localWorldApi('listWorlds', []))).hosting
     expect(rehosting.roomCode).not.toBe(hosting.roomCode)
     await joinWith(rehosting.roomCode)

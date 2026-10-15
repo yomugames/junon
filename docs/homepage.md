@@ -60,8 +60,8 @@ menu" block in `client/stylesheets/style.css`.
   [development.md](development.md#online-co-op-webrtc)). Host: **Host online
   and play** (`hostWorldOnline`); while hosting, the Host panel shows the room
   code in a read-only field with a Copy button, and the owner gets it in chat.
-  In game, the colony menu's (P) Info tab shows the owner the same field
-  above the privacy toggle; it asks the local game server (`getHosting`, or
+  In game, the colony menu's (P) Info tab shows the owner the same field,
+  under the member list; it asks the local game server (`getHosting`, or
   `GET /local/host` in a browser) each time the menu opens.
   Join: a room code field and Join. The code is checked with the signalling
   server first, so a wrong code or another version shows in the menu message.

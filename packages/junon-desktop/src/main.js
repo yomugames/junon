@@ -18,7 +18,7 @@ const CLIENT_DIR = path.join(path.dirname(require.resolve("junon-io/package.json
 const APP_ORIGIN = "app://junon"
 
 // the subset of Server#getLocalWorldApi the renderer may call
-const LOCAL_WORLD_API_METHODS = ["listWorlds", "createWorld", "openWorld", "hostWorld", "hostWorldOnSteam", "hostWorldOnline", "stopHosting", "startTutorial", "listImportCharacters", "importWorld"]
+const LOCAL_WORLD_API_METHODS = ["listWorlds", "createWorld", "openWorld", "hostWorld", "hostWorldOnSteam", "hostWorldOnline", "getHosting", "stopHosting", "startTutorial", "listImportCharacters", "importWorld"]
 
 // The signalling server for online (WebRTC) co-op, packages/junon-signal,
 // deployed as a Cloudflare Worker. JUNON_SIGNAL_URL points elsewhere, or

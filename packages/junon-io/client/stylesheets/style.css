@@ -3872,14 +3872,16 @@ body.imposter_mode #welcome_hud .game_info {
     margin-bottom: 10px;
 }
 
-.room_code_entry label {
-    color: #aaa;
-    margin-right: 10px;
+.room_code_entry .room_code_input {
+    width: 160px;
+    cursor: pointer;
 }
 
-.room_code_entry .room_code_input {
-    width: 200px;
-    cursor: pointer;
+.room_code_entry .copy_room_code_btn {
+    float: none;
+    margin-left: 10px;
+    font-size: 16px;
+    vertical-align: middle;
 }
 
 .invite_link_input {
@@ -3927,43 +3929,6 @@ html[lang='ru'] .colony_info_entry label {
     width: 200px;
     font-size: 18px;
     font-family: arial;
-}
-
-.team_private_status {
-    background-color: #127046;
-    color: #ccc;
-    padding: 5px 10px;
-    margin-left: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.team_private_status.read_only {
-    background: none;
-    color: #127046;
-    cursor: initial;
-}
-
-.team_private_status.private {
-    background-color: #963939;
-}
-
-.team_private_status.private.read_only {
-    background: none;
-    color: #f74f4f;
-    ;
-}
-
-.team_private_status[data-disabled='true'] {
-    opacity: 0.7;
-}
-
-.team_private_status:hover {
-    opacity: 0.8;
-}
-
-.team_private_status.read_only:hover {
-    opacity: 1;
 }
 
 #changelogs {

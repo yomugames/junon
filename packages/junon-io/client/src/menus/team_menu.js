@@ -18,7 +18,6 @@ class TeamMenu extends BaseMenu {
   initListeners() {
     super.initListeners()
 
-    this.el.querySelector(".team_private_status").addEventListener("click", this.onTeamPrivacyStatusClick.bind(this), true)
     this.el.querySelector(".room_code_input").addEventListener("click", this.onCopyRoomCodeClick.bind(this))
     this.el.querySelector(".copy_room_code_btn").addEventListener("click", this.onCopyRoomCodeClick.bind(this))
     this.el.querySelector(".member_management_container").addEventListener("click", this.onMemberListClick.bind(this))
@@ -1546,12 +1545,6 @@ class TeamMenu extends BaseMenu {
     SocketUtil.emit("EditTeam", { id: this.activeTeam.id, name: name })
   }
 
-  onTeamPrivacyStatusClick() {
-    if (!this.activeTeam) return
-
-    SocketUtil.emit("EditTeam", { id: this.activeTeam.id, isPrivate: !this.activeTeam.isPrivate })
-  }
-
   onTeamContainerClick(event) {
     let el = event.target
     let teamEntry = el.closest(".team_list_entry")
@@ -1730,7 +1723,6 @@ class TeamMenu extends BaseMenu {
     this.el.querySelector(".member_list_container").style.display = 'block'
 
     this.renderRenameBtn(team)
-    this.renderPrivacy(team)
     this.renderMembers(team)
 
     if (team.isLeader(this.game.player)) {
@@ -1864,41 +1856,6 @@ class TeamMenu extends BaseMenu {
     document.execCommand('copy')
     this.el.querySelector(".copy_room_code_btn").innerText = i18n.t("Copied")
   }
-
-  renderPrivacy(team) {
-    let isPrivate = team.isPrivate
-
-    if (!this.isLeader(team, this.game.player)) {
-      this.el.querySelector(".team_private_status").dataset.disabled = true
-      this.el.querySelector(".team_private_status").classList.add("read_only")
-    } else {
-      this.el.querySelector(".team_private_status").classList.remove("read_only")
-    }
-
-    if (isPrivate) {
-      this.el.querySelector(".team_private_status").classList.add("private")
-      this.el.querySelector(".team_private_status").innerText = i18n.t("Private")
-    } else {
-      this.el.querySelector(".team_private_status").classList.remove("private")
-      this.el.querySelector(".team_private_status").innerText = i18n.t("Public")
-    }
-  }
-
-  setSectorIsPrivate(isPrivate) {
-    this.sectorIsPrivate = isPrivate
-
-    this.el.querySelector(".team_private_status").dataset.disabled = true
-    this.el.querySelector(".team_private_status").classList.add("read_only")
-
-    if (isPrivate) {
-      this.el.querySelector(".team_private_status").classList.add("private")
-      this.el.querySelector(".team_private_status").innerText = i18n.t("Private")
-    } else {
-      this.el.querySelector(".team_private_status").classList.remove("private")
-      this.el.querySelector(".team_private_status").innerText = i18n.t("Public")
-    }
-  }
-
 
   renderMembers(team) {
     let playerList = Object.values(team.members)

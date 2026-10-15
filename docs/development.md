@@ -335,7 +335,7 @@ app isn't put in an asar archive, because the game server runs from
 A packaged build leaves out the Steam binding (`steamworks-ffi-node`, `koffi`)
 and `junon-io`'s client sources, tests and build tooling. Code that the game
 server loads therefore can't require anything under `packages/junon-io/client/`.
-A cross-built Windows exe has the default Electron icon and isn't code-signed.
+The Windows exe and the Linux window use `packages/junon-desktop/assets/icon.png` (512×512 with transparency) as their icon. A Windows exe built on Linux isn't code-signed.
 
 Check a packaged build with `test/packaged.spec.js` ([testing.md](testing.md#desktop-e2e)).
 

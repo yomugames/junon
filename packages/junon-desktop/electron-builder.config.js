@@ -8,6 +8,7 @@ module.exports = {
 
   files: [
     "src/**",
+    "assets/**",
     "package.json",
     // Steam is off in itch.io builds (src/steam.js); its binding and FFI
     // library are large and native
@@ -30,7 +31,7 @@ module.exports = {
   afterPack: "./scripts/after_pack.js",
 
   // a plain folder: itch.io's butler uploads it as is (docs/development.md#packaging)
-  win: { target: "dir" },
+  win: { target: "dir", icon: "assets/icon.png" },
   mac: { target: "dir" },
-  linux: { target: "dir" }
+  linux: { target: "dir", icon: "assets/icon.png" }
 }

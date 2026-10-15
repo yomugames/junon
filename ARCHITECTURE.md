@@ -147,6 +147,8 @@ world API, Steam co-op sockets and the signalling server's address.
 `src/steam*.js` hold the optional Steam integration, `src/rtc_host*` the host
 side of online co-op. The server reaches main through `server/util/desktop_channel.js`,
 which tests can also back with Node IPC (`JUNON_DESKTOP_IPC=1`).
+`electron-builder.config.js` and `scripts/after_pack.js` package it for release
+([development.md](docs/development.md#packaging)).
 
 ## Important contracts
 

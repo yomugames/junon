@@ -7,8 +7,10 @@
   "scripts": {
     "start": "electron .",
     "test:e2e": "playwright test",
-    "screenshot": "node scripts/screenshot.js"
+    "screenshot": "node scripts/screenshot.js",
+    "package": "electron-builder --config electron-builder.config.js"
   },
+  "author": "Yomu Games",
   "license": "ISC",
   "dependencies": {
     "get-port": "^5.0.0",
@@ -17,8 +19,9 @@
     "steamworks-ffi-node": "^0.11.3"
   },
   "devDependencies": {
-    "electron": "^44.6.0",
     "@playwright/test": "^1.63.0",
+    "electron": "^44.6.0",
+    "electron-builder": "^26.15.3",
     "junon-signal": "*",
     "miniflare": "^4.20260730.0"
   }

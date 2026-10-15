@@ -1,4 +1,3 @@
-const Dirt = require("../../client/src/entities/effects/dirt")
 const BaseCommand = require("./base_command")
 
 class DirtCommand extends BaseCommand {

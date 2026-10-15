@@ -180,6 +180,18 @@ deployed signalling server, and check that online co-op is unavailable. Connecti
 only be checked by hand
 ([webrtc-coop.md](exec-plans/active/webrtc-coop.md#validation)).
 
+`test/packaged.spec.js` runs a packaged build
+([development.md](development.md#packaging)) instead of the sources. It
+creates and saves a world, which checks that the packaged server finds its
+files and native modules. The test is skipped unless `JUNON_PACKAGED_APP` points
+at the packaged executable. It can only run a build for the machine it runs on;
+a Windows build made on Linux has to be checked on Windows.
+
+```sh
+npm run desktop:package
+JUNON_PACKAGED_APP=release/linux-unpacked/junon-desktop xvfb-run -a npm run test:e2e --workspace packages/junon-desktop -- test/packaged.spec.js
+```
+
 ## Validation by change type
 
 | Change | Minimum useful validation |

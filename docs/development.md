@@ -309,6 +309,36 @@ Set `JUNON_USER_DATA_DIR` to run with a different user-data directory, for
 example to run two instances side by side. Server output appears in the
 terminal that ran `npm run desktop`.
 
+#### Packaging
+
+`npm run desktop:package` builds the standalone client and packages the app
+with electron-builder (`packages/junon-desktop/electron-builder.config.js`)
+into a plain folder under `packages/junon-desktop/release/`, which is what
+itch.io's `butler push` uploads. It builds for the current platform; pass a
+platform to build another:
+
+```sh
+npm run desktop:package                # this platform
+npm run desktop:package -- --win       # release/win-unpacked/Junon.exe
+npm run desktop:package -- --linux     # release/linux-unpacked/junon-desktop
+```
+
+Packaging needs network access: it downloads Electron for the target and the
+target's native binaries. electron-builder's native rebuild is off, because it
+overwrites the workspace's `node_modules` with the target platform's binaries.
+Instead `scripts/after_pack.js` puts them in the packaged copy only: the N-API
+prebuilt `sqlite3` binary (prebuild-install) and sharp's `@img/sharp-<platform>-<arch>`
+package (`npm pack`). That is what lets a Windows build be made on Linux. The
+app isn't put in an asar archive, because the game server runs from
+`junon-io`'s directory and the native modules are replaced after packing.
+
+A packaged build leaves out the Steam binding (`steamworks-ffi-node`, `koffi`)
+and `junon-io`'s client sources, tests and build tooling. Code that the game
+server loads therefore can't require anything under `packages/junon-io/client/`.
+A cross-built Windows exe has the default Electron icon and isn't code-signed.
+
+Check a packaged build with `test/packaged.spec.js` ([testing.md](testing.md#desktop-e2e)).
+
 ### Steam
 
 Steam co-op is being built ([execution plan](exec-plans/active/steam-coop.md)).

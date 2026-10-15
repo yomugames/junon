@@ -23,5 +23,8 @@ packages/junon-io/playwright-report/
 steamworks_sdk/
 steam_appid.txt
 
+# packaged desktop builds (npm run desktop:package)
+packages/junon-desktop/release/
+
 # wrangler local state (packages/junon-signal)
 .wrangler/

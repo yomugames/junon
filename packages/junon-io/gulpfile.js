@@ -28,12 +28,16 @@ let watch = gulp.watch;
 let gitVersion         = require('child_process').execSync('git rev-parse --short=7 HEAD').toString().trim()
 let env                = process.env.NODE_ENV || 'development';
 let paths
-let gameVersion        = fs.readFileSync("VERSION.txt", 'utf8').replace("\n","")
+let gameVersion        = fs.readFileSync("VERSION.txt", 'utf8').trim()
 
-let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
-let protocolDirectory = nodeModulesPath + "/junon-common/protocol"
-let protocolContents        = require('child_process').execSync(`cat ${protocolDirectory}/enum.proto ${protocolDirectory}/base.proto ${protocolDirectory}/app.proto`).toString()
-let protocolHash = require('crypto').createHash('md5').update(protocolContents).digest("hex").substring(0,8)
+// same hash as the server's (server/server.js), read without shelling out to
+// `npm root` and `cat`, which break on Windows; globs need forward slashes
+let protocolDirectory = path.join(path.dirname(require.resolve("junon-common/package.json")), "protocol")
+let protocolGlobDirectory = protocolDirectory.split(path.sep).join("/")
+let protocolContents = ["enum.proto", "base.proto", "app.proto"].map((file) => {
+  return fs.readFileSync(path.join(protocolDirectory, file))
+})
+let protocolHash = require('crypto').createHash('md5').update(Buffer.concat(protocolContents)).digest("hex").substring(0,8)
 
 console.log("gitVersion: " + gitVersion)
 console.log("protocolHash: " + protocolHash)
@@ -171,9 +175,7 @@ function compressMangle() {
     // (See https://github.com/wearefractal/vinyl for vinyl attributes and functions)
     var transformedFile = vinylFile.clone();
 
-    let filePath = vinylFile.history[0]
-    let tokens = filePath.split("/")
-    let fileName = tokens[tokens.length - 1]
+    let fileName = path.basename(vinylFile.history[0])
     let sourceMapFileName = fileName.replace(".js", vinylFile.revHash + ".js") + ".map"
 
     let build = {}
@@ -201,8 +203,7 @@ function compressMangle() {
 }
 
 function copyProtobuf(){
-  let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
-  let file = gulp.src(nodeModulesPath + '/junon-common/protocol/*.proto')
+  let file = gulp.src(protocolGlobDirectory + '/*.proto')
                  .pipe(replace(/(\w+)\.proto/g, '$1-' + protocolHash + '.proto'))
                  .pipe(rename((path) => {
                    path.basename += `-${protocolHash}`

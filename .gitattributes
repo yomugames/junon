@@ -1,0 +1,4 @@
+# The protocol hash (server/server.js, gulpfile.js) is taken over these files'
+# bytes, and co-op refuses peers whose hash differs, so a Windows checkout
+# must not turn them into CRLF.
+packages/junon-common/protocol/*.proto text eol=lf

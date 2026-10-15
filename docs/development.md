@@ -315,9 +315,11 @@ Steam co-op is being built ([execution plan](exec-plans/active/steam-coop.md)).
 With Steam, **Host co-op** can host on Steam: the host opens a Steam lobby
 (friends only, or invite only), and friends join from an invite, from Join
 Game in the Steam friends list, or from the friends listed in **Join co-op**.
-No port forwarding is needed: game traffic goes peer to peer over Steam's
-relay, to the lobby's owner, who only accepts lobby members. The desktop
-app's main process loads Steamworks through `steamworks-ffi-node`
+Steam co-op is off by default while builds ship on itch.io only; start the
+desktop app with `JUNON_STEAM=1` to turn it on. No port forwarding is needed:
+game traffic goes peer to peer over Steam's relay, to the lobby's owner, who
+only accepts lobby members. With Steam on, the desktop app's main process
+loads Steamworks through `steamworks-ffi-node`
 (`packages/junon-desktop/src/steam.js`) and, if anything is missing, logs one
 `Steam: ...` line and runs without Steam. It needs:
 
@@ -330,7 +332,7 @@ app's main process loads Steamworks through `steamworks-ffi-node`
 
 | Variable | Meaning |
 | --- | --- |
-| `JUNON_STEAM` | `0` turns Steam off. The desktop e2e tests set it. |
+| `JUNON_STEAM` | `1` turns Steam on. Steam is off by default while builds ship on itch.io only. |
 | `JUNON_STEAM_APP_ID` | Steam app id. Defaults to 480 (Valve's "Spacewar" test app) until Junon has its own. Any Steam account can use 480. |
 | `JUNON_STEAMWORKS_SDK` | Path to an unpacked Steamworks SDK's `sdk/` directory. |
 | `JUNON_STEAM_FAKE_SDK`, `JUNON_FAKE_STEAM` | Tests only: load the in-memory Steam in `packages/junon-desktop/test/support/fake_steam.js` instead of the binding, with a scenario as JSON. Never set them otherwise. |

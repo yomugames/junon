@@ -4,9 +4,10 @@ const path = require("path")
 // here in the main process, once per app; the game server never loads it and
 // only sees Steam guests as sockets relayed over its parent port.
 //
-// Steam is optional. Anything that goes wrong - the binding or the Steamworks
-// redistributable missing, Steam not running, JUNON_STEAM=0 - leaves
-// `isAvailable` false and the game works as without Steam.
+// Steam is optional and off for now (builds ship on itch.io); JUNON_STEAM=1
+// turns it on. Anything that goes wrong - the binding or the Steamworks
+// redistributable missing, Steam not running - leaves `isAvailable` false and
+// the game works as without Steam.
 
 // Valve's public test app ("Spacewar") until Junon has its own app id
 const DEVELOPMENT_APP_ID = 480
@@ -24,7 +25,7 @@ class SteamRuntime {
   }
 
   init() {
-    if (process.env.JUNON_STEAM === "0") return false
+    if (process.env.JUNON_STEAM !== "1") return false
 
     let appId = parseInt(process.env.JUNON_STEAM_APP_ID || DEVELOPMENT_APP_ID, 10)
     if (!Number.isInteger(appId) || appId <= 0) {

@@ -198,7 +198,7 @@ new process globals require explicit justification in an execution plan.
 
 Development requires Node.js 26.4.0 and npm workspaces. The game needs no
 network service; online co-op needs the signalling server, only to connect. Sentry reporting is off unless `JUNON_SERVER_SENTRY_DSN` is set
-outside `development`/`test`. Steam is optional: without the Steam client or
+outside `development`/`test`. Steam is optional and off unless `JUNON_STEAM=1`; without the Steam client or
 the Steamworks redistributables, the desktop app runs without Steam features
 (see [docs/development.md](docs/development.md#steam)).
 

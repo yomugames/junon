@@ -104,7 +104,7 @@ stays Steam-free: it only sees sockets.
 
 Done as follows. `src/steam.js` (`SteamRuntime`) requires the binding inside
 `init()`, so a missing package or redistributable can't stop the app.
-`JUNON_STEAM=0` turns it off; `JUNON_STEAM_APP_ID` defaults to 480;
+Steam is off unless `JUNON_STEAM=1` (builds ship on itch.io for now); `JUNON_STEAM_APP_ID` defaults to 480;
 `JUNON_STEAMWORKS_SDK` points at an SDK outside the repository. After init it
 calls `initRelayNetworkAccess()` and polls `runCallbacks()` plus
 `networkingSockets.runCallbacks()` every 10 ms while a Steam connection is
@@ -389,8 +389,8 @@ no-vendored-secrets spirit).
   native surface; it may affect input or performance. It is optional.
 - `restartAppIfNecessary` must be off in development or `npm run desktop`
   relaunches through Steam.
-- Rollback: Steam is feature-detected; removing the dependency or setting
-  `JUNON_STEAM=0` returns the app to direct-address co-op only.
+- Rollback: Steam is feature-detected; removing the dependency or leaving
+  `JUNON_STEAM` unset returns the app to direct-address co-op only.
 
 ## Result
 

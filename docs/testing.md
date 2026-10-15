@@ -147,10 +147,16 @@ xvfb-run -a npm run test:e2e --workspace packages/junon-desktop
 The desktop tests run with `JUNON_STEAM=0`. They check that the Steam preload
 API reports Steam as unavailable and refuses to host or connect.
 `test/steam_relay.spec.js` runs in Node, without Electron: it puts the
-main-process Steam relays (`src/steam_host.js`, `src/steam_guest.js`) on an
-in-memory stand-in for Steam Networking Sockets, with a real game server behind
-the host, and covers the hello, version refusal, joining, a full Steam send
-buffer, and the end of hosting. Real Steam can only be checked by hand
+main-process Steam code (`src/steam.js`, `steam_lobby.js`, `steam_host.js`,
+`steam_guest.js`) on an in-memory Steam (`test/support/fake_steam.js`), with a
+real game server behind the host, and covers the lobby and its data, the
+friends-hosting list, refusing connections from outside the lobby, invites,
+the hello and version refusal, joining, a full Steam send buffer, and the end
+of hosting. The desktop test "hosts on Steam, invites friends and joins a
+friend from the menu" runs the app on the same fake Steam
+(`JUNON_STEAM_FAKE_SDK`) to cover the menus, join requests and an invite that
+starts the game; its friend lives in the app's process, so that test stops
+at the version check. Real Steam can only be checked by hand
 ([steam-coop.md](exec-plans/active/steam-coop.md#validation)).
 
 ## Validation by change type

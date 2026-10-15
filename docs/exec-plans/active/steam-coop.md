@@ -67,8 +67,10 @@ Acceptance criteria:
 - [x] 2026-10-14: Milestone 2: Steam transport (framing, host socket adapter,
   guest transport). Covered by Jest, and by a desktop test of the relays on a
   fake Steam with a real server; not yet run on real Steam.
-- [ ] Milestone 3: host and guest flows (lobby, invites, join-requested,
-  rich presence, Join panel friend list).
+- [x] 2026-10-14: Milestone 3: host and guest flows (lobby, invites,
+  join requests, rich presence, Join panel friend list), and the host only
+  accepting lobby members. Covered on a fake Steam; not yet run on real
+  Steam.
 - [ ] Milestone 4: Steam identity for guests and per-connection limits.
 - [ ] Milestone 5: two-account validation on two machines; docs.
 - [ ] Milestone 6 (with Phase 9 packaging): ship `steam_api` libraries
@@ -199,9 +201,7 @@ Done as follows, with these differences from the steps above:
   parent port, so tests can play the main process.
 - Main refuses `hostWorldOnSteam` when it has no Steam, since the server
   can't tell.
-- Not done yet: the listen socket accepts every connection request; Milestone 3
-  limits it to lobby members. Until then nothing in the UI starts Steam
-  hosting.
+- Milestone 3 limited the listen socket to lobby members.
 
 ### Milestone 3: host and guest flows
 
@@ -230,6 +230,54 @@ Done as follows, with these differences from the steps above:
    close the listen socket and clear rich presence. Main does the same if the
    server process exits. A guest whose host left the lobby gets the existing
    disconnect handling.
+
+Done as follows (main: `src/steam_lobby.js`, `main.js`; client:
+`util/steam_coop.js`, `components/local_world_menu.js`):
+
+- `hostWorldOnSteam` takes `lobbyType` (`friends` or `invite`, mapped to
+  Steam's FriendsOnly and Private lobby types). The server's `steamHosting`
+  message carries what main needs for the lobby: lobby type, world name,
+  `maxMembers` (`Game#getMaxPlayers`, 20), protocol hash and game version.
+  Main creates the lobby on that message, and its `hostWorldOnSteam` handler
+  waits for it; if the lobby can't be created, it stops hosting again and
+  reports the error. Lobby data: `junon=1`, `protocol`, `version`, `world`.
+- Membership gate: a connection request waits up to 10 s for its Steam id to
+  appear among the lobby's members (the host may see the request before the
+  member list updates), then is closed. Without it, anyone who knew the
+  host's Steam id could connect; the hello's protocol check isn't access
+  control.
+- Rich presence: `status` ("Hosting <world>", "Playing in <world>") and
+  `steam_player_group`. No `connect` key: with it, Join Game would arrive as
+  GameRichPresenceJoinRequested, which the binding doesn't expose. A host in
+  a joinable lobby already gets Join Game, which arrives as
+  GameLobbyJoinRequested. `status` only shows in the Steam client once
+  localization tokens (`steam_display`) are set up for the real app id.
+- Invites: Steam's overlay invite dialog, and a list of online friends with
+  an Invite button each (`inviteUserToLobby`, a Steam chat invite), because
+  the overlay isn't hooked into the Electron window yet (Milestone 1, step 4)
+  and the dialog may not show without it.
+- Join requests: GameLobbyJoinRequested goes to the renderer
+  (`junon:steam-join-request`), and the lobby of a launch with
+  `+connect_lobby <id>` (from argv, or `getLaunchCommandLine`) is reported
+  once by `getStatus().pendingLobbyId`. Both join through the same path as
+  the Join panel's list; with a world open, the player is asked first.
+- Friends hosting: `getFriendGamePlayed` for each friend, keeping those in
+  this app with a lobby, plus their `status`. Steam fills in the lobby for
+  friends who are in one.
+- Leaving: the guest leaves the lobby when the menu shows again (back from
+  the world, kicked, or the host closed it). It stays in the lobby while
+  disconnected, so the client's automatic reconnects still pass the host's
+  membership gate. Main leaves both lobbies on quit. A player can't join a
+  lobby while hosting one.
+- Main-only Steam calls go through one `junon:steam-api` IPC with an
+  allowlist (`getStatus`, `listFriends`, `listFriendsHosting`, `invite`,
+  `openInviteDialog`, `joinLobby`, `leaveLobby`), replacing
+  `junon:steam-status`.
+- Tests: `test/support/fake_steam.js` is an in-memory Steam (sockets,
+  lobbies, friends, rich presence, overlay) shared by `steam_relay.spec.js`
+  and the desktop app, which loads it instead of the binding when
+  `JUNON_STEAM_FAKE_SDK` is set. That seam is test-only, like
+  `JUNON_DESKTOP_IPC`.
 
 ### Milestone 4: Steam identity
 
@@ -321,8 +369,11 @@ no-vendored-secrets spirit).
   its platform package and `steamworks-ffi-node` outside the asar.
 - 2026-10-14: The team menu's world Preview builds its URL from the game
   connection URL, so a Steam guest (`steam:<id>`) gets a broken image.
-  Serving thumbnails over Steam (or inline, as `listWorlds` does) belongs to
-  Milestone 3.
+  Still open after Milestone 3: serve them over the game socket, or inline
+  as `listWorlds` does.
+- 2026-10-14: Steam's member list can lag a guest's connection request, which
+  is why the host waits for membership instead of checking once. The fake
+  Steam delays membership the same way, so the tests exercise the wait.
 - 2026-10-14: The server's join traffic is small (about 4 KB up to
   `JoinGame`); the client asks for the rest afterwards. Measure the whole
   initial load over the relay in Milestone 5.
@@ -347,5 +398,10 @@ Milestones 1 and 2 are done (2026-10-14) and validated without real Steam:
 Jest `test/server` (51 tests, including `steam_framing` and `steam_coop`),
 `NODE_ENV=standalone npm run client:build`, and the desktop suite
 (`desktop.spec.js` with Steam off, `steam_relay.spec.js` on a fake Steam).
-No Steam session, lobby or invite has run yet; that needs Milestone 3 and two
-Steam accounts.
+Milestone 3 is done (2026-10-14), validated the same way: the desktop suite
+now also runs the menus on a fake Steam (hosting, both lobby types, invites,
+friends hosting, join requests, an invite that starts the game) and the relay
+tests cover lobbies and the membership gate. No real Steam session, lobby or
+invite has run yet; that is Milestone 5, with two Steam accounts. Open:
+Steam guests are still keyed by their local profile (Milestone 4), the
+overlay, and world thumbnails for Steam guests.

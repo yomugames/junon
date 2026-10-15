@@ -109,11 +109,15 @@ test('Steam guests join through the desktop channel while the world is hosted on
   early.open()
   expect((await early.waitForClose()).isGraceful).toBe(false)
 
-  await expect(request('hostWorldOnSteam', { worldId, ownerUid: 'ffffffffffffffffffffffffffffffff' })).rejects.toThrow('another profile')
-  const hosted = await request('hostWorldOnSteam', { worldId, ownerUid: OWNER_UID })
-  expect(hosted.hosting).toMatchObject({ worldId, isOnSteam: true, port: null, addresses: [] })
-  await waitFor((message) => message.type === 'steamHosting' && message.isHosting === true, 'steamHosting on')
-  await expect(request('hostWorldOnSteam', { worldId, ownerUid: OWNER_UID })).rejects.toThrow('Already hosting')
+  await expect(request('hostWorldOnSteam', { worldId, ownerUid: 'ffffffffffffffffffffffffffffffff', lobbyType: 'friends' })).rejects.toThrow('another profile')
+  await expect(request('hostWorldOnSteam', { worldId, ownerUid: OWNER_UID, lobbyType: 'public' })).rejects.toThrow('who can join')
+  const hosted = await request('hostWorldOnSteam', { worldId, ownerUid: OWNER_UID, lobbyType: 'friends' })
+  expect(hosted.hosting).toMatchObject({ worldId, isOnSteam: true, steamLobbyType: 'friends', port: null, addresses: [] })
+  // main gets what it needs for the lobby
+  expect(await waitFor((message) => message.type === 'steamHosting' && message.isHosting === true, 'steamHosting on')).toEqual({
+    type: 'steamHosting', isHosting: true, lobbyType: 'friends', worldName: 'Steam World', maxMembers: 20, protocolHash: PROTOCOL_HASH, version: expect.any(String)
+  })
+  await expect(request('hostWorldOnSteam', { worldId, ownerUid: OWNER_UID, lobbyType: 'friends' })).rejects.toThrow('Already hosting')
   expect((await request('listWorlds')).hosting).toMatchObject({ isOnSteam: true })
 
   // main only passes Steam ids, but the server checks anyway
@@ -173,7 +177,7 @@ test('a guest that never says hello is dropped, and quitting kicks Steam guests'
   server = startServer()
   await waitFor((message) => message.type === 'ready', 'ready')
   const { worldId } = await request('createWorld', { ownerUid: OWNER_UID, name: 'Steam World', gameMode: 'survival' })
-  await request('hostWorldOnSteam', { worldId, ownerUid: OWNER_UID })
+  await request('hostWorldOnSteam', { worldId, ownerUid: OWNER_UID, lobbyType: 'friends' })
 
   const silent = steamGuest(1)
   silent.open()

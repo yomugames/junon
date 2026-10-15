@@ -310,7 +310,11 @@ terminal that ran `npm run desktop`.
 ### Steam
 
 Steam co-op is being built ([execution plan](exec-plans/active/steam-coop.md)).
-The transport is in place; there is no menu entry for it yet. The desktop
+With Steam, **Host co-op** can host on Steam: the host opens a Steam lobby
+(friends only, or invite only), and friends join from an invite, from Join
+Game in the Steam friends list, or from the friends listed in **Join co-op**.
+No port forwarding is needed: game traffic goes peer to peer over Steam's
+relay, to the lobby's owner, who only accepts lobby members. The desktop
 app's main process loads Steamworks through `steamworks-ffi-node`
 (`packages/junon-desktop/src/steam.js`) and, if anything is missing, logs one
 `Steam: ...` line and runs without Steam. It needs:
@@ -327,9 +331,14 @@ app's main process loads Steamworks through `steamworks-ffi-node`
 | `JUNON_STEAM` | `0` turns Steam off. The desktop e2e tests set it. |
 | `JUNON_STEAM_APP_ID` | Steam app id. Defaults to 480 (Valve's "Spacewar" test app) until Junon has its own. Any Steam account can use 480. |
 | `JUNON_STEAMWORKS_SDK` | Path to an unpacked Steamworks SDK's `sdk/` directory. |
+| `JUNON_STEAM_FAKE_SDK`, `JUNON_FAKE_STEAM` | Tests only: load the in-memory Steam in `packages/junon-desktop/test/support/fake_steam.js` instead of the binding, with a scenario as JSON. Never set them otherwise. |
 
-Testing Steam co-op by hand takes two Steam accounts on two machines; one
-account can't be both host and guest.
+Testing Steam co-op by hand takes two Steam accounts that are friends, on two
+machines; one account can't be both host and guest. With app id 480 both
+accounts can run it. Invites and Join Game only reach a running copy through
+Steam, so start the desktop app with Steam running. Steam guests are
+characters keyed by their local profile for now; keying them by Steam account
+is the next step of the plan.
 
 ## Configuration
 

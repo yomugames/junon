@@ -6,6 +6,7 @@ const ServerProcess = require("./server_process")
 const SteamRuntime = require("./steam")
 const SteamHost = require("./steam_host")
 const SteamGuest = require("./steam_guest")
+const SteamLobbies = require("./steam_lobby")
 
 // The client is the junon-io production build for NODE_ENV=standalone
 // (`NODE_ENV=standalone npm run client:build`), served from app://junon/.
@@ -37,6 +38,9 @@ let isQuitting = false
 let steam = new SteamRuntime()
 let steamHost = null
 let steamGuest = null
+let steamLobbies = null
+// the lobby being created for the current Steam hosting (steamHosting)
+let steamLobbyOpening = null
 
 function isClientBuilt() {
   let indexPath = path.join(CLIENT_DIR, "index.html")
@@ -75,6 +79,7 @@ function registerIpc() {
     if (method === "hostWorldOnSteam" && !steamHost) return { error: "Steam is not available" }
 
     try {
+      if (method === "hostWorldOnSteam") return { result: await hostWorldOnSteam(args) }
       return { result: await serverProcess.request(method, args) }
     } catch (e) {
       return { error: e.message }
@@ -83,9 +88,29 @@ function registerIpc() {
 
   // Steam co-op for the renderer (preload.js). Without Steam, getStatus says
   // so and the client hides the Steam controls.
-  ipcMain.handle("junon:steam-status", (event) => {
-    if (!isAppFrame(event.senderFrame)) return { isAvailable: false }
-    return steam.getStatus()
+  ipcMain.handle("junon:steam-api", async (event, method, args) => {
+    if (!isAppFrame(event.senderFrame)) return { error: "Forbidden" }
+    if (!Array.isArray(args)) return { error: "Unknown request" }
+    if (method === "getStatus") return { result: getSteamStatus() }
+    if (!steamLobbies) return { error: "Steam is not available" }
+
+    let api = {
+      listFriends: () => steamLobbies.listFriends(),
+      listFriendsHosting: () => steamLobbies.listFriendsHosting(),
+      invite: (friendSteamId) => steamLobbies.invite(friendSteamId),
+      openInviteDialog: () => steamLobbies.openInviteDialog(),
+      // resolves to { hostSteamId, worldName }; the renderer then opens a
+      // Steam socket to the host
+      joinLobby: (lobbyId, protocolHash) => steamLobbies.joinLobby(lobbyId, protocolHash),
+      leaveLobby: () => steamLobbies.leaveJoinedLobby()
+    }
+    if (!Object.prototype.hasOwnProperty.call(api, method)) return { error: "Unknown request" }
+
+    try {
+      return { result: await api[method](...args) }
+    } catch (e) {
+      return { error: e.message }
+    }
   })
 
   ipcMain.handle("junon:steam-socket-open", (event, hostSteamId, protocolHash) => {
@@ -114,14 +139,61 @@ function registerIpc() {
 // Steam guests' frames
 function onServerMessage(message) {
   if (!steamHost) return
-  if (message.type === "steamHosting") return steamHost.setHosting(!!message.isHosting)
+  if (message.type === "steamHosting") return onSteamHosting(message)
   if (SteamHost.isServerMessage(message)) steamHost.onServerMessage(message)
+}
+
+// the server starts or ends Steam hosting (Server#startSteamHosting,
+// #stopHosting), also when the host switches worlds or quits
+function onSteamHosting(message) {
+  steamHost.setHosting(!!message.isHosting)
+
+  if (message.isHosting) {
+    steamLobbyOpening = steamLobbies.openLobby(message)
+    // hostWorldOnSteam reports a failure
+    steamLobbyOpening.catch(() => {})
+  } else {
+    steamLobbyOpening = null
+    steamLobbies.closeLobby()
+  }
+}
+
+// The server sends steamHosting before it answers, so the lobby is on its
+// way by then. Without a lobby nobody can join, so hosting is undone.
+async function hostWorldOnSteam(args) {
+  let result = await serverProcess.request("hostWorldOnSteam", args)
+
+  let lobbyId
+  try {
+    lobbyId = await steamLobbyOpening
+  } catch (e) {
+    await serverProcess.request("stopHosting", [])
+    throw e
+  }
+  if (!lobbyId) throw new Error("Hosting ended before the Steam lobby was ready")
+
+  result.hosting.steamLobbyId = lobbyId
+  return result
+}
+
+// pendingLobbyId: the lobby an invite launched the game to join, reported
+// once
+function getSteamStatus() {
+  let status = steam.getStatus()
+  if (steamLobbies) status.pendingLobbyId = steamLobbies.takeLaunchLobby()
+  return status
 }
 
 function initSteam() {
   if (!steam.init()) return
 
-  steamHost = new SteamHost(steam, (message) => serverProcess.post(message))
+  steamLobbies = new SteamLobbies(steam, {
+    // an invite accepted, or Join Game clicked, while the game runs
+    onJoinRequest: (lobbyId) => {
+      if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send("junon:steam-join-request", lobbyId)
+    }
+  })
+  steamHost = new SteamHost(steam, (message) => serverProcess.post(message), (steamId) => steamLobbies.isMember(steamId))
   steamGuest = new SteamGuest(steam)
 }
 
@@ -206,6 +278,7 @@ if (!app.requestSingleInstanceLock()) {
     event.preventDefault()
     isQuitting = true
     serverProcess.stop().finally(() => {
+      if (steamLobbies) steamLobbies.shutdown()
       steam.shutdown()
       app.quit()
     })

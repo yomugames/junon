@@ -705,12 +705,13 @@ class Server {
       },
       // the same, for Steam friends; desktop only, where main owns the Steam
       // connections (SteamSocketBridge)
-      hostWorldOnSteam: async ({ worldId, ownerUid } = {}) => {
+      hostWorldOnSteam: async ({ worldId, ownerUid, lobbyType } = {}) => {
         await validOwnedWorld(worldId, ownerUid)
+        if (!['friends', 'invite'].includes(lobbyType)) throw new Error('Choose who can join')
         if (!this.steamSocketBridge) throw new Error('Steam co-op needs the desktop app')
         if (this.steamHost) throw new Error('Already hosting on Steam. Stop hosting first.')
         await this.activateStandaloneWorld({ worldId, ownerUid })
-        this.startSteamHosting()
+        this.startSteamHosting({ lobbyType })
         return { worldId, serverUrl: serverUrl(), hosting: this.getHostingStatus() }
       },
       stopHosting: async () => {
@@ -762,11 +763,22 @@ class Server {
     })
   }
 
-  // Steam co-op: main runs the Steam listen socket while this is set and
-  // relays its connections (SteamSocketBridge)
-  startSteamHosting() {
-    this.steamHost = { startedAt: Date.now() }
-    desktopChannel.postMessage({ type: 'steamHosting', isHosting: true })
+  // Steam co-op: main runs the Steam lobby and listen socket while this is
+  // set and relays their connections (SteamSocketBridge). lobbyType:
+  // 'friends' (any Steam friend can join) or 'invite'.
+  startSteamHosting({ lobbyType }) {
+    this.steamHost = { startedAt: Date.now(), lobbyType: lobbyType }
+
+    let game = this.getMainGame()
+    desktopChannel.postMessage({
+      type: 'steamHosting',
+      isHosting: true,
+      lobbyType: lobbyType,
+      worldName: game && game.sector ? game.sector.name : '',
+      maxMembers: game ? game.getMaxPlayers() : 20,
+      protocolHash: protocolHash,
+      version: this.gameVersion
+    })
 
     LOG.info('Hosting co-op on Steam')
     this.forEachGame((game) => {
@@ -804,7 +816,8 @@ class Server {
       port: this.coopHost ? this.coopHost.port : null,
       addresses: this.coopHost ? this.getLanAddresses() : [],
       hasPassword: !!(this.coopHost && this.coopHost.passwordKey),
-      isOnSteam: !!this.steamHost
+      isOnSteam: !!this.steamHost,
+      steamLobbyType: this.steamHost ? this.steamHost.lobbyType : null
     }
   }
 
@@ -813,7 +826,7 @@ class Server {
     let status = this.getHostingStatus()
     if (!status || !player.isSectorOwner() || !player.isPlayerReady) return
 
-    if (status.isOnSteam) player.showChatSuccess('Co-op is open to your Steam friends.')
+    if (status.isOnSteam) player.showChatSuccess(status.steamLobbyType === 'invite' ? 'Co-op is open on Steam to friends you invite.' : 'Co-op is open to your Steam friends.')
     if (!status.port) return
 
     let addresses = status.addresses.map((address) => address + ':' + status.port)

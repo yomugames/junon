@@ -19,6 +19,11 @@ const LocalWorldApi = {
     return this.call('hostWorld', [details], () => this.request('host', this.json(details)))
   },
 
+  // desktop only: the Steam lobby lives in the desktop app's main process
+  hostWorldOnSteam(details) {
+    return this.call('hostWorldOnSteam', [details], () => Promise.reject(new Error('Steam co-op needs the desktop app')))
+  },
+
   stopHosting() {
     return this.call('stopHosting', [], () => this.request('host/stop', this.json({})))
   },

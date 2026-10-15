@@ -41,6 +41,19 @@ menu" block in `client/stylesheets/style.css`.
   no sectors row and is never saved, so it never appears in the world list;
   opening any other world discards it. The client recognises it by the map's
   sector name, "Tutorial Lobby". `test/e2e/tutorial.spec.js` covers this.
+- **Host co-op** and **Join co-op** get a Steam section above the address
+  form when the desktop app has Steam (`steam.call('getStatus')`; see
+  [development.md](development.md#steam)). Host: who can join (Steam friends,
+  or only invited friends) and **Host on Steam and play**
+  (`hostWorldOnSteam`). While hosting on Steam, the Host panel offers Steam's
+  invite dialog and an Invite button for each online friend. Join: the
+  friends hosting Junon on Steam, each with a Join button, and a Refresh
+  button. An invite accepted in Steam, or Join Game in the friends list,
+  joins the same way, after asking first if a world is open; an invite that
+  started the game is joined once the menu loads. Going back to the menu
+  leaves the host's Steam lobby. Errors, such as a version mismatch, show in
+  the menu message. The desktop test "hosts on Steam, invites friends and
+  joins a friend from the menu" covers these panels on a fake Steam.
 - Switching panels clears the previous panel's error message.
 
 ## Selectors other code depends on
@@ -48,6 +61,10 @@ menu" block in `client/stylesheets/style.css`.
 The e2e join helper (`test/e2e/support/join.js`) waits for `#local_world_menu`,
 then uses `.local_new_btn`, `.world_name`, `.world_mode` and `.create_world`.
 `LocalWorldMenu` binds `.local_<name>_btn` for `new`, `load`, `tutorial`,
-`import`, `host` and `join`, plus `.local_continue_btn`. A new local world API
+`import`, `host` and `join`, plus `.local_continue_btn`. The Steam controls
+are `.steam_lobby_type`, `.start_steam_hosting`, `.steam_invite_dialog`,
+`.steam_friend .steam_invite`, `.steam_host .steam_join` and `.steam_refresh`;
+the hosting view's `.host_summary` and `.steam_hosting_summary`; the desktop
+test uses them. A new local world API
 method must also be added to `LOCAL_WORLD_API_METHODS` in
 `packages/junon-desktop/src/main.js`, or the desktop app rejects it.

@@ -27,9 +27,19 @@ contextBridge.exposeInMainWorld("junonDesktop", {
   },
 
   steam: {
-    // { isAvailable, steamId, personaName }
-    getStatus() {
-      return ipcRenderer.invoke("junon:steam-status")
+    // getStatus() -> { isAvailable, steamId, personaName, pendingLobbyId };
+    // listFriends, listFriendsHosting, invite(friendSteamId),
+    // openInviteDialog, joinLobby(lobbyId, protocolHash), leaveLobby
+    // (main.js, steam_lobby.js)
+    async call(method, ...args) {
+      let response = await ipcRenderer.invoke("junon:steam-api", method, args)
+      if (response.error) throw new Error(response.error)
+      return response.result
+    },
+
+    // handler(lobbyId): an invite accepted or Join Game clicked in Steam
+    onJoinRequest(handler) {
+      ipcRenderer.on("junon:steam-join-request", (event, lobbyId) => handler(lobbyId))
     },
 
     // handlers: { onOpen(), onMessage(kind, data), onClose(reason, wasOpen) };

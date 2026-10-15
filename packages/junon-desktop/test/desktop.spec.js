@@ -23,11 +23,12 @@ test.afterEach(() => {
   fs.rmSync(userDataDir, { recursive: true, force: true })
 })
 
-async function launch(dataDir = userDataDir) {
+// extraEnv: e.g. a fake Steam (steamEnv)
+async function launch(dataDir = userDataDir, extraEnv = {}) {
   const app = await electron.launch({
     args: CHROMIUM_ARGS.concat([APP_DIR]),
     // Steam off, so a machine with Steam running behaves like CI
-    env: Object.assign({}, process.env, { JUNON_USER_DATA_DIR: dataDir, JUNON_STEAM: '0' })
+    env: Object.assign({}, process.env, { JUNON_USER_DATA_DIR: dataDir, JUNON_STEAM: '0' }, extraEnv)
   })
   const page = await app.firstWindow()
   const errors = []
@@ -58,7 +59,7 @@ test('creates a world, saves it on quit and loads it after a restart', async () 
   expect(await page.evaluate(() => window.junonDesktop.localWorldApi('constructor', []).catch((e) => e.message))).toBe('Unknown request')
 
   // without Steam, the Steam co-op API says so and refuses to host or connect
-  expect(await page.evaluate(() => window.junonDesktop.steam.getStatus())).toEqual({ isAvailable: false })
+  expect(await page.evaluate(() => window.junonDesktop.steam.call('getStatus'))).toEqual({ isAvailable: false })
   expect(await page.evaluate(() => window.junonDesktop.localWorldApi('hostWorldOnSteam', [{}]).catch((e) => e.message))).toBe('Steam is not available')
   expect(await page.evaluate(() => window.junonDesktop.steam.openSocket('76561198000000001', 'abcd1234', {}).catch((e) => e.message))).toBe('Steam is not available')
 
@@ -219,6 +220,75 @@ test('keeps the chosen language after a restart', async () => {
   await page.selectOption('#language_select', 'en')
   await page.waitForURL(/\/en\/$/)
   await page.locator('#local_world_menu').waitFor({ state: 'visible', timeout: 60_000 })
+  await quit(app)
+  expect(errors).toEqual([])
+})
+
+// The app on an in-memory Steam (support/fake_steam.js) in place of the
+// binding. scenario: see the end of that file.
+function steamEnv(scenario) {
+  return { JUNON_STEAM: '1', JUNON_STEAM_FAKE_SDK: path.join(__dirname, 'support', 'fake_steam.js'), JUNON_FAKE_STEAM: JSON.stringify(scenario) }
+}
+
+const ALLY = { steamId: '76561198000000002', personaName: 'Ally', hostsLobby: { protocol: '00000000', version: '0.0.1' } }
+
+// The Steam menus, against a fake Steam. Game traffic between two players on
+// Steam is covered by steam_relay.spec.js; the friend here only exists in the
+// app's own process, so joining them stops at the version check.
+test('hosts on Steam, invites friends and joins a friend from the menu', async () => {
+  let { app, page, errors } = await launch(userDataDir, steamEnv({ steamId: '76561198000000001', personaName: 'Me', others: [ALLY] }))
+  const fakeSteam = (fn, arg) => app.evaluate((electron, [source, arg]) => new Function('steam', 'arg', 'return (' + source + ')(steam, arg)')(global.junonFakeSteam, arg), [fn.toString(), arg])
+
+  expect(await page.evaluate(() => window.junonDesktop.steam.call('getStatus'))).toEqual({ isAvailable: true, steamId: '76561198000000001', personaName: 'Me', pendingLobbyId: null })
+
+  await page.evaluate(() => window.junonDesktop.localWorldApi('createWorld', [{ ownerUid: window.main.localProfile.uid, name: 'Steam World', gameMode: 'survival' }]))
+  await page.click('.local_host_btn')
+  await page.selectOption('.steam_lobby_type', 'invite')
+  await page.click('.start_steam_hosting')
+  await page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
+  await page.waitForFunction(() => document.body.innerText.includes('Co-op is open on Steam to friends you invite'), null, { timeout: 30_000 })
+
+  const lobby = await fakeSteam((steam) => Array.from(steam.network.lobbies.values()).find((entry) => entry.owner === steam.steamId))
+  expect(lobby).toMatchObject({ type: 0, maxMembers: 20, data: { junon: '1', world: 'Steam World' } })
+
+  // back in the menu, the Host panel invites friends
+  await page.evaluate(() => window.main.onExitGameMenuBtnClick())
+  await page.locator('#local_world_menu').waitFor({ state: 'visible', timeout: 30_000 })
+  await page.click('.local_host_btn')
+  await expect(page.locator('.host_summary')).toHaveText('Hosting Steam World on Steam.')
+  await expect(page.locator('.steam_hosting_summary')).toHaveText('Only friends you invite can join.')
+  await page.click('.steam_invite_dialog')
+  await page.locator('.steam_friend', { hasText: 'Ally' }).locator('.steam_invite').click()
+  await expect(page.locator('.steam_friend .steam_invite')).toHaveText('Invited')
+  expect(await fakeSteam((steam) => steam.calls)).toEqual([
+    { type: 'inviteDialog', lobbyId: lobby.id },
+    { type: 'invite', lobbyId: lobby.id, steamId: ALLY.steamId }
+  ])
+
+  // stopping hosting leaves the lobby
+  await page.click('.stop_hosting')
+  await page.locator('.start_steam_hosting').waitFor()
+  expect(await fakeSteam((steam, id) => steam.network.lobbies.has(id), lobby.id)).toBe(false)
+
+  // the Join panel lists friends hosting on Steam; this one runs another
+  // version, which the lobby data tells before connecting
+  await page.click('.local_join_btn')
+  await expect(page.locator('.steam_host')).toHaveText(/Ally · Hosting Ally's world/)
+  await page.click('.steam_join')
+  await expect(page.locator('.local_menu_message')).toHaveText(/Version mismatch: the host runs Junon 0\.0\.1/)
+
+  // an invite accepted in Steam while the game runs goes the same way
+  await page.click('.local_new_btn')
+  const allyLobby = await fakeSteam((steam) => Array.from(steam.network.lobbies.keys())[0])
+  await fakeSteam((steam, id) => steam.requestJoin(id, '76561198000000002'), allyLobby)
+  await expect(page.locator('.local_menu_message')).toHaveText(/Version mismatch/)
+
+  await quit(app)
+  expect(errors).toEqual([])
+
+  // an invite accepted while the game was closed starts it with the lobby
+  ;({ app, page, errors } = await launch(userDataDir, steamEnv({ steamId: '76561198000000001', others: [ALLY], launchLobby: true })))
+  await expect(page.locator('.local_menu_message')).toHaveText(/Version mismatch/)
   await quit(app)
   expect(errors).toEqual([])
 })

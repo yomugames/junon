@@ -1,5 +1,7 @@
 const LocalWorldApi = require('../util/local_world_api')
 const CoopAuth = require('../util/coop_auth')
+const SteamCoop = require('../util/steam_coop')
+const SteamSocket = require('../util/steam_socket')
 
 const DEFAULT_HOST_PORT = 7777
 const MODE_LABELS = { survival: 'Survival', peaceful: 'Sandbox', hardcore: 'Hardcore' }
@@ -27,6 +29,40 @@ class LocalWorldMenu {
     this.continueBtn.addEventListener('click', () => {
       if (this.latestWorld) this.openWorld(this.latestWorld)
     })
+
+    this.steamStatus = { isAvailable: false }
+    this.initSteam()
+  }
+
+  // Steam co-op controls show only when the desktop app has Steam. An invite
+  // accepted while the game was closed launches it with the lobby to join.
+  async initSteam() {
+    if (!SteamCoop.isAvailable()) return
+
+    this.steamStatus = await SteamCoop.getStatus()
+    if (!this.steamStatus.isAvailable) return
+
+    SteamCoop.onJoinRequest((lobbyId) => this.onSteamJoinRequest(lobbyId))
+    if (this.steamStatus.pendingLobbyId) this.run(() => this.joinSteamLobby(this.steamStatus.pendingLobbyId))
+  }
+
+  // an invite accepted, or Join Game clicked in Steam, while the game runs
+  onSteamJoinRequest(lobbyId) {
+    if (this.main.game.player) {
+      if (!window.confirm('Leave this world and join your friend on Steam?')) return
+      this.main.onExitGameMenuBtnClick()
+    }
+    this.run(() => this.joinSteamLobby(lobbyId))
+  }
+
+  async joinSteamLobby(lobbyId) {
+    this.saveName()
+    const joined = await SteamCoop.joinLobby(lobbyId)
+    this.isInSteamLobby = true
+    this.main.standaloneServerUrl = SteamSocket.urlFor(joined.hostSteamId)
+    this.main.standaloneAuthorize = null
+    this.el.style.display = 'none'
+    this.main.joinStandaloneWorld()
   }
 
   // highlights the menu entry whose panel is showing, and drops the
@@ -56,6 +92,13 @@ class LocalWorldMenu {
   }
 
   show() {
+    // back from a Steam host's world: out of its lobby, so Steam stops
+    // showing the player in it
+    if (this.isInSteamLobby) {
+      this.isInSteamLobby = false
+      SteamCoop.leaveLobby().catch(() => {})
+    }
+
     document.querySelector('.middle_container').style.display = 'block'
     this.el.style.display = 'block'
     this.loadWorlds()
@@ -213,7 +256,8 @@ class LocalWorldMenu {
       const result = await LocalWorldApi.listWorlds()
       if (result.hosting) return this.showHosting(result)
 
-      this.panel.innerHTML = '<h2>Host co-op</h2><p>Friends on your network, or on a VPN such as Tailscale, join with your address and this port. To play over the internet, forward the port on your router.</p><label>World <select class="host_world ui_select"></select></label><label>Port <input class="host_port black_input" type="number" min="1024" max="65535" value="' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="host_password black_input" type="password" maxlength="64" placeholder="optional" autocomplete="new-password"></label><button class="start_hosting ui_btn">Host and play</button>'
+      const steamSection = this.steamStatus.isAvailable ? '<h3>On Steam</h3><p>Steam friends join from your invite, or with Join Game in Steam. No port forwarding needed.</p><label>Who can join <select class="steam_lobby_type ui_select"><option value="friends">Steam friends</option><option value="invite">Only friends I invite</option></select></label><button class="start_steam_hosting ui_btn">Host on Steam and play</button><h3>By address</h3>' : ''
+      this.panel.innerHTML = '<h2>Host co-op</h2><label>World <select class="host_world ui_select"></select></label>' + steamSection + '<p>Friends on your network, or on a VPN such as Tailscale, join with your address and this port. To play over the internet, forward the port on your router.</p><label>Port <input class="host_port black_input" type="number" min="1024" max="65535" value="' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="host_password black_input" type="password" maxlength="64" placeholder="optional" autocomplete="new-password"></label><button class="start_hosting ui_btn">Host and play</button>'
       const select = this.panel.querySelector('.host_world')
       result.worlds.forEach((world) => {
         const option = document.createElement('option')
@@ -234,21 +278,45 @@ class LocalWorldMenu {
         })
         this.open(hosted.worldId, hosted.serverUrl)
       }))
+
+      const steamButton = this.panel.querySelector('.start_steam_hosting')
+      if (steamButton) steamButton.addEventListener('click', () => this.run(async () => {
+        this.saveName()
+        steamButton.disabled = true
+        try {
+          const hosted = await LocalWorldApi.hostWorldOnSteam({
+            worldId: select.value,
+            ownerUid: this.main.localProfile.uid,
+            lobbyType: this.panel.querySelector('.steam_lobby_type').value
+          })
+          this.open(hosted.worldId, hosted.serverUrl)
+        } finally {
+          steamButton.disabled = false
+        }
+      }))
     })
   }
 
   showHosting(result) {
     const hosting = result.hosting
     const world = result.worlds.find((entry) => entry.id === hosting.worldId)
-    this.panel.innerHTML = '<h2>Host co-op</h2><p class="host_summary"></p><ul class="host_addresses"></ul><button class="play_hosted ui_btn">Play</button> <button class="stop_hosting ui_btn">Stop hosting</button>'
-    this.panel.querySelector('.host_summary').textContent = 'Hosting ' + (world ? world.name : 'your world') + (hosting.hasPassword ? ' with a password' : '') + '. Friends join at:'
-    const list = this.panel.querySelector('.host_addresses')
-    const addresses = hosting.addresses.length ? hosting.addresses : ['<your address>']
-    addresses.forEach((address) => {
-      const item = document.createElement('li')
-      item.textContent = address + ':' + hosting.port
-      list.appendChild(item)
-    })
+    this.panel.innerHTML = '<h2>Host co-op</h2><p class="host_summary"></p><ul class="host_addresses"></ul><div class="steam_hosting"></div><button class="play_hosted ui_btn">Play</button> <button class="stop_hosting ui_btn">Stop hosting</button>'
+    const worldName = world ? world.name : 'your world'
+
+    if (hosting.port) {
+      this.panel.querySelector('.host_summary').textContent = 'Hosting ' + worldName + (hosting.hasPassword ? ' with a password' : '') + '. Friends join at:'
+      const list = this.panel.querySelector('.host_addresses')
+      const addresses = hosting.addresses.length ? hosting.addresses : ['<your address>']
+      addresses.forEach((address) => {
+        const item = document.createElement('li')
+        item.textContent = address + ':' + hosting.port
+        list.appendChild(item)
+      })
+    } else {
+      this.panel.querySelector('.host_summary').textContent = 'Hosting ' + worldName + ' on Steam.'
+    }
+    if (hosting.isOnSteam) this.renderSteamInvites(this.panel.querySelector('.steam_hosting'), hosting)
+
     this.panel.querySelector('.play_hosted').addEventListener('click', () => this.open(hosting.worldId, result.serverUrl))
     this.panel.querySelector('.stop_hosting').addEventListener('click', () => this.run(async () => {
       await LocalWorldApi.stopHosting()
@@ -256,9 +324,67 @@ class LocalWorldMenu {
     }))
   }
 
+  // the invite controls of a world hosted on Steam: Steam's own invite
+  // dialog (in the overlay), and a list of online friends to invite directly,
+  // which works without the overlay
+  renderSteamInvites(container, hosting) {
+    container.innerHTML = '<p class="steam_hosting_summary"></p><button class="steam_invite_dialog ui_btn">Invite with Steam</button><div class="steam_friends">Loading friends…</div>'
+    container.querySelector('.steam_hosting_summary').textContent = hosting.steamLobbyType === 'invite' ? 'Only friends you invite can join.' : 'Your Steam friends can join with Join Game in Steam, or from an invite.'
+    container.querySelector('.steam_invite_dialog').addEventListener('click', () => this.run(() => SteamCoop.openInviteDialog()))
+
+    this.run(async () => {
+      const friends = await SteamCoop.listFriends()
+      const list = container.querySelector('.steam_friends')
+      list.textContent = friends.length ? '' : 'No Steam friends are online.'
+      friends.forEach((friend) => {
+        const entry = document.createElement('div')
+        entry.className = 'steam_friend'
+        const name = document.createElement('span')
+        name.textContent = friend.name
+        const button = document.createElement('button')
+        button.className = 'steam_invite ui_btn'
+        button.textContent = 'Invite'
+        button.addEventListener('click', () => this.run(async () => {
+          await SteamCoop.invite(friend.steamId)
+          button.textContent = 'Invited'
+          button.disabled = true
+        }))
+        entry.appendChild(name)
+        entry.appendChild(button)
+        list.appendChild(entry)
+      })
+    })
+  }
+
+  // friends hosting a Junon world on Steam, each with a Join button
+  renderSteamHosts(container) {
+    container.innerHTML = '<h3>Friends on Steam <button class="steam_refresh ui_btn">Refresh</button></h3><div class="steam_hosts">Looking for friends…</div><h3>By address</h3>'
+    container.querySelector('.steam_refresh').addEventListener('click', () => this.renderSteamHosts(container))
+
+    this.run(async () => {
+      const hosts = await SteamCoop.listFriendsHosting()
+      const list = container.querySelector('.steam_hosts')
+      list.textContent = hosts.length ? '' : 'None of your Steam friends are hosting right now.'
+      hosts.forEach((host) => {
+        const entry = document.createElement('div')
+        entry.className = 'steam_host'
+        const label = document.createElement('span')
+        label.textContent = host.name + (host.status ? ' · ' + host.status : '')
+        const button = document.createElement('button')
+        button.className = 'steam_join ui_btn'
+        button.textContent = 'Join'
+        button.addEventListener('click', () => this.run(() => this.joinSteamLobby(host.lobbyId)))
+        entry.appendChild(label)
+        entry.appendChild(button)
+        list.appendChild(entry)
+      })
+    })
+  }
+
   joinWorld() {
     this.setActive('join')
-    this.panel.innerHTML = '<h2>Join co-op</h2><label>Address <input class="join_address black_input" placeholder="192.168.1.10:' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="join_password black_input" type="password" maxlength="64" placeholder="if the host set one"></label><button class="connect_world ui_btn">Join</button>'
+    this.panel.innerHTML = '<h2>Join co-op</h2><div class="join_steam"></div><label>Address <input class="join_address black_input" placeholder="192.168.1.10:' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="join_password black_input" type="password" maxlength="64" placeholder="if the host set one"></label><button class="connect_world ui_btn">Join</button>'
+    if (this.steamStatus.isAvailable) this.renderSteamHosts(this.panel.querySelector('.join_steam'))
     this.panel.querySelector('.connect_world').addEventListener('click', () => this.run(async () => {
       this.saveName()
       const address = this.panel.querySelector('.join_address').value.trim()

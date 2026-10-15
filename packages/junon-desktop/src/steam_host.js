@@ -2,17 +2,25 @@ const SteamFraming = require("junon-common/steam_framing")
 const { STATE_CONNECTED, STATE_CLOSED_BY_PEER, STATE_PROBLEM_DETECTED_LOCALLY, END_REASON_APP } = require("./steam")
 const { SteamFrameAssembler, SteamOutbox, STEAM_VIRTUAL_PORT } = SteamFraming
 
+// a guest joins the lobby before it connects, but the host may see the
+// connection request before the lobby's member list updates
+const MEMBERSHIP_WAIT_MS = 10 * 1000
+
 // The host's side of Steam co-op. While the game server says the world is
 // hosted on Steam (`steamHosting`), a P2P listen socket accepts guests'
 // connections; their messages are reassembled into frames and relayed to the
 // server (server/util/steam_socket_bridge.js), and the server's frames are
 // split and sent back. The guest's Steam id comes from the authenticated
-// connection.
+// connection, and only members of the host's lobby are accepted
+// (steam_lobby.js).
 class SteamHost {
-  // runtime: SteamRuntime; postToServer(message)
-  constructor(runtime, postToServer) {
+  // runtime: SteamRuntime; postToServer(message); isAllowed(steamId)
+  constructor(runtime, postToServer, isAllowed) {
     this.runtime = runtime
     this.postToServer = postToServer
+    this.isAllowed = isAllowed
+    // connection requests waiting for their Steam id to show up in the lobby
+    this.pendingRequests = new Map()
     this.listenSocket = null
     this.pollGroup = null
     // Steam connection handle -> { connectionId, steamId, assembler, outbox }
@@ -25,7 +33,7 @@ class SteamHost {
   }
 
   isActive() {
-    return this.connections.size > 0
+    return this.connections.size > 0 || this.pendingRequests.size > 0
   }
 
   setHosting(isHosting) {
@@ -37,6 +45,8 @@ class SteamHost {
       // the server has already ended its guest sockets; closing the listen
       // socket drops whatever is left
       Array.from(this.connections.keys()).forEach((connection) => this.closeConnection(connection, true))
+      this.pendingRequests.forEach((request, connection) => this.runtime.networking.closeConnection(connection, END_REASON_APP, "", false))
+      this.pendingRequests.clear()
       this.runtime.networking.closeListenSocket(this.listenSocket)
       this.runtime.networking.destroyPollGroup(this.pollGroup)
       this.listenSocket = null
@@ -48,12 +58,34 @@ class SteamHost {
   onConnectionRequest(request) {
     if (!this.listenSocket || request.listenSocket !== this.listenSocket) return
 
-    // Milestone 3 limits this to members of the host's lobby
-    this.runtime.networking.acceptConnection(request.connection)
+    this.pendingRequests.set(request.connection, { steamId: String(request.identityRemote), deadline: Date.now() + MEMBERSHIP_WAIT_MS })
+    this.checkPendingRequests()
+  }
+
+  checkPendingRequests() {
+    let now = Date.now()
+    this.pendingRequests.forEach((request, connection) => {
+      if (this.isAllowed(request.steamId)) {
+        this.pendingRequests.delete(connection)
+        this.runtime.networking.acceptConnection(connection)
+      } else if (now > request.deadline) {
+        this.pendingRequests.delete(connection)
+        this.runtime.networking.closeConnection(connection, END_REASON_APP, "Not in the host's lobby", false)
+      }
+    })
   }
 
   onConnectionStateChange(change) {
     if (!this.listenSocket || change.info.listenSocket !== this.listenSocket) return
+
+    // a requester that gave up before it was let in
+    if (this.pendingRequests.has(change.connection)) {
+      if (change.newState === STATE_CLOSED_BY_PEER || change.newState === STATE_PROBLEM_DETECTED_LOCALLY) {
+        this.pendingRequests.delete(change.connection)
+        this.runtime.networking.closeConnection(change.connection, 0, "", false)
+      }
+      return
+    }
 
     if (change.newState === STATE_CONNECTED && !this.connections.has(change.connection)) {
       this.onConnected(change.connection, change.info.identityRemote)
@@ -104,6 +136,7 @@ class SteamHost {
 
   poll() {
     if (!this.pollGroup) return
+    this.checkPendingRequests()
 
     let messages = this.runtime.networking.receiveMessagesOnPollGroup(this.pollGroup, 256)
     messages.forEach((message) => {

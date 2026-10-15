@@ -56,8 +56,11 @@ a reason.
 Steam co-op (in progress, [plan](docs/exec-plans/active/steam-coop.md)) uses
 Steam Networking Sockets P2P instead of a guest listener. Steamworks runs only
 in the Electron main process (`junon-desktop/src/steam.js`), and the game server
-never loads it. On the host, `steam_host.js` accepts Steam connections and
-relays whole frames to the server over the parent port, where
+never loads it. Friends find and join the world through a Steam lobby
+(`steam_lobby.js`) that main creates when the server reports Steam hosting;
+the lobby data carries the protocol hash, so a guest on another version is
+told before connecting. On the host, `steam_host.js` accepts Steam
+connections from lobby members only and relays whole frames to the server over the parent port, where
 `server/util/steam_socket_bridge.js` turns each one into a guest socket with
 the same shape as a `ws` one (`isGuest`, `remoteAddress` `steam:<id>`). On the
 guest, `steam_guest.js` carries the renderer's game socket

@@ -33,7 +33,8 @@ class SteamRuntime {
     }
 
     try {
-      let SteamworksSDK = require("steamworks-ffi-node").default
+      // tests swap in an in-memory Steam (test/support/fake_steam.js)
+      let SteamworksSDK = require(process.env.JUNON_STEAM_FAKE_SDK ? path.resolve(process.env.JUNON_STEAM_FAKE_SDK) : "steamworks-ffi-node").default
       let sdk = SteamworksSDK.getInstance()
 
       // the Steamworks redistributable isn't in the repository (Valve's

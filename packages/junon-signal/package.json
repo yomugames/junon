@@ -1,0 +1,21 @@
+{
+  "name": "junon-signal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Signalling server that pairs Junon co-op hosts and guests for WebRTC",
+  "main": "src/signal_server.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev:worker": "wrangler dev",
+    "deploy:worker": "wrangler deploy",
+    "test": "node --test test/*.test.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^7.1.1"
+  },
+  "devDependencies": {
+    "miniflare": "^4.20260730.0",
+    "wrangler": "^4.151.0"
+  }
+}

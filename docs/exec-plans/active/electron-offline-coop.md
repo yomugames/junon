@@ -439,7 +439,9 @@ Done as follows.
 `electron-builder` for Windows, macOS, and Linux; code signing and notarization.
 Steam builds add their own packaging steps (Steamworks redistributables,
 `koffi` and `steamworks-ffi-node` outside the asar, no `steam_appid.txt`); see
-Milestone 6 of [steam-coop.md](steam-coop.md).
+Milestone 6 of [steam-coop.md](steam-coop.md). Builds without Steam (itch.io)
+set `DEFAULT_SIGNAL_URL` to the deployed signalling server for online co-op;
+see [webrtc-coop.md](webrtc-coop.md).
 
 ## Validation
 

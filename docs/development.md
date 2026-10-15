@@ -340,6 +340,81 @@ Steam, so start the desktop app with Steam running. Steam guests are
 characters keyed by their local profile for now; keying them by Steam account
 is the next step of the plan.
 
+### Online co-op (WebRTC)
+
+Online co-op is being built ([execution plan](exec-plans/active/webrtc-coop.md))
+for builds without Steam, such as itch.io. **Host co-op** gets **Host online
+and play**, which shows a room code; friends enter it under **Join co-op**.
+Game traffic goes peer to peer over WebRTC; the signalling server in
+`packages/junon-signal` only pairs the two. The desktop app shows these
+controls only when it knows a signalling server:
+
+| Variable | Meaning |
+| --- | --- |
+| `JUNON_SIGNAL_URL` | Desktop app: the signalling server, `ws://` or `wss://`. Overrides `DEFAULT_SIGNAL_URL` in `packages/junon-desktop/src/main.js`, which release builds set to the deployed server and which is `null` in the repository. |
+
+To try it on one machine, run the signalling server, then two desktop
+instances with separate user-data directories:
+
+```sh
+npm run signal
+JUNON_SIGNAL_URL=ws://127.0.0.1:8787 npm run desktop
+JUNON_SIGNAL_URL=ws://127.0.0.1:8787 JUNON_USER_DATA_DIR=/tmp/junon-guest npm run desktop
+```
+
+The signalling protocol has two implementations in `packages/junon-signal`,
+tested against the same suite: a Cloudflare Worker (`worker/index.mjs`), the
+production target, and a plain Node server (`src/signal_server.js`), for
+development, tests and self-hosting. `npm run dev:worker --workspace
+packages/junon-signal` runs the Worker locally on `ws://127.0.0.1:8787` too.
+
+#### Cloudflare Worker
+
+The Worker routes each connection to a Durable Object per room (`Room`),
+named by the room code, and keeps per-address limits in another
+(`AddressLimits`); `wrangler.toml` declares both. Rooms use the WebSocket
+Hibernation API: between joins they're evicted from memory, the host's
+keepalive pings are answered without waking them, and deadlines (guest
+lifetime, the host's resume window) are one alarm. Billed time is a few
+seconds per join, not the length of a hosting session. Deploy:
+
+```sh
+cd packages/junon-signal
+npx wrangler login
+npx wrangler deploy
+# optional TURN: the shared secret, plus TURN_URLS under [vars]
+npx wrangler secret put TURN_SECRET
+```
+
+The deployed `wss://junon-signal.<account>.workers.dev` (or a custom domain)
+is what `DEFAULT_SIGNAL_URL` should be. Settings are `[vars]` in
+`wrangler.toml`, documented at the top of `worker/index.mjs`: `ICE_SERVERS`,
+`TURN_URLS`, `TURN_SECRET`, `TURN_TTL`, and limits for tests. Unlike the Node
+server, it limits rooms opened per address per 10 minutes (10), not rooms
+open at once, and has no per-address connection cap; Cloudflare's own
+protection covers floods.
+
+#### Node server
+
+A plain Node process (`npm run signal`, or
+`node packages/junon-signal/src/index.js`) with no database. Deploy it behind
+a TLS-terminating reverse proxy that forwards WebSocket upgrades, so release
+builds use `wss://`, and set `JUNON_SIGNAL_TRUST_PROXY=1` there so its
+per-address limits see players' addresses. `GET /health` answers `ok` (on
+the Worker too).
+
+| Variable | Meaning |
+| --- | --- |
+| `JUNON_SIGNAL_PORT`, `JUNON_SIGNAL_HOST` | Where to listen. Default `0.0.0.0:8787`. |
+| `JUNON_SIGNAL_TRUST_PROXY` | `1` behind a reverse proxy: take the client's address from the last `X-Forwarded-For` entry. |
+| `JUNON_SIGNAL_ICE_SERVERS` | JSON array of `RTCIceServer`s handed to both peers, replacing the default public STUN servers (Google, Cloudflare). |
+| `JUNON_SIGNAL_TURN_URLS`, `JUNON_SIGNAL_TURN_SECRET`, `JUNON_SIGNAL_TURN_TTL` | Optional TURN relay: comma-separated `turn:` URLs and the TURN server's shared secret (coturn `use-auth-secret`). Each peer gets credentials valid for `TTL` seconds (default 3600). Off by default. |
+
+Without TURN, players whose networks block direct connections can't connect
+and are told to join by address or over a VPN. Changing the signalling
+protocol affects every released game; see
+[ARCHITECTURE.md](../ARCHITECTURE.md#important-contracts).
+
 ## Configuration
 
 The game server loads a root `.env` file before initializing configuration,

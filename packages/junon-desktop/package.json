@@ -17,6 +17,8 @@
   },
   "devDependencies": {
     "electron": "^44.6.0",
-    "@playwright/test": "^1.63.0"
+    "@playwright/test": "^1.63.0",
+    "junon-signal": "*",
+    "miniflare": "^4.20260730.0"
   }
 }

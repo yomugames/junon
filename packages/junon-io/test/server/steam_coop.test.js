@@ -1,8 +1,8 @@
-// Steam co-op on the game server. The desktop shell's main process owns the
-// Steam connections and relays their frames over the desktop channel
-// (server/util/steam_socket_bridge.js). Here the test plays main: it forks the
-// real server with a Node IPC channel in place of Electron's parent port and
-// sends the same messages main would for Steam guests.
+// Steam and WebRTC co-op on the game server. The desktop shell's main process
+// owns the Steam connections and WebRTC data channels and relays their frames
+// over the desktop channel (server/util/relay_socket_bridge.js). Here the test
+// plays main: it forks the real server with a Node IPC channel in place of
+// Electron's parent port and sends the same messages main would for guests.
 const { fork } = require('child_process')
 const crypto = require('crypto')
 const fs = require('fs')
@@ -10,6 +10,7 @@ const os = require('os')
 const path = require('path')
 const protobuf = require('protobufjs')
 const SteamFraming = require('junon-common/steam_framing')
+const RtcTransport = require('junon-common/rtc_transport')
 
 const SERVER_PATH = path.resolve(__dirname, '../../server/server.js')
 const PROTOCOL_DIR = path.join(path.dirname(require.resolve('junon-common/package.json')), 'protocol')
@@ -78,24 +79,33 @@ async function request(method, ...args) {
   return result.result
 }
 
-// a Steam connection as main relays it
-function steamGuest(connectionId, steamId = GUEST_STEAM_ID) {
+// a connection as main relays it: prefix 'steam' or 'rtc', identity the
+// open message's fields
+function relayGuest(prefix, connectionId, identity, transportVersion) {
   const isFor = (message) => message.connectionId === connectionId
   const guest = {
-    open: () => server.send({ type: 'steamOpen', connectionId, steamId }),
-    close: () => server.send({ type: 'steamClose', connectionId }),
-    sendControl: (data) => server.send({ type: 'steamFrame', connectionId, kind: SteamFraming.KIND_CONTROL, data }),
-    hello: (protocol = PROTOCOL_HASH) => guest.sendControl({ type: 'hello', version: SteamFraming.STEAM_TRANSPORT_VERSION, protocol }),
-    sendGame: (payload) => server.send({ type: 'steamFrame', connectionId, kind: SteamFraming.KIND_BINARY, data: MessageWrapper.encode(payload).finish() }),
-    waitForControl: (type) => waitFor((message) => isFor(message) && message.type === 'steamFrame' && message.kind === SteamFraming.KIND_CONTROL && message.data.type === type, type),
-    waitForClose: () => waitFor((message) => isFor(message) && message.type === 'steamClose', 'close of ' + connectionId),
+    open: () => server.send(Object.assign({ type: prefix + 'Open', connectionId }, identity)),
+    close: () => server.send({ type: prefix + 'Close', connectionId }),
+    sendControl: (data) => server.send({ type: prefix + 'Frame', connectionId, kind: SteamFraming.KIND_CONTROL, data }),
+    hello: (protocol = PROTOCOL_HASH) => guest.sendControl({ type: 'hello', version: transportVersion, protocol }),
+    sendGame: (payload) => server.send({ type: prefix + 'Frame', connectionId, kind: SteamFraming.KIND_BINARY, data: MessageWrapper.encode(payload).finish() }),
+    waitForControl: (type) => waitFor((message) => isFor(message) && message.type === prefix + 'Frame' && message.kind === SteamFraming.KIND_CONTROL && message.data.type === type, type),
+    waitForClose: () => waitFor((message) => isFor(message) && message.type === prefix + 'Close', 'close of ' + connectionId),
     waitForGame: async (kind) => {
-      const message = await waitFor((entry) => isFor(entry) && entry.type === 'steamFrame' && entry.kind === SteamFraming.KIND_BINARY && MessageWrapper.decode(entry.data).kind === kind, kind)
+      const message = await waitFor((entry) => isFor(entry) && entry.type === prefix + 'Frame' && entry.kind === SteamFraming.KIND_BINARY && MessageWrapper.decode(entry.data).kind === kind, kind)
       return MessageWrapper.decode(message.data)[kind]
     },
     requestGame: (uid, username) => guest.sendGame({ RequestGame: { uid, username, screenWidth: 800, screenHeight: 600, sessionId: uid } })
   }
   return guest
+}
+
+function steamGuest(connectionId, steamId = GUEST_STEAM_ID) {
+  return relayGuest('steam', connectionId, { steamId }, SteamFraming.STEAM_TRANSPORT_VERSION)
+}
+
+function rtcGuest(connectionId, address = null) {
+  return relayGuest('rtc', connectionId, { address }, RtcTransport.RTC_TRANSPORT_VERSION)
 }
 
 test('Steam guests join through the desktop channel while the world is hosted on Steam', async () => {
@@ -194,4 +204,59 @@ test('a guest that never says hello is dropped, and quitting kicks Steam guests'
   expect((await guest.waitForGame('PlayerKick')).reason).toContain('closed the world')
   expect((await silent.waitForControl('reject')).data.reason).toContain('no longer being hosted')
   expect(await server.exited).toBe(0)
+})
+
+test('WebRTC guests join through the desktop channel while the world is hosted online', async () => {
+  server = startServer()
+  await waitFor((message) => message.type === 'ready', 'ready')
+  const { worldId } = await request('createWorld', { ownerUid: OWNER_UID, name: 'Online World', gameMode: 'survival' })
+
+  const early = rtcGuest(1)
+  early.open()
+  expect((await early.waitForClose()).isGraceful).toBe(false)
+
+  const hosted = await request('hostWorldOnline', { worldId, ownerUid: OWNER_UID })
+  expect(hosted.hosting).toMatchObject({ worldId, isOnline: true, roomCode: null, isOnSteam: false, port: null })
+  expect(await waitFor((message) => message.type === 'rtcHosting' && message.isHosting === true, 'rtcHosting on')).toEqual({
+    type: 'rtcHosting', isHosting: true, worldName: 'Online World', protocolHash: PROTOCOL_HASH
+  })
+  await expect(request('hostWorldOnline', { worldId, ownerUid: OWNER_UID })).rejects.toThrow('Already hosting')
+
+  // main reports the signalling server's room code; nonsense is ignored.
+  // IPC keeps order, so the request below sees both.
+  server.send({ type: 'rtcRoom', code: 'K7QF2M9X' })
+  server.send({ type: 'rtcRoom', code: '<b>' })
+  expect((await request('listWorlds')).hosting.roomCode).toBe('K7QF2M9X')
+
+  // a Steam-version hello is refused: the transports are versioned apart
+  const steamHello = rtcGuest(2)
+  steamHello.open()
+  steamHello.sendControl({ type: 'hello', version: 999, protocol: PROTOCOL_HASH })
+  expect((await steamHello.waitForControl('reject')).data).toMatchObject({ code: 'version' })
+
+  // two guests from one address, and one through a TURN relay (no address)
+  const guests = [rtcGuest(3, '203.0.113.7'), rtcGuest(4, '203.0.113.7'), rtcGuest(5, null)]
+  for (const [index, guest] of guests.entries()) {
+    guest.open()
+    guest.hello()
+    await guest.waitForControl('welcome')
+    guest.requestGame('rtcGuestProfile' + index, 'RtcGuest' + index)
+    expect((await guest.waitForGame('JoinGame')).uid).toBe('rtcGuestProfile' + index)
+  }
+
+  // the owner's profile can't come in as a guest
+  const impostor = rtcGuest(6, '198.51.100.1')
+  impostor.open()
+  impostor.hello()
+  await impostor.waitForControl('welcome')
+  impostor.requestGame(OWNER_UID, 'Impostor')
+  expect((await impostor.waitForGame('CantJoin')).message).toContain('owns the world')
+
+  await request('stopHosting')
+  for (const guest of guests) {
+    expect((await guest.waitForGame('PlayerKick')).reason).toContain('stopped hosting')
+    expect((await guest.waitForClose()).isGraceful).toBe(true)
+  }
+  await waitFor((message) => message.type === 'rtcHosting' && message.isHosting === false, 'rtcHosting off')
+  expect((await request('listWorlds')).hosting).toBe(null)
 })

@@ -2,6 +2,7 @@ const Cookies = require("js-cookie")
 const SocketUtil = require("../util/socket_util")
 const ClientHelper = require("../util/client_helper")
 const SteamSocket = require("../util/steam_socket")
+const RtcSocket = require("../util/rtc_socket")
 
 class GameConnection {
 
@@ -58,8 +59,15 @@ class GameConnection {
       }
     }
 
-    // steam:<id> URLs are Steam co-op hosts, reached through the desktop app
-    this.socket = SteamSocket.isSteamUrl(url) ? new SteamSocket(url) : new WebSocket(url)
+    // steam:<id> URLs are Steam co-op hosts, reached through the desktop app;
+    // rtc:<room code> URLs are online co-op hosts, reached over WebRTC
+    if (SteamSocket.isSteamUrl(url)) {
+      this.socket = new SteamSocket(url)
+    } else if (RtcSocket.isRtcUrl(url)) {
+      this.socket = new RtcSocket(url)
+    } else {
+      this.socket = new WebSocket(url)
+    }
     this.socket.binaryType = "arraybuffer"
 
     this.socket.onopen = () => {
@@ -72,7 +80,7 @@ class GameConnection {
       if (callback.success) callback.success(this.socket)
     }
 
-    // a Steam socket says why it failed, e.g. a version mismatch
+    // Steam and WebRTC sockets say why they failed, e.g. a version mismatch
     this.socket.onerror = (event) => {
       let wasNeverConnected = this.isFirstSocketSetup
       if (callback.error) callback.error(wasNeverConnected, event && event.reason)

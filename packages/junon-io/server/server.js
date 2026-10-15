@@ -37,6 +37,8 @@ const StandaloneWorlds = require("junon-common/standalone_worlds")
 const SaveImporter = require("junon-common/save_importer")
 const getDesktopChannel = require("./util/desktop_channel")
 const SteamSocketBridge = require("./util/steam_socket_bridge")
+const RtcSocketBridge = require("./util/rtc_socket_bridge")
+const RtcTransport = require("junon-common/rtc_transport")
 const Item = require("./entities/item")
 
 global.i18n = {
@@ -271,13 +273,14 @@ class Server {
   }
 
   // Messages from the desktop main process: local menu requests (see
-  // getLocalWorldApi), Steam co-op guest traffic (SteamSocketBridge), and a
+  // getLocalWorldApi), Steam and WebRTC co-op guest traffic
+  // (SteamSocketBridge, RtcSocketBridge), the online room's code, and a
   // save-and-exit request when the app quits, since killing a utility process
   // on Windows skips the SIGTERM handler.
   initDesktopChannel() {
     let api = this.getLocalWorldApi()
 
-    this.steamSocketBridge = new SteamSocketBridge({
+    const bridgeOptions = (isAccepting) => ({
       postMessage: (message) => desktopChannel.postMessage(message),
       sockets: this.standaloneSocketServer.sockets,
       handlers: {
@@ -286,12 +289,17 @@ class Server {
         close: this.onSocketClose.bind(this)
       },
       protocolHash: protocolHash,
-      isAccepting: () => !!this.steamHost && !!this.getMainGame()
+      isAccepting: isAccepting
     })
+    this.steamSocketBridge = new SteamSocketBridge(bridgeOptions(() => !!this.steamHost && !!this.getMainGame()))
+    this.rtcSocketBridge = new RtcSocketBridge(bridgeOptions(() => !!this.onlineHost && !!this.getMainGame()))
 
     desktopChannel.onMessage(async (data) => {
       if (!data) return
       if (this.steamSocketBridge.handle(data)) return
+      if (this.rtcSocketBridge.handle(data)) return
+      if (data.type === 'rtcRoom') return this.onOnlineRoom(data.code)
+      if (data.type === 'rtcHostingFailed') return this.stopOnlineHosting('The host lost the connection to the online co-op service.')
       if (data.type === 'shutdown') return this.shutdownStandalone()
       if (data.type !== 'localApi') return
 
@@ -714,6 +722,17 @@ class Server {
         this.startSteamHosting({ lobbyType })
         return { worldId, serverUrl: serverUrl(), hosting: this.getHostingStatus() }
       },
+      // the same, for anyone with the room code, over WebRTC; desktop only,
+      // where main owns the peer connections and the signalling server's room
+      // (RtcSocketBridge)
+      hostWorldOnline: async ({ worldId, ownerUid } = {}) => {
+        await validOwnedWorld(worldId, ownerUid)
+        if (!this.rtcSocketBridge) throw new Error('Online co-op needs the desktop app')
+        if (this.onlineHost) throw new Error('Already hosting online. Stop hosting first.')
+        await this.activateStandaloneWorld({ worldId, ownerUid })
+        this.startOnlineHosting()
+        return { worldId, serverUrl: serverUrl(), hosting: this.getHostingStatus() }
+      },
       stopHosting: async () => {
         this.stopHosting("The host stopped hosting the world.")
         return { hosting: null }
@@ -786,9 +805,54 @@ class Server {
     })
   }
 
-  // ends both kinds of hosting: every guest, LAN or Steam, gets the reason
+  // WebRTC co-op: main keeps a room open on the signalling server while this
+  // is set, and relays its guests' data channels (RtcSocketBridge). The room
+  // code comes back from main (onOnlineRoom); it can change if main loses the
+  // signalling server for too long.
+  startOnlineHosting() {
+    this.onlineHost = { startedAt: Date.now(), roomCode: null }
+
+    let game = this.getMainGame()
+    desktopChannel.postMessage({
+      type: 'rtcHosting',
+      isHosting: true,
+      worldName: game && game.sector ? game.sector.name : '',
+      protocolHash: protocolHash
+    })
+
+    LOG.info('Hosting co-op online')
+  }
+
+  onOnlineRoom(code) {
+    if (!this.onlineHost || !RtcTransport.normalizeRoomCode(code)) return
+    this.onlineHost.roomCode = code
+
+    this.forEachGame((game) => {
+      game.forEachPlayer((player) => this.sendOnlineHostingStatus(player))
+    })
+  }
+
+  // main couldn't open the room, or lost its peer connections: ends online
+  // hosting only, so LAN and Steam guests stay
+  stopOnlineHosting(reason) {
+    if (!this.onlineHost) return
+
+    this.standaloneSocketServer.sockets.forEach((socket) => {
+      if (!socket.isRtc) return
+      this.socketUtil.emit(socket, "PlayerKick", { reason: reason })
+      socket.end()
+    })
+    this.rtcSocketBridge.closePending()
+    this.onlineHost = null
+    desktopChannel.postMessage({ type: 'rtcHosting', isHosting: false })
+
+    LOG.info('Stopped hosting co-op online')
+  }
+
+  // ends every kind of hosting: every guest, LAN, Steam or online, gets the
+  // reason
   stopHosting(reason) {
-    if (!this.coopHost && !this.steamHost) return
+    if (!this.coopHost && !this.steamHost && !this.onlineHost) return
 
     this.standaloneSocketServer.sockets.forEach((socket) => {
       if (socket.isGuest) this.socketUtil.emit(socket, "PlayerKick", { reason: reason })
@@ -800,15 +864,20 @@ class Server {
       this.steamSocketBridge.closePending()
       desktopChannel.postMessage({ type: 'steamHosting', isHosting: false })
     }
+    if (this.onlineHost) {
+      this.rtcSocketBridge.closePending()
+      desktopChannel.postMessage({ type: 'rtcHosting', isHosting: false })
+    }
 
     this.coopHost = null
     this.steamHost = null
+    this.onlineHost = null
 
     LOG.info('Stopped hosting co-op')
   }
 
   getHostingStatus() {
-    if (!this.coopHost && !this.steamHost) return null
+    if (!this.coopHost && !this.steamHost && !this.onlineHost) return null
     let game = this.getMainGame()
 
     return {
@@ -817,7 +886,9 @@ class Server {
       addresses: this.coopHost ? this.getLanAddresses() : [],
       hasPassword: !!(this.coopHost && this.coopHost.passwordKey),
       isOnSteam: !!this.steamHost,
-      steamLobbyType: this.steamHost ? this.steamHost.lobbyType : null
+      steamLobbyType: this.steamHost ? this.steamHost.lobbyType : null,
+      isOnline: !!this.onlineHost,
+      roomCode: this.onlineHost ? this.onlineHost.roomCode : null
     }
   }
 
@@ -827,11 +898,17 @@ class Server {
     if (!status || !player.isSectorOwner() || !player.isPlayerReady) return
 
     if (status.isOnSteam) player.showChatSuccess(status.steamLobbyType === 'invite' ? 'Co-op is open on Steam to friends you invite.' : 'Co-op is open to your Steam friends.')
+    this.sendOnlineHostingStatus(player)
     if (!status.port) return
 
     let addresses = status.addresses.map((address) => address + ':' + status.port)
     let where = addresses.length ? addresses.join(', ') : 'port ' + status.port
     player.showChatSuccess('Co-op is open. Friends join at ' + where + (status.hasPassword ? ' with your password' : ''))
+  }
+
+  sendOnlineHostingStatus(player) {
+    if (!this.onlineHost || !this.onlineHost.roomCode || !player.isSectorOwner() || !player.isPlayerReady) return
+    player.showChatSuccess('Co-op is open online. Friends join with the room code ' + RtcTransport.formatRoomCode(this.onlineHost.roomCode))
   }
 
   // IPv4 addresses of this machine that other machines can use, LAN or VPN

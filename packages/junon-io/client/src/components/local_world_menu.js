@@ -2,6 +2,9 @@ const LocalWorldApi = require('../util/local_world_api')
 const CoopAuth = require('../util/coop_auth')
 const SteamCoop = require('../util/steam_coop')
 const SteamSocket = require('../util/steam_socket')
+const OnlineCoop = require('../util/online_coop')
+const RtcSocket = require('../util/rtc_socket')
+const RtcTransport = require('junon-common/rtc_transport')
 
 const DEFAULT_HOST_PORT = 7777
 const MODE_LABELS = { survival: 'Survival', peaceful: 'Sandbox', hardcore: 'Hardcore' }
@@ -32,6 +35,11 @@ class LocalWorldMenu {
 
     this.steamStatus = { isAvailable: false }
     this.initSteam()
+
+    // online co-op controls show only when the desktop app has a signalling
+    // server
+    this.onlineStatus = { isAvailable: false }
+    OnlineCoop.getStatus().then((status) => { this.onlineStatus = status })
   }
 
   // Steam co-op controls show only when the desktop app has Steam. An invite
@@ -53,6 +61,19 @@ class LocalWorldMenu {
       this.main.onExitGameMenuBtnClick()
     }
     this.run(() => this.joinSteamLobby(lobbyId))
+  }
+
+  // online co-op: the room is checked first, so a wrong code or another
+  // version gets a message here instead of a failed connection
+  async joinOnlineRoom(input) {
+    this.saveName()
+    const code = RtcTransport.normalizeRoomCode(input)
+    if (!code) throw new Error('Enter the 8-character room code from the host')
+    await OnlineCoop.checkRoom(code)
+    this.main.standaloneServerUrl = RtcSocket.urlFor(code)
+    this.main.standaloneAuthorize = null
+    this.el.style.display = 'none'
+    this.main.joinStandaloneWorld()
   }
 
   async joinSteamLobby(lobbyId) {
@@ -256,8 +277,10 @@ class LocalWorldMenu {
       const result = await LocalWorldApi.listWorlds()
       if (result.hosting) return this.showHosting(result)
 
-      const steamSection = this.steamStatus.isAvailable ? '<h3>On Steam</h3><p>Steam friends join from your invite, or with Join Game in Steam. No port forwarding needed.</p><label>Who can join <select class="steam_lobby_type ui_select"><option value="friends">Steam friends</option><option value="invite">Only friends I invite</option></select></label><button class="start_steam_hosting ui_btn">Host on Steam and play</button><h3>By address</h3>' : ''
-      this.panel.innerHTML = '<h2>Host co-op</h2><label>World <select class="host_world ui_select"></select></label>' + steamSection + '<p>Friends on your network, or on a VPN such as Tailscale, join with your address and this port. To play over the internet, forward the port on your router.</p><label>Port <input class="host_port black_input" type="number" min="1024" max="65535" value="' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="host_password black_input" type="password" maxlength="64" placeholder="optional" autocomplete="new-password"></label><button class="start_hosting ui_btn">Host and play</button>'
+      const steamSection = this.steamStatus.isAvailable ? '<h3>On Steam</h3><p>Steam friends join from your invite, or with Join Game in Steam. No port forwarding needed.</p><label>Who can join <select class="steam_lobby_type ui_select"><option value="friends">Steam friends</option><option value="invite">Only friends I invite</option></select></label><button class="start_steam_hosting ui_btn">Host on Steam and play</button>' : ''
+      const onlineSection = this.onlineStatus.isAvailable ? '<h3>Online</h3><p>You get a room code; friends join with it. No port forwarding needed. A few networks block direct connections: friends on those can join by address or over a VPN.</p><button class="start_online_hosting ui_btn">Host online and play</button>' : ''
+      const addressHeading = steamSection || onlineSection ? '<h3>By address</h3>' : ''
+      this.panel.innerHTML = '<h2>Host co-op</h2><label>World <select class="host_world ui_select"></select></label>' + steamSection + onlineSection + addressHeading + '<p>Friends on your network, or on a VPN such as Tailscale, join with your address and this port. To play over the internet, forward the port on your router.</p><label>Port <input class="host_port black_input" type="number" min="1024" max="65535" value="' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="host_password black_input" type="password" maxlength="64" placeholder="optional" autocomplete="new-password"></label><button class="start_hosting ui_btn">Host and play</button>'
       const select = this.panel.querySelector('.host_world')
       result.worlds.forEach((world) => {
         const option = document.createElement('option')
@@ -277,6 +300,18 @@ class LocalWorldMenu {
           password: this.panel.querySelector('.host_password').value
         })
         this.open(hosted.worldId, hosted.serverUrl)
+      }))
+
+      const onlineButton = this.panel.querySelector('.start_online_hosting')
+      if (onlineButton) onlineButton.addEventListener('click', () => this.run(async () => {
+        this.saveName()
+        onlineButton.disabled = true
+        try {
+          const hosted = await LocalWorldApi.hostWorldOnline({ worldId: select.value, ownerUid: this.main.localProfile.uid })
+          this.open(hosted.worldId, hosted.serverUrl)
+        } finally {
+          onlineButton.disabled = false
+        }
       }))
 
       const steamButton = this.panel.querySelector('.start_steam_hosting')
@@ -300,7 +335,7 @@ class LocalWorldMenu {
   showHosting(result) {
     const hosting = result.hosting
     const world = result.worlds.find((entry) => entry.id === hosting.worldId)
-    this.panel.innerHTML = '<h2>Host co-op</h2><p class="host_summary"></p><ul class="host_addresses"></ul><div class="steam_hosting"></div><button class="play_hosted ui_btn">Play</button> <button class="stop_hosting ui_btn">Stop hosting</button>'
+    this.panel.innerHTML = '<h2>Host co-op</h2><p class="host_summary"></p><ul class="host_addresses"></ul><div class="online_hosting"></div><div class="steam_hosting"></div><button class="play_hosted ui_btn">Play</button> <button class="stop_hosting ui_btn">Stop hosting</button>'
     const worldName = world ? world.name : 'your world'
 
     if (hosting.port) {
@@ -313,8 +348,9 @@ class LocalWorldMenu {
         list.appendChild(item)
       })
     } else {
-      this.panel.querySelector('.host_summary').textContent = 'Hosting ' + worldName + ' on Steam.'
+      this.panel.querySelector('.host_summary').textContent = 'Hosting ' + worldName + (hosting.isOnSteam ? ' on Steam.' : ' online.')
     }
+    if (hosting.isOnline) this.renderRoomCode(this.panel.querySelector('.online_hosting'), hosting.roomCode)
     if (hosting.isOnSteam) this.renderSteamInvites(this.panel.querySelector('.steam_hosting'), hosting)
 
     this.panel.querySelector('.play_hosted').addEventListener('click', () => this.open(hosting.worldId, result.serverUrl))
@@ -322,6 +358,25 @@ class LocalWorldMenu {
       await LocalWorldApi.stopHosting()
       this.hostWorld()
     }))
+  }
+
+  // the room code of a world hosted online, to pass on to friends. app:// isn't
+  // a secure context, so no Clipboard API: Copy selects and copies the field.
+  renderRoomCode(container, roomCode) {
+    if (!roomCode) {
+      container.textContent = 'Opening the online room…'
+      return
+    }
+
+    container.innerHTML = '<p>Friends join online with this room code:</p><input class="room_code black_input" readonly> <button class="copy_room_code ui_btn">Copy</button>'
+    const input = container.querySelector('.room_code')
+    input.value = RtcTransport.formatRoomCode(roomCode)
+    const copy = container.querySelector('.copy_room_code')
+    copy.addEventListener('click', () => {
+      input.select()
+      document.execCommand('copy')
+      copy.textContent = 'Copied'
+    })
   }
 
   // the invite controls of a world hosted on Steam: Steam's own invite
@@ -358,7 +413,7 @@ class LocalWorldMenu {
 
   // friends hosting a Junon world on Steam, each with a Join button
   renderSteamHosts(container) {
-    container.innerHTML = '<h3>Friends on Steam <button class="steam_refresh ui_btn">Refresh</button></h3><div class="steam_hosts">Looking for friends…</div><h3>By address</h3>'
+    container.innerHTML = '<h3>Friends on Steam <button class="steam_refresh ui_btn">Refresh</button></h3><div class="steam_hosts">Looking for friends…</div>'
     container.querySelector('.steam_refresh').addEventListener('click', () => this.renderSteamHosts(container))
 
     this.run(async () => {
@@ -383,8 +438,12 @@ class LocalWorldMenu {
 
   joinWorld() {
     this.setActive('join')
-    this.panel.innerHTML = '<h2>Join co-op</h2><div class="join_steam"></div><label>Address <input class="join_address black_input" placeholder="192.168.1.10:' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="join_password black_input" type="password" maxlength="64" placeholder="if the host set one"></label><button class="connect_world ui_btn">Join</button>'
+    const onlineSection = this.onlineStatus.isAvailable ? '<h3>Online</h3><label>Room code <input class="join_room_code black_input" maxlength="9" placeholder="K7QF-2M9X" autocomplete="off"></label><button class="join_online ui_btn">Join</button>' : ''
+    const addressHeading = this.steamStatus.isAvailable || this.onlineStatus.isAvailable ? '<h3>By address</h3>' : ''
+    this.panel.innerHTML = '<h2>Join co-op</h2><div class="join_steam"></div>' + onlineSection + addressHeading + '<label>Address <input class="join_address black_input" placeholder="192.168.1.10:' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="join_password black_input" type="password" maxlength="64" placeholder="if the host set one"></label><button class="connect_world ui_btn">Join</button>'
     if (this.steamStatus.isAvailable) this.renderSteamHosts(this.panel.querySelector('.join_steam'))
+    const onlineButton = this.panel.querySelector('.join_online')
+    if (onlineButton) onlineButton.addEventListener('click', () => this.run(() => this.joinOnlineRoom(this.panel.querySelector('.join_room_code').value)))
     this.panel.querySelector('.connect_world').addEventListener('click', () => this.run(async () => {
       this.saveName()
       const address = this.panel.querySelector('.join_address').value.trim()

@@ -9,7 +9,8 @@ const WebSocket = require("ws")
 // The main listener is the host's own (loopback by default). Co-op hosting
 // adds a guest listener on another address and port; its sockets are marked
 // `isGuest`, and its upgrades must pass the `authorizeGuest` handler. Steam
-// co-op guests (steam_socket_bridge.js) are added to the same socket set.
+// and WebRTC co-op guests (relay_socket_bridge.js) are added to the same
+// socket set.
 
 const MAX_PAYLOAD_LENGTH = 16 * 1024 * 1024
 
@@ -146,8 +147,8 @@ class StandaloneSocketServer {
     this.endGuestSockets()
   }
 
-  // every guest socket, including Steam guests (SteamSocketBridge), which
-  // share this set
+  // every guest socket, including Steam and WebRTC guests
+  // (RelaySocketBridge), which share this set
   endGuestSockets() {
     Array.from(this.sockets).forEach((socket) => {
       if (socket.isGuest) socket.end()

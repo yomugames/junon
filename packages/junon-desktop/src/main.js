@@ -7,6 +7,7 @@ const SteamRuntime = require("./steam")
 const SteamHost = require("./steam_host")
 const SteamGuest = require("./steam_guest")
 const SteamLobbies = require("./steam_lobby")
+const RtcHost = require("./rtc_host")
 
 // The client is the junon-io production build for NODE_ENV=standalone
 // (`NODE_ENV=standalone npm run client:build`), served from app://junon/.
@@ -17,13 +18,25 @@ const CLIENT_DIR = path.join(path.dirname(require.resolve("junon-io/package.json
 const APP_ORIGIN = "app://junon"
 
 // the subset of Server#getLocalWorldApi the renderer may call
-const LOCAL_WORLD_API_METHODS = ["listWorlds", "createWorld", "openWorld", "hostWorld", "hostWorldOnSteam", "stopHosting", "startTutorial", "listImportCharacters", "importWorld"]
+const LOCAL_WORLD_API_METHODS = ["listWorlds", "createWorld", "openWorld", "hostWorld", "hostWorldOnSteam", "hostWorldOnline", "stopHosting", "startTutorial", "listImportCharacters", "importWorld"]
+
+// The signalling server for online (WebRTC) co-op, packages/junon-signal.
+// Release builds set DEFAULT_SIGNAL_URL to the deployed server; without
+// one, the online co-op controls are hidden.
+const DEFAULT_SIGNAL_URL = null
+const SIGNAL_URL = /^wss?:\/\/[^\s]+$/.test(process.env.JUNON_SIGNAL_URL || "") ? process.env.JUNON_SIGNAL_URL : DEFAULT_SIGNAL_URL
 
 // Separate user-data directories let two instances run side by side on one
 // machine, e.g. a co-op host and a guest when testing
 if (process.env.JUNON_USER_DATA_DIR) {
   app.setPath("userData", path.resolve(process.env.JUNON_USER_DATA_DIR))
 }
+
+// WebRTC co-op: offer guests this machine's real local addresses rather than
+// mDNS names, which some networks (and two instances on one machine) can't
+// resolve. Peers are friends the host gave a room code, and LAN co-op shows
+// these addresses anyway.
+app.commandLine.appendSwitch("disable-features", "WebRtcHideLocalIpsWithMdns")
 
 protocol.registerSchemesAsPrivileged([
   // not `secure`: the page must be allowed to open ws:// sockets to co-op hosts
@@ -41,6 +54,9 @@ let steamGuest = null
 let steamLobbies = null
 // the lobby being created for the current Steam hosting (steamHosting)
 let steamLobbyOpening = null
+
+// online co-op (rtc_host.js); null without a signalling server
+let rtcHost = null
 
 function isClientBuilt() {
   let indexPath = path.join(CLIENT_DIR, "index.html")
@@ -77,9 +93,11 @@ function registerIpc() {
     if (!LOCAL_WORLD_API_METHODS.includes(method) || !Array.isArray(args)) return { error: "Unknown request" }
     // the server can't tell whether this process has Steam
     if (method === "hostWorldOnSteam" && !steamHost) return { error: "Steam is not available" }
+    if (method === "hostWorldOnline" && !rtcHost) return { error: "Online co-op is not available" }
 
     try {
       if (method === "hostWorldOnSteam") return { result: await hostWorldOnSteam(args) }
+      if (method === "hostWorldOnline") return { result: await hostWorldOnline(args) }
       return { result: await serverProcess.request(method, args) }
     } catch (e) {
       return { error: e.message }
@@ -113,6 +131,18 @@ function registerIpc() {
     }
   })
 
+  // online co-op guests connect from the renderer (client/src/util/rtc_socket.js)
+  // and only need to know where the signalling server is
+  ipcMain.handle("junon:online-status", (event) => {
+    if (!isAppFrame(event.senderFrame)) return { isAvailable: false }
+    return { isAvailable: !!SIGNAL_URL, signalUrl: SIGNAL_URL }
+  })
+
+  ipcMain.on("junon:rtc-host-event", (event, message) => {
+    if (!rtcHost || !rtcHost.isHostWindow(event.sender)) return
+    rtcHost.onWindowEvent(message)
+  })
+
   ipcMain.handle("junon:steam-socket-open", (event, hostSteamId, protocolHash) => {
     if (!isAppFrame(event.senderFrame)) return { error: "Forbidden" }
     if (!steamGuest) return { error: "Steam is not available" }
@@ -135,12 +165,30 @@ function registerIpc() {
   })
 }
 
-// the game server tells main when Steam hosting starts and stops, and relays
-// Steam guests' frames
+// the game server tells main when Steam and online hosting start and stop,
+// and relays those guests' frames
 function onServerMessage(message) {
+  if (rtcHost) {
+    if (message.type === "rtcHosting") return rtcHost.setHosting(message)
+    if (RtcHost.isServerMessage(message)) return rtcHost.onServerMessage(message)
+  }
+
   if (!steamHost) return
   if (message.type === "steamHosting") return onSteamHosting(message)
   if (SteamHost.isServerMessage(message)) steamHost.onServerMessage(message)
+}
+
+// As for Steam: the server sends rtcHosting before it answers, and the room
+// code follows from the signalling server. If it can't be had, main has
+// already told the server to stop online hosting (rtcHostingFailed).
+async function hostWorldOnline(args) {
+  let result = await serverProcess.request("hostWorldOnline", args)
+
+  let roomCode = await rtcHost.opening
+  if (!roomCode) throw new Error("Hosting ended before the room was ready")
+
+  result.hosting.roomCode = roomCode
+  return result
 }
 
 // the server starts or ends Steam hosting (Server#startSteamHosting,
@@ -223,6 +271,9 @@ function createWindow() {
     if (/^https?:\/\//.test(url)) shell.openExternal(url)
   })
 
+  // the online co-op host window is hidden, so closing this one is quitting
+  mainWindow.on("closed", () => app.quit())
+
   mainWindow.loadURL(APP_ORIGIN + "/")
 }
 
@@ -236,6 +287,7 @@ async function start() {
   protocol.handle("app", serveClient)
   registerIpc()
   initSteam()
+  if (SIGNAL_URL) rtcHost = new RtcHost(SIGNAL_URL, (message) => serverProcess.post(message))
 
   serverProcess = new ServerProcess({
     savesDir: path.join(app.getPath("userData"), "saves"),
@@ -277,10 +329,12 @@ if (!app.requestSingleInstanceLock()) {
     if (isQuitting || !serverProcess) return
     event.preventDefault()
     isQuitting = true
-    serverProcess.stop().finally(() => {
-      if (steamLobbies) steamLobbies.shutdown()
-      steam.shutdown()
-      app.quit()
-    })
+    serverProcess.stop()
+      .finally(() => rtcHost && rtcHost.shutdown())
+      .finally(() => {
+        if (steamLobbies) steamLobbies.shutdown()
+        steam.shutdown()
+        app.quit()
+      })
   })
 }

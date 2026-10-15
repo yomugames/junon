@@ -1,0 +1,24 @@
+# The signalling server on Cloudflare Workers (worker/index.mjs). Deploy with
+# `npm run deploy:worker --workspace packages/junon-signal`; see
+# docs/development.md#online-co-op-webrtc.
+name = "junon-signal"
+main = "worker/index.mjs"
+compatibility_date = "2026-07-01"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+
+[[durable_objects.bindings]]
+name = "LIMITS"
+class_name = "AddressLimits"
+
+# SQLite-backed Durable Objects (available on the free plan)
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room", "AddressLimits"]
+
+# [vars]
+# ICE_SERVERS = '[{"urls":"stun:stun.cloudflare.com:3478"}]'
+# TURN_URLS = "turn:turn.example.com:3478"
+# TURN_SECRET is a secret: `npx wrangler secret put TURN_SECRET`

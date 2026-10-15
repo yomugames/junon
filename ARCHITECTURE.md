@@ -20,12 +20,17 @@ Electron main process (packages/junon-desktop)
   | serves the client build as app://junon/
   | relays preload IPC (window.junonDesktop) to the server's parent port
   | runs Steamworks, if available, and relays Steam co-op guests' frames
+  | relays online co-op guests' frames from a hidden WebRTC window
   v
 utility process: game server <------> saves dir (sector.sav files + SQLite)
   ^                                  ^
   | game WebSocket                   | guest WebSocket, while hosting co-op
   | (ws://127.0.0.1:<free port>)     | (ws://0.0.0.0:<host port>, password proof)
 renderer: game client                other players' clients
+
+online co-op: host's hidden window <-- WebRTC data channel --> guest's game page
+                         \                                   /
+                          `-- junon-signal (room codes, offers, ICE) --'
 ```
 
 The same server also runs without Electron (`npm run server`). It then serves
@@ -69,6 +74,20 @@ guest, `steam_guest.js` carries the renderer's game socket
 512 KB message limit, plus a control hello with the transport version and
 protocol hash that the host checks before any game message.
 
+Online co-op (in progress, [plan](docs/exec-plans/active/webrtc-coop.md)) is
+for builds without Steam: friends join with a room code over WebRTC. The
+signalling server (`packages/junon-signal`, run by us) pairs host and guest
+and relays their offers and ICE candidates; game traffic goes peer to peer. On
+the host, Electron main has no WebRTC, so `junon-desktop/src/rtc_host.js`
+opens a hidden window (`src/rtc_host/`) that holds the room and the peer
+connections, and main relays frames to the server, where
+`server/util/rtc_socket_bridge.js` makes guest sockets (`isRtc`,
+`remoteAddress` the guest's IP). Both bridges share
+`server/util/relay_socket_bridge.js`. On the guest, the game page's own
+`client/src/util/rtc_socket.js` carries the game socket for `rtc:<code>` URLs.
+Online co-op shows only when the desktop app knows a signalling server
+(`JUNON_SIGNAL_URL`, or a release default).
+
 ## Packages and responsibilities
 
 ### `packages/junon-io`
@@ -106,6 +125,16 @@ This package is shared infrastructure:
 Changes here have the widest blast radius and must be checked against the game
 server, the client and the shared game code.
 
+### `packages/junon-signal`
+
+The WebRTC signalling server for online co-op: rooms with short codes, relayed
+offers, answers and ICE candidates, and the STUN/TURN servers handed to both
+peers. Two implementations of one protocol, sharing `src/protocol.mjs`: a
+Cloudflare Worker with a Durable Object per room (`worker/index.mjs`, the
+production target) and a standalone Node `ws` server (`src/signal_server.js`)
+for development, tests and self-hosting. No other workspace dependency;
+deployed apart from the game. It keeps no game data.
+
 ### `packages/junon-desktop`
 
 The Electron shell. `src/main.js` serves the client built with
@@ -114,8 +143,9 @@ The Electron shell. `src/main.js` serves the client built with
 `src/server_process.js` runs `junon-io/server/server.js` in an Electron utility
 process, with saves in `<userData>/saves`, and asks it to save and exit when the
 app quits. `src/preload.js` exposes the only privileged renderer API: the local
-world API and Steam co-op sockets. `src/steam*.js` hold the optional Steam
-integration. The server reaches main through `server/util/desktop_channel.js`,
+world API, Steam co-op sockets and the signalling server's address.
+`src/steam*.js` hold the optional Steam integration, `src/rtc_host*` the host
+side of online co-op. The server reaches main through `server/util/desktop_channel.js`,
 which tests can also back with Node IPC (`JUNON_DESKTOP_IPC=1`).
 
 ## Important contracts
@@ -128,6 +158,15 @@ which tests can also back with Node IPC (`JUNON_DESKTOP_IPC=1`).
   framing or the control messages change. The parent-port messages between
   main and the server (`steamOpen`, `steamFrame`, `steamClose`,
   `steamHosting`) are documented in `server/util/steam_socket_bridge.js`.
+- Online co-op adds `RTC_TRANSPORT_VERSION` and `SIGNAL_PROTOCOL_VERSION`
+  (`junon-common/rtc_transport.js`). The first is checked like the Steam
+  one. The second must match `packages/junon-signal`, whose protocol is
+  documented at the top of `src/signal_server.js` (including the
+  `?v=&role=&code=` query the Worker routes by); released games keep
+  talking to the deployed server, so change it only compatibly, or run both
+  versions. The main-server messages (`rtcOpen`, `rtcFrame`, `rtcClose`,
+  `rtcHosting`, `rtcRoom`, `rtcHostingFailed`) are documented in
+  `server/util/rtc_socket_bridge.js` and `junon-desktop/src/rtc_host.js`.
 - Files under `protocol/save_formats/` preserve historical persisted-world
   compatibility, including saves exported from the hosted game; add a version
   rather than silently changing an old format.
@@ -158,7 +197,7 @@ new process globals require explicit justification in an execution plan.
 ## Runtime dependencies
 
 Development requires Node.js 26.4.0 and npm workspaces. The game needs no
-network service. Sentry reporting is off unless `JUNON_SERVER_SENTRY_DSN` is set
+network service; online co-op needs the signalling server, only to connect. Sentry reporting is off unless `JUNON_SERVER_SENTRY_DSN` is set
 outside `development`/`test`. Steam is optional: without the Steam client or
 the Steamworks redistributables, the desktop app runs without Steam features
 (see [docs/development.md](docs/development.md#steam)).

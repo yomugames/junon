@@ -21,6 +21,8 @@ This file is the entry point, not the complete manual. Keep durable knowledge in
   save serialization and import, logging, and socket utilities.
 - `packages/junon-desktop/`: Electron shell that runs the game server and
   client offline.
+- `packages/junon-signal/`: WebRTC signalling server for online co-op room
+  codes; deployed on its own.
 - `docs/`: versioned engineering knowledge and execution plans.
 
 ## Working rules

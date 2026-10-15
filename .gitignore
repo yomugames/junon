@@ -22,3 +22,6 @@ packages/junon-io/playwright-report/
 # id file; see docs/development.md#steam
 steamworks_sdk/
 steam_appid.txt
+
+# wrangler local state (packages/junon-signal)
+.wrangler/

@@ -16,14 +16,23 @@ ipcRenderer.on("junon:steam-socket", (event, socketId, socketEvent) => {
 })
 
 // The only privileged API the game page gets: world management for the local
-// menu (client/src/util/local_world_api.js), and Steam co-op
-// (client/src/util/steam_socket.js). Game traffic goes over the ordinary game
-// socket, or for a Steam guest over Steam through main.
+// menu (client/src/util/local_world_api.js), Steam co-op
+// (client/src/util/steam_socket.js) and where online co-op's signalling
+// server is (client/src/util/rtc_socket.js). Game traffic goes over the
+// ordinary game socket, for a Steam guest over Steam through main, and for an
+// online guest over the page's own WebRTC data channel.
 contextBridge.exposeInMainWorld("junonDesktop", {
   async localWorldApi(method, args) {
     let response = await ipcRenderer.invoke("junon:local-world-api", method, args)
     if (response.error) throw new Error(response.error)
     return response.result
+  },
+
+  online: {
+    // { isAvailable, signalUrl }
+    getStatus() {
+      return ipcRenderer.invoke("junon:online-status")
+    }
   },
 
   steam: {

@@ -54,6 +54,15 @@ menu" block in `client/stylesheets/style.css`.
   leaves the host's Steam lobby. Errors, such as a version mismatch, show in
   the menu message. The desktop test "hosts on Steam, invites friends and
   joins a friend from the menu" covers these panels on a fake Steam.
+- **Host co-op** and **Join co-op** get an Online section above the address
+  form when the desktop app knows a signalling server
+  (`online.getStatus()`; see
+  [development.md](development.md#online-co-op-webrtc)). Host: **Host online
+  and play** (`hostWorldOnline`); while hosting, the Host panel shows the room
+  code in a read-only field with a Copy button, and the owner gets it in chat.
+  Join: a room code field and Join. The code is checked with the signalling
+  server first, so a wrong code or another version shows in the menu message.
+  With Steam or online co-op, the address form gets a "By address" heading.
 - Switching panels clears the previous panel's error message.
 
 ## Selectors other code depends on
@@ -64,7 +73,9 @@ then uses `.local_new_btn`, `.world_name`, `.world_mode` and `.create_world`.
 `import`, `host` and `join`, plus `.local_continue_btn`. The Steam controls
 are `.steam_lobby_type`, `.start_steam_hosting`, `.steam_invite_dialog`,
 `.steam_friend .steam_invite`, `.steam_host .steam_join` and `.steam_refresh`;
-the hosting view's `.host_summary` and `.steam_hosting_summary`; the desktop
-test uses them. A new local world API
-method must also be added to `LOCAL_WORLD_API_METHODS` in
-`packages/junon-desktop/src/main.js`, or the desktop app rejects it.
+the hosting view's `.host_summary` and `.steam_hosting_summary`. The online
+controls are `.start_online_hosting`, `.room_code`, `.copy_room_code`,
+`.join_room_code` and `.join_online`. The desktop tests use them. A new local
+world API method must be added to `client/src/util/local_world_api.js` and to
+`LOCAL_WORLD_API_METHODS` in `packages/junon-desktop/src/main.js`, or the
+client can't call it and the desktop app rejects it.

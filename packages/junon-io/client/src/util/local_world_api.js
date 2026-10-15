@@ -24,6 +24,11 @@ const LocalWorldApi = {
     return this.call('hostWorldOnSteam', [details], () => Promise.reject(new Error('Steam co-op needs the desktop app')))
   },
 
+  // desktop only: the WebRTC peer connections live in the desktop app
+  hostWorldOnline(details) {
+    return this.call('hostWorldOnline', [details], () => Promise.reject(new Error('Online co-op needs the desktop app')))
+  },
+
   stopHosting() {
     return this.call('stopHosting', [], () => this.request('host/stop', this.json({})))
   },

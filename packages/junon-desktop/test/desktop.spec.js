@@ -7,6 +7,8 @@ const { test, expect, _electron: electron } = require('@playwright/test')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
+const { startSignalBackend } = require('junon-signal/testing')
+const WebSocket = require('ws')
 
 const APP_DIR = path.resolve(__dirname, '..')
 
@@ -62,6 +64,9 @@ test('creates a world, saves it on quit and loads it after a restart', async () 
   expect(await page.evaluate(() => window.junonDesktop.steam.call('getStatus'))).toEqual({ isAvailable: false })
   expect(await page.evaluate(() => window.junonDesktop.localWorldApi('hostWorldOnSteam', [{}]).catch((e) => e.message))).toBe('Steam is not available')
   expect(await page.evaluate(() => window.junonDesktop.steam.openSocket('76561198000000001', 'abcd1234', {}).catch((e) => e.message))).toBe('Steam is not available')
+  // without a signalling server, no online co-op
+  expect(await page.evaluate(() => window.junonDesktop.online.getStatus())).toEqual({ isAvailable: false, signalUrl: null })
+  expect(await page.evaluate(() => window.junonDesktop.localWorldApi('hostWorldOnline', [{}]).catch((e) => e.message))).toBe('Online co-op is not available')
 
   await page.click('.local_new_btn')
   await page.fill('.world_name', 'Desktop World')
@@ -200,6 +205,124 @@ test('a second instance joins a hosted world, leaves and rejoins', async () => {
   } finally {
     if (host) await quit(host.app)
     if (guest) await quit(guest.app)
+    fs.rmSync(guestDataDir, { recursive: true, force: true })
+  }
+})
+
+// asks the signalling server about a room, as the Join panel does:
+// { type: 'room', worldName, ... } or { type: 'error', code, ... }
+function lookupRoom(signalUrl, code) {
+  return new Promise((resolve, reject) => {
+    const ws = new WebSocket(signalUrl + '/?v=1&role=lookup&code=' + code)
+    ws.on('open', () => ws.send(JSON.stringify({ type: 'lookup', version: 1, code })))
+    ws.on('message', (data) => { resolve(JSON.parse(data)); ws.close() })
+    ws.on('error', reject)
+  })
+}
+
+// Online co-op over real WebRTC between two instances on this machine,
+// through a signalling server started here with no STUN servers, so nothing
+// leaves the machine: the Node server, and the Cloudflare Worker in workerd.
+// NAT traversal is checked by hand (docs/exec-plans/active/webrtc-coop.md).
+for (const backend of ['node', 'worker']) test(`hosts online with a room code, and a second instance joins over WebRTC (${backend} signalling)`, async () => {
+  const signal = await startSignalBackend(backend, { iceServers: [] })
+  const onlineEnv = { JUNON_SIGNAL_URL: signal.url }
+  const guestDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'junon-desktop-guest-'))
+  let host
+  let guest
+
+  try {
+    host = await launch(userDataDir, onlineEnv)
+    expect(await host.page.evaluate(() => window.junonDesktop.online.getStatus())).toEqual({ isAvailable: true, signalUrl: onlineEnv.JUNON_SIGNAL_URL })
+    await setName(host.page, 'Host')
+    await host.page.evaluate(() => window.junonDesktop.localWorldApi('createWorld', [{ ownerUid: window.main.localProfile.uid, name: 'Online World', gameMode: 'survival' }]))
+    await host.page.click('.local_host_btn')
+    await host.page.click('.start_online_hosting')
+    await host.page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
+    await host.page.waitForFunction(() => document.body.innerText.includes('Friends join with the room code'), null, { timeout: 30_000 })
+
+    const hosting = (await host.page.evaluate(() => window.junonDesktop.localWorldApi('listWorlds', []))).hosting
+    expect(hosting).toMatchObject({ isOnline: true, port: null })
+    expect(hosting.roomCode).toMatch(/^[2-9A-HJKMNP-TV-Z]{8}$/)
+    expect(await lookupRoom(signal.url, hosting.roomCode)).toMatchObject({ type: 'room', worldName: 'Online World' })
+
+    guest = await launch(guestDataDir, onlineEnv)
+    await setName(guest.page, 'Guest')
+    const joinWith = async (code) => {
+      await guest.page.click('.local_join_btn')
+      await guest.page.fill('.join_room_code', code)
+      await guest.page.click('.join_online')
+    }
+
+    await joinWith('ABCD-EFGH')
+    await expect(guest.page.locator('.local_menu_message')).toHaveText(/No world is being hosted with that code/)
+    await joinWith('nonsense')
+    await expect(guest.page.locator('.local_menu_message')).toHaveText('Enter the 8-character room code from the host')
+
+    // a host on another version is caught before connecting
+    const otherVersion = new WebSocket(signal.url + '/?v=1&role=host')
+    await new Promise((resolve) => otherVersion.on('open', resolve))
+    otherVersion.send(JSON.stringify({ type: 'host', version: 1, protocol: '00000000', worldName: 'Old World' }))
+    const otherCode = await new Promise((resolve) => otherVersion.on('message', (data) => resolve(JSON.parse(data).code)))
+    await joinWith(otherCode)
+    await expect(guest.page.locator('.local_menu_message')).toHaveText(/^Version mismatch/)
+    otherVersion.close()
+
+    // typed as a player might
+    await joinWith((hosting.roomCode.slice(0, 4) + '-' + hosting.roomCode.slice(4)).toLowerCase())
+    await guest.page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
+    expect(await guest.page.evaluate(() => [window.game.sector.name, window.player.name, window.game.gameConnection.socket.url])).toEqual(['Online World', 'Guest', 'rtc:' + hosting.roomCode])
+    await host.page.waitForFunction(() => Object.values(window.game.sector.players).some((player) => player.name === 'Guest'), null, { timeout: 30_000 })
+
+    // a dropped connection reconnects on its own, through the room again
+    await guest.page.evaluate(() => {
+      window.droppedSocket = window.game.gameConnection.socket
+      window.droppedSocket.close()
+    })
+    await guest.page.waitForFunction(() => {
+      const connection = window.game.gameConnection
+      return connection.socket !== window.droppedSocket && connection.isConnected() &&
+        getComputedStyle(document.querySelector('.disconnected_msg')).display === 'none'
+    }, null, { timeout: 60_000 })
+    expect(await guest.page.evaluate(() => window.player.name)).toBe('Guest')
+
+    // the Host panel shows the code to pass on
+    await host.page.evaluate(() => window.main.onExitGameMenuBtnClick())
+    await host.page.locator('#local_world_menu').waitFor({ state: 'visible', timeout: 30_000 })
+    await host.page.click('.local_host_btn')
+    await expect(host.page.locator('.host_summary')).toHaveText('Hosting Online World online.')
+    await expect(host.page.locator('.room_code')).toHaveValue(hosting.roomCode.slice(0, 4) + '-' + hosting.roomCode.slice(4))
+
+    // stopping tells the guest why, and closes the room
+    await host.page.click('.stop_hosting')
+    await guest.page.waitForFunction(() => document.body.innerText.includes('The host stopped hosting the world'), null, { timeout: 30_000 })
+    await expect(guest.page.locator('#local_world_menu')).toBeVisible()
+    await expect.poll(async () => (await lookupRoom(signal.url, hosting.roomCode)).code).toBe('not_found')
+
+    // hosting again opens a new room; the host quitting saves the world and
+    // tells the guest why they left
+    await host.page.click('.start_online_hosting')
+    await host.page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
+    const rehosting = (await host.page.evaluate(() => window.junonDesktop.localWorldApi('listWorlds', []))).hosting
+    expect(rehosting.roomCode).not.toBe(hosting.roomCode)
+    await joinWith(rehosting.roomCode)
+    // window.player is still the last session's until the new one starts
+    await host.page.waitForFunction(() => Object.values(window.game.sector.players).some((player) => player.name === 'Guest'), null, { timeout: 120_000 })
+    await guest.page.waitForFunction((url) => window.game.gameConnection.socket.url === url && window.game.gameConnection.isConnected(), 'rtc:' + rehosting.roomCode, { timeout: 30_000 })
+
+    await quit(host.app)
+    expect(host.errors).toEqual([])
+    host = null
+    await guest.page.waitForFunction(() => document.body.innerText.includes('The host closed the world'), null, { timeout: 30_000 })
+    await expect(guest.page.locator('#local_world_menu')).toBeVisible()
+
+    await quit(guest.app)
+    expect(guest.errors).toEqual([])
+    guest = null
+  } finally {
+    if (host) await quit(host.app)
+    if (guest) await quit(guest.app)
+    await signal.stop()
     fs.rmSync(guestDataDir, { recursive: true, force: true })
   }
 })

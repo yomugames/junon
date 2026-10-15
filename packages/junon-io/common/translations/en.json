@@ -41,6 +41,8 @@
   "ColonyLeaveConfirmMessage": "As a non-registered user, your colony would be deleted once you leave. Do you want to proceed?",
   "DemoteMembersPermission": "Demote members to guest when owner exits game",
   "MemberList": "Members",
+  "RoomCode": "Room code",
+  "OpeningRoom": "Opening the room...",
   "AllowMembers": "Members",
   "AllowEveryone": "Everyone",
   "MineColony": "Mine",

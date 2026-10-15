@@ -227,6 +227,7 @@ test('WebRTC guests join through the desktop channel while the world is hosted o
   server.send({ type: 'rtcRoom', code: 'K7QF2M9X' })
   server.send({ type: 'rtcRoom', code: '<b>' })
   expect((await request('listWorlds')).hosting.roomCode).toBe('K7QF2M9X')
+  expect((await request('getHosting')).hosting).toMatchObject({ isOnline: true, roomCode: 'K7QF2M9X' })
 
   // a Steam-version hello is refused: the transports are versioned apart
   const steamHello = rtcGuest(2)

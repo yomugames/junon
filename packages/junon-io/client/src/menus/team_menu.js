@@ -4,6 +4,8 @@ const Constants = require("./../../../common/constants.json")
 const Protocol = require("./../../../common/util/protocol")
 const Helper = require("./../../../common/helper")
 const ClientHelper = require("./../util/client_helper")
+const LocalWorldApi = require("./../util/local_world_api")
+const RtcTransport = require("junon-common/rtc_transport")
 
 
 /*
@@ -17,6 +19,8 @@ class TeamMenu extends BaseMenu {
     super.initListeners()
 
     this.el.querySelector(".team_private_status").addEventListener("click", this.onTeamPrivacyStatusClick.bind(this), true)
+    this.el.querySelector(".room_code_input").addEventListener("click", this.onCopyRoomCodeClick.bind(this))
+    this.el.querySelector(".copy_room_code_btn").addEventListener("click", this.onCopyRoomCodeClick.bind(this))
     this.el.querySelector(".member_management_container").addEventListener("click", this.onMemberListClick.bind(this))
 
     this.el.querySelector(".rename_btn").addEventListener("click", this.onRenameBtnClick.bind(this))
@@ -1361,6 +1365,8 @@ class TeamMenu extends BaseMenu {
       this.renderJoinableTeams()
     }
 
+    this.renderRoomCode()
+
     if (this.game.getTeamCount() > 1 && this.game.sector.settings.showTeamJoin) {
       this.el.querySelector(".colony_teams_tab").style.display = 'inline-block'
     } else {
@@ -1809,6 +1815,54 @@ class TeamMenu extends BaseMenu {
     } else {
       this.el.querySelector(".rename_btn").style.display = 'inline-block'
     }
+  }
+
+  // The online co-op room code, for the world owner while hosting online
+  // (Server#getHostingStatus). The host's own game server is local, so the
+  // menu asks it through LocalWorldApi rather than the game socket. The room
+  // can still be opening, or reopen with a new code, so it is fetched on
+  // every open, and again shortly while it is opening.
+  async renderRoomCode() {
+    clearTimeout(this.roomCodeTimeout)
+
+    let hosting = null
+    if (this.game.player && this.game.player.isSectorOwner()) {
+      try {
+        hosting = (await LocalWorldApi.getHosting()).hosting
+      } catch (e) {
+        hosting = null
+      }
+    }
+
+    let entry = this.el.querySelector(".room_code_entry")
+    if (!hosting || !hosting.isOnline || !this.isOpen()) {
+      entry.style.display = 'none'
+      return
+    }
+
+    let input = this.el.querySelector(".room_code_input")
+    let copyBtn = this.el.querySelector(".copy_room_code_btn")
+    entry.style.display = 'block'
+    copyBtn.innerText = i18n.t("Copy")
+
+    if (hosting.roomCode) {
+      input.value = RtcTransport.formatRoomCode(hosting.roomCode)
+      copyBtn.style.display = 'inline-block'
+    } else {
+      input.value = i18n.t("OpeningRoom")
+      copyBtn.style.display = 'none'
+      this.roomCodeTimeout = setTimeout(() => {
+        if (this.isOpen()) this.renderRoomCode()
+      }, 2000)
+    }
+  }
+
+  // app:// isn't a secure context, so no Clipboard API: select and copy
+  onCopyRoomCodeClick() {
+    let input = this.el.querySelector(".room_code_input")
+    input.select()
+    document.execCommand('copy')
+    this.el.querySelector(".copy_room_code_btn").innerText = i18n.t("Copied")
   }
 
   renderPrivacy(team) {

@@ -29,6 +29,11 @@ const LocalWorldApi = {
     return this.call('hostWorldOnline', [details], () => Promise.reject(new Error('Online co-op needs the desktop app')))
   },
 
+  // { hosting }: null when the world isn't hosted (Server#getHostingStatus)
+  getHosting() {
+    return this.call('getHosting', [], () => this.request('host'))
+  },
+
   stopHosting() {
     return this.call('stopHosting', [], () => this.request('host/stop', this.json({})))
   },

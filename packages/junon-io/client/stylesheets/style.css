@@ -3867,6 +3867,21 @@ body.imposter_mode #welcome_hud .game_info {
     vertical-align: middle;
 }
 
+.room_code_entry {
+    display: none;
+    margin-bottom: 10px;
+}
+
+.room_code_entry label {
+    color: #aaa;
+    margin-right: 10px;
+}
+
+.room_code_entry .room_code_input {
+    width: 200px;
+    cursor: pointer;
+}
+
 .invite_link_input {
     background-color: black;
     border: none;

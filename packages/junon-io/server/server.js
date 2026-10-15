@@ -606,6 +606,7 @@ class Server {
     app.get('/local/worlds', route(() => api.listWorlds()))
     app.post('/local/worlds', route((req) => api.createWorld(req.body)))
     app.post('/local/worlds/open', route((req) => api.openWorld(req.body)))
+    app.get('/local/host', route(() => api.getHosting()))
     app.post('/local/host', route((req) => api.hostWorld(req.body)))
     app.post('/local/host/stop', route(() => api.stopHosting()))
     app.post('/local/tutorial', route((req) => api.startTutorial(req.body)))
@@ -732,6 +733,10 @@ class Server {
         await this.activateStandaloneWorld({ worldId, ownerUid })
         this.startOnlineHosting()
         return { worldId, serverUrl: serverUrl(), hosting: this.getHostingStatus() }
+      },
+      // what the in-game colony menu shows the owner, such as the room code
+      getHosting: async () => {
+        return { hosting: this.getHostingStatus() }
       },
       stopHosting: async () => {
         this.stopHosting("The host stopped hosting the world.")

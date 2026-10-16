@@ -8120,6 +8120,32 @@ body.imposter_mode .minigame_poster {
     background-color: #222;
 }
 
+#desktop_transition_section {
+    display: none;
+    width: calc(100% - 20px);
+    max-width: 840px;
+    margin: 20px auto 24px;
+}
+
+#welcome_container.in_game #desktop_transition_section {
+    display: none !important;
+}
+
+#desktop_transition_notice {
+    padding: 12px 16px;
+    border: 1px solid #bf5036;
+    background-color: #44271d;
+    color: white;
+    font-family: 'cc';
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+#desktop_transition_notice a {
+    color: #ffca91;
+    text-decoration: underline;
+}
+
 .home_action_row {
     display: block;
     margin-bottom: 10px;
@@ -8180,9 +8206,8 @@ body.imposter_mode .minigame_poster {
 }
 
 .discord_link {
-    position: absolute;
-    top: 15px;
-    right: 15px;
+    display: block;
+    margin: 10px auto 0;
 }
 
 .discord_link img {

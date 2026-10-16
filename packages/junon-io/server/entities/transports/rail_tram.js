@@ -208,7 +208,14 @@ class RailTram extends BaseEntity {
       this.skipTurn = true
 
       return
-    } 
+    }
+    
+    if(this.nextJunction && this.isNextJunctionGoingToDestination()) {
+      let railStopTramCenter = this.destination.getTramCenter()
+      let distanceToStop = this.game.distance(this.getX(), this.getY(), railStopTramCenter.x, railStopTramCenter.y)
+      // adjust speed so we don't derail at stop
+      speed = Math.max(32, Math.min(distanceToStop / 4, 96))
+    }
 
     angle = Math.atan2(this.direction[1], this.direction[0])
 
@@ -221,6 +228,13 @@ class RailTram extends BaseEntity {
     let junctionCol = this.nextJunction.getCol()
     let nextStructureHit = this.getContainer().structureMap.get(junctionRow + this.direction[1], junctionCol + this.direction[0])
     return nextStructureHit && nextStructureHit.hasCategory("rail_stop")
+  }
+
+  isNextJunctionGoingToDestination() {
+    let junctionRow = this.nextJunction.getRow()
+    let junctionCol = this.nextJunction.getCol()
+    let nextStructureHit = this.getContainer().structureMap.get(junctionRow + this.direction[1], junctionCol + this.direction[0])
+    return nextStructureHit && nextStructureHit.hasCategory("rail_stop") && nextStructureHit === this.destination
   }
 
   handleMovementInRailStop(structure, speed) {

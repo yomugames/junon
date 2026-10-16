@@ -31,6 +31,18 @@ menu" block in `client/stylesheets/style.css`.
   `data:` URL (`Server#readWorldThumbnail`), because closed worlds' thumbnails
   aren't served over HTTP and the desktop app has no page server.
   `test/e2e/world_thumbnail.spec.js` covers this.
+- **New world** asks for a name, a mode and the map size in tiles (rows and
+  columns, 128 x 128 by default). Each side must be a whole number of 16-tile
+  chunks between `minWorldSize` and `maxWorldSize` in `common/constants.json`
+  (64 and 256); `createWorld` refuses anything else. The size only applies
+  when the map is generated; a save keeps its own. Maps needn't be square:
+  the in-game map fits the longer side (`MapMenu#resizeCanvas`).
+- Each world card has a delete button (top right, shown on hover or focus).
+  After a confirm dialog it calls `deleteWorld`, which removes the save
+  directory, the thumbnail and the `sectors` row. If the world is open, the
+  server stops hosting and closes it without saving first. Only the owning
+  profile can delete a world. `test/e2e/world_management.spec.js` covers the
+  form and the delete button.
 - **Patch notes** shows the 10 latest `changelogs/` entries, newest first. They
   are rendered into `#local_changelog_template` when the page is built, so the
   desktop app needs a client rebuild to show a new release.
@@ -77,7 +89,10 @@ menu" block in `client/stylesheets/style.css`.
 ## Selectors other code depends on
 
 The e2e join helper (`test/e2e/support/join.js`) waits for `#local_world_menu`,
-then uses `.local_new_btn`, `.world_name`, `.world_mode` and `.create_world`.
+then uses `.local_new_btn`, `.world_name`, `.world_mode` and `.create_world`;
+the map size inputs are `.world_rows` and `.world_cols`. A world card is
+`.local_world_card`, holding the `.local_world_entry` button (which opens the
+world) and `.local_world_delete`.
 `LocalWorldMenu` binds `.local_<name>_btn` for `new`, `load`, `tutorial`,
 `import`, `host` and `join`, plus `.local_continue_btn`. The Steam controls
 are `.steam_lobby_type`, `.start_steam_hosting`, `.steam_invite_dialog`,

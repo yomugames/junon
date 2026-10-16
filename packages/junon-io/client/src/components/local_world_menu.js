@@ -5,6 +5,7 @@ const SteamSocket = require('../util/steam_socket')
 const OnlineCoop = require('../util/online_coop')
 const RtcSocket = require('../util/rtc_socket')
 const RtcTransport = require('junon-common/rtc_transport')
+const Constants = require('../../../common/constants.json')
 
 const DEFAULT_HOST_PORT = 7777
 const MODE_LABELS = { survival: 'Survival', peaceful: 'Sandbox', hardcore: 'Hardcore' }
@@ -157,12 +158,20 @@ class LocalWorldMenu {
     this.main.joinStandaloneWorld()
   }
 
+  // map size is in tiles, in whole chunks (Server#getLocalWorldApi checks it)
   newWorld() {
     this.setActive('new')
-    this.panel.innerHTML = '<h2>New world</h2><label>World name <input class="world_name black_input" maxlength="40"></label><label>Mode <select class="world_mode ui_select"><option value="survival">Survival</option><option value="peaceful">Sandbox</option><option value="hardcore">Hardcore</option></select></label><button class="create_world ui_btn">Create and play</button>'
+    const sizeInput = (className, label) => '<label>' + label + ' <input class="' + className + ' black_input" type="number" min="' + Constants.minWorldSize + '" max="' + Constants.maxWorldSize + '" step="' + Constants.chunkRowCount + '" value="' + Constants.defaultWorldSize + '"></label>'
+    this.panel.innerHTML = '<h2>New world</h2><label>World name <input class="world_name black_input" maxlength="40"></label><label>Mode <select class="world_mode ui_select"><option value="survival">Survival</option><option value="peaceful">Sandbox</option><option value="hardcore">Hardcore</option></select></label><div class="world_size">' + sizeInput('world_rows', 'Map rows') + sizeInput('world_cols', 'Map columns') + '</div><button class="create_world ui_btn">Create and play</button>'
     this.panel.querySelector('.create_world').addEventListener('click', () => this.run(async () => {
       this.saveName()
-      const result = await LocalWorldApi.createWorld({ ownerUid: this.main.localProfile.uid, name: this.panel.querySelector('.world_name').value, gameMode: this.panel.querySelector('.world_mode').value })
+      const result = await LocalWorldApi.createWorld({
+        ownerUid: this.main.localProfile.uid,
+        name: this.panel.querySelector('.world_name').value,
+        gameMode: this.panel.querySelector('.world_mode').value,
+        rowCount: Number(this.panel.querySelector('.world_rows').value),
+        colCount: Number(this.panel.querySelector('.world_cols').value)
+      })
       this.open(result.worldId, result.serverUrl)
     }))
   }
@@ -185,8 +194,12 @@ class LocalWorldMenu {
     })
   }
 
-  // world names are player input, so entries are built with textContent
+  // world names are player input, so entries are built with textContent. The
+  // delete button sits beside the card's button, since buttons can't nest.
   createWorldEntry(world, isHosted) {
+    const card = document.createElement('div')
+    card.className = 'local_world_card'
+
     const button = document.createElement('button')
     button.className = 'local_world_entry'
     button.dataset.mode = world.mode
@@ -219,7 +232,24 @@ class LocalWorldMenu {
     }
 
     button.addEventListener('click', () => this.openWorld(world))
-    return button
+    card.appendChild(button)
+
+    const remove = document.createElement('button')
+    remove.className = 'local_world_delete'
+    remove.title = 'Delete world'
+    remove.setAttribute('aria-label', 'Delete world')
+    remove.addEventListener('click', () => this.deleteWorld(world))
+    card.appendChild(remove)
+
+    return card
+  }
+
+  deleteWorld(world) {
+    if (!window.confirm('Delete "' + world.name + '"? This can\'t be undone.')) return
+    this.run(async () => {
+      await LocalWorldApi.deleteWorld({ worldId: world.id, ownerUid: this.main.localProfile.uid })
+      this.loadWorlds()
+    })
   }
 
   renderNoWorlds(list) {

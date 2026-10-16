@@ -1324,6 +1324,7 @@ body {
     left: 0px;
     width: 100%;
     height: 100%;
+    object-fit: contain;
 }
 
 #map_terrain_canvas {
@@ -8597,8 +8598,15 @@ body.imposter_mode .minigame_poster {
     gap: 14px;
 }
 
+#local_world_menu .local_world_card {
+    position: relative;
+    display: flex;
+}
+
 #local_world_menu .local_world_entry {
     position: relative;
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     padding: 0px;
@@ -8636,7 +8644,7 @@ body.imposter_mode .minigame_poster {
     object-fit: cover;
 }
 
-#local_world_menu .local_world_entry:hover,
+#local_world_menu .local_world_card:hover .local_world_entry,
 #local_world_menu .local_world_entry:focus-visible {
     transform: translateY(-2px);
     outline: none;
@@ -8671,6 +8679,69 @@ body.imposter_mode .minigame_poster {
     color: white;
     background-color: rgba(46, 160, 67, 0.9);
     border-radius: 10px;
+}
+
+#local_world_menu .local_world_delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    box-sizing: border-box;
+    width: 28px;
+    height: 28px;
+    padding: 0px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: solid 1px rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s, background-color 0.15s, transform 0.15s;
+}
+
+/* the X is two bars rather than a glyph, so the font can't push it off center */
+#local_world_menu .local_world_delete::before,
+#local_world_menu .local_world_delete::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 2px;
+    margin: -1px 0px 0px -7px;
+    background-color: white;
+    border-radius: 1px;
+}
+
+#local_world_menu .local_world_delete::before {
+    transform: rotate(45deg);
+}
+
+#local_world_menu .local_world_delete::after {
+    transform: rotate(-45deg);
+}
+
+#local_world_menu .local_world_card:hover .local_world_delete,
+#local_world_menu .local_world_card:focus-within .local_world_delete {
+    opacity: 1;
+}
+
+#local_world_menu .local_world_card:hover .local_world_delete {
+    transform: translateY(-2px);
+}
+
+#local_world_menu .local_world_delete:hover,
+#local_world_menu .local_world_delete:focus-visible {
+    outline: none;
+    background-color: #d9534f;
+}
+
+#local_world_menu .world_size {
+    display: flex;
+    gap: 12px;
+    max-width: 420px;
+}
+
+#local_world_menu .world_size label {
+    flex: 1;
 }
 
 #local_world_menu .local_world_empty {

@@ -15,6 +15,10 @@ const LocalWorldApi = {
     return this.call('openWorld', [details], () => this.request('worlds/open', this.json(details)))
   },
 
+  deleteWorld(details) {
+    return this.call('deleteWorld', [details], () => this.request('worlds/delete', this.json(details)))
+  },
+
   hostWorld(details) {
     return this.call('hostWorld', [details], () => this.request('host', this.json(details)))
   },

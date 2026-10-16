@@ -1078,7 +1078,7 @@ async setGameMode(gameMode) {
         break
       case "spawnMob":
         let x = sector.randomSpawnPos()
-        let y = sector.randomSpawnPos()
+        let y = sector.randomSpawnPos(sector.getSectorHeight())
         sector.spawnMob({ x: x, y: y, type: "BioRaptor", count: count })
         break
       case "removeMobs":

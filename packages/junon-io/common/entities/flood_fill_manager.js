@@ -107,9 +107,10 @@ class FloodFillManager {
 
   getCellNative(row, col) {
     let maxRowCount = this.grids[0].getRowCount()
+    let maxColCount = this.grids[0].getColCount()
 
     if (row < 0 || row > maxRowCount - 1) return null
-    if (col < 0 || col > maxRowCount - 1) return null
+    if (col < 0 || col > maxColCount - 1) return null
 
     let cell = { row: row, col: col, type: 0, entity: null } // 0 means empty 
 

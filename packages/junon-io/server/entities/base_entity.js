@@ -290,7 +290,7 @@ class BaseEntity extends BaseTransientEntity {
 
     let padding = 1
     throwSpot.x = this.sector.normalizePosition(throwSpot.x, padding)
-    throwSpot.y = this.sector.normalizePosition(throwSpot.y, padding)
+    throwSpot.y = this.sector.normalizePosition(throwSpot.y, padding, this.sector.getSectorHeight())
 
     return throwSpot
   }

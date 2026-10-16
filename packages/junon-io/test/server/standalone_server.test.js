@@ -209,6 +209,75 @@ test('local menu creates and reloads a world through loopback routes', async () 
   }
 })
 
+test('local menu creates a world of a chosen size and deletes worlds', async () => {
+  const server = startServer({ JUNON_WORLD_ID: '', JUNON_OWNER_UID: '' })
+  try {
+    await waitForOutput(server, 'Webpage available')
+    const base = `http://127.0.0.1:${server.clientPort}/local/`
+    const ownerUid = '0123456789abcdef0123456789abcdef'
+    const post = (route, body) => fetch(base + route, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    })
+    const readHeader = (worldId) => {
+      const compressed = fs.readFileSync(path.join(savesDir, worldId, 'sector.sav'))
+      const SaveState = protobuf.loadSync(SAVE_HEADER_PROTO).lookupType('app.SaveState')
+      return SaveState.decode(zlib.gunzipSync(compressed)).metadata
+    }
+
+    // sizes are whole 16-tile chunks within the allowed range
+    for (const size of [{ rowCount: 100, colCount: 128 }, { rowCount: 48, colCount: 128 }, { rowCount: 128, colCount: 512 }, { rowCount: '128', colCount: 128 }]) {
+      let response = await post('worlds', Object.assign({ ownerUid, name: 'Bad Size', gameMode: 'survival' }, size))
+      expect(response.status).toBe(400)
+    }
+
+    let response = await post('worlds', { ownerUid, name: 'Wide World', gameMode: 'survival', rowCount: 64, colCount: 96 })
+    expect(response.status).toBe(200)
+    const wide = (await response.json()).worldId
+
+    // creating the next world closes (and saves) the wide one; no size is the
+    // default 128 x 128
+    response = await post('worlds', { ownerUid, name: 'Default World', gameMode: 'peaceful' })
+    expect(response.status).toBe(200)
+    const standard = (await response.json()).worldId
+    let header = readHeader(wide)
+    expect([header.rowCount, header.colCount]).toEqual([64, 96])
+
+    // the save keeps its size when the world is loaded again
+    response = await post('worlds/open', { worldId: wide, ownerUid })
+    expect(response.status).toBe(200)
+    expect(server.output).toContain('Save data found: ' + path.join(savesDir, wide))
+    header = readHeader(standard)
+    expect([header.rowCount, header.colCount]).toEqual([128, 128])
+
+    response = await post('worlds/delete', { worldId: wide, ownerUid: 'ffffffffffffffffffffffffffffffff' })
+    expect(response.status).toBe(400)
+
+    // a closed world
+    response = await post('worlds/delete', { worldId: standard, ownerUid })
+    expect(response.status).toBe(200)
+    expect(fs.existsSync(path.join(savesDir, standard))).toBe(false)
+
+    // the open world is closed without saving
+    response = await post('worlds/delete', { worldId: wide, ownerUid })
+    expect(response.status).toBe(200)
+    expect(fs.existsSync(path.join(savesDir, wide))).toBe(false)
+
+    response = await fetch(base + 'worlds')
+    const listed = await response.json()
+    expect(listed.worlds).toEqual([])
+    expect(listed.activeWorldId).toBeFalsy()
+    expect(await queryDatabase('select uid from sectors')).toEqual([])
+
+    response = await post('worlds/open', { worldId: standard, ownerUid })
+    expect(response.status).toBe(400)
+  } finally {
+    server.kill('SIGTERM')
+    await server.exited
+  }
+  // nothing left to save on shutdown either
+  expect(fs.readdirSync(savesDir).filter((name) => /^[a-f0-9]{24}$/.test(name))).toEqual([])
+})
+
 // Co-op: the host opens the world on a second, all-interfaces port. Guests
 // pass a protocol and password check, can't use the owner's profile, and are
 // told why they are disconnected when hosting stops or the host quits.

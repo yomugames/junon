@@ -193,11 +193,14 @@ class Server {
 
     let sectorModel = await this.findSectorWithAttributers(worldId)
 
+    // the map size only applies to a new world; a save keeps its own
     let result = await this.createGame({
       creatorIp: "127.0.0.1",
       creatorUid: sectorModel.creatorUid,
       sectorData: { id: worldId, name: sectorModel.name, sectorModel: sectorModel },
-      gameMode: sectorModel.gameMode
+      gameMode: sectorModel.gameMode,
+      rowCount: options.rowCount,
+      colCount: options.colCount
     })
 
     if (!result.createdGame) {
@@ -606,6 +609,7 @@ class Server {
     app.get('/local/worlds', route(() => api.listWorlds()))
     app.post('/local/worlds', route((req) => api.createWorld(req.body)))
     app.post('/local/worlds/open', route((req) => api.openWorld(req.body)))
+    app.post('/local/worlds/delete', route((req) => api.deleteWorld(req.body)))
     app.get('/local/host', route(() => api.getHosting()))
     app.post('/local/host', route((req) => api.hostWorld(req.body)))
     app.post('/local/host/stop', route(() => api.stopHosting()))
@@ -673,6 +677,7 @@ class Server {
   getLocalWorldApi() {
     const validOwner = (uid) => typeof uid === 'string' && /^[a-f0-9]{32}$/i.test(uid)
     const validWorld = (uid) => typeof uid === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(uid)
+    const validWorldSize = (size) => Number.isInteger(size) && size >= Constants.minWorldSize && size <= Constants.maxWorldSize && size % Constants.chunkRowCount === 0
     const validSave = (bytes) => {
       if (!(bytes instanceof Uint8Array)) throw new Error('Invalid save file')
       return Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength)
@@ -691,11 +696,35 @@ class Server {
         let worlds = await Promise.all(rows.map(async (row) => ({ id: row.uid, name: row.name, mode: row.gameMode, days: row.daysAlive, thumbnail: await this.readWorldThumbnail(row.screenshot) })))
         return { worlds: worlds, activeWorldId: this.getMainGame() && this.getMainGame().getId(), serverUrl: serverUrl(), hosting: this.getHostingStatus() }
       },
-      createWorld: async ({ ownerUid, name, gameMode } = {}) => {
+      // rowCount and colCount are optional (Sector defaults to 128); chunks
+      // are 16 tiles, so a size must be a multiple of that
+      createWorld: async ({ ownerUid, name, gameMode, rowCount, colCount } = {}) => {
         if (!validOwner(ownerUid) || typeof name !== 'string' || !/^[\p{L}\p{N} _-]{1,40}$/u.test(name.trim()) || !['peaceful', 'survival', 'hardcore'].includes(gameMode)) throw new Error('Invalid world details')
+        rowCount = rowCount === undefined ? Constants.defaultWorldSize : rowCount
+        colCount = colCount === undefined ? Constants.defaultWorldSize : colCount
+        if (!validWorldSize(rowCount) || !validWorldSize(colCount)) throw new Error('Map rows and columns must be multiples of ' + Constants.chunkRowCount + ' from ' + Constants.minWorldSize + ' to ' + Constants.maxWorldSize)
         let worldId = require('crypto').randomBytes(12).toString('hex')
-        await this.activateStandaloneWorld({ worldId, ownerUid, name: name.trim(), gameMode })
+        await this.activateStandaloneWorld({ worldId, ownerUid, name: name.trim(), gameMode, rowCount, colCount })
         return { worldId, serverUrl: serverUrl() }
+      },
+      // removes the world's save, thumbnail and registry row. The open world
+      // is closed first, without saving.
+      deleteWorld: async ({ worldId, ownerUid } = {}) => {
+        await validOwnedWorld(worldId, ownerUid)
+        let current = this.getMainGame()
+        if (current && current.getId() === worldId) {
+          this.stopHosting("The host deleted the world.")
+          if (current.isSaving) await current.waitUntilSavingFinished()
+          await current.remove()
+        }
+
+        let row = await SectorModel.findOne({ where: { uid: worldId } })
+        if (row.screenshot && /^[a-f0-9]{32}$/.test(row.screenshot)) {
+          await fs.promises.rm(Game.prototype.getLocalImagePath(row.screenshot + "_thumb.jpg"), { force: true })
+        }
+        await fs.promises.rm(path.dirname(WorldSerializer.getSectorSavePath(worldId)), { recursive: true, force: true })
+        await row.destroy()
+        return { worldId }
       },
       openWorld: async ({ worldId, ownerUid } = {}) => {
         await validOwnedWorld(worldId, ownerUid)

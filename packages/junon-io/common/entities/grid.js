@@ -707,7 +707,7 @@ class Grid {
   raycastVertical(x1, y1, x2, y2, maxLength, entityToIgnore) {
     let obstacles = []
 
-    maxLength = maxLength || this.tileSize * this.ROW_COUNT // default is map width
+    maxLength = maxLength || this.tileSize * Math.max(this.ROW_COUNT, this.COLUMN_COUNT) // default is the map's longer side
 
     if (x2 - x1 === 0) return obstacles
 
@@ -795,7 +795,7 @@ class Grid {
   raycastHorizontal(x1, y1, x2, y2, maxLength, entityToIgnore) {
     let obstacles = []
 
-    maxLength = maxLength || this.tileSize * this.ROW_COUNT // default is map width
+    maxLength = maxLength || this.tileSize * Math.max(this.ROW_COUNT, this.COLUMN_COUNT) // default is the map's longer side
 
     if (y2 - y1 === 0) return obstacles
 

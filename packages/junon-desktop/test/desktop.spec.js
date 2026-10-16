@@ -106,8 +106,13 @@ test('creates a world, saves it on quit and loads it after a restart', async () 
   await page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
   expect(await page.evaluate(() => window.game.sector.uid)).toBe(worldId)
 
+  // deleting the open world closes it without saving, so quitting leaves no save
+  await page.evaluate((id) => window.junonDesktop.localWorldApi('deleteWorld', [{ worldId: id, ownerUid: window.main.localProfile.uid }]), worldId)
+  expect(await page.evaluate(() => window.junonDesktop.localWorldApi('listWorlds', []).then((result) => result.worlds))).toEqual([])
+
   await quit(app)
   expect(errors).toEqual([])
+  expect(savePaths()).toEqual([])
 })
 
 // prefer a private (LAN or VPN) address, as a friend on the same network

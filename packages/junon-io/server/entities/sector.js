@@ -1852,7 +1852,7 @@ initSettings(entities) {
 
   getAvailableSpawnPos(w, h, isSnapped, grids, searchCount = 0) {
     let randomX = this.randomSpawnPos()
-    let randomY = this.randomSpawnPos()
+    let randomY = this.randomSpawnPos(this.getSectorHeight())
     let left
     let top
 
@@ -1861,7 +1861,7 @@ initSettings(entities) {
       randomY = Math.floor(randomY / Constants.tileSize) * Constants.tileSize + (Constants.tileSize / 2)
 
       left = this.normalizeSpawnPos(randomX - w/2)
-      top  = this.normalizeSpawnPos(randomY - h/2)
+      top  = this.normalizeSpawnPos(randomY - h/2, undefined, this.getSectorHeight())
 
       left = Math.floor(left / Constants.tileSize) * Constants.tileSize
       top  = Math.floor(top / Constants.tileSize) * Constants.tileSize
@@ -1907,9 +1907,10 @@ initSettings(entities) {
 
   }
 
-  randomSpawnPos() {
-    let x = Math.floor(Math.random() * this.getSectorWidth())
-    return this.normalizeSpawnPos(x)
+  // mapSize: the sector's width by default; pass its height for a y
+  randomSpawnPos(mapSize = this.getSectorWidth()) {
+    let s = Math.floor(Math.random() * mapSize)
+    return this.normalizeSpawnPos(s, undefined, mapSize)
   }
 
   normalizeSpawnPos(s, padding, mapSize) {

@@ -5,16 +5,18 @@ const BaseMenu = require("./base_menu")
 
 class MapMenu extends BaseMenu {
 
+  // the longer side of the map fits 512 pixels; maps needn't be square
   resizeCanvas(sector) {
     let cssCanvasWidth = 512
-    this.zoomMultiplier = Math.floor(cssCanvasWidth / sector.getRowCount())
-    this.mapSize = this.zoomMultiplier * sector.getRowCount()
+    this.zoomMultiplier = Math.max(1, Math.floor(cssCanvasWidth / Math.max(sector.getRowCount(), sector.getColCount())))
+    this.mapWidth = this.zoomMultiplier * sector.getColCount()
+    this.mapHeight = this.zoomMultiplier * sector.getRowCount()
 
-    this.terrainCanvas.width = this.mapSize
-    this.terrainCanvas.height = this.mapSize
+    this.terrainCanvas.width = this.mapWidth
+    this.terrainCanvas.height = this.mapHeight
 
-    this.entityCanvas.width = this.mapSize
-    this.entityCanvas.height = this.mapSize
+    this.entityCanvas.width = this.mapWidth
+    this.entityCanvas.height = this.mapHeight
   }
 
   onMenuConstructed() {
@@ -59,7 +61,7 @@ class MapMenu extends BaseMenu {
     let sectorColCount = this.game.sector.getColCount()
     this.alerts = {}
 
-    this.zoomMultiplier = Math.floor(this.mapSize / sectorColCount)
+    this.zoomMultiplier = Math.floor(this.mapWidth / sectorColCount)
   }
 
   syncWithServer(data) {
@@ -148,9 +150,8 @@ class MapMenu extends BaseMenu {
 
   repositionMiniMap(player) {
     let miniMapWidth  = this.miniMapMenu.offsetWidth
-    let actualMapWidth = this.mapSize
-    let topLeftX = (player.getX() / this.game.sector.getSectorWidth()) * actualMapWidth - miniMapWidth / 2
-    let topLeftY = (player.getY() / this.game.sector.getSectorWidth()) * actualMapWidth - miniMapWidth /2
+    let topLeftX = (player.getX() / this.game.sector.getSectorWidth()) * this.mapWidth - miniMapWidth / 2
+    let topLeftY = (player.getY() / this.game.sector.getSectorHeight()) * this.mapHeight - miniMapWidth /2
 
     this.miniMapTerrainCanvas.style.marginLeft = (0 - topLeftX) + "px"
     this.miniMapTerrainCanvas.style.marginTop =  (0 - topLeftY) + "px"

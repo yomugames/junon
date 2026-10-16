@@ -8132,7 +8132,6 @@ body.imposter_mode .minigame_poster {
 }
 
 #desktop_transition_notice {
-    margin-bottom: 16px;
     padding: 12px 16px;
     border: 1px solid #bf5036;
     background-color: #44271d;
@@ -8145,15 +8144,6 @@ body.imposter_mode .minigame_poster {
 #desktop_transition_notice a {
     color: #ffca91;
     text-decoration: underline;
-}
-
-.itch_download_widget {
-    display: block;
-    width: 552px;
-    max-width: 100%;
-    height: 167px;
-    margin: 0 auto 16px;
-    border: 0;
 }
 
 .home_action_row {

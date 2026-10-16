@@ -337,6 +337,15 @@ and `junon-io`'s client sources, tests and build tooling. Code that the game
 server loads therefore can't require anything under `packages/junon-io/client/`.
 The Windows exe and the Linux window use `packages/junon-desktop/assets/icon.png` (512×512 with transparency) as their icon. A Windows exe built on Linux isn't code-signed.
 
+On Windows, extract the whole release folder onto a local drive before launching
+`Junon.exe`. In Parallels, macOS shared folders such as `\\Mac\Home\Downloads`
+are network shares from the Windows guest. Electron can fail to launch its
+sandboxed GPU process from a share (`GPU process launch failed: error_code=18`,
+then `GPU process isn't usable`), even when the executable itself starts. Copy
+the extracted folder to a path such as `C:\Games\Junon` and run the exe there;
+keep its `resources` and other packaged files beside it. A PowerShell prompt's
+current directory does not change where an exe launched by its full path runs.
+
 Check a packaged build with `test/packaged.spec.js` ([testing.md](testing.md#desktop-e2e)).
 
 ### Steam

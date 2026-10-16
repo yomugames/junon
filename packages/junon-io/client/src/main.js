@@ -1597,6 +1597,7 @@ class Main {
     this.hideNewGameMenu()
 
     document.querySelector(".middle_container").style.display = 'block'
+    document.querySelector("#desktop_transition_section").style.display = 'block'
     if (this.gameExplorer && this.gameExplorer.isAttachedToBody) {
       this.gameExplorer.attachToMiddleContainer()
     }
@@ -1604,6 +1605,7 @@ class Main {
 
   hideHomeMenu() {
     document.querySelector(".middle_container").style.display = 'none'
+    document.querySelector("#desktop_transition_section").style.display = 'none'
   }
 
   lockJoin() {

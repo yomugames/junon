@@ -4772,6 +4772,10 @@ arrow.style.setProperty('--arrow-color',realColor)
     inputController.setPlayer(player)
 
     this.centerCameraTo(this.player.getCameraFocusTarget())
+
+    // otherwise the mini map waits for the first step, which on a map larger
+    // than it leaves the spawn out of view
+    this.mapMenu.repositionTo(player)
   }
 
   isMouseHeld() {

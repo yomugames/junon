@@ -32,11 +32,23 @@ menu" block in `client/stylesheets/style.css`.
   aren't served over HTTP and the desktop app has no page server.
   `test/e2e/world_thumbnail.spec.js` covers this.
 - **New world** asks for a name, a mode and the map size in tiles (rows and
-  columns, 128 x 128 by default). Each side must be a whole number of 16-tile
-  chunks between `minWorldSize` and `maxWorldSize` in `common/constants.json`
-  (64 and 256); `createWorld` refuses anything else. The size only applies
-  when the map is generated; a save keeps its own. Maps needn't be square:
-  the in-game map fits the longer side (`MapMenu#resizeCanvas`).
+  columns, 128 x 128 by default). Each side must be a positive multiple of 16
+  (a chunk, `chunkRowCount`); `createWorld` refuses anything else. There is
+  deliberately no upper limit: generation time and memory grow with the area
+  (measured: 1024 x 1024 about 15 s). The size only applies when the map is
+  generated; a save keeps its own. Maps needn't be square: the in-game map
+  fits the longer side, at least one pixel per tile, and a map over 512 tiles
+  gets mini map canvases larger than 512 pixels (`MapMenu#resizeCanvas`).
+- While a world is created, the form disables its button and shows a progress
+  bar with the stage ("Generating terrain", then "Mapping regions") and a
+  percentage, polled from `getWorldProgress` (`GET /local/worlds/progress` in
+  a browser) every 250 ms (`LocalWorldMenu#followWorldProgress`). The server
+  generates a new map in slices of the event loop so it can answer
+  meanwhile: `MapGenerator#generate` and `Sector#buildRegionSteps` are
+  generator functions whose yields are pause points, run by
+  `server/util/steps.js` (`/map regenerate` still runs them in one go). Only
+  one world loads at a time; opening, creating, deleting or hosting during a
+  load is refused with "A world is still loading".
 - Each world card has a delete button (top right, shown on hover or focus).
   After a confirm dialog it calls `deleteWorld`, which removes the save
   directory, the thumbnail and the `sectors` row. If the world is open, the
@@ -92,7 +104,8 @@ The e2e join helper (`test/e2e/support/join.js`) waits for `#local_world_menu`,
 then uses `.local_new_btn`, `.world_name`, `.world_mode` and `.create_world`;
 the map size inputs are `.world_rows` and `.world_cols`. A world card is
 `.local_world_card`, holding the `.local_world_entry` button (which opens the
-world) and `.local_world_delete`.
+world) and `.local_world_delete`. The creation progress is `.world_progress`
+(shown with `.visible`), `.world_progress_label` and `.world_progress_fill`.
 `LocalWorldMenu` binds `.local_<name>_btn` for `new`, `load`, `tutorial`,
 `import`, `host` and `join`, plus `.local_continue_btn`. The Steam controls
 are `.steam_lobby_type`, `.start_steam_hosting`, `.steam_invite_dialog`,

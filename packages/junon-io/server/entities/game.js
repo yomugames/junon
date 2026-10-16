@@ -811,7 +811,7 @@ class Game {
 
     // tests always start from a new map
     if (env === 'test') {
-      this.initSurvivalSector({ rowCount: rowCount, colCount: colCount, uid: this.sectorUid, name: this.sectorName, gameMode: gameMode })
+      await this.initSurvivalSector({ rowCount: rowCount, colCount: colCount, uid: this.sectorUid, name: this.sectorName, gameMode: gameMode }, null, options.onProgress)
       return
     }
 
@@ -840,7 +840,7 @@ class Game {
       }
 
       console.log("No save data for sector " + uid + " . Creating new map " + gameMode)
-      await this.initSurvivalSector({ rowCount: rowCount, colCount: colCount, uid: uid, name: this.sectorName, gameMode: gameMode })
+      await this.initSurvivalSector({ rowCount: rowCount, colCount: colCount, uid: uid, name: this.sectorName, gameMode: gameMode }, null, options.onProgress)
       return
     }
 
@@ -1036,14 +1036,17 @@ async setGameMode(gameMode) {
     }
   }
 
-  async initSurvivalSector(metadata = {}, entities) {
+  // a new map (no entities) is generated in slices of the event loop;
+  // onProgress, if given, follows it (Sector#generateMapInSlices)
+  async initSurvivalSector(metadata = {}, entities, onProgress) {
     if (metadata.timestamp) {
       this.timestamp = metadata.timestamp.toNumber()
       this.hour = this.getHourFromTimestamp(this.timestamp)
       this.isNight = this.hour < 6 || this.hour >= 18
     }
 
-    let sector = new SurvivalSector(this, metadata, entities)
+    let sector = new SurvivalSector(this, metadata, entities, { isGeneratedInSlices: !entities })
+    if (!entities) await sector.generateMapInSlices(onProgress || (() => {}))
     await this.initCreatorTeam()
   }
 

@@ -7,6 +7,12 @@ const LocalWorldApi = {
     return this.call('listWorlds', [], () => this.request('worlds'))
   },
 
+  // { loading }: the world being opened or created, with its stage and
+  // progress (0 to 1), or null
+  getWorldProgress() {
+    return this.call('getWorldProgress', [], () => this.request('worlds/progress'))
+  },
+
   createWorld(details) {
     return this.call('createWorld', [details], () => this.request('worlds', this.json(details)))
   },

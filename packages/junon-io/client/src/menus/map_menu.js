@@ -5,7 +5,9 @@ const BaseMenu = require("./base_menu")
 
 class MapMenu extends BaseMenu {
 
-  // the longer side of the map fits 512 pixels; maps needn't be square
+  // the longer side of the map fits 512 pixels, at least one pixel per tile;
+  // maps needn't be square. A map over 512 tiles gets a larger canvas, which
+  // the map menu scales down and the mini map scrolls across.
   resizeCanvas(sector) {
     let cssCanvasWidth = 512
     this.zoomMultiplier = Math.max(1, Math.floor(cssCanvasWidth / Math.max(sector.getRowCount(), sector.getColCount())))
@@ -17,6 +19,15 @@ class MapMenu extends BaseMenu {
 
     this.entityCanvas.width = this.mapWidth
     this.entityCanvas.height = this.mapHeight
+
+    let miniMapWidth = Math.max(cssCanvasWidth, this.mapWidth)
+    let miniMapHeight = Math.max(cssCanvasWidth, this.mapHeight)
+    ;[this.miniMapTerrainCanvas, this.miniMapEntityCanvas].forEach((canvas) => {
+      canvas.width = miniMapWidth
+      canvas.height = miniMapHeight
+      canvas.style.width = miniMapWidth + "px"
+      canvas.style.height = miniMapHeight + "px"
+    })
   }
 
   onMenuConstructed() {
@@ -122,7 +133,7 @@ class MapMenu extends BaseMenu {
 
   redrawEntityMap() {
     this.getEntityContextList().forEach((ctx) => {
-      ctx.clearRect(0, 0, this.entityCanvas.width, this.entityCanvas.height)
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     })
 
     for (let id in this.labels) {
@@ -214,12 +225,9 @@ class MapMenu extends BaseMenu {
     this.labels = {}
     this.renderQueue = []
 
-    this.getTerrainContextList().forEach((ctx) => {
-      ctx.clearRect(0, 0, this.terrainCanvas.width, this.terrainCanvas.height)
-    })
-
-    this.getEntityContextList().forEach((ctx) => {
-      ctx.clearRect(0, 0, this.entityCanvas.width, this.entityCanvas.height)
+    // the mini map canvases can be larger than the map menu's
+    this.getTerrainContextList().concat(this.getEntityContextList()).forEach((ctx) => {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     })
   }
 

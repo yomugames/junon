@@ -5,6 +5,7 @@ const Constants = require('./../../common/constants.json')
 const Protocol = require('../../common/util/protocol')
 const Grid = require('../../common/entities/grid')
 const Helper = require("../../common/helper")
+const Steps = require("./steps")
 
 class MapGenerator {
   constructor(sector, groundMap, distanceMap) {
@@ -20,6 +21,16 @@ class MapGenerator {
   }
 
   regenerate() {
+    Steps.run(this.regenerateSteps())
+  }
+
+  // the same, in slices of the event loop (Steps.runInSlices), for a new
+  // world; onProgress gets the fraction generated
+  regenerateInSlices(onProgress) {
+    return Steps.runInSlices(this.regenerateSteps(), onProgress)
+  }
+
+  *regenerateSteps() {
     this.sector.landManager.cleanup()
     this.sector.poolManager.cleanup()
 
@@ -42,7 +53,7 @@ class MapGenerator {
     this.grounds = {}
     this.liquids = {}
 
-    this.generate()
+    yield* this.generate()
 
     if (this.sector.roomManager) {
       this.sector.roomManager.isAllocationDisabled = false
@@ -58,7 +69,7 @@ class MapGenerator {
 
     let noiseFactor = 70
 
-    this.createNoiseMap(this.heightMap, octaves, noiseFactor, this.seed)
+    return this.createNoiseMap(this.heightMap, octaves, noiseFactor, this.seed)
   }
 
   createCaveMap() {
@@ -70,7 +81,7 @@ class MapGenerator {
 
     let noiseFactor = 30
 
-    this.createNoiseMap(this.caveMap, octaves, noiseFactor, this.seed)
+    return this.createNoiseMap(this.caveMap, octaves, noiseFactor, this.seed)
   }
 
   createTemperatureMap() {
@@ -81,84 +92,113 @@ class MapGenerator {
 
     let noiseFactor = 70
 
-    this.createNoiseMap(this.temperatureMap, octaves, noiseFactor, this.seed + 15666)
+    return this.createNoiseMap(this.temperatureMap, octaves, noiseFactor, this.seed + 15666)
   }
 
-  createNoiseMap(grid, octaves, noiseFactor, seed) {
+  *createNoiseMap(grid, octaves, noiseFactor, seed) {
     noise.seed(seed)
 
-    grid.forEach((row, col) => {
-      let totalNoise = 0
+    let rowCount = grid.getRowCount()
+    let colCount = grid.getColCount()
 
-      octaves.forEach((octave) => {
-        let value = octave.ratio * noise.simplex2(octave.frequency * row / noiseFactor, 
-                                                  octave.frequency * col / noiseFactor)
-        totalNoise += value
-      })
+    for (let row = 0; row < rowCount; row++) {
+      for (let col = 0; col < colCount; col++) {
+        this.setNoise(grid, row, col, octaves, noiseFactor)
+      }
 
-      // translate (-1,1) to (0,2) 
-      totalNoise = totalNoise + 1 
-
-      // normalize (0,2) to (0,1)
-      totalNoise = totalNoise / 2
-
-      totalNoise = Math.pow(totalNoise, this.EXPONENTIAL_FACTOR)
-
-      grid.set({ row: row, col: col, value: totalNoise })
-    })  
+      yield (row + 1) / rowCount
+    }
   }
 
-  assignTiles() {
-    // first pass, terrain + biomes
-    this.groundMap.forEach((row, col) => {
-      let elevation   = this.heightMap.get(row, col)
-      let temperature = this.temperatureMap.get(row, col).entity
+  setNoise(grid, row, col, octaves, noiseFactor) {
+    let totalNoise = 0
 
-      let x = col * Constants.tileSize + Constants.tileSize/2
-      let y = row * Constants.tileSize + Constants.tileSize/2
-
-
-      if (elevation > this.ASTEROID_ELEVATION_THRESHOLD) {
-        // foreground
-        if (elevation > (0.70)) {
-          if (temperature < 0.05) { 
-            new Terrains.Oil(this.sector, row, col)
-          } else if (temperature < 0.40) { 
-            new Terrains.Rock(this.sector, row, col)
-          } else {
-            new Terrains.Oil(this.sector, row, col)
-          }
-        } else if (elevation > (0.60)) {
-          let klass = Math.random() < 0.40 ? Terrains.CopperAsteroid : Terrains.Asteroid
-          new klass(this.sector, row, col)
-
-        } else if (elevation > (0.30)) {
-          let klass = Terrains.Asteroid
-          new klass(this.sector, row, col)
-        } else {
-          let klass = Math.random() < 0.15 ? Terrains.Asteroid : Terrains.Asteroid
-          new klass(this.sector, row, col)
-        }
-
-      } else {
-        this.groundMap.set({ row: row, col: col, value: 0 })
-      }
+    octaves.forEach((octave) => {
+      let value = octave.ratio * noise.simplex2(octave.frequency * row / noiseFactor, 
+                                                octave.frequency * col / noiseFactor)
+      totalNoise += value
     })
+
+    // translate (-1,1) to (0,2) 
+    totalNoise = totalNoise + 1 
+
+    // normalize (0,2) to (0,1)
+    totalNoise = totalNoise / 2
+
+    totalNoise = Math.pow(totalNoise, this.EXPONENTIAL_FACTOR)
+
+    grid.set({ row: row, col: col, value: totalNoise })
+  }
+
+  *assignTiles() {
+    let rowCount = this.groundMap.getRowCount()
+    let colCount = this.groundMap.getColCount()
+
+    // first pass, terrain + biomes
+    for (let row = 0; row < rowCount; row++) {
+      for (let col = 0; col < colCount; col++) {
+        this.assignTile(row, col)
+      }
+
+      yield (row + 1) / rowCount / 2
+    }
 
     // second pass, cave tunnels (only asteroids would be on foreground)
-    this.groundMap.forEach((row, col) => {
-      let elevation   = this.caveMap.get(row, col)
-
-      if (elevation > this.ASTEROID_ELEVATION_THRESHOLD) {
-        let entity = this.groundMap.get(row, col)
-        if (entity && entity.isObstacle()) {
-          entity.remove()
-
-          new Terrains.Rock(this.sector, row, col) // replace asteroid with rock platform
-        }
+    for (let row = 0; row < rowCount; row++) {
+      for (let col = 0; col < colCount; col++) {
+        this.digCaveTunnel(row, col)
       }
-    })
 
+      yield 0.5 + (row + 1) / rowCount / 2
+    }
+  }
+
+  assignTile(row, col) {
+    let elevation   = this.heightMap.get(row, col)
+    let temperature = this.temperatureMap.get(row, col).entity
+
+    let x = col * Constants.tileSize + Constants.tileSize/2
+    let y = row * Constants.tileSize + Constants.tileSize/2
+
+
+    if (elevation > this.ASTEROID_ELEVATION_THRESHOLD) {
+      // foreground
+      if (elevation > (0.70)) {
+        if (temperature < 0.05) { 
+          new Terrains.Oil(this.sector, row, col)
+        } else if (temperature < 0.40) { 
+          new Terrains.Rock(this.sector, row, col)
+        } else {
+          new Terrains.Oil(this.sector, row, col)
+        }
+      } else if (elevation > (0.60)) {
+        let klass = Math.random() < 0.40 ? Terrains.CopperAsteroid : Terrains.Asteroid
+        new klass(this.sector, row, col)
+
+      } else if (elevation > (0.30)) {
+        let klass = Terrains.Asteroid
+        new klass(this.sector, row, col)
+      } else {
+        let klass = Math.random() < 0.15 ? Terrains.Asteroid : Terrains.Asteroid
+        new klass(this.sector, row, col)
+      }
+
+    } else {
+      this.groundMap.set({ row: row, col: col, value: 0 })
+    }
+  }
+
+  digCaveTunnel(row, col) {
+    let elevation   = this.caveMap.get(row, col)
+
+    if (elevation > this.ASTEROID_ELEVATION_THRESHOLD) {
+      let entity = this.groundMap.get(row, col)
+      if (entity && entity.isObstacle()) {
+        entity.remove()
+
+        new Terrains.Rock(this.sector, row, col) // replace asteroid with rock platform
+      }
+    }
   }
 
   registerLiquid(liquid) {
@@ -177,11 +217,18 @@ class MapGenerator {
     delete this.grounds[rock.getId()] 
   }
 
-  createPlants() {
-    this.sector.landManager.forEachLand((land) => {
-      let coord = land.getRandomCoord()
+  *createPlants() {
+    let lands = this.sector.landManager.lands
+    let landCount = Object.keys(lands).length
+    let index = 0
+
+    for (let id in lands) {
+      let coord = lands[id].getRandomCoord()
       this.createPlantPatch(coord)
-    })
+
+      index += 1
+      yield index / landCount
+    }
   }
 
   createPlantPatch(coord, plantCount = 10) {
@@ -303,38 +350,57 @@ class MapGenerator {
     this.temperatureMap = null
   }
 
-  generate() {
-    this.createHeightMap()
-    this.createCaveMap()
-    this.createTemperatureMap()
-    this.assignTiles()
+  // each step's share of the time, measured on a 1024 x 1024 map, so the
+  // progress it yields moves at a steady pace
+  *generate() {
+    yield* Steps.weighted(this.createHeightMap(), 0, 0.1)
+    yield* Steps.weighted(this.createCaveMap(), 0.1, 0.1)
+    yield* Steps.weighted(this.createTemperatureMap(), 0.2, 0.1)
+    yield* Steps.weighted(this.assignTiles(), 0.3, 0.2)
     this.removeMaps()
     console.log(`++ terrains generated: ${Object.keys(this.grounds).length}`)
 
-    this.groupLiquids()
+    yield* Steps.weighted(this.groupLiquids(), 0.5, 0.1)
     console.log("++ pools grouped")
 
     this.createWater()
     console.log("++ water generated")
 
-    this.groupLands()
+    yield* Steps.weighted(this.groupLands(), 0.6, 0.35)
     console.log("++ lands grouped")
 
-    this.createPlants()
+    yield* Steps.weighted(this.createPlants(), 0.95, 0.05)
     console.log("++ plants created")
   }
 
-  groupLands() {
+  // A tile inside a land (or pool) found earlier is skipped instead of looked
+  // up: findOrCreate would just return that land, and the lookup searches
+  // every land, which made grouping quadratic in the map's area.
+  *groupLands() {
+    let grouped = new Set()
+    let groundCount = Object.keys(this.grounds).length
+
     for (let id in this.grounds) {
       let ground = this.grounds[id]
-      this.sector.landManager.findOrCreateLand(ground)        
+      if (grouped.has(ground.getRow() + "-" + ground.getCol())) continue
+
+      let land = this.sector.landManager.findOrCreateLand(ground)
+      land.tiles.forEach((key) => grouped.add(key))
+      yield grouped.size / groundCount
     }
   }
 
-  groupLiquids() {
+  *groupLiquids() {
+    let grouped = new Set()
+    let liquidCount = Object.keys(this.liquids).length
+
     for (let id in this.liquids) {
       let liquid = this.liquids[id]
-      this.sector.poolManager.findOrCreatePool(liquid)        
+      if (grouped.has(liquid.getRow() + "-" + liquid.getCol())) continue
+
+      let pool = this.sector.poolManager.findOrCreatePool(liquid)
+      Object.keys(pool.tiles).forEach((key) => grouped.add(key))
+      yield grouped.size / liquidCount
     }
   }
 

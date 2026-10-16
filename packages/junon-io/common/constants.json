@@ -12,8 +12,6 @@
   "holdItemIndex": 9999,
   "chunkRowCount": 16,
   "chunkColCount": 16,
-  "minWorldSize": 64,
-  "maxWorldSize": 256,
   "defaultWorldSize": 128,
   "fovViewDistance": 384,
   "maxStorageCount": 48,

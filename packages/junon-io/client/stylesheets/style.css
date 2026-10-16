@@ -8747,6 +8747,44 @@ body.imposter_mode .minigame_poster {
 #local_world_menu .local_world_empty {
     grid-column: 1 / -1;
     padding: 60px 20px;
+#local_world_menu .world_progress {
+    display: none;
+    max-width: 420px;
+    margin-top: 18px;
+}
+
+#local_world_menu .world_progress.visible {
+    display: block;
+}
+
+#local_world_menu .world_progress_label {
+    margin-bottom: 8px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #8a96a8;
+}
+
+#local_world_menu .world_progress_bar {
+    height: 8px;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.45);
+    border: solid 1px rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+#local_world_menu .world_progress_fill {
+    width: 0%;
+    height: 100%;
+    background-color: #e0673f;
+    transition: width 0.25s linear;
+}
+
+#local_world_menu .local_menu_panel .ui_btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
     text-align: center;
 }
 

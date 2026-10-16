@@ -224,8 +224,8 @@ test('local menu creates a world of a chosen size and deletes worlds', async () 
       return SaveState.decode(zlib.gunzipSync(compressed)).metadata
     }
 
-    // sizes are whole 16-tile chunks within the allowed range
-    for (const size of [{ rowCount: 100, colCount: 128 }, { rowCount: 48, colCount: 128 }, { rowCount: 128, colCount: 512 }, { rowCount: '128', colCount: 128 }]) {
+    // sizes are whole 16-tile chunks, with no upper limit
+    for (const size of [{ rowCount: 100, colCount: 128 }, { rowCount: 0, colCount: 128 }, { rowCount: 128, colCount: -16 }, { rowCount: '128', colCount: 128 }]) {
       let response = await post('worlds', Object.assign({ ownerUid, name: 'Bad Size', gameMode: 'survival' }, size))
       expect(response.status).toBe(400)
     }
@@ -276,6 +276,56 @@ test('local menu creates a world of a chosen size and deletes worlds', async () 
   }
   // nothing left to save on shutdown either
   expect(fs.readdirSync(savesDir).filter((name) => /^[a-f0-9]{24}$/.test(name))).toEqual([])
+})
+
+// a new map is generated in slices of the event loop, so the server answers
+// progress requests meanwhile and refuses to load a second world
+test('reports progress while generating a large map', async () => {
+  const server = startServer({ JUNON_WORLD_ID: '', JUNON_OWNER_UID: '' })
+  try {
+    await waitForOutput(server, 'Webpage available')
+    const base = `http://127.0.0.1:${server.clientPort}/local/`
+    const ownerUid = '0123456789abcdef0123456789abcdef'
+    const post = (route, body) => fetch(base + route, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    })
+
+    let isCreated = false
+    const creating = post('worlds', { ownerUid, name: 'Large World', gameMode: 'survival', rowCount: 512, colCount: 512 })
+      .then((response) => { isCreated = true; return response })
+
+    const samples = []
+    let slowestReply = 0
+    while (!isCreated) {
+      const sentAt = Date.now()
+      const { loading } = await (await fetch(base + 'worlds/progress')).json()
+      slowestReply = Math.max(slowestReply, Date.now() - sentAt)
+      if (loading) {
+        samples.push(loading)
+        if (samples.length === 1) {
+          const refused = await post('worlds', { ownerUid, name: 'Second World', gameMode: 'survival' })
+          expect(refused.status).toBe(400)
+          expect((await refused.json()).error).toMatch(/still loading/)
+        }
+      }
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
+
+    expect((await creating).status).toBe(200)
+    expect(slowestReply).toBeLessThan(2000)
+    expect(samples.map((sample) => sample.stage)).toContain('terrain')
+    const progress = samples.map((sample) => sample.progress)
+    expect(progress).toEqual([...progress].sort((a, b) => a - b))
+    expect(Math.max(...progress)).toBeGreaterThan(0)
+    expect(Math.max(...progress)).toBeLessThanOrEqual(1)
+
+    expect(await (await fetch(base + 'worlds/progress')).json()).toEqual({ loading: null })
+    const listed = await (await fetch(base + 'worlds')).json()
+    expect(listed.worlds.map((world) => world.name)).toEqual(['Large World'])
+  } finally {
+    server.kill('SIGTERM')
+    await server.exited
+  }
 })
 
 // Co-op: the host opens the world on a second, all-interfaces port. Guests

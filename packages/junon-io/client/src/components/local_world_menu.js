@@ -9,6 +9,8 @@ const Constants = require('../../../common/constants.json')
 
 const DEFAULT_HOST_PORT = 7777
 const MODE_LABELS = { survival: 'Survival', peaceful: 'Sandbox', hardcore: 'Hardcore' }
+const LOADING_STAGE_LABELS = { starting: 'Preparing world', terrain: 'Generating terrain', regions: 'Mapping regions' }
+const PROGRESS_POLL_INTERVAL = 250
 
 // Standalone home menu. World management goes through LocalWorldApi (loopback
 // page server, or the desktop app's game server process); game traffic still
@@ -161,19 +163,59 @@ class LocalWorldMenu {
   // map size is in tiles, in whole chunks (Server#getLocalWorldApi checks it)
   newWorld() {
     this.setActive('new')
-    const sizeInput = (className, label) => '<label>' + label + ' <input class="' + className + ' black_input" type="number" min="' + Constants.minWorldSize + '" max="' + Constants.maxWorldSize + '" step="' + Constants.chunkRowCount + '" value="' + Constants.defaultWorldSize + '"></label>'
-    this.panel.innerHTML = '<h2>New world</h2><label>World name <input class="world_name black_input" maxlength="40"></label><label>Mode <select class="world_mode ui_select"><option value="survival">Survival</option><option value="peaceful">Sandbox</option><option value="hardcore">Hardcore</option></select></label><div class="world_size">' + sizeInput('world_rows', 'Map rows') + sizeInput('world_cols', 'Map columns') + '</div><button class="create_world ui_btn">Create and play</button>'
-    this.panel.querySelector('.create_world').addEventListener('click', () => this.run(async () => {
+    const sizeInput = (className, label) => '<label>' + label + ' <input class="' + className + ' black_input" type="number" min="' + Constants.chunkRowCount + '" step="' + Constants.chunkRowCount + '" value="' + Constants.defaultWorldSize + '"></label>'
+    this.panel.innerHTML = '<h2>New world</h2><label>World name <input class="world_name black_input" maxlength="40"></label><label>Mode <select class="world_mode ui_select"><option value="survival">Survival</option><option value="peaceful">Sandbox</option><option value="hardcore">Hardcore</option></select></label><div class="world_size">' + sizeInput('world_rows', 'Map rows') + sizeInput('world_cols', 'Map columns') + '</div><button class="create_world ui_btn">Create and play</button><div class="world_progress"><div class="world_progress_label"></div><div class="world_progress_bar"><div class="world_progress_fill"></div></div></div>'
+    const createButton = this.panel.querySelector('.create_world')
+    createButton.addEventListener('click', () => this.run(async () => {
       this.saveName()
-      const result = await LocalWorldApi.createWorld({
-        ownerUid: this.main.localProfile.uid,
-        name: this.panel.querySelector('.world_name').value,
-        gameMode: this.panel.querySelector('.world_mode').value,
-        rowCount: Number(this.panel.querySelector('.world_rows').value),
-        colCount: Number(this.panel.querySelector('.world_cols').value)
-      })
-      this.open(result.worldId, result.serverUrl)
+      createButton.disabled = true
+      try {
+        const result = await this.followWorldProgress(this.panel.querySelector('.world_progress'), LocalWorldApi.createWorld({
+          ownerUid: this.main.localProfile.uid,
+          name: this.panel.querySelector('.world_name').value,
+          gameMode: this.panel.querySelector('.world_mode').value,
+          rowCount: Number(this.panel.querySelector('.world_rows').value),
+          colCount: Number(this.panel.querySelector('.world_cols').value)
+        }))
+        this.open(result.worldId, result.serverUrl)
+      } finally {
+        createButton.disabled = false
+      }
     }))
+  }
+
+  // Shows the server's progress on a world being created (getWorldProgress)
+  // in the given .world_progress element until the request settles. Large
+  // maps take a while to generate; the server keeps answering meanwhile.
+  async followWorldProgress(element, request) {
+    let isSettled = false
+    const render = (loading) => {
+      const percent = Math.floor(loading.progress * 100)
+      element.querySelector('.world_progress_label').textContent = (LOADING_STAGE_LABELS[loading.stage] || 'Loading') + '… ' + percent + '%'
+      element.querySelector('.world_progress_fill').style.width = percent + '%'
+    }
+
+    render({ stage: 'starting', progress: 0 })
+    element.classList.add('visible')
+    const poll = async () => {
+      while (!isSettled) {
+        try {
+          const result = await LocalWorldApi.getWorldProgress()
+          if (!isSettled && result.loading) render(result.loading)
+        } catch (e) {
+          // the request's own outcome is what gets reported
+        }
+        await new Promise((resolve) => setTimeout(resolve, PROGRESS_POLL_INTERVAL))
+      }
+    }
+    poll()
+
+    try {
+      return await request
+    } finally {
+      isSettled = true
+      element.classList.remove('visible')
+    }
   }
 
   loadWorlds() {

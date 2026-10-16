@@ -200,7 +200,8 @@ class Server {
       sectorData: { id: worldId, name: sectorModel.name, sectorModel: sectorModel },
       gameMode: sectorModel.gameMode,
       rowCount: options.rowCount,
-      colCount: options.colCount
+      colCount: options.colCount,
+      onProgress: options.onProgress
     })
 
     if (!result.createdGame) {
@@ -214,29 +215,60 @@ class Server {
     console.log("Standalone world ready: " + worldId)
   }
 
+  // A new map is generated in slices of the event loop, so the local menu
+  // can follow it (getWorldProgress) meanwhile. One world loads at a time.
   async activateStandaloneWorld(options) {
+    this.checkNoWorldLoading()
     let current = this.getMainGame()
     if (current && current.getId() === options.worldId) return
-    this.stopHosting("The host closed the world.")
-    if (current) await current.prepareRemove()
-    await this.loadStandaloneWorld(options)
+
+    this.worldLoading = { worldId: options.worldId, stage: "starting", progress: 0 }
+    try {
+      this.stopHosting("The host closed the world.")
+      if (current) await current.prepareRemove()
+      await this.loadStandaloneWorld(Object.assign({}, options, {
+        onProgress: (stage, fraction) => this.setWorldLoadingProgress(stage, fraction)
+      }))
+    } finally {
+      this.worldLoading = null
+    }
+  }
+
+  checkNoWorldLoading() {
+    if (this.worldLoading) throw new Error("A world is still loading. Try again when it's ready.")
+  }
+
+  // of a new map's generation (Sector#generateMapInSlices), the terrain stage
+  // takes about 60% of the time and the regions stage the rest
+  setWorldLoadingProgress(stage, fraction) {
+    if (!this.worldLoading) return
+    let isRegions = stage === "regions"
+    this.worldLoading.stage = stage
+    this.worldLoading.progress = (isRegions ? 0.6 : 0) + (isRegions ? 0.4 : 0.6) * Math.min(1, fraction)
   }
 
   // The tutorial is a throwaway world built from common/tutorial.sav.gz
   // (Game#initSector). It has no sectors row, so it is never listed, and
   // Game#canBeSaved refuses it; opening any other world discards it.
   async activateTutorialWorld() {
+    this.checkNoWorldLoading()
     let current = this.getMainGame()
-    this.stopHosting("The host closed the world.")
-    if (current) await current.prepareRemove()
-
     let worldId = "tutorial-" + crypto.randomBytes(6).toString("hex")
-    let result = await this.createGame({ isTutorial: true, sectorData: { id: worldId } })
-    if (!result.createdGame) {
-      throw new Error("Unable to start the tutorial: " + result.error)
-    }
 
-    await new Promise((resolve) => result.createdGame.onGameReady(resolve))
+    this.worldLoading = { worldId: worldId, stage: "starting", progress: 0 }
+    try {
+      this.stopHosting("The host closed the world.")
+      if (current) await current.prepareRemove()
+
+      let result = await this.createGame({ isTutorial: true, sectorData: { id: worldId } })
+      if (!result.createdGame) {
+        throw new Error("Unable to start the tutorial: " + result.error)
+      }
+
+      await new Promise((resolve) => result.createdGame.onGameReady(resolve))
+    } finally {
+      this.worldLoading = null
+    }
   }
 
   initStandaloneProcessHandlers() {
@@ -607,6 +639,7 @@ class Server {
     const api = this.getLocalWorldApi()
     const raw = express.raw({ type: 'application/octet-stream', limit: '100mb' })
     app.get('/local/worlds', route(() => api.listWorlds()))
+    app.get('/local/worlds/progress', route(() => api.getWorldProgress()))
     app.post('/local/worlds', route((req) => api.createWorld(req.body)))
     app.post('/local/worlds/open', route((req) => api.openWorld(req.body)))
     app.post('/local/worlds/delete', route((req) => api.deleteWorld(req.body)))
@@ -677,7 +710,7 @@ class Server {
   getLocalWorldApi() {
     const validOwner = (uid) => typeof uid === 'string' && /^[a-f0-9]{32}$/i.test(uid)
     const validWorld = (uid) => typeof uid === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(uid)
-    const validWorldSize = (size) => Number.isInteger(size) && size >= Constants.minWorldSize && size <= Constants.maxWorldSize && size % Constants.chunkRowCount === 0
+    const validWorldSize = (size) => Number.isInteger(size) && size > 0 && size % Constants.chunkRowCount === 0
     const validSave = (bytes) => {
       if (!(bytes instanceof Uint8Array)) throw new Error('Invalid save file')
       return Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength)
@@ -697,12 +730,13 @@ class Server {
         return { worlds: worlds, activeWorldId: this.getMainGame() && this.getMainGame().getId(), serverUrl: serverUrl(), hosting: this.getHostingStatus() }
       },
       // rowCount and colCount are optional (Sector defaults to 128); chunks
-      // are 16 tiles, so a size must be a multiple of that
+      // are 16 tiles, so a size must be a multiple of that. There is no upper
+      // limit: a huge map is the player's call, bounded by their memory.
       createWorld: async ({ ownerUid, name, gameMode, rowCount, colCount } = {}) => {
         if (!validOwner(ownerUid) || typeof name !== 'string' || !/^[\p{L}\p{N} _-]{1,40}$/u.test(name.trim()) || !['peaceful', 'survival', 'hardcore'].includes(gameMode)) throw new Error('Invalid world details')
         rowCount = rowCount === undefined ? Constants.defaultWorldSize : rowCount
         colCount = colCount === undefined ? Constants.defaultWorldSize : colCount
-        if (!validWorldSize(rowCount) || !validWorldSize(colCount)) throw new Error('Map rows and columns must be multiples of ' + Constants.chunkRowCount + ' from ' + Constants.minWorldSize + ' to ' + Constants.maxWorldSize)
+        if (!validWorldSize(rowCount) || !validWorldSize(colCount)) throw new Error('Map rows and columns must be multiples of ' + Constants.chunkRowCount)
         let worldId = require('crypto').randomBytes(12).toString('hex')
         await this.activateStandaloneWorld({ worldId, ownerUid, name: name.trim(), gameMode, rowCount, colCount })
         return { worldId, serverUrl: serverUrl() }
@@ -710,6 +744,7 @@ class Server {
       // removes the world's save, thumbnail and registry row. The open world
       // is closed first, without saving.
       deleteWorld: async ({ worldId, ownerUid } = {}) => {
+        this.checkNoWorldLoading()
         await validOwnedWorld(worldId, ownerUid)
         let current = this.getMainGame()
         if (current && current.getId() === worldId) {
@@ -762,6 +797,11 @@ class Server {
         await this.activateStandaloneWorld({ worldId, ownerUid })
         this.startOnlineHosting()
         return { worldId, serverUrl: serverUrl(), hosting: this.getHostingStatus() }
+      },
+      // { loading }: the world being opened or created, with its stage
+      // ("starting", "terrain" or "regions") and progress from 0 to 1, or null
+      getWorldProgress: async () => {
+        return { loading: this.worldLoading ? Object.assign({}, this.worldLoading) : null }
       },
       // what the in-game colony menu shows the owner, such as the room code
       getHosting: async () => {

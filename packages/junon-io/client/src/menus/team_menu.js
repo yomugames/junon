@@ -6,6 +6,7 @@ const Helper = require("./../../../common/helper")
 const ClientHelper = require("./../util/client_helper")
 const LocalWorldApi = require("./../util/local_world_api")
 const RtcTransport = require("junon-common/rtc_transport")
+const OnlineCoop = require("./../util/online_coop")
 
 
 /*
@@ -20,6 +21,7 @@ class TeamMenu extends BaseMenu {
 
     this.el.querySelector(".room_code_input").addEventListener("click", this.onCopyRoomCodeClick.bind(this))
     this.el.querySelector(".copy_room_code_btn").addEventListener("click", this.onCopyRoomCodeClick.bind(this))
+    this.el.querySelector('.room_visibility_select').addEventListener('change', this.onRoomVisibilityChange.bind(this))
     this.el.querySelector(".member_management_container").addEventListener("click", this.onMemberListClick.bind(this))
 
     this.el.querySelector(".rename_btn").addEventListener("click", this.onRenameBtnClick.bind(this))
@@ -1201,7 +1203,15 @@ class TeamMenu extends BaseMenu {
   }
 
   renderScreenshots(sector) {
-    this.el.querySelector(".colony_screenshots_gallery").innerHTML = ""
+    const gallery = this.el.querySelector(".colony_screenshots_gallery")
+    gallery.innerHTML = ""
+
+    // WebRTC carries game traffic, not the host's HTTP screenshot files.
+    // Avoid making an invalid rtc: image request in a guest's colony menu.
+    if (this.game.main.gameConnection && this.game.main.gameConnection.url.startsWith('rtc:')) {
+      if (Object.keys(sector.screenshots).length) gallery.textContent = 'Colony previews are unavailable while joining online.'
+      return
+    }
 
     for (let key in sector.screenshots) {
       let el = "<div class='screenshot_entry' data-key='" + key + "'>" +
@@ -1829,6 +1839,7 @@ class TeamMenu extends BaseMenu {
     let entry = this.el.querySelector(".room_code_entry")
     if (!hosting || !hosting.isOnline || !this.isOpen()) {
       entry.style.display = 'none'
+      this.el.querySelector('.room_visibility_section').style.display = 'none'
       return
     }
 
@@ -1840,12 +1851,46 @@ class TeamMenu extends BaseMenu {
     if (hosting.roomCode) {
       input.value = RtcTransport.formatRoomCode(hosting.roomCode)
       copyBtn.style.display = 'inline-block'
+      this.el.querySelector('.room_visibility_section').style.display = 'block'
+      const select = this.el.querySelector('.room_visibility_select')
+      select.disabled = true
+      select.options[0].textContent = 'Checking…'
+      select.value = ''
+      this.el.querySelector('.room_visibility_error').textContent = ''
+      OnlineCoop.getVisibility().then((result) => this.showRoomVisibility(result.isPublic)).catch((error) => {
+        select.options[0].textContent = 'Unavailable'
+        this.el.querySelector('.room_visibility_error').textContent = error.message
+      })
     } else {
       input.value = i18n.t("OpeningRoom")
       copyBtn.style.display = 'none'
+      this.el.querySelector('.room_visibility_section').style.display = 'none'
       this.roomCodeTimeout = setTimeout(() => {
         if (this.isOpen()) this.renderRoomCode()
       }, 2000)
+    }
+  }
+
+  showRoomVisibility(isPublic) {
+    this.roomIsPublic = isPublic
+    const select = this.el.querySelector('.room_visibility_select')
+    select.value = isPublic ? 'public' : 'private'
+    select.disabled = false
+    this.el.querySelector('.room_visibility_error').textContent = ''
+  }
+
+  async onRoomVisibilityChange(event) {
+    const wasPublic = this.roomIsPublic
+    const isPublic = event.target.value === 'public'
+    if (isPublic === wasPublic) return
+    const select = this.el.querySelector('.room_visibility_select')
+    select.disabled = true
+    try {
+      const result = await OnlineCoop.setVisibility(isPublic)
+      this.showRoomVisibility(result.isPublic)
+    } catch (error) {
+      this.showRoomVisibility(wasPublic)
+      this.el.querySelector('.room_visibility_error').textContent = error.message
     }
   }
 

@@ -32,6 +32,16 @@ contextBridge.exposeInMainWorld("junonDesktop", {
     // { isAvailable, signalUrl }
     getStatus() {
       return ipcRenderer.invoke("junon:online-status")
+    },
+    async setVisibility(isPublic) {
+      const response = await ipcRenderer.invoke('junon:online-visibility', isPublic)
+      if (response.error) throw new Error(response.error)
+      return response.result
+    },
+    async getVisibility() {
+      const response = await ipcRenderer.invoke('junon:online-visibility', null)
+      if (response.error) throw new Error(response.error)
+      return response.result
     }
   },
 

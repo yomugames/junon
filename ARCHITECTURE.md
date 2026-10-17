@@ -87,6 +87,13 @@ connections, and main relays frames to the server, where
 `client/src/util/rtc_socket.js` carries the game socket for `rtc:<code>` URLs.
 Online co-op shows only when the desktop app knows a signalling server
 (`JUNON_SIGNAL_URL`, or a release default).
+Hosts can mark their online room Public or Private without changing its code.
+Public rooms appear in the signalling service's `/rooms` directory; Private is
+the default and rooms remain joinable by code in either mode. The Cloudflare
+Worker keeps public room codes in a Directory Durable Object and checks each
+against its live Room object before listing it. The Node backend uses its live
+room map. The directory stores no game state and carries no game traffic
+([implementation plan](docs/exec-plans/completed/public-room-browser.md)).
 
 ## Packages and responsibilities
 
@@ -169,6 +176,15 @@ which tests can also back with Node IPC (`JUNON_DESKTOP_IPC=1`).
   versions. The main-server messages (`rtcOpen`, `rtcFrame`, `rtcClose`,
   `rtcHosting`, `rtcRoom`, `rtcHostingFailed`) are documented in
   `server/util/rtc_socket_bridge.js` and `junon-desktop/src/rtc_host.js`.
+  Public browsing is an additive version 1 extension: host hello accepts
+  `isPublic` (default false), a host `visibility` message gets an
+  acknowledgement, and `GET /rooms` returns at most 100 live public rooms.
+  The host can send optional `details` with player count, capacity and a
+  bounded JPEG preview in its hello and later updates. The directory exposes
+  these only for live public rooms. The desktop polls the game server for
+  updates; guests still connect directly over WebRTC using the room code.
+  Older deployments cannot acknowledge a visibility change, so the desktop
+  reports a failure instead of claiming it succeeded.
 - Files under `protocol/save_formats/` preserve historical persisted-world
   compatibility, including saves exported from the hosted game; add a version
   rather than silently changing an old format.

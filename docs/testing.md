@@ -153,6 +153,12 @@ the owner's room code:
 ```sh
 NODE_ENV=standalone npm run client:build
 xvfb-run -a npm run screenshot --workspace packages/junon-desktop -- --online --colony-menu --copy --out /tmp/shots
+
+# show the visibility dropdown in the colony menu and hosting panel
+xvfb-run -a npm run screenshot --workspace packages/junon-desktop -- --online --colony-menu --public --hosting-menu --out /tmp/shots
+
+# show the public room browser before and after making the room private
+xvfb-run -a npm run screenshot --workspace packages/junon-desktop -- --online --colony-menu --public --join-menu --out /tmp/shots
 ```
 
 The desktop tests run with `JUNON_STEAM=0`. They check that the Steam preload
@@ -179,6 +185,12 @@ in `workerd` through Miniflare (`junon-signal/testing.js`). Other desktop tests 
 deployed signalling server, and check that online co-op is unavailable. Connections across real networks and NATs can
 only be checked by hand
 ([webrtc-coop.md](exec-plans/active/webrtc-coop.md#validation)).
+The same test checks that rooms start Private, become visible in the public
+browser when the host switches to Public, and disappear when switched back.
+The shared signalling suite checks visibility, code joins, and bounded room
+details on both backends. The desktop online co-op test checks the public
+directory's player count and saved screenshot preview through the real game
+server and room browser.
 
 `test/packaged.spec.js` runs a packaged build
 ([development.md](development.md#packaging)) instead of the sources. It
@@ -205,7 +217,7 @@ JUNON_PACKAGED_APP=release/linux-unpacked/junon-desktop xvfb-run -a npm run test
 | Startup/configuration | Start the server in the intended `NODE_ENV` (`standalone`, and `development` for `npm run server`) |
 | Server runtime, local menu, co-op | `test/server/standalone_*.test.js`; `standalone_server.test.js` boots a real server, checks save/reload, exercises the local world and import HTTP routes, checks the `ws` game socket, and covers co-op hosting (preflight, password challenge and proof, replay and throttling, guest upgrade checks, owner-profile refusal, stop and shutdown notices), world thumbnails, and the singleplayer pause |
 | Steam co-op transport | `test/server/steam_framing.test.js` (fragmentation, malformed input, send back-pressure) and `test/server/steam_coop.test.js` (forks the server with `JUNON_DESKTOP_IPC=1` and plays the desktop main process: hello and version check, Steam guests joining, owner-profile refusal, stop and shutdown notices), then `packages/junon-desktop/test/steam_relay.spec.js` |
-| Online co-op (WebRTC) | `npm test --workspace packages/junon-signal` (Node's test runner, one suite run against the Node server and the Cloudflare Worker in `workerd`: pairing, lookups, keepalive, throttling, room resume and expiry, guest lifetime, TURN credentials), `test/server/steam_coop.test.js` (the WebRTC case: `rtcHosting`, `rtcRoom`, hello check, guest addresses), then the desktop online co-op test |
+| Online co-op (WebRTC) | `npm test --workspace packages/junon-signal` (Node's test runner, one suite run against the Node server and the Cloudflare Worker in `workerd`: pairing, lookups, public visibility and directory, keepalive, throttling, room resume and expiry, guest lifetime, TURN credentials), `test/server/steam_coop.test.js` (the WebRTC case: `rtcHosting`, `rtcRoom`, hello check, guest addresses), then the desktop online co-op test |
 | Desktop shell (`packages/junon-desktop`) | `NODE_ENV=standalone npm run client:build`, then the desktop e2e test (see below) |
 | Player-facing flow across client and server | The closest `test/e2e` spec, or a new one |
 

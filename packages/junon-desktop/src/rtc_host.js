@@ -20,10 +20,11 @@ const SHUTDOWN_GRACE_MS = 3 * 1000
 // the room code (`rtcRoom`), or that the room couldn't be opened
 // (`rtcHostingFailed`).
 class RtcHost {
-  // signalUrl: the signalling server; postToServer(message)
-  constructor(signalUrl, postToServer) {
+  // signalUrl: the signalling server; postToServer(message); getRoomDetails()
+  constructor(signalUrl, postToServer, getRoomDetails) {
     this.signalUrl = signalUrl
     this.postToServer = postToServer
+    this.getRoomDetails = getRoomDetails
     this.window = null
     this.isWindowLoaded = false
     this.pendingCommands = []
@@ -35,6 +36,13 @@ class RtcHost {
     this.resolveOpening = null
     this.rejectOpening = null
     this.onStopped = null
+    this.isPublic = false
+    this.visibilityRequests = new Map()
+    this.nextVisibilityRequestId = 1
+    this.isHosting = false
+    this.detailsTimer = null
+    this.detailsGeneration = 0
+    this.lastDetailsJson = null
   }
 
   isHostWindow(webContents) {
@@ -76,6 +84,9 @@ class RtcHost {
   // rtcHosting from the server (Server#startOnlineHosting, #stopHosting)
   setHosting(message) {
     if (message.isHosting) {
+      this.stopDetailsUpdates()
+      this.isHosting = true
+      this.isPublic = false
       this.opening = new Promise((resolve, reject) => {
         this.resolveOpening = resolve
         this.rejectOpening = reject
@@ -90,16 +101,60 @@ class RtcHost {
         signalVersion: RtcTransport.SIGNAL_PROTOCOL_VERSION,
         channelLabel: RtcTransport.RTC_CHANNEL_LABEL,
         protocol: message.protocolHash,
-        worldName: message.worldName
+        worldName: message.worldName,
+        isPublic: false
       })
+      this.detailsTimer = setInterval(() => this.refreshDetails(), 5000)
+      this.refreshDetails()
       console.log("WebRTC: opening a co-op room")
     } else {
+      this.stopDetailsUpdates()
+      this.isHosting = false
+      this.isPublic = false
+      this.visibilityRequests.forEach((entry) => { clearTimeout(entry.timer); entry.reject(new Error('Online hosting ended')) })
+      this.visibilityRequests.clear()
       this.finishOpening(null)
       // the server has ended its guest sockets; whatever is left is dropped
       this.connections.clear()
       this.command({ type: "stop" })
       console.log("WebRTC: stopped accepting co-op connections")
     }
+  }
+
+  stopDetailsUpdates() {
+    clearInterval(this.detailsTimer)
+    this.detailsTimer = null
+    this.detailsGeneration += 1
+    this.lastDetailsJson = null
+  }
+
+  async refreshDetails() {
+    if (!this.isHosting || !this.getRoomDetails) return
+    const generation = this.detailsGeneration
+    try {
+      const details = await this.getRoomDetails()
+      if (!this.isHosting || generation !== this.detailsGeneration) return
+      const json = JSON.stringify(details)
+      if (json === this.lastDetailsJson) return
+      this.lastDetailsJson = json
+      this.command({ type: 'details', details: details })
+    } catch (error) {
+      // A world or its preview can still be loading; the next poll retries.
+    }
+  }
+
+  setVisibility(isPublic) {
+    if (typeof isPublic !== 'boolean') return Promise.reject(new Error('Choose Public or Private'))
+    if (!this.isHosting || !this.window || this.window.isDestroyed()) return Promise.reject(new Error('Host online first'))
+    const requestId = this.nextVisibilityRequestId++
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.visibilityRequests.delete(requestId)
+        reject(new Error('The online co-op service did not confirm the change'))
+      }, 10000)
+      this.visibilityRequests.set(requestId, { resolve, reject, timer })
+      this.command({ type: 'visibility', isPublic, requestId })
+    })
   }
 
   finishOpening(code, error) {
@@ -119,6 +174,19 @@ class RtcHost {
       if (!code) return
       this.postToServer({ type: "rtcRoom", code: code })
       this.finishOpening(code)
+    } else if (event.type === 'visibility') {
+      const pending = this.visibilityRequests.get(event.requestId)
+      if (!pending || typeof event.isPublic !== 'boolean') return
+      clearTimeout(pending.timer)
+      this.visibilityRequests.delete(event.requestId)
+      this.isPublic = event.isPublic
+      pending.resolve({ isPublic: this.isPublic })
+    } else if (event.type === 'visibilityError') {
+      const pending = this.visibilityRequests.get(event.requestId)
+      if (!pending) return
+      clearTimeout(pending.timer)
+      this.visibilityRequests.delete(event.requestId)
+      pending.reject(new Error(String(event.message || 'Could not change room visibility')))
     } else if (event.type === "failed") {
       this.postToServer({ type: "rtcHostingFailed" })
       this.finishOpening(null, new Error(String(event.message).slice(0, 200)))

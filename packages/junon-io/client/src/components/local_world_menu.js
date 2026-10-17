@@ -454,7 +454,7 @@ class LocalWorldMenu {
       return
     }
 
-    container.innerHTML = '<p>Friends join online with this room code:</p><input class="room_code black_input" readonly> <button class="copy_room_code ui_btn">Copy</button>'
+    container.innerHTML = '<p>Friends join online with this room code:</p><div class="hosting_detail_row room_code_row"><label class="hosting_detail_label" for="host_room_code">Room code</label><input id="host_room_code" class="room_code black_input" readonly> <button class="copy_room_code ui_btn">Copy</button></div><div class="hosting_detail_row room_visibility_row"><label class="hosting_detail_label" for="host_visibility_select">Visibility</label><select id="host_visibility_select" class="room_visibility_select" disabled><option value="">Checking…</option><option value="private">Private</option><option value="public">Public</option></select></div><p class="room_visibility_hint">Private rooms are joinable by code.</p>'
     const input = container.querySelector('.room_code')
     input.value = RtcTransport.formatRoomCode(roomCode)
     const copy = container.querySelector('.copy_room_code')
@@ -463,6 +463,34 @@ class LocalWorldMenu {
       document.execCommand('copy')
       copy.textContent = 'Copied'
     })
+    const select = container.querySelector('.room_visibility_select')
+    const hint = container.querySelector('.room_visibility_hint')
+    let isPublic = null
+    const showVisibility = (isPublic) => {
+      select.value = isPublic ? 'public' : 'private'
+      select.disabled = false
+      hint.textContent = isPublic ? 'This room appears in the server browser.' : 'Private rooms are joinable by code.'
+    }
+    OnlineCoop.getVisibility().then((result) => {
+      isPublic = result.isPublic
+      showVisibility(isPublic)
+    }).catch((error) => {
+      select.options[0].textContent = 'Unavailable'
+      hint.textContent = 'Visibility unavailable.'
+      this.message.textContent = error.message
+    })
+    select.addEventListener('change', () => this.run(async () => {
+      const previous = isPublic
+      select.disabled = true
+      try {
+        const result = await OnlineCoop.setVisibility(select.value === 'public')
+        isPublic = result.isPublic
+        showVisibility(isPublic)
+      } catch (error) {
+        showVisibility(previous)
+        throw error
+      }
+    }))
   }
 
   // the invite controls of a world hosted on Steam: Steam's own invite
@@ -524,12 +552,21 @@ class LocalWorldMenu {
 
   joinWorld() {
     this.setActive('join')
-    const onlineSection = this.onlineStatus.isAvailable ? '<h3>Online</h3><label>Room code <input class="join_room_code black_input" maxlength="9" placeholder="K7QF-2M9X" autocomplete="off"></label><button class="join_online ui_btn">Join</button>' : ''
+    const browserSection = this.onlineStatus.isAvailable
+      ? '<section class="join_browser_section"><div class="public_rooms_heading"><h3>Public rooms</h3><button class="refresh_online_rooms ui_btn">Refresh</button></div><div class="online_rooms empty">Looking for public rooms…</div><p class="join_browser_note">Private rooms can be joined with a code.</p></section>'
+      : ''
+    const codeSection = this.onlineStatus.isAvailable
+      ? '<section class="join_method"><h3>Join with code</h3><label for="join_room_code">Room code</label><div class="join_inline_controls"><input id="join_room_code" class="join_room_code black_input" maxlength="9" placeholder="K7QF-2M9X" autocomplete="off"><button class="join_online ui_btn">Join</button></div></section>'
+      : ''
     const addressHeading = this.steamStatus.isAvailable || this.onlineStatus.isAvailable ? '<h3>By address</h3>' : ''
-    this.panel.innerHTML = '<h2>Join co-op</h2><div class="join_steam"></div>' + onlineSection + addressHeading + '<label>Address <input class="join_address black_input" placeholder="192.168.1.10:' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="join_password black_input" type="password" maxlength="64" placeholder="if the host set one"></label><button class="connect_world ui_btn">Join</button>'
+    this.panel.innerHTML = '<h2>Join co-op</h2><div class="join_steam"></div><div class="join_layout' + (this.onlineStatus.isAvailable ? '' : ' no_browser') + '">' + browserSection + '<div class="join_methods">' + codeSection + '<section class="join_method join_address_section">' + addressHeading + '<label>Address <input class="join_address black_input" placeholder="192.168.1.10:' + DEFAULT_HOST_PORT + '"></label><label>Password <input class="join_password black_input" type="password" maxlength="64" placeholder="if the host set one"></label><button class="connect_world ui_btn">Join by address</button></section></div></div>'
     if (this.steamStatus.isAvailable) this.renderSteamHosts(this.panel.querySelector('.join_steam'))
     const onlineButton = this.panel.querySelector('.join_online')
     if (onlineButton) onlineButton.addEventListener('click', () => this.run(() => this.joinOnlineRoom(this.panel.querySelector('.join_room_code').value)))
+    if (this.onlineStatus.isAvailable) {
+      this.panel.querySelector('.refresh_online_rooms').addEventListener('click', () => this.renderOnlineRooms())
+      this.renderOnlineRooms()
+    }
     this.panel.querySelector('.connect_world').addEventListener('click', () => this.run(async () => {
       this.saveName()
       const address = this.panel.querySelector('.join_address').value.trim()
@@ -543,6 +580,51 @@ class LocalWorldMenu {
       this.el.style.display = 'none'
       this.main.joinStandaloneWorld()
     }))
+  }
+
+  renderOnlineRooms() {
+    const list = this.panel.querySelector('.online_rooms')
+    if (!list) return
+    list.textContent = 'Looking for public rooms…'
+    list.classList.add('empty')
+    this.run(async () => {
+      const rooms = await OnlineCoop.listRooms()
+      if (!list.isConnected) return
+      list.textContent = rooms.length ? '' : 'No public rooms are available.'
+      list.classList.toggle('empty', !rooms.length)
+      rooms.forEach((room) => {
+        const entry = document.createElement('div')
+        entry.className = 'online_room'
+        const preview = document.createElement('div')
+        preview.className = 'online_room_preview'
+        if (room.thumbnail) {
+          const image = document.createElement('img')
+          image.src = room.thumbnail
+          image.alt = ''
+          preview.appendChild(image)
+        } else {
+          preview.textContent = 'No preview'
+        }
+        const details = document.createElement('div')
+        details.className = 'online_room_details'
+        const label = document.createElement('span')
+        label.className = 'online_room_name'
+        label.textContent = room.worldName || 'Unnamed world'
+        const players = document.createElement('span')
+        players.className = 'online_room_players'
+        players.textContent = room.playerCount === null ? 'Players unavailable' : room.playerCount + ' / ' + room.maxPlayers + ' players'
+        details.appendChild(label)
+        details.appendChild(players)
+        const button = document.createElement('button')
+        button.className = 'online_room_join ui_btn'
+        button.textContent = 'Join'
+        button.addEventListener('click', () => this.run(() => this.joinOnlineRoom(room.code)))
+        entry.appendChild(preview)
+        entry.appendChild(details)
+        entry.appendChild(button)
+        list.appendChild(entry)
+      })
+    })
   }
 
 }

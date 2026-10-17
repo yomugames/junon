@@ -6,10 +6,11 @@
 //
 // Commands from main:
 //   start { signalUrl, signalVersion, channelLabel, protocol, worldName }
-//   send { peerId, chunks }, close { peerId, isGraceful }, stop
+//   visibility { isPublic, requestId }, send { peerId, chunks },
+//   close { peerId, isGraceful }, stop
 // Events to main:
 //   room { code }, failed { message }, open { peerId, address },
-//   data { peerId, data }, close { peerId }, stopped
+//   data { peerId, data }, close { peerId }, stopped, visibility
 
 const SIGNAL_TIMEOUT_MS = 10 * 1000
 // The signalling connection stays open while hosting. A ping every
@@ -45,6 +46,8 @@ window.rtcHost.onCommand((command) => {
   if (command.type === "stop") stop()
   if (command.type === "send") send(command.peerId, command.chunks)
   if (command.type === "close") closePeer(command.peerId, command.isGraceful, false)
+  if (command.type === 'visibility') setVisibility(command)
+  if (command.type === 'details') setDetails(command)
 })
 
 function emit(message) {
@@ -106,7 +109,9 @@ function connectSignal() {
       protocol: config.protocol,
       worldName: config.worldName,
       code: room ? room.code : undefined,
-      token: room ? room.token : undefined
+      token: room ? room.token : undefined,
+      isPublic: config.isPublic === true,
+      details: config.details
     }))
   }
 
@@ -148,6 +153,20 @@ function sendSignal(message) {
   if (signal && signal.readyState === WebSocket.OPEN) signal.send(JSON.stringify(message))
 }
 
+function setVisibility(command) {
+  if (!config || !room || !signal || signal.readyState !== WebSocket.OPEN) {
+    emit({ type: 'visibilityError', requestId: command.requestId, message: 'The online room is reconnecting. Try again shortly.' })
+    return
+  }
+  sendSignal({ type: 'visibility', isPublic: command.isPublic, requestId: command.requestId })
+}
+
+function setDetails(command) {
+  if (!config) return
+  config.details = command.details
+  sendSignal({ type: 'details', details: command.details })
+}
+
 function onSignal(ws, message) {
   if (message.type === "hosted") {
     reconnectAttempts = 0
@@ -155,6 +174,9 @@ function onSignal(ws, message) {
     let isNewCode = !room || room.code !== message.code
     room = { code: message.code, token: message.token }
     if (isNewCode) emit({ type: "room", code: message.code })
+  } else if (message.type === 'visibility' && typeof message.isPublic === 'boolean') {
+    config.isPublic = message.isPublic
+    emit({ type: 'visibility', isPublic: message.isPublic, requestId: message.requestId })
   } else if (message.type === "error") {
     ws.errorMessage = String(message.message || "The online co-op service refused to host.")
   } else if (message.type === "peer") {

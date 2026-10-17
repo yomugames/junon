@@ -79,6 +79,60 @@ for (const backend of BACKENDS) {
       assert.strictEqual(SignalServer.normalizeCode(42), null)
     })
 
+    test('lists only public live rooms and keeps private rooms joinable by code', async () => {
+      const list = async () => (await (await fetch(server.url.replace(/^ws/, 'http') + '/rooms')).json()).rooms
+      const privateHost = await host()
+      assert.deepStrictEqual(await list(), [])
+
+      const guest = await join(privateHost.hosted.code)
+      await guest.next('joined')
+      await guest.sendJson({ type: 'visibility', isPublic: true, requestId: 1 })
+      assert.strictEqual((await guest.next('error')).code, 'bad_request')
+      await guest.closed
+      assert.deepStrictEqual(await list(), [])
+
+      await privateHost.sendJson({ type: 'visibility', isPublic: true, requestId: 1 })
+      assert.deepStrictEqual(await privateHost.next('visibility'), { type: 'visibility', isPublic: true, requestId: 1, taken: true })
+      assert.deepStrictEqual(await list(), [{ code: privateHost.hosted.code, worldName: 'Moonbase', protocol: PROTOCOL }])
+
+      await privateHost.sendJson({ type: 'visibility', isPublic: false, requestId: 2 })
+      await privateHost.next('visibility')
+      assert.deepStrictEqual(await list(), [])
+
+      const publicHost = await host({ isPublic: true })
+      assert.deepStrictEqual(await list(), [{ code: publicHost.hosted.code, worldName: 'Moonbase', protocol: PROTOCOL }])
+      publicHost.close()
+      await publicHost.closed
+      assert.deepStrictEqual(await list(), [])
+      privateHost.close()
+    })
+
+    test('lists a public room with host-supplied player count and preview updates', async () => {
+      const list = async () => (await (await fetch(server.url.replace(/^ws/, 'http') + '/rooms')).json()).rooms
+      const thumbnail = 'data:image/jpeg;base64,' + Buffer.from([0xff, 0xd8, 0xff, 0xd9]).toString('base64')
+      const first = { playerCount: 1, maxPlayers: 20, thumbnail }
+      const hostWs = await host({ isPublic: true, details: first })
+      assert.deepStrictEqual(await list(), [{ code: hostWs.hosted.code, worldName: 'Moonbase', protocol: PROTOCOL, ...first }])
+
+      const next = { playerCount: 2, maxPlayers: 20, thumbnail: null }
+      await hostWs.sendJson({ type: 'details', details: next })
+      // The details update has no acknowledgement; a following visibility
+      // acknowledgement proves the signal backend processed it first.
+      await hostWs.sendJson({ type: 'visibility', isPublic: true, requestId: 1 })
+      await hostWs.next('visibility')
+      assert.deepStrictEqual(await list(), [{ code: hostWs.hosted.code, worldName: 'Moonbase', protocol: PROTOCOL, ...next }])
+
+      await hostWs.sendJson({ type: 'details', details: { ...next, code: '22222222' } })
+      assert.strictEqual((await hostWs.next('error')).code, 'bad_request')
+      await hostWs.closed
+      assert.deepStrictEqual(await list(), [])
+
+      const invalidCount = await host({ isPublic: true })
+      await invalidCount.sendJson({ type: 'details', details: { playerCount: 21, maxPlayers: 20, thumbnail: null } })
+      assert.strictEqual((await invalidCount.next('error')).code, 'bad_request')
+      await invalidCount.closed
+    })
+
     test('pairs a guest with the host and relays signals both ways', async () => {
       const hostWs = await host()
       assert.match(hostWs.hosted.code, /^[2-9A-HJKMNP-TV-Z]{8}$/)

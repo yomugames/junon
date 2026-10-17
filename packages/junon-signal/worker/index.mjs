@@ -1,7 +1,7 @@
 import { DurableObject } from 'cloudflare:workers'
 import {
   SIGNAL_PROTOCOL_VERSION, DEFAULT_ICE_SERVERS, PING, PONG, LIMITS, MESSAGES,
-  normalizeCode, generateCode, isValidProtocol, cleanWorldName, isSignalData, iceServersWithTurn
+  normalizeCode, generateCode, isValidProtocol, isValidRoomDetails, cleanWorldName, isSignalData, iceServersWithTurn
 } from '../src/protocol.mjs'
 
 // The signalling server on Cloudflare: the protocol of src/signal_server.js
@@ -87,6 +87,9 @@ export default {
   async fetch(request, env) {
     let url = new URL(request.url)
     if (url.pathname === '/health') return new Response('ok')
+    if (request.method === 'GET' && url.pathname === '/rooms') {
+      return env.DIRECTORY.get(env.DIRECTORY.idFromName('public')).fetch('http://internal/rooms')
+    }
     if (request.headers.get('Upgrade') !== 'websocket') return new Response('Not found', { status: 404 })
 
     if (Number(url.searchParams.get('v')) !== SIGNAL_PROTOCOL_VERSION) return refuse('version', MESSAGES.version)
@@ -129,6 +132,38 @@ export default {
     }
 
     return refuse('bad_request', MESSAGES.unexpected)
+  }
+}
+
+// The global public index stores only room codes. Every browse request checks
+// the room object before returning metadata, so a stale or closed room cannot
+// remain visible after a host disconnects.
+export class Directory extends DurableObject {
+  constructor(ctx, env) {
+    super(ctx, env)
+    this.env = env
+  }
+
+  async fetch(request) {
+    let url = new URL(request.url)
+    if (request.method === 'PUT' && url.pathname.startsWith('/room/')) {
+      await this.ctx.storage.put(url.pathname.slice(6), true)
+      return new Response('ok')
+    }
+    if (request.method === 'DELETE' && url.pathname.startsWith('/room/')) {
+      await this.ctx.storage.delete(url.pathname.slice(6))
+      return new Response('ok')
+    }
+    if (request.method !== 'GET' || url.pathname !== '/rooms') return new Response('Not found', { status: 404 })
+
+    let codes = await this.ctx.storage.list({ limit: 100 })
+    let rooms = []
+    for (let code of codes.keys()) {
+      let response = await this.env.ROOMS.get(this.env.ROOMS.idFromName(code)).fetch('http://internal/directory-status')
+      if (response.ok) rooms.push(await response.json())
+      else await this.ctx.storage.delete(code)
+    }
+    return Response.json({ rooms: rooms }, { headers: { 'Cache-Control': 'no-store', 'Access-Control-Allow-Origin': '*' } })
   }
 }
 
@@ -175,10 +210,11 @@ export class AddressLimits extends DurableObject {
 // tagged 'host', 'guest' plus 'peer:<peerId>', or 'lookup'; each has an
 // attachment { role, peerId, isHello, helloBy, expiresAt, connectedAt,
 // messageCount, messageWindowStart }. Storage holds 'room':
-// { code, token, protocol, worldName, hostGoneAt }.
+// { code, token, protocol, worldName, isPublic, details, hostGoneAt }.
 export class Room extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env)
+    this.env = env
     this.config = config(env)
     // answered by Cloudflare while the room hibernates
     ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair(PING, PONG))
@@ -242,6 +278,11 @@ export class Room extends DurableObject {
     let code = request.headers.get('X-Junon-Code')
     let room = await this.ctx.storage.get('room')
 
+    if (request.method === 'GET' && new URL(request.url).pathname === '/directory-status') {
+      if (!room || !room.isPublic || !this.activeHost()) return new Response('Not found', { status: 404 })
+      return Response.json({ code: room.code, worldName: room.worldName, protocol: room.protocol, ...(room.details || {}) })
+    }
+
     if (role === 'host' && (room || this.sockets('host').length > 0)) return new Response('Taken', { status: 409 })
     if (role === 'resume' && !room) return new Response('Gone', { status: 404 })
     if (role === 'join' || role === 'lookup') {
@@ -301,7 +342,7 @@ export class Room extends DurableObject {
     if (!message || typeof message !== 'object' || typeof message.type !== 'string') return this.fail(ws, 'bad_request', MESSAGES.malformed)
 
     if (!attachment.isHello) return this.onHello(ws, attachment, message)
-    if (attachment.role === 'host') return this.onHostMessage(message)
+    if (attachment.role === 'host') return this.onHostMessage(ws, message)
     if (attachment.role === 'join') return this.onGuestMessage(ws, attachment, message)
   }
 
@@ -331,6 +372,7 @@ export class Room extends DurableObject {
 
   async onHost(ws, attachment, message) {
     if (!isValidProtocol(message.protocol)) return this.fail(ws, 'bad_request', MESSAGES.invalidProtocol)
+    if (message.details !== undefined && !isValidRoomDetails(message.details)) return this.fail(ws, 'bad_request', MESSAGES.malformed)
 
     let room = await this.ctx.storage.get('room')
     if (room) {
@@ -341,6 +383,8 @@ export class Room extends DurableObject {
 
     room.protocol = message.protocol
     room.worldName = cleanWorldName(message.worldName)
+    room.isPublic = message.isPublic === true
+    room.details = message.details || null
     room.hostGoneAt = null
     await this.ctx.storage.put('room', room)
 
@@ -350,10 +394,34 @@ export class Room extends DurableObject {
     })
 
     this.send(ws, { type: 'hosted', code: room.code, token: room.token, iceServers: await this.iceServers() })
+    await this.setDirectory(room)
     await this.scheduleAlarm()
   }
 
-  onHostMessage(message) {
+  async setDirectory(room) {
+    let directory = this.env.DIRECTORY.get(this.env.DIRECTORY.idFromName('public'))
+    await directory.fetch('http://internal/room/' + room.code, { method: room.isPublic && this.activeHost() ? 'PUT' : 'DELETE' })
+  }
+
+  async onHostMessage(ws, message) {
+    if (message.type === 'details') {
+      if (!isValidRoomDetails(message.details)) return this.fail(ws, 'bad_request', MESSAGES.malformed)
+      let room = await this.ctx.storage.get('room')
+      if (!room) return
+      room.details = message.details
+      await this.ctx.storage.put('room', room)
+      return
+    }
+    if (message.type === 'visibility') {
+      if (typeof message.isPublic !== 'boolean' || !Number.isSafeInteger(message.requestId) || message.requestId < 1) return this.fail(ws, 'bad_request', MESSAGES.malformed)
+      let room = await this.ctx.storage.get('room')
+      if (!room) return
+      room.isPublic = message.isPublic
+      await this.ctx.storage.put('room', room)
+      await this.setDirectory(room)
+      this.send(ws, { type: 'visibility', isPublic: room.isPublic, requestId: message.requestId })
+      return
+    }
     let guest = typeof message.peerId === 'string' && this.sockets('peer:' + message.peerId)[0]
     if (!guest) return
 
@@ -402,6 +470,7 @@ export class Room extends DurableObject {
     if (!room) return
     room.hostGoneAt = Date.now()
     await this.ctx.storage.put('room', room)
+    await this.setDirectory(room)
 
     this.sockets('guest').forEach((guest) => this.fail(guest, 'host_left', MESSAGES.hostLeft))
     await this.scheduleAlarm()

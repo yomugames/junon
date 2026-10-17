@@ -142,6 +142,17 @@ function registerIpc() {
     return { isAvailable: !!SIGNAL_URL, signalUrl: SIGNAL_URL }
   })
 
+  ipcMain.handle('junon:online-visibility', async (event, isPublic) => {
+    if (!isAppFrame(event.senderFrame)) return { error: 'Forbidden' }
+    if (!rtcHost) return { error: 'Online co-op is not available' }
+    if (isPublic === null) return { result: { isPublic: rtcHost.isPublic } }
+    try {
+      return { result: await rtcHost.setVisibility(isPublic) }
+    } catch (e) {
+      return { error: e.message }
+    }
+  })
+
   ipcMain.on("junon:rtc-host-event", (event, message) => {
     if (!rtcHost || !rtcHost.isHostWindow(event.sender)) return
     rtcHost.onWindowEvent(message)
@@ -293,7 +304,7 @@ async function start() {
   protocol.handle("app", serveClient)
   registerIpc()
   initSteam()
-  if (SIGNAL_URL) rtcHost = new RtcHost(SIGNAL_URL, (message) => serverProcess.post(message))
+  if (SIGNAL_URL) rtcHost = new RtcHost(SIGNAL_URL, (message) => serverProcess.post(message), () => serverProcess.request('getOnlineRoomDetails'))
 
   serverProcess = new ServerProcess({
     savesDir: path.join(app.getPath("userData"), "saves"),

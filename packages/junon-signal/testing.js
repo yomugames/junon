@@ -34,7 +34,7 @@ async function startSignalBackend(backend, options = {}) {
     scriptPath: path.join(__dirname, 'worker/index.mjs'),
     modulesRoot: __dirname,
     compatibilityDate: '2026-07-01',
-    durableObjects: { ROOMS: 'Room', LIMITS: 'AddressLimits' },
+    durableObjects: { ROOMS: 'Room', LIMITS: 'AddressLimits', DIRECTORY: 'Directory' },
     bindings: bindings
   })
   const url = await mf.ready

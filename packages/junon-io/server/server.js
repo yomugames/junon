@@ -22,6 +22,7 @@ const http = require("http")
 const express = require("express")
 const bodyParser = require('body-parser')
 const fs = require("fs")
+const Sharp = require("sharp")
 const Polyglot = require('node-polyglot')
 const englishTranslationMap = require('../common/translations/en')
 const japaneseTranslationMap = require('../common/translations/ja')
@@ -729,6 +730,16 @@ class Server {
         let worlds = await Promise.all(rows.map(async (row) => ({ id: row.uid, name: row.name, mode: row.gameMode, days: row.daysAlive, thumbnail: await this.readWorldThumbnail(row.screenshot) })))
         return { worlds: worlds, activeWorldId: this.getMainGame() && this.getMainGame().getId(), serverUrl: serverUrl(), hosting: this.getHostingStatus() }
       },
+      getOnlineRoomDetails: async () => {
+        let game = this.onlineHost && this.getMainGame()
+        if (!game || !game.sector) throw new Error('No online room is being hosted')
+        let row = await SectorModel.findOne({ where: { uid: game.getId() }, attributes: ['screenshot'] })
+        return {
+          playerCount: game.getPlayerCount(),
+          maxPlayers: game.getMaxPlayers(),
+          thumbnail: await this.readPublicRoomThumbnail(row && row.screenshot)
+        }
+      },
       // rowCount and colCount are optional (Sector defaults to 128); chunks
       // are 16 tiles, so a size must be a multiple of that. There is no upper
       // limit: a huge map is the player's call, bounded by their memory.
@@ -1082,6 +1093,30 @@ class Server {
       let data = await fs.promises.readFile(filePath)
       return "data:image/jpeg;base64," + data.toString("base64")
     } catch(e) {
+      return null
+    }
+  }
+
+  // A small JPEG fits in a signalling message and can be listed for public
+  // rooms. Cache by screenshot token; player counts are still read live.
+  async readPublicRoomThumbnail(screenshot) {
+    if (typeof screenshot !== 'string' || !/^[a-f0-9]{32}$/.test(screenshot)) return null
+    if (this.onlineRoomThumbnailCache && this.onlineRoomThumbnailCache.key === screenshot) return this.onlineRoomThumbnailCache.data
+
+    try {
+      const source = await fs.promises.readFile(Game.prototype.getLocalImagePath(screenshot + '_thumb.jpg'))
+      let data = null
+      for (const [width, quality] of [[160, 55], [120, 40]]) {
+        const jpeg = await Sharp(source).resize(width, Math.round(width * 0.8)).jpeg({ quality: quality }).toBuffer()
+        const base64 = jpeg.toString('base64')
+        if (base64.length <= 8192) {
+          data = 'data:image/jpeg;base64,' + base64
+          break
+        }
+      }
+      this.onlineRoomThumbnailCache = { key: screenshot, data: data }
+      return data
+    } catch (e) {
       return null
     }
   }

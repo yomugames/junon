@@ -266,6 +266,17 @@ for (const backend of ['node', 'worker']) test(`hosts online with a room code, a
     await host.page.evaluate(() => window.game.teamMenu.open())
     await expect(host.page.locator('.room_code_input')).toHaveValue(hosting.roomCode.slice(0, 4) + '-' + hosting.roomCode.slice(4))
     await expect(host.page.locator('.copy_room_code_btn')).toBeVisible()
+    await expect(host.page.locator('.room_visibility_section .room_visibility_select')).toHaveValue('private')
+    const publicRooms = async () => (await (await fetch(signal.url.replace(/^ws/, 'http') + '/rooms')).json()).rooms
+    expect(await publicRooms()).toEqual([])
+    await host.page.selectOption('.room_visibility_section .room_visibility_select', 'public')
+    await expect(host.page.locator('.room_visibility_section .room_visibility_select')).toHaveValue('public')
+    await expect.poll(publicRooms).toMatchObject([{
+      code: hosting.roomCode, worldName: 'Online World', protocol: await host.page.evaluate(() => window.protocolHash),
+      playerCount: 1, maxPlayers: 20
+    }])
+    await host.page.evaluate(() => window.game.screenshot())
+    await expect.poll(async () => (await publicRooms())[0]?.thumbnail, { timeout: 30_000 }).toMatch(/^data:image\/jpeg;base64,/)
     await host.page.evaluate(() => window.game.teamMenu.close())
 
     guest = await launch(guestDataDir, onlineEnv)
@@ -275,6 +286,10 @@ for (const backend of ['node', 'worker']) test(`hosts online with a room code, a
       await guest.page.fill('.join_room_code', code)
       await guest.page.click('.join_online')
     }
+    await guest.page.click('.local_join_btn')
+    await expect(guest.page.locator('.online_room')).toHaveText(/Online World/)
+    await expect(guest.page.locator('.online_room_players')).toHaveText('1 / 20 players')
+    await expect(guest.page.locator('.online_room_preview img')).toBeVisible()
 
     await joinWith('ABCD-EFGH')
     await expect(guest.page.locator('.local_menu_message')).toHaveText(/No world is being hosted with that code/)
@@ -290,11 +305,12 @@ for (const backend of ['node', 'worker']) test(`hosts online with a room code, a
     await expect(guest.page.locator('.local_menu_message')).toHaveText(/^Version mismatch/)
     otherVersion.close()
 
-    // typed as a player might
-    await joinWith((hosting.roomCode.slice(0, 4) + '-' + hosting.roomCode.slice(4)).toLowerCase())
+    // browsing joins through the same room-code path
+    await guest.page.click('.online_room_join')
     await guest.page.waitForFunction(() => !!window.player, null, { timeout: 120_000 })
     expect(await guest.page.evaluate(() => [window.game.sector.name, window.player.name, window.game.gameConnection.socket.url])).toEqual(['Online World', 'Guest', 'rtc:' + hosting.roomCode])
     await host.page.waitForFunction(() => Object.values(window.game.sector.players).some((player) => player.name === 'Guest'), null, { timeout: 30_000 })
+    await expect.poll(async () => (await publicRooms())[0]?.playerCount, { timeout: 30_000 }).toBe(2)
 
     // a dropped connection reconnects on its own, through the room again
     await guest.page.evaluate(() => {
@@ -314,6 +330,10 @@ for (const backend of ['node', 'worker']) test(`hosts online with a room code, a
     await host.page.click('.local_host_btn')
     await expect(host.page.locator('.host_summary')).toHaveText('Hosting Online World online.')
     await expect(host.page.locator('.room_code')).toHaveValue(hosting.roomCode.slice(0, 4) + '-' + hosting.roomCode.slice(4))
+    await expect(host.page.locator('.online_hosting .room_visibility_select')).toHaveValue('public')
+    await host.page.selectOption('.online_hosting .room_visibility_select', 'private')
+    await expect(host.page.locator('.online_hosting .room_visibility_select')).toHaveValue('private')
+    await expect.poll(publicRooms).toEqual([])
 
     // stopping tells the guest why, and closes the room
     await host.page.click('.stop_hosting')
@@ -346,8 +366,8 @@ for (const backend of ['node', 'worker']) test(`hosts online with a room code, a
     expect(guest.errors).toEqual([])
     guest = null
   } finally {
-    if (host) await quit(host.app)
-    if (guest) await quit(guest.app)
+    if (host) await quit(host.app).catch(() => {})
+    if (guest) await quit(guest.app).catch(() => {})
     await signal.stop()
     fs.rmSync(guestDataDir, { recursive: true, force: true })
   }

@@ -13,7 +13,10 @@
 // Options:
 //   --online         host the world online, so the owner gets a room code
 //   --colony-menu    open the colony menu (P) on its Info tab
+//   --hosting-menu   show the homepage's active online hosting panel
+//   --join-menu      show the homepage's Public rooms browser
 //   --copy           with --colony-menu: click Copy next to the room code too
+//   --public         with --online --colony-menu: show the room as Public
 //   --out <dir>      where to write the PNGs (default: <tmp>/junon-screenshots)
 const { _electron: electron } = require('@playwright/test')
 const fs = require('fs')
@@ -26,16 +29,22 @@ const APP_DIR = path.resolve(__dirname, '..')
 const CHROMIUM_ARGS = ['--ignore-gpu-blocklist', '--enable-unsafe-swiftshader']
 
 function parseArgs(argv) {
-  const options = { online: false, colonyMenu: false, copy: false, out: path.join(os.tmpdir(), 'junon-screenshots') }
+  const options = { online: false, colonyMenu: false, hostingMenu: false, joinMenu: false, copy: false, public: false, out: path.join(os.tmpdir(), 'junon-screenshots') }
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]
     if (arg === '--online') options.online = true
     else if (arg === '--colony-menu') options.colonyMenu = true
+    else if (arg === '--hosting-menu') options.hostingMenu = true
+    else if (arg === '--join-menu') options.joinMenu = true
     else if (arg === '--copy') options.copy = true
+    else if (arg === '--public') options.public = true
     else if (arg === '--out' && argv[i + 1]) options.out = path.resolve(argv[++i])
     else throw new Error('Unknown option ' + arg + '. See the comment at the top of scripts/screenshot.js.')
   }
   if (options.copy && !options.colonyMenu) throw new Error('--copy needs --colony-menu')
+  if (options.public && (!options.online || !options.colonyMenu)) throw new Error('--public needs --online and --colony-menu')
+  if (options.hostingMenu && !options.online) throw new Error('--hosting-menu needs --online')
+  if (options.joinMenu && !options.online) throw new Error('--join-menu needs --online')
   return options
 }
 
@@ -55,7 +64,13 @@ async function main() {
   const saved = []
   const save = async (name, locator) => {
     const file = path.join(options.out, name + '.png')
-    await (locator || page).screenshot({ path: file })
+    if (locator) {
+      const box = await locator.boundingBox()
+      if (!box) throw new Error('The menu is not visible for a screenshot')
+      await page.screenshot({ path: file, clip: box, timeout: 60_000 })
+    } else {
+      await page.screenshot({ path: file, timeout: 60_000 })
+    }
     saved.push(file)
   }
   let page
@@ -83,6 +98,14 @@ async function main() {
     await page.waitForTimeout(2000)
     await save('game')
 
+    if (options.public && options.joinMenu) {
+      await page.evaluate(() => window.game.screenshot())
+      await page.waitForFunction(async () => {
+        const details = await window.junonDesktop.localWorldApi('listWorlds', [])
+        return !!details.worlds.find((world) => world.name === 'Screenshot World' && world.thumbnail)
+      }, null, { timeout: 30_000 })
+    }
+
     if (options.colonyMenu) {
       // the game takes keys once the canvas has focus
       await page.mouse.click(640, 400)
@@ -90,13 +113,61 @@ async function main() {
       const menu = page.locator('#manage_team_menu')
       await menu.waitFor({ state: 'visible', timeout: 10_000 })
       if (options.online) await page.locator('.room_code_entry').waitFor({ state: 'visible', timeout: 10_000 })
+      if (options.public) {
+        await page.waitForFunction(() => document.querySelector('.room_visibility_section .room_visibility_select').value === 'private')
+        await save('colony_menu_private', menu)
+        await page.selectOption('.room_visibility_section .room_visibility_select', 'public')
+        await page.waitForFunction(() => document.querySelector('.room_visibility_section .room_visibility_select').value === 'public')
+        if (options.joinMenu) {
+          await page.waitForFunction(async (url) => {
+            const rooms = (await (await fetch(url)).json()).rooms
+            return rooms.some((room) => room.thumbnail && room.playerCount === 1 && room.maxPlayers === 20)
+          }, signal.url.replace(/^ws/, 'http') + '/rooms', { timeout: 30_000 }).catch(async (error) => {
+            const rooms = await (await fetch(signal.url.replace(/^ws/, 'http') + '/rooms')).json()
+            throw new Error(error.message + ': ' + JSON.stringify(rooms.rooms.map((room) => ({
+              playerCount: room.playerCount, maxPlayers: room.maxPlayers,
+              thumbnailLength: room.thumbnail && room.thumbnail.length
+            }))))
+          })
+        }
+      }
       await page.waitForTimeout(500)
       await save('colony_menu_screen')
-      await save('colony_menu', menu)
+      await save(options.public ? 'colony_menu_public' : 'colony_menu', menu)
 
       if (options.copy) {
         await page.click('.copy_room_code_btn')
         await save('colony_menu_copied', menu)
+      }
+    }
+    if (options.hostingMenu) {
+      await page.evaluate(() => window.main.onExitGameMenuBtnClick())
+      await page.locator('#local_world_menu').waitFor({ state: 'visible', timeout: 30_000 })
+      await page.click('.local_host_btn')
+      await page.waitForFunction(() => ['private', 'public'].includes(document.querySelector('.online_hosting .room_visibility_select')?.value), null, { timeout: 10_000 })
+      await save('hosting_menu')
+    }
+    if (options.joinMenu) {
+      if (!options.hostingMenu) {
+        await page.evaluate(() => window.main.onExitGameMenuBtnClick())
+        await page.locator('#local_world_menu').waitFor({ state: 'visible', timeout: 30_000 })
+      }
+      await page.click('.local_join_btn')
+      if (options.public) {
+        await page.locator('.online_room').waitFor({ state: 'visible', timeout: 10_000 })
+        await page.waitForFunction(() => !!document.querySelector('.online_room_preview img') &&
+          /^\d+ \/ 20 players$/.test(document.querySelector('.online_room_players')?.textContent || ''), null, { timeout: 30_000 })
+        await save('join_menu_public')
+        await page.click('.local_host_btn')
+        await page.waitForFunction(() => document.querySelector('.online_hosting .room_visibility_select')?.value === 'public', null, { timeout: 10_000 })
+        await page.selectOption('.online_hosting .room_visibility_select', 'private')
+        await page.waitForFunction(() => document.querySelector('.online_hosting .room_visibility_hint')?.textContent === 'Private rooms are joinable by code.', null, { timeout: 10_000 })
+        await page.click('.local_join_btn')
+        await page.getByText('No public rooms are available.').waitFor({ state: 'visible', timeout: 10_000 })
+        await save('join_menu_private')
+      } else {
+        await page.getByText('No public rooms are available.').waitFor({ state: 'visible', timeout: 10_000 })
+        await save('join_menu_private')
       }
     }
   } finally {

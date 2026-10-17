@@ -13,10 +13,18 @@ class_name = "Room"
 name = "LIMITS"
 class_name = "AddressLimits"
 
+[[durable_objects.bindings]]
+name = "DIRECTORY"
+class_name = "Directory"
+
 # SQLite-backed Durable Objects (available on the free plan)
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Room", "AddressLimits"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Directory"]
 
 # [vars]
 # ICE_SERVERS = '[{"urls":"stun:stun.cloudflare.com:3478"}]'

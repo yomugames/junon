@@ -89,6 +89,16 @@ menu" block in `client/stylesheets/style.css`.
   `GET /local/host` in a browser) each time the menu opens.
   Join: a room code field and Join. The code is checked with the signalling
   server first, so a wrong code or another version shows in the menu message.
+  The owner's in-game Info tab has a Visibility section above the room code,
+  with a Room label and a Private/Public dropdown aligned and styled like the
+  Members role dropdown. Both dropdowns align with the colony info values and
+  room code. The active Host panel labels Room code and Visibility in matching
+  rows, with the input and dropdown aligned in the same column.
+  Rooms start Private; Public adds them to the browser under Join co-op, and
+  switching back removes them. Either way, the code still works. The browser shows only rooms using
+  the current game's protocol hash and offers a Refresh button. Join co-op
+  shows Public rooms as the main browser, with code and address joining in a
+  separate column. On narrower windows, these sections stack.
   With Steam or online co-op, the address form gets a "By address" heading.
 - Switching panels clears the previous panel's error message.
 - When the game server refuses a join (`CantJoin`, e.g. a name already in the
@@ -112,7 +122,20 @@ are `.steam_lobby_type`, `.start_steam_hosting`, `.steam_invite_dialog`,
 `.steam_friend .steam_invite`, `.steam_host .steam_join` and `.steam_refresh`;
 the hosting view's `.host_summary` and `.steam_hosting_summary`. The online
 controls are `.start_online_hosting`, `.room_code`, `.copy_room_code`,
-`.join_room_code` and `.join_online`. The desktop tests use them. A new local
+`.room_visibility_select`, `.online_room`, `.refresh_online_rooms`,
+`.join_room_code` and `.join_online`. The in-game control is
+the same `.room_visibility_select` dropdown in its own
+`.room_visibility_section` above the room code. The section uses a
+Members-style heading. The active hosting panel has the same Public/Private
+choice.
+Public browser entries display a live player count, maximum player count and
+the saved colony screenshot thumbnail. Hosts send a resized, bounded JPEG to
+signalling; it updates while hosting. If a world has no screenshot, or an
+older signalling service omits the details, the browser shows a preview and
+count placeholder. Private rooms never appear in the directory.
+The public browser preview is independent of the in-game screenshot gallery;
+the latter uses host HTTP image paths and is unavailable to WebRTC guests.
+The desktop tests use them. A new local
 world API method must be added to `client/src/util/local_world_api.js` and to
 `LOCAL_WORLD_API_METHODS` in `packages/junon-desktop/src/main.js`, or the
 client can't call it and the desktop app rejects it.

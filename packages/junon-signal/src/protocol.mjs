@@ -19,6 +19,7 @@ export const PONG = 'pong'
 
 export const LIMITS = {
   maxPayload: 16 * 1024,
+  maxRoomThumbnailBase64: 8192,
   helloTimeoutMs: 10 * 1000,
   // a guest only needs the room until its data channel is open
   guestLifetimeMs: 60 * 1000,
@@ -31,6 +32,19 @@ export const LIMITS = {
   // messages per connection per window
   maxMessages: 200,
   messageWindowMs: 10 * 1000
+}
+
+export function isValidRoomDetails(details) {
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return false
+  if (Object.keys(details).some((key) => !['playerCount', 'maxPlayers', 'thumbnail'].includes(key))) return false
+  if (!Number.isInteger(details.playerCount) || details.playerCount < 0 || details.playerCount > 100) return false
+  if (!Number.isInteger(details.maxPlayers) || details.maxPlayers < 1 || details.maxPlayers > 100) return false
+  if (details.playerCount > details.maxPlayers) return false
+  if (details.thumbnail === null) return true
+  if (typeof details.thumbnail !== 'string' || details.thumbnail.length > LIMITS.maxRoomThumbnailBase64 + 23) return false
+  if (!details.thumbnail.startsWith('data:image/jpeg;base64,')) return false
+  const base64 = details.thumbnail.slice(23)
+  return base64.length > 0 && base64.length <= LIMITS.maxRoomThumbnailBase64 && base64.length % 4 === 0 && /^[A-Za-z0-9+/]+={0,2}$/.test(base64)
 }
 
 export const MESSAGES = {

@@ -19,7 +19,7 @@ const Protocol = require('./protocol.mjs')
 // first message instead. JSON text messages; the first one from a client says
 // what it is:
 //
-//   host:   { type: 'host', version, protocol, worldName, code?, token? }
+//   host:   { type: 'host', version, protocol, worldName, code?, token?, isPublic?, details? }
 //           -> { type: 'hosted', code, token, iceServers }
 //           code and token reclaim the host's room after a dropped
 //           connection; an expired room gets a new code, a wrong token an
@@ -34,7 +34,13 @@ const Protocol = require('./protocol.mjs')
 //   to the host:    { type: 'peer', peerId }, { type: 'peerLeft', peerId },
 //                   { type: 'signal', peerId, data }
 //   from the host:  { type: 'signal', peerId, data }, { type: 'drop', peerId }
+//                   { type: 'visibility', isPublic, requestId }
+//           -> { type: 'visibility', isPublic, requestId }
+//                   { type: 'details', details: { playerCount, maxPlayers, thumbnail } }
 //   guest <-> here: { type: 'signal', data }
+// GET /rooms lists at most 100 live public rooms as { rooms: [{ code,
+// worldName, protocol, playerCount?, maxPlayers?, thumbnail? }] }.
+// Private rooms still join by code. thumbnail is a bounded JPEG data URL.
 //
 // data is an object the peers define (an SDP description or a candidate). A
 // refusal is { type: 'error', code, message } followed by a close; codes:
@@ -65,7 +71,7 @@ const hmacSha1Base64 = (secret, text) => crypto.createHmac('sha1', secret).updat
 class SignalServer {
   constructor(options = {}) {
     this.options = Object.assign({}, DEFAULTS, options)
-    // code -> { code, token, host, protocol, worldName, address, guests: Map(peerId -> ws), expireTimer }
+    // code -> { code, token, host, protocol, worldName, isPublic, address, guests: Map(peerId -> ws), expireTimer }
     this.rooms = new Map()
     this.connectionCounts = new Map()
     this.failedLookups = new Map()
@@ -78,6 +84,12 @@ class SignalServer {
 
   listen(port, host) {
     this.httpServer = http.createServer((req, res) => {
+      if (req.method === 'GET' && req.url === '/rooms') {
+        const rooms = Array.from(this.rooms.values()).filter((room) => room.host && room.isPublic)
+          .slice(0, 100).map((room) => Object.assign({ code: room.code, worldName: room.worldName, protocol: room.protocol }, room.details || {}))
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'Access-Control-Allow-Origin': '*' })
+        return res.end(JSON.stringify({ rooms: rooms }))
+      }
       res.writeHead(req.url === '/health' ? 200 : 404, { 'Content-Type': 'text/plain' })
       res.end(req.url === '/health' ? 'ok' : 'Not found')
     })
@@ -212,6 +224,7 @@ class SignalServer {
 
   async onHost(ws, message) {
     if (!Protocol.isValidProtocol(message.protocol)) return this.fail(ws, 'bad_request', Protocol.MESSAGES.invalidProtocol)
+    if (message.details !== undefined && !Protocol.isValidRoomDetails(message.details)) return this.fail(ws, 'bad_request', Protocol.MESSAGES.malformed)
 
     let code = Protocol.normalizeCode(message.code)
     let room = code && this.rooms.get(code)
@@ -230,6 +243,8 @@ class SignalServer {
     room.host = ws
     room.protocol = message.protocol
     room.worldName = Protocol.cleanWorldName(message.worldName)
+    room.isPublic = message.isPublic === true
+    room.details = message.details || null
     ws.junon.role = 'host'
     ws.junon.room = room
 
@@ -278,6 +293,17 @@ class SignalServer {
 
   onHostMessage(ws, message) {
     let room = ws.junon.room
+    if (message.type === 'details') {
+      if (!Protocol.isValidRoomDetails(message.details)) return this.fail(ws, 'bad_request', Protocol.MESSAGES.malformed)
+      room.details = message.details
+      return
+    }
+    if (message.type === 'visibility') {
+      if (typeof message.isPublic !== 'boolean' || !Number.isSafeInteger(message.requestId) || message.requestId < 1) return this.fail(ws, 'bad_request', Protocol.MESSAGES.malformed)
+      room.isPublic = message.isPublic
+      this.send(ws, { type: 'visibility', isPublic: room.isPublic, requestId: message.requestId })
+      return
+    }
     let guest = typeof message.peerId === 'string' && room.guests.get(message.peerId)
     if (!guest) return
 

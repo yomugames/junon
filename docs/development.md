@@ -396,6 +396,12 @@ controls only when it knows a signalling server:
 | --- | --- |
 | `JUNON_SIGNAL_URL` | Desktop app: the signalling server, `ws://` or `wss://`, in place of `DEFAULT_SIGNAL_URL` in `packages/junon-desktop/src/main.js` (the deployed Cloudflare Worker). `off` turns online co-op off; the desktop tests set it. |
 
+Online rooms start Private. The owner can switch Public/Private in the
+Visibility section above the room code; public rooms appear in Join co-op's browser. `GET /rooms` on the
+signalling service serves that directory (CORS enabled) and returns at most
+100 live rooms. An updated Cloudflare deployment needs the `Directory`
+Durable Object binding and its `v2` migration in `wrangler.toml`.
+
 To try it on one machine, run the signalling server, then two desktop
 instances with separate user-data directories:
 

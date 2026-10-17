@@ -454,7 +454,7 @@ class LocalWorldMenu {
       return
     }
 
-    container.innerHTML = '<p>Friends join online with this room code:</p><div class="hosting_detail_row room_code_row"><label class="hosting_detail_label" for="host_room_code">Room code</label><input id="host_room_code" class="room_code black_input" readonly> <button class="copy_room_code ui_btn">Copy</button></div><div class="hosting_detail_row room_visibility_row"><label class="hosting_detail_label" for="host_visibility_select">Visibility</label><select id="host_visibility_select" class="room_visibility_select" disabled><option value="">Checking…</option><option value="private">Private</option><option value="public">Public</option></select></div><p class="room_visibility_hint">Private rooms are joinable by code.</p>'
+    container.innerHTML = '<p>Friends join online with this room code:</p><div class="hosting_detail_row room_code_row"><label class="hosting_detail_label" for="host_room_code">Room code</label><input id="host_room_code" class="room_code black_input" readonly> <button class="copy_room_code ui_btn">Copy</button></div><div class="hosting_detail_row room_visibility_row"><label class="hosting_detail_label" for="host_visibility_select">Visibility</label><select id="host_visibility_select" class="room_visibility_select visibility_pending" disabled><option value="private">Private</option><option value="public">Public</option></select></div><p class="room_visibility_hint"></p>'
     const input = container.querySelector('.room_code')
     input.value = RtcTransport.formatRoomCode(roomCode)
     const copy = container.querySelector('.copy_room_code')
@@ -468,6 +468,7 @@ class LocalWorldMenu {
     let isPublic = null
     const showVisibility = (isPublic) => {
       select.value = isPublic ? 'public' : 'private'
+      select.classList.remove('visibility_pending')
       select.disabled = false
       hint.textContent = isPublic ? 'This room appears in the server browser.' : 'Private rooms are joinable by code.'
     }
@@ -475,7 +476,6 @@ class LocalWorldMenu {
       isPublic = result.isPublic
       showVisibility(isPublic)
     }).catch((error) => {
-      select.options[0].textContent = 'Unavailable'
       hint.textContent = 'Visibility unavailable.'
       this.message.textContent = error.message
     })

@@ -3913,6 +3913,10 @@ body.imposter_mode #welcome_hud .game_info {
     opacity: 0.6;
 }
 
+.room_visibility_select.visibility_pending {
+    visibility: hidden;
+}
+
 .room_visibility_hint {
     margin: 6px 0 0;
     color: #8f9ba8;

@@ -114,7 +114,10 @@ async function main() {
       await menu.waitFor({ state: 'visible', timeout: 10_000 })
       if (options.online) await page.locator('.room_code_entry').waitFor({ state: 'visible', timeout: 10_000 })
       if (options.public) {
-        await page.waitForFunction(() => document.querySelector('.room_visibility_section .room_visibility_select').value === 'private')
+        await page.waitForFunction(() => {
+          const select = document.querySelector('.room_visibility_section .room_visibility_select')
+          return select.value === 'private' && !select.disabled
+        })
         await save('colony_menu_private', menu)
         await page.selectOption('.room_visibility_section .room_visibility_select', 'public')
         await page.waitForFunction(() => document.querySelector('.room_visibility_section .room_visibility_select').value === 'public')

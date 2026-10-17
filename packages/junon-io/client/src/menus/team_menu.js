@@ -1854,11 +1854,9 @@ class TeamMenu extends BaseMenu {
       this.el.querySelector('.room_visibility_section').style.display = 'block'
       const select = this.el.querySelector('.room_visibility_select')
       select.disabled = true
-      select.options[0].textContent = 'Checking…'
-      select.value = ''
+      select.classList.add('visibility_pending')
       this.el.querySelector('.room_visibility_error').textContent = ''
       OnlineCoop.getVisibility().then((result) => this.showRoomVisibility(result.isPublic)).catch((error) => {
-        select.options[0].textContent = 'Unavailable'
         this.el.querySelector('.room_visibility_error').textContent = error.message
       })
     } else {
@@ -1875,6 +1873,7 @@ class TeamMenu extends BaseMenu {
     this.roomIsPublic = isPublic
     const select = this.el.querySelector('.room_visibility_select')
     select.value = isPublic ? 'public' : 'private'
+    select.classList.remove('visibility_pending')
     select.disabled = false
     this.el.querySelector('.room_visibility_error').textContent = ''
   }

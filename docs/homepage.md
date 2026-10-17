@@ -128,6 +128,8 @@ the same `.room_visibility_select` dropdown in its own
 `.room_visibility_section` above the room code. The section uses a
 Members-style heading. The active hosting panel has the same Public/Private
 choice.
+Both visibility dropdowns contain only Public and Private; their space stays
+reserved while the current state loads.
 Public browser entries display a live player count, maximum player count and
 the saved colony screenshot thumbnail. Hosts send a resized, bounded JPEG to
 signalling; it updates while hosting. If a world has no screenshot, or an

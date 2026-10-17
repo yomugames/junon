@@ -584,12 +584,9 @@ class Sector {
   }
 
   initChunks() {
-    const numOfTilesInRow  = this.getColCount()
-    const numOfTilesInCol  = this.getRowCount()
-
     this.chunks = {}
-    this.NUM_CHUNKS_IN_ROW = numOfTilesInRow / Constants.chunkColCount
-    this.NUM_CHUNKS_IN_COL = numOfTilesInCol / Constants.chunkRowCount
+    this.NUM_CHUNK_ROWS = this.getRowCount() / Constants.chunkRowCount
+    this.NUM_CHUNK_COLS = this.getColCount() / Constants.chunkColCount
   }
 
   getChunkRegionById(id) {
@@ -597,8 +594,8 @@ class Sector {
   }
 
   getChunk(row, col) {
-    if (row < 0 || row > this.NUM_CHUNKS_IN_ROW - 1) return null
-    if (col < 0 || col > this.NUM_CHUNKS_IN_COL - 1) return null
+    if (row < 0 || row >= this.NUM_CHUNK_ROWS) return null
+    if (col < 0 || col >= this.NUM_CHUNK_COLS) return null
 
     let chunkKey = Chunk.getKey(row, col)
     if (!this.chunks[chunkKey]) {

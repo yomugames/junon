@@ -38,6 +38,10 @@ changes:
 npm run client:build
 ```
 
+For terrain visibility on rectangular worlds, run
+`test/client/sector_chunks.test.js`; it checks that the client accepts the last
+chunk in both 64×128 and 128×64 maps and rejects chunks past either edge.
+
 ## End-to-end tests
 
 Playwright's own Chromium must be installed once per machine

@@ -174,3 +174,15 @@ server really applied the change instead of the client having predicted it.
 At handoff, name the exact commands run and their outcomes. If MySQL, credentials,
 native modules, browsers, or external services prevented validation, state that
 constraint and the narrower checks that did run.
+
+## Local Firebase integration
+
+With Java 21+ installed, run `npm run test:firebase` from the root. This boots
+Auth/Realtime Database emulators under the demo project, verifies tokens in both
+services (including forged UID/invalid-token rejection), calls the real account
+HTTP handler and colony creation handler against disposable SQLite, and verifies
+Realtime Database writes. It does not touch development MySQL or retained emulator
+accounts. Stop your development emulators first because the ports are shared.
+The `.integration.js` filename intentionally keeps this out of ordinary Jest runs.
+SQLite verifies SQL persistence paths; it does not replace a manual MySQL-backed
+sign-in, registration and colony creation check using docs/development.md.

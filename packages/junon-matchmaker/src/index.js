@@ -2,15 +2,13 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../../../.e
 
 global.env = process.env.NODE_ENV || 'development'
 // Mirrors junon-io/server/server.js: NODE_ENV=test needs the same debug
-// behavior as development (sqlite db, non-SSL port 3000, no Firebase/AWS
-// credentials required) so it can run in Jest and E2E test harnesses alike.
+// behavior as development (including non-SSL port 3000), with isolated SQLite
+// and no Firebase/AWS credentials so Jest and E2E harnesses can run independently.
 global.debugMode = (env === 'development' || env === 'test') ? true : false
 
-// Firebase is an optional production integration. Local runs must not require
-// Application Default Credentials just because the machine has network access.
-if (debugMode && process.env.JUNON_USE_FIREBASE !== 'true') {
-  global.isOffline = true
-}
+// Unit/e2e tests retain their explicit isolated mode. Development uses local
+// Firebase emulators and keeps SQL account and sector persistence enabled.
+if (env === 'test') global.isOffline = true
 
 global.PLAYER_CAPACITY_PER_SECTOR = 5
 global.MAX_SECTORS_PER_SERVER = 8
@@ -106,6 +104,7 @@ class MatchmakerServer {
   }
 
   async run() {
+    await require('junon-common/firebase_emulators')(env)
     if (env === 'test') {
       // sqlite :memory: (see db/config.js) starts with no schema at all -
       // real MySQL gets its schema from db/migrations, but that never runs
@@ -247,7 +246,7 @@ class MatchmakerServer {
   }
 
   async getUidFromRequest(idToken, uid) {
-    if (debugMode) return uid
+    if (env === 'test') return uid
     return await FirebaseAdminHelper.verifyIdToken(idToken)
   }
 
@@ -2875,19 +2874,8 @@ class MatchmakerServer {
 
 let isCalledDirectly = require.main === module
 if (isCalledDirectly) {
-  if (debugMode) {
-    require("dns").lookup("www.google.com", (err) => {
-      if (err) {
-        global.isOffline = true
-      }
-
-      global.server = new MatchmakerServer()
-      global.server.run()
-    })
-  } else {
-    global.server = new MatchmakerServer()
-    global.server.run()
-  }
+  global.server = new MatchmakerServer()
+  global.server.run()
 }
 
 

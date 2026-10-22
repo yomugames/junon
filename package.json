@@ -7,7 +7,9 @@
     "matchmaker": "npm run start --workspace packages/junon-matchmaker",
     "test": "npm run test --workspace packages/junon-io",
     "client:build": "npm run client:build --workspace packages/junon-io",
-    "db:setup": "npm run db:setup --workspace packages/junon-common"
+    "db:setup": "npm run db:setup --workspace packages/junon-common",
+    "firebase:emulators": "firebase emulators:start --only auth,database --project demo-junon-local --import .firebase-data --export-on-exit .firebase-data",
+    "test:firebase": "firebase emulators:exec --only auth,database --project demo-junon-local \"npm exec --workspace packages/junon-io -- jest test/server/firebase_emulator.integration.js --runInBand --testMatch=**/firebase_emulator.integration.js\""
   },
   "workspaces": [
     "packages/*"
@@ -25,5 +27,8 @@
   },
   "allowScripts": {
     "sqlite3@6.0.1": true
+  },
+  "devDependencies": {
+    "firebase-tools": "15.34.1"
   }
 }

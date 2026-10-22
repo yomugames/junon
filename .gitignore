@@ -16,3 +16,10 @@ packages/junon-io/test-results/
 packages/junon-io/playwright-report/
 .env
 .env*
+
+# Local emulator users/data and diagnostics
+.firebase/
+.firebase-data/
+firebase-debug.log*
+database-debug.log*
+ui-debug.log*

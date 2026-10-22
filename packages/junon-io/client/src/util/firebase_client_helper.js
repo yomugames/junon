@@ -43,7 +43,6 @@ class FirebaseClientHelper {
     // }
 
     firebase.auth().signInWithPopup(provider).then((result) => {
-      let token = result.credential.accessToken
       let user = result.user
 
       this.onSignInSuccessful(user)
@@ -77,6 +76,11 @@ class FirebaseClientHelper {
 
   static initFirebase(callback) {
     firebase.initializeApp(Config[env].firebase)
+    if (env === 'development') {
+      firebase.auth().useEmulator('http://' + Config[env].firebaseEmulators.auth)
+      // This legacy database SDK predates useEmulator(); the local databaseURL
+      // above selects the emulator and explicit namespace instead.
+    }
     this.googleProvider = new firebase.auth.GoogleAuthProvider()
     this.facebookProvider = new firebase.auth.FacebookAuthProvider()
 

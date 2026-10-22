@@ -1,7 +1,7 @@
 const { applicationDefault, initializeApp } = require('firebase-admin/app')
 const { getAuth } = require('firebase-admin/auth')
 const { getDatabase } = require('firebase-admin/database')
-const Config = require("junon-common/config")
+const firebaseOptions = require("junon-common/firebase_options")
 const LOG = require('junon-common/logger')
 
 const admin = {
@@ -16,10 +16,7 @@ class FirebaseAdminHelper {
     if (global.isOffline) return false
 
     if (!global.isFirebaseInitialized) {
-      admin.initializeApp({
-        credential: admin.credential.applicationDefault(),
-        databaseURL: Config[env].firebase.databaseURL
-      })
+      admin.initializeApp(firebaseOptions(env, admin.credential.applicationDefault))
 
       global.isFirebaseInitialized = true
     }

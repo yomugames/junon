@@ -63,11 +63,9 @@ global.appRoot = path.resolve(__dirname + '/../')
 
 debugMode = (env === 'development' || env === 'test') ? true : false
 
-// Firebase is an optional production integration. Local runs must not require
-// Application Default Credentials just because the machine has network access.
-if (debugMode && process.env.JUNON_USE_FIREBASE !== 'true') {
-  global.isOffline = true
-}
+// Unit/e2e tests retain their explicit isolated mode. Development uses local
+// Firebase emulators and keeps SQL account and sector persistence enabled.
+if (env === 'test') global.isOffline = true
 
 // NODE_ENV=test normally isolates the game server from the matchmaker entirely
 // (no outbound socket, no heartbeat) so Jest unit tests never open real
@@ -144,6 +142,7 @@ class Server {
   }
 
   async run() {
+    await require('junon-common/firebase_emulators')(env)
     if (env === 'test') {
       // sqlite :memory: (see junon-common/db/config.js) starts with no schema
       // at all - real MySQL gets its schema from db/migrations, which never
@@ -546,7 +545,8 @@ class Server {
   }
 
   async getUidFromRequest(idToken, uid) {
-    if (debugMode || !idToken) return uid
+    if (env === 'test') return uid
+    if (env !== 'development' && !idToken) return uid
     return await FirebaseAdminHelper.verifyIdToken(idToken)
   }
 
@@ -1604,19 +1604,8 @@ class Server {
 
 let isCalledDirectly = require.main === module
 if (isCalledDirectly) {
-  if (debugMode) {
-    require("dns").lookup("www.google.com", (err) => {
-      if (err) {
-        global.isOffline = true
-      }
-
-      global.server = new Server()
-      global.server.run()
-    })
-  } else {
-    global.server = new Server()
-    global.server.run()
-  }
+  global.server = new Server()
+  global.server.run()
 }
 
 global.JunonServer = Server

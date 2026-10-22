@@ -96,7 +96,11 @@ new process globals require explicit justification in an execution plan.
 ## Runtime dependencies
 
 Local full-stack development requires Node.js 26.4.0, npm workspaces, and MySQL.
-Firebase, AWS, Sentry, DNS, and production host metadata are environment-specific.
+Development uses loopback Firebase Auth and Realtime Database emulators with a
+shared demo project ID; local MySQL account/sector persistence stays enabled.
+Tests retain isolated offline behavior. Staging/production use remote Firebase
+and Application Default Credentials. AWS, Sentry, DNS, and production host
+metadata are environment-specific.
 Development paths bypass or default some integrations; do not assume a successful
 local boot proves production integration behavior.
 

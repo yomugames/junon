@@ -27,6 +27,13 @@ real credentials.
 
 ## Dependencies
 
+After dependency changes, commit the updated `package-lock.json` and check it
+with `npm ci --dry-run --ignore-scripts --no-audit --no-fund`. This validates
+the clean-install dependency graph without replacing local `node_modules`.
+If npm reports an out-of-sync lockfile, run
+`npm install --package-lock-only --ignore-scripts --no-audit --no-fund`, review
+the lockfile diff, and repeat the check.
+
 `npm audit` is expected to run clean of critical advisories. Several entries in
 the workspace manifests are declared but never required (they only widened the
 vulnerable surface), so before upgrading a flagged package, check whether
@@ -205,9 +212,10 @@ them along with six moderates. The shipped bundle barely changed - 314 bytes -
 which is the direct evidence that none of it was ever bundled.
 
 Verify a change here against the built artifact, not just the build exit code.
-Firebase is off in `development` and `test` (`server.js` sets `global.isOffline`
-unless `JUNON_USE_FIREBASE=true`), so neither Jest nor the e2e suite exercises
-sign-in; a broken namespace would still let every suite pass. Load the built
+Development uses Firebase emulators; ordinary Jest and gameplay e2e tests use
+isolated test mode and do not exercise sign-in. Run `npm run test:firebase` for
+emulator authentication and SQL persistence coverage; a broken browser namespace
+can still let server tests pass. Load the built
 vendor bundle in a browser and confirm `window.firebase` still carries
 `initializeApp`, `apps`, `auth()`, `database()` and
 `auth.GoogleAuthProvider` / `auth.FacebookAuthProvider` - the surface
@@ -307,10 +315,53 @@ initializing configuration, including when their workspace scripts are run
 directly. Keep this file uncommitted. `direnv` remains useful when local setup
 requires `.envrc` shell logic beyond environment variables stored in `.env`.
 
-Firebase is disabled by default in `development` and `test`, so local startup
-does not need Google Application Default Credentials. To intentionally exercise
-Firebase in a credentialed local environment, set `JUNON_USE_FIREBASE=true` in
-your uncommitted `.env` file. Do not use that flag with placeholder credentials.
+### Local Firebase and accounts
+
+Development always uses the local `demo-junon-local` Firebase project. No Google
+login, service-account file, or Application Default Credentials are needed.
+`JUNON_USE_FIREBASE` is retired; remove it from existing local `.env` files.
+
+The Firebase CLI is pinned as a development dependency. Install Java 21 or newer
+for the Realtime Database emulator, then start these in
+separate terminals after `npm install` and `npm run db:setup`:
+
+```sh
+npm run firebase:emulators
+npm run client
+npm run server
+```
+
+`npm run serveronly` and `npm run matchmaker` can replace the combined server.
+Start emulators first. Auth listens on 127.0.0.1:9099, Realtime Database on
+127.0.0.1:9000, and the inspection UI on http://127.0.0.1:4000. First startup
+downloads emulator components. All services and the development browser use these
+fixed loopback endpoints from `junon-common/config.json` and `firebase.json`.
+The legacy browser database SDK uses an HTTP database URL with an explicit
+namespace rather than the newer `useEmulator()` method. See the official
+[Auth](https://firebase.google.com/docs/emulator-suite/connect_auth) and
+[Realtime Database](https://firebase.google.com/docs/emulator-suite/connect_rtdb)
+emulator connection guides.
+
+Use the normal Google/Facebook login buttons: the emulator supplies a local
+provider screen, without contacting those identity providers. Complete Junon's
+username registration to create the matching user in local MySQL
+(`junon_development`). Normal colonies create SQL sector records with the
+verified account UID; guest colonies also create SQL records. Use separate
+browser profiles to test multiple accounts, ownership and friends.
+
+Emulator accounts and database state are imported from `.firebase-data/` when
+present and exported there on graceful shutdown. Keep this ignored directory
+alongside your local SQL database: deleting emulator accounts without resetting
+SQL can leave ownership pointing at identities that no longer exist. World saves
+continue to use the existing development filesystem paths. Emulator database
+rules are local-only and must never be deployed to a hosted Firebase project.
+
+Development no longer switches to offline mode based on public DNS availability.
+Missing emulators are a setup error; start them rather than enabling `isOffline`.
+`NODE_ENV=test` retains isolated offline behavior for existing Jest/gameplay e2e
+suites. Staging and production still use their existing remote Firebase config
+and Application Default Credentials. Emulator token verification is enabled in
+development; supplied client UIDs are no longer accepted as account identity.
 
 Do not invent placeholder production credentials to make local startup pass.
 Prefer focused tests for isolated code and report unavailable integrations.

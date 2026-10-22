@@ -27,6 +27,13 @@ real credentials.
 
 ## Dependencies
 
+After dependency changes, commit the updated `package-lock.json` and check it
+with `npm ci --dry-run --ignore-scripts --no-audit --no-fund`. This validates
+the clean-install dependency graph without replacing local `node_modules`.
+If npm reports an out-of-sync lockfile, run
+`npm install --package-lock-only --ignore-scripts --no-audit --no-fund`, review
+the lockfile diff, and repeat the check.
+
 `npm audit` is expected to run clean of critical advisories. Several entries in
 the workspace manifests are declared but never required (they only widened the
 vulnerable surface), so before upgrading a flagged package, check whether

@@ -95,7 +95,7 @@ new process globals require explicit justification in an execution plan.
 
 ## Runtime dependencies
 
-Local full-stack development requires Node.js 26.4.0, npm workspaces, and MySQL.
+Local full-stack development requires Node.js 26.12.1, npm workspaces, and MySQL.
 Development uses loopback Firebase Auth and Realtime Database emulators with a
 shared demo project ID; local MySQL account/sector persistence stays enabled.
 Tests retain isolated offline behavior. Staging/production use remote Firebase

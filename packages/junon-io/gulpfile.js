@@ -380,6 +380,9 @@ function compileIndex(language) {
       gameVersion: gameVersion,
       protocolHash: protocolHash,
       language: language,
+      // the deployed site only links to the desktop download now; development
+      // builds (npm run client, e2e) still serve the playable client
+      downloadOnly: isProduction,
       test_vm: process.env.TEST_VM,
       assetPath: function(path){
         return manifest[path];

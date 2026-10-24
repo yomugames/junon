@@ -8146,6 +8146,39 @@ body.imposter_mode .minigame_poster {
     text-decoration: underline;
 }
 
+#download_page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    background: #0b1825 url(./../assets/images/background/space.jpg) center / cover no-repeat;
+}
+
+#download_page_content {
+    width: 100%;
+    max-width: 840px;
+    text-align: center;
+}
+
+#download_page_caption {
+    margin: 0 0 20px;
+    color: white;
+    font-family: 'Pixelforce';
+    font-size: 64px;
+    font-weight: normal;
+}
+
+.itch_download_widget {
+    display: block;
+    width: 552px;
+    max-width: 100%;
+    height: 167px;
+    margin: 0 auto 16px;
+    border: 0;
+}
+
 .home_action_row {
     display: block;
     margin-bottom: 10px;

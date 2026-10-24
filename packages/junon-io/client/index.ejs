@@ -37,6 +37,9 @@
 
 </head>
 <body class='<%= nodeEnv %>'>
+<% if (downloadOnly) { %>
+    <%- include('./download') %>
+<% } else { %>
     <div class="wrapper">
         <%- include('./main') %>
     </div>
@@ -473,6 +476,7 @@
     </script>
     <script src="/<%= assetPath('vendor.js') %>"></script>
     <script src="/<%= assetPath('app.js') %>"   ></script>
+<% } %>
 </body>
 <div id="fb-root"></div>
 </html>

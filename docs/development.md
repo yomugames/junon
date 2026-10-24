@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Node.js 26.4.0 (declared by the root `.nvmrc`)
+- Node.js 26.12.1 (declared by the root `.nvmrc`)
 - npm with workspace support
 - MySQL for database-backed paths
 - system libraries required by native npm dependencies such as `sharp` and

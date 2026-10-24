@@ -1,7 +1,7 @@
 Installation
 ==========
 
-1. Install node 16.15.0
+1. Install Node.js 26.12.1
 2. Install mysql
 
 3. go to ~/junon-matchmaker directory

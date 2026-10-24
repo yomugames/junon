@@ -303,6 +303,13 @@ development HTTP port defaults to 8000 in code; the historical README mentions
 8001, so confirm the URL printed by the running processes rather than relying on
 the old value.
 
+The online servers closed on October 25, 2026, so the production build
+(`npm run client:build`) renders `index.html` as a download-only page
+(`client/download.ejs`: the itch.io embed and a notice) without the game
+scripts. Development builds still render the playable client from
+`client/main.ejs`, which the e2e suite relies on. The switch is the
+`downloadOnly` value passed to the template in `gulpfile.js`.
+
 ## Configuration and integrations
 
 Runtime behavior depends on `NODE_ENV` and, depending on the service, variables

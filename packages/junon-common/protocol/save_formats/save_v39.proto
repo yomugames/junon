@@ -239,6 +239,8 @@ message Mob {
   uint32 level = 22;
   uint32 status = 23;
   repeated string attackables = 24;
+  uint32 nameColor = 25;
+  uint32 nameSize = 26;
 }
 
 message MasterRef {

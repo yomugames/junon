@@ -1267,7 +1267,8 @@ class TeamMenu extends BaseMenu {
     let buildingName = Protocol.definition().BuildingType[activityLog.entityType]
     let friendlyBuildingName = buildingName.replace(/([A-Z])/g, ' $1').trim() // space before capital letters
 
-    let date = new Date(activityLog.timestamp)
+    // timestamp is a long (since its in uint64)
+    let date = new Date(activityLog.timestamp.toNumber())
     let formattedTime = date.toLocaleDateString() + " " + date.toLocaleTimeString()
 
     let el = "<tr class='activity_log_row'>" +
@@ -1294,7 +1295,7 @@ class TeamMenu extends BaseMenu {
   }
 
   createCommandLogEl(commandLog) {
-    let date = new Date(commandLog.timestamp)
+    let date = new Date(commandLog.timestamp.toNumber())
     let formattedTime = date.toLocaleDateString() + " " + date.toLocaleTimeString()
     let escapedCommand = ClientHelper.escapeHTML(commandLog.command)
 

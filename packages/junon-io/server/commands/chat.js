@@ -16,6 +16,11 @@ class Chat extends BaseCommand {
   allowOwnerOnly() {
     return true
   }
+  
+  isNonSandboxCommand() {
+    return true
+  }
+
 
   perform(caller, args) {
     let row

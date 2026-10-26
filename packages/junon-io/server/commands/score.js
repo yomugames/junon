@@ -17,6 +17,10 @@ class Score extends BaseCommand {
     return true
   }
 
+  isNonSandboxCommand() {
+    return true
+  }
+
   perform(caller, args) {
     let subcommand = args[0]
     const username = args[1]

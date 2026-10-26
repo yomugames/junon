@@ -15,6 +15,10 @@ class Ban extends BaseCommand {
     return true
   }
 
+  isNonSandboxCommand() {
+    return true
+  }
+
   isArgumentRequired() {
     return true
   }

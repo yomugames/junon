@@ -11,6 +11,8 @@ class Raid {
     this.sector = data.sector
 
     this.mobGroups = {}
+    this.spawnGroundTiles = []
+    this.spawnGrounds = []
     this.boss = data.boss
 
     this.applyData(data)
@@ -26,16 +28,27 @@ class Raid {
   prepare(options = {}) {
     this.isPreparing = true
 
-    if (options.row) {
+    if (options.row !== undefined && options.col !== undefined) {
       let platform = this.sector.getStandingPlatform(options.row, options.col)
       if (platform) {
-        this.spawnGround = platform
+        this.setSpawnGrounds([platform])
       }
     } else {
-      let room = this.determineSpawnRoom(this.team)
-      if (room) {
-        this.spawnGround = this.determineSpawnGround(room)
-      }
+      this.setSpawnGrounds(this.determineSpawnGrounds(this.team, this.getDesiredSpawnPointCount()))
+    }
+  }
+
+  setSpawnGrounds(grounds) {
+    this.spawnGroundTiles = grounds
+    this.spawnGrounds = grounds.map((ground) => ({
+      row: ground.getRow(),
+      col: ground.getCol()
+    }))
+    this.spawnGround = grounds[0]
+
+    if (this.spawnGround) {
+      this.spawnGroundRow = this.spawnGround.getRow()
+      this.spawnGroundCol = this.spawnGround.getCol()
     }
   }
 
@@ -98,16 +111,20 @@ class Raid {
 
     if (!this.team) return
 
-    if (data.spawnGroundRow) {
-      let ground = this.sector.groundMap.get(data.spawnGroundRow, data.spawnGroundCol)
-      if (!ground) {
-        ground = this.sector.platformMap.get(data.spawnGroundRow, data.spawnGroundCol)
+    let savedSpawnGrounds = data.spawnGrounds
+    if (!savedSpawnGrounds || savedSpawnGrounds.length === 0) {
+      if (data.spawnGroundRow !== undefined && data.spawnGroundCol !== undefined) {
+        savedSpawnGrounds = [{ row: data.spawnGroundRow, col: data.spawnGroundCol }]
+      } else {
+        savedSpawnGrounds = []
       }
-
-      this.spawnGround = ground
-      this.spawnGroundRow = data.spawnGroundRow
-      this.spawnGroundCol = data.spawnGroundCol
     }
+
+    let grounds = savedSpawnGrounds.map((spawnGround) => {
+      return this.sector.groundMap.get(spawnGround.row, spawnGround.col) ||
+        this.sector.platformMap.get(spawnGround.row, spawnGround.col)
+    }).filter(Boolean)
+    this.setSpawnGrounds(grounds)
 
     if (data.occurTimestamp) {
       this.occurTimestamp = data.occurTimestamp 
@@ -123,14 +140,46 @@ class Raid {
   }
 
   determineSpawnRoom(team) {
-    let roomList = Object.values(team.rooms)
-    let roomsSorted = roomList.filter((room) => {
+    return this.getSortedSpawnRooms(team)[0]
+  }
+
+  getSortedSpawnRooms(team) {
+    return Object.values(team.rooms).filter((room) => {
       return room.size > 0
     }).sort((room, otherRoom) => {
       return room.getRaidSpawnScore() - otherRoom.getRaidSpawnScore()
     })
+  }
 
-    return roomsSorted[0]
+  getDesiredSpawnPointCount() {
+    let daysAlive = this.team.getNumDaysAlive()
+    return Math.max(1, Math.min(4, Math.floor(daysAlive / 15) + 1))
+  }
+
+  determineSpawnGrounds(team, desiredCount) {
+    let rooms = this.getSortedSpawnRooms(team)
+    let grounds = []
+    let coordinates = {}
+    let emptyPasses = 0
+
+    while (grounds.length < desiredCount && emptyPasses < 3) {
+      let previousCount = grounds.length
+
+      for (let i = 0; i < rooms.length && grounds.length < desiredCount; i++) {
+        let ground = this.determineSpawnGround(rooms[i])
+        if (!ground) continue
+
+        let key = ground.getRow() + "-" + ground.getCol()
+        if (!coordinates[key]) {
+          coordinates[key] = true
+          grounds.push(ground)
+        }
+      }
+
+      emptyPasses = grounds.length === previousCount ? emptyPasses + 1 : 0
+    }
+
+    return grounds
   }
 
   determineSpawnGround(room) {
@@ -168,7 +217,7 @@ class Raid {
   }
 
   hasTarget() {
-    return this.spawnGround
+    return this.spawnGroundTiles.length > 0
   }
 
   static shouldExistFor(team) {
@@ -230,7 +279,7 @@ class Raid {
 
   start() {
     this.isPreparing = false
-    if (!this.spawnGround) return
+    if (this.spawnGroundTiles.length === 0) return
 
     this.spawnGroundRow = this.spawnGround.getRow()
     this.spawnGroundCol = this.spawnGround.getCol()
@@ -290,14 +339,37 @@ class Raid {
       level = Math.min(30, level)
     }
 
-    this.sector.spawnMob({
-      x: this.spawnGround.getX(),
-      y: this.spawnGround.getY(),
-      type: "Guard",
-      count: mobCount,
-      level: level,
-      raid: this,
-      ignoreLimits: true
+    this.spawnMobsAtSpawnPoints("Guard", mobCount, level)
+  }
+
+  getMobCountsPerSpawnPoint(mobCount, pointCount = this.spawnGroundTiles.length) {
+    if (pointCount === 0) return []
+
+    let baseCount = Math.floor(mobCount / pointCount)
+    let remainder = mobCount % pointCount
+
+    return Array.from({ length: pointCount }, (_, index) => {
+      return baseCount + (index < remainder ? 1 : 0)
+    })
+  }
+
+  spawnMobsAtSpawnPoints(type, mobCount, level, spawnPoints = this.spawnGroundTiles) {
+    let counts = this.getMobCountsPerSpawnPoint(mobCount, spawnPoints.length)
+
+    spawnPoints.forEach((spawnPoint, index) => {
+      if (counts[index] === 0) return
+
+      let x = spawnPoint.getX ? spawnPoint.getX() : spawnPoint.x
+      let y = spawnPoint.getY ? spawnPoint.getY() : spawnPoint.y
+      this.sector.spawnMob({
+        x: x,
+        y: y,
+        type: type,
+        count: counts[index],
+        level: level,
+        raid: this,
+        ignoreLimits: true
+      })
     })
   }
 
@@ -339,15 +411,7 @@ class Raid {
       level = Math.min(30, level)
     }
 
-    this.sector.spawnMob({
-      x: this.spawnGround.getX(),
-      y: this.spawnGround.getY(),
-      type: "Chemist",
-      level: level,
-      count: mobCount,
-      raid: this,
-      ignoreLimits: true
-    })
+    this.spawnMobsAtSpawnPoints("Chemist", mobCount, level)
   }
 
   getDesiredMobCountChemist() {
@@ -408,7 +472,7 @@ class Raid {
       return Math.min(10, count)
     }
 
-    if(this.team.getNumDaysAlive < 28) {
+    if(this.team.getNumDaysAlive() < 28) {
       return 1
     }
 
@@ -427,18 +491,17 @@ class Raid {
       level = Math.min(30, level)
     }
 
-    let row = Math.random() < 0.5 ? 1 : this.sector.getRowCount() - 1
-    let col = Math.random() < 0.5 ? 1 : this.sector.getColCount() - 1
+    let mapEdges = [
+      { x: Constants.tileSize, y: Constants.tileSize },
+      { x: Constants.tileSize, y: (this.sector.getRowCount() - 1) * Constants.tileSize },
+      { x: (this.sector.getColCount() - 1) * Constants.tileSize, y: Constants.tileSize },
+      { x: (this.sector.getColCount() - 1) * Constants.tileSize, y: (this.sector.getRowCount() - 1) * Constants.tileSize }
+    ]
+    let spawnPoints = Helper.randomIndexList(mapEdges)
+      .slice(0, this.spawnGroundTiles.length)
+      .map((index) => mapEdges[index])
 
-    this.sector.spawnMob({
-      x: col * Constants.tileSize,
-      y: row * Constants.tileSize,
-      type: "Drone",
-      level: level,
-      count: mobCount,
-      raid: this,
-      ignoreLimits: true
-    })
+    this.spawnMobsAtSpawnPoints("Drone", mobCount, level, spawnPoints)
   }
 
   spawnTrooper() {
@@ -453,15 +516,7 @@ class Raid {
       level = Math.min(30, level)
     }
 
-    this.sector.spawnMob({
-      x: this.spawnGround.getX(),
-      y: this.spawnGround.getY(),
-      type: "Trooper",
-      level: level,
-      count: mobCount,
-      raid: this,
-      ignoreLimits: true
-    })
+    this.spawnMobsAtSpawnPoints("Trooper", mobCount, level)
   }
 
   spawnSapper() {
@@ -476,14 +531,7 @@ class Raid {
       level = Math.min(30, level)
     }
 
-    this.sector.spawnMob({
-      x: this.spawnGround.getX(),
-      y: this.spawnGround.getY(),
-      type: "Sapper",
-      level: level,
-      raid: this,
-      ignoreLimits: true
-    })
+    this.spawnMobsAtSpawnPoints("Sapper", mobCount, level)
   }
 
   onRaidGoalTargetRemoved() {

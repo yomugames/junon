@@ -21,8 +21,8 @@ class Scrooge extends BaseBadge {
     }
 
     getColor() {
-        //golden yellow
-        return 'ffd700'
+        //bright yellow to avoid confusion with contrib badge
+        return 'ffff99'
     }
 }
 

@@ -33,6 +33,7 @@ const LOG = require('junon-common/logger')
 const queryString = require('querystring')
 const util = require('util')
 const User = require("junon-common/db/user")
+const ModeratorGiveableBadges = require("junon-common/moderator_giveable_badges")
 const SectorModel = require("junon-common/db/sector")
 const Favorite = require("junon-common/db/favorite")
 const IpBan = require("junon-common/db/ip_ban")
@@ -609,8 +610,14 @@ class MatchmakerServer {
           }
 
           if(!body.username) {
-            let data = { error: "Missing username of event winner."}
+            let data = { error: "Missing username."}
             res.end(JSON.stringify(data))
+            return
+          }
+
+          let badge = ModeratorGiveableBadges.find((entry) => entry.id === body.badgeId)
+          if (!badge) {
+            res.end(JSON.stringify({error: "Invalid badge."}))
             return
           }
 
@@ -624,20 +631,17 @@ class MatchmakerServer {
             return;
           }
 
-          if(!user.badges) {
-            user.badges = "ev"
-            res.end(JSON.stringify({success: body.username + " was given event badge."}))
-            return
-          }
-          if(user.badges.split(',').indexOf("ev") != -1) {
-            res.end(JSON.stringify({success: body.username + " already has the event badge"}))
+          let userBadges = user.badges ? user.badges.split(',').filter(Boolean) : []
+          if(userBadges.indexOf(badge.id) !== -1) {
+            res.end(JSON.stringify({success: body.username + " already has the " + badge.name + " badge."}))
             return
           }
 
-          user.badges += ",ev"
-          user.save();
+          userBadges.push(badge.id)
+          user.badges = userBadges.join(',')
+          await user.save()
 
-          res.end(JSON.stringify({success: body.username + " was given the event badge."}))
+          res.end(JSON.stringify({success: body.username + " was given the " + badge.name + " badge."}))
         }
         catch(e) {
           ExceptionReporter.captureException(e)
@@ -963,10 +967,13 @@ class MatchmakerServer {
       let gameServerSocket = this.gameServerSockets[server.host]
       let sectorId
 
-      if (data.isTutorial || global.isOffline) {
+      if (!data.isTutorial) {
+        uid = await this.getUidFromRequest(data.idToken, data.uid)
+      }
+
+      if (data.isTutorial || (global.isOffline && !uid)) {
         sectorId = base64id.generateId()
       } else {
-        uid = await this.getUidFromRequest(data.idToken, data.uid)
         let sectorData = {}
 
         if (data.name) {
